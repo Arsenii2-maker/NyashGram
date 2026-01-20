@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NyashGram</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- 🌸 Sidebar -->
+  <aside class="sidebar">
+    <h1>NyashGram 🐱</h1>
+
+    <div class="souls">
+      <div class="soul active">
+        <span class="dot awake"></span>
+        <p>@bestie</p>
+      </div>
+      <div class="soul">
+        <span class="dot dreaming"></span>
+        <p>@philo</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 💌 Chat Room -->
+  <main class="room">
+    <header class="room-header">
+      <h2>@bestie ✨</h2>
+      <span class="mood">mood: cozy</span>
+    </header>
+
+    <div class="whispers" id="whispers">
+      <div class="whisper incoming">приветик 🫶</div>
+      <div class="whisper outgoing">nyashgram выглядит мило</div>
+    </div>
+
+    <!-- ✍️ Input -->
+    <div class="composer">
+      <button class="purr">🎙</button>
+      <input type="text" id="input" placeholder="напиши whisper..." />
+      <button onclick="sendWhisper()">➤</button>
+    </div>
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,56 +1,304 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NyashGram</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NyashGram 🐱</title>
+
+<style>
+:root {
+  --bg: #f7f7fb;
+  --card: #ffffff;
+  --text: #111;
+  --muted: #888;
+  --accent: #ffd86b;
+  --border: #e5e5ea;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ЭКРАНЫ */
+.screen {
+  display: none;
+  height: 100vh;
+  width: 100%;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* WELCOME */
+#welcome {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+#welcome h1 {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+
+#welcome p {
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+#welcome input {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+#welcome button {
+  padding: 14px 24px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* CHATS */
+#chats {
+  flex-direction: column;
+}
+
+.topbar {
+  padding: 14px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.chat-item:hover {
+  background: #f0f0f5;
+}
+
+/* CHAT */
+#chat {
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 14px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 12px;
+  border-radius: 16px;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.me {
+  background: var(--accent);
+  margin-left: auto;
+}
+
+.other {
+  background: var(--card);
+}
+
+.input-bar {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+
+.input-bar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 16px;
+}
+
+.input-bar button {
+  border: none;
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+/* PROFILE / INFO */
+.panel {
+  flex-direction: column;
+  padding: 24px;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.panel button {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent);
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
-<!-- 🌱 Awakening -->
-<div class="awakening" id="awakening">
+<!-- WELCOME -->
+<div id="welcome" class="screen active">
   <h1>NyashGram 🐱</h1>
   <p>пробудись и выбери имя</p>
-  <input id="nickname" placeholder="@nyasha" />
-  <button onclick="awake()">✨ awaken</button>
+  <input id="nameInput" placeholder="Твоё имя">
+  <button onclick="awake()">✨ пробудиться</button>
 </div>
 
-<!-- 💌 App -->
-<div class="app hidden" id="app">
+<!-- CHATS -->
+<div id="chats" class="screen">
+  <div class="topbar">
+    <div class="avatar" onclick="openProfile()">🐱</div>
+    <div>
+      <div id="userName">—</div>
+      <div style="font-size:12px;color:var(--muted)">в сети</div>
+    </div>
+  </div>
 
-  <aside class="sidebar">
-    <h1>NyashGram</h1>
-
-    <div class="souls">
-      <div class="soul active" onclick="switchRoom('bestie')">
-        <span class="dot awake"></span>
-        <p>#bestie</p>
-      </div>
-      <div class="soul" onclick="switchRoom('philosopher')">
-        <span class="dot dreaming"></span>
-        <p>#philosopher</p>
+  <div class="chat-list">
+    <div class="chat-item" onclick="openChat()">
+      <div class="avatar">✨</div>
+      <div>
+        <div><b>#bestie</b></div>
+        <div style="font-size:13px;color:var(--muted)">эй, ты здесь?</div>
       </div>
     </div>
-  </aside>
-
-  <main class="room">
-    <header class="room-header">
-      <h2 id="roomTitle">#bestie ✨</h2>
-      <span class="mood" id="userTag"></span>
-    </header>
-
-    <div class="whispers" id="whispers"></div>
-
-    <div class="composer">
-      <button class="purr">🎙</button>
-      <input type="text" id="input" placeholder="напиши whisper..." />
-      <button onclick="sendWhisper()">➤</button>
-    </div>
-  </main>
-
+  </div>
 </div>
 
-<script src="app.js"></script>
+<!-- CHAT -->
+<div id="chat" class="screen">
+  <div class="chat-header">
+    <div class="avatar" onclick="openInfo()">✨</div>
+    <div>
+      <div><b>#bestie</b></div>
+      <div style="font-size:12px;color:var(--muted)">онлайн</div>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg other">привет 💫</div>
+  </div>
+
+  <div class="input-bar">
+    <input id="msgInput" placeholder="написать сообщение…">
+    <button onclick="send()">➤</button>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="screen panel">
+  <h2>Профиль</h2>
+  <p id="profileName"></p>
+  <button onclick="goChats()">Назад</button>
+</div>
+
+<!-- INFO -->
+<div id="info" class="screen panel">
+  <h2>#bestie</h2>
+  <p>статус: онлайн</p>
+  <button onclick="goChat()">Назад</button>
+</div>
+
+<script>
+let userName = "";
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function awake() {
+  const val = document.getElementById("nameInput").value.trim();
+  if (!val) return;
+  userName = val;
+  document.getElementById("userName").innerText = userName;
+  document.getElementById("profileName").innerText = userName;
+  show("chats");
+}
+
+function openChat() { show("chat"); }
+function goChats() { show("chats"); }
+function openProfile() { show("profile"); }
+function openInfo() { show("info"); }
+function goChat() { show("chat"); }
+
+function send() {
+  const input = document.getElementById("msgInput");
+  if (!input.value.trim()) return;
+  const msg = document.createElement("div");
+  msg.className = "msg me";
+  msg.innerText = input.value;
+  document.getElementById("messages").appendChild(msg);
+  input.value = "";
+  document.getElementById("messages").scrollTop = 999999;
+}
+</script>
+
 </body>
 </html>

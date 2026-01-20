@@ -1,329 +1,71 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NyashGram</title>
-
-<style>
-:root {
-  --accent: #ffcc33;
-  --bg: #0f0f12;
-  --panel: #18181d;
-  --text: #ffffff;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
-}
-
-.hidden { display: none; }
-
-button {
-  background: var(--accent);
-  border: none;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform .15s;
-}
-button:active { transform: scale(.96); }
-
-/* ЭКРАНЫ */
-.screen {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  animation: fade .25s ease;
-}
-
-@keyframes fade {
-  from { opacity: 0; transform: scale(.98); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* СТАРТ */
-#start {
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-}
-
-input {
-  background: #222;
-  border: none;
-  color: white;
-  padding: 12px;
-  border-radius: 10px;
-  width: 220px;
-}
-
-/* ЧАТЫ */
-#chats {
-  background: var(--panel);
-}
-
-.header {
-  padding: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #111;
-}
-
-.chat-list {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.chat {
-  padding: 14px;
-  border-bottom: 1px solid #222;
-  cursor: pointer;
-}
-.chat:hover { background: #222; }
-
-/* ЧАТ */
-#chat {
-  background-size: cover;
-  background-position: center;
-}
-
-.messages {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-.msg {
-  max-width: 70%;
-  margin-bottom: 8px;
-  padding: 8px 12px;
-  border-radius: 14px;
-  animation: pop .2s ease;
-}
-
-@keyframes pop {
-  from { transform: scale(.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.me {
-  background: var(--accent);
-  color: black;
-  margin-left: auto;
-}
-
-.other {
-  background: #2a2a2f;
-}
-
-.input-bar {
-  display: flex;
-  gap: 6px;
-  padding: 10px;
-  background: #111;
-}
-
-.input-bar input {
-  flex: 1;
-}
-
-/* ПРОФИЛЬ */
-#profile {
-  padding: 16px;
-  gap: 14px;
-}
-
-.avatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  background: #333;
-  overflow: hidden;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* НАСТРОЙКИ */
-.color-picker {
-  display: flex;
-  gap: 10px;
-}
-
-.color {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>NyashGram 🐱</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
+<body class="dark">
 
-<body>
-
-<!-- СТАРТ -->
-<div id="start" class="screen">
-  <h2>NyashGram</h2>
-  <input id="nameInput" placeholder="Твоё имя" />
-  <button onclick="enter()">Войти</button>
+<!-- ===== ЭКРАН ВХОДА ===== -->
+<div id="loginScreen" class="screen active">
+  <h1>NyashGram 🐱</h1>
+  <p>Пробудись и выбери имя</p>
+  <input id="usernameInput" placeholder="Твоё имя">
+  <button id="enterBtn">Войти</button>
 </div>
 
-<!-- ЧАТЫ -->
-<div id="chats" class="screen hidden">
-  <div class="header">
-    <b id="userName"></b>
-    <button onclick="openProfile()">Профиль</button>
+<!-- ===== ОСНОВНОЙ ЭКРАН ===== -->
+<div id="appScreen" class="screen">
+
+  <!-- ШАПКА -->
+  <header>
+    <div id="profileBtn">
+      <img id="avatarImg" src="https://via.placeholder.com/40">
+      <span id="profileName"></span>
+    </div>
+    <button id="settingsBtn">⚙️</button>
+  </header>
+
+  <!-- СПИСОК ЧАТОВ -->
+  <div id="chatList">
+    <div class="chat active">#bestie ✨</div>
   </div>
-  <div class="chat-list">
-    <div class="chat" onclick="openChat()">bestie 💬</div>
+
+  <!-- ЧАТ -->
+  <div id="chat">
+    <div id="messages"></div>
+
+    <div id="inputBar">
+      <input id="messageInput" placeholder="Сообщение...">
+      <button id="photoBtn">📷</button>
+      <button id="voiceBtn">🎤</button>
+      <button id="sendBtn">➡️</button>
+    </div>
   </div>
 </div>
 
-<!-- ЧАТ -->
-<div id="chat" class="screen hidden">
-  <div class="header">
-    <button onclick="backToChats()">←</button>
-    <b>bestie</b>
-  </div>
-
-  <div class="messages" id="messages"></div>
-
-  <div class="input-bar">
-    <button onclick="sendImage()">📷</button>
-    <button id="recBtn">🎙</button>
-    <input id="msgInput" placeholder="Сообщение..." />
-    <button onclick="sendMsg()">➤</button>
-  </div>
-</div>
-
-<!-- ПРОФИЛЬ -->
-<div id="profile" class="screen hidden">
-  <div class="header">
-    <button onclick="backToChats()">←</button>
-    <b>Профиль</b>
-  </div>
-
-  <div class="avatar">
-    <img id="avatarImg" />
-  </div>
-  <input type="file" accept="image/*" onchange="setAvatar(this)" />
-
-  <button onclick="openSettings()">Настройки</button>
-</div>
-
-<!-- НАСТРОЙКИ -->
-<div id="settings" class="screen hidden">
-  <div class="header">
-    <button onclick="openProfile()">←</button>
-    <b>Кастомизация</b>
-  </div>
+<!-- ===== НАСТРОЙКИ / КАСТОМИЗАЦИЯ ===== -->
+<div id="settingsScreen" class="modal">
+  <h2>Кастомизация</h2>
 
   <p>Цвет кнопок</p>
-  <div class="color-picker">
-    <div class="color" style="background:#ffcc33" onclick="setColor('#ffcc33')"></div>
-    <div class="color" style="background:#ff66cc" onclick="setColor('#ff66cc')"></div>
-<div class="color" style="background:#66ffcc" onclick="setColor('#66ffcc')"></div>
-  </div>
+  <input type="color" id="accentColor">
+
+  <p>Тема</p>
+  <button id="lightTheme">🌕 Светлая</button>
+  <button id="darkTheme">🌑 Тёмная</button>
 
   <p>Обои чата</p>
-  <input type="file" accept="image/*" onchange="setWallpaper(this)" />
+  <input type="file" id="bgInput">
+
+  <p>Аватар</p>
+  <input type="file" id="avatarInput">
+
+  <button id="closeSettings">Готово</button>
 </div>
 
-<script>
-let recorder, chunks = [];
-
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-}
-
-function enter() {
-  const name = nameInput.value.trim();
-  if (!name) return;
-  userName.textContent = name;
-  show('chats');
-}
-
-function openChat() { show('chat'); }
-function backToChats() { show('chats'); }
-function openProfile() { show('profile'); }
-function openSettings() { show('settings'); }
-
-function sendMsg() {
-  const text = msgInput.value;
-  if (!text) return;
-  addMsg(text, 'me');
-  msgInput.value = '';
-}
-
-function addMsg(content, cls) {
-  const div = document.createElement('div');
-  div.className = 'msg ' + cls;
-  div.innerHTML = content;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function sendImage() {
-  const i = document.createElement('input');
-  i.type = 'file';
-  i.accept = 'image/*';
-  i.onchange = () => {
-    const img = URL.createObjectURL(i.files[0]);
-    addMsg(`<img src="${img}" style="max-width:100%;border-radius:10px">`, 'me');
-  };
-  i.click();
-}
-
-/* ГОЛОСОВЫЕ */
-recBtn.onclick = async () => {
-  if (!recorder) {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    recorder = new MediaRecorder(stream);
-    recorder.ondataavailable = e => chunks.push(e.data);
-    recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'audio/webm' });
-      chunks = [];
-      const url = URL.createObjectURL(blob);
-      addMsg(`<audio controls src="${url}"></audio>`, 'me');
-    };
-    recorder.start();
-    recBtn.textContent = '⏹';
-  } else {
-    recorder.stop();
-    recorder = null;
-    recBtn.textContent = '🎙';
-  }
-};
-
-function setAvatar(input) {
-  avatarImg.src = URL.createObjectURL(input.files[0]);
-}
-
-function setColor(c) {
-  document.documentElement.style.setProperty('--accent', c);
-}
-
-function setWallpaper(input) {
-  const url = URL.createObjectURL(input.files[0]);
-  document.getElementById('chat').style.backgroundImage = url(${url});
-}
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>

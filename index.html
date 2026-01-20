@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NyashGram 🐱</title>
 
 <style>
 :root {
+  --accent: #ffd86b;
   --bg: #f7f7fb;
   --card: #ffffff;
   --text: #111;
   --muted: #888;
-  --accent: #ffd86b;
   --border: #e5e5ea;
+  --wallpaper: none;
 }
 
 * {
@@ -26,7 +27,6 @@ body {
   color: var(--text);
 }
 
-/* ЭКРАНЫ */
 .screen {
   display: none;
   height: 100vh;
@@ -37,7 +37,6 @@ body {
   display: flex;
 }
 
-/* WELCOME */
 #welcome {
   flex-direction: column;
   justify-content: center;
@@ -48,36 +47,23 @@ body {
 
 #welcome h1 {
   font-size: 42px;
-  margin-bottom: 8px;
-}
-
-#welcome p {
-  color: var(--muted);
-  margin-bottom: 24px;
 }
 
 #welcome input {
   width: 100%;
   max-width: 320px;
   padding: 14px;
-  font-size: 16px;
   border-radius: 12px;
   border: 1px solid var(--border);
   margin-bottom: 12px;
 }
 
-#welcome button {
-  padding: 14px 24px;
-  border-radius: 999px;
-  border: none;
+button {
   background: var(--accent);
-  font-size: 16px;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
   cursor: pointer;
-}
-
-/* CHATS */
-#chats {
-  flex-direction: column;
 }
 
 .topbar {
@@ -90,20 +76,25 @@ body {
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  background: var(--accent);
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  overflow: hidden;
   cursor: pointer;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .chat-list {
   flex: 1;
-  overflow-y: auto;
 }
 
 .chat-item {
@@ -114,22 +105,10 @@ body {
   cursor: pointer;
 }
 
-.chat-item:hover {
-  background: #f0f0f5;
-}
-
-/* CHAT */
 #chat {
   flex-direction: column;
-}
-
-.chat-header {
-  padding: 14px;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background: var(--wallpaper), var(--bg);
+  background-size: cover;
 }
 
 .messages {
@@ -143,7 +122,6 @@ body {
   padding: 12px;
   border-radius: 16px;
   margin-bottom: 10px;
-  line-height: 1.3;
 }
 
 .me {
@@ -159,7 +137,6 @@ body {
   padding: 12px;
   display: flex;
   gap: 8px;
-  border-top: 1px solid var(--border);
   background: var(--card);
 }
 
@@ -168,54 +145,37 @@ body {
   padding: 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  font-size: 16px;
 }
 
-.input-bar button {
-  border: none;
-  background: var(--accent);
-  border-radius: 999px;
-  padding: 12px 16px;
-  cursor: pointer;
-}
-
-/* PROFILE / INFO */
 .panel {
   flex-direction: column;
   padding: 24px;
+  gap: 16px;
 }
 
-.panel h2 {
-  margin-top: 0;
-}
-
-.panel button {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: var(--accent);
-  cursor: pointer;
+.settings-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- WELCOME -->
 <div id="welcome" class="screen active">
   <h1>NyashGram 🐱</h1>
-  <p>пробудись и выбери имя</p>
   <input id="nameInput" placeholder="Твоё имя">
   <button onclick="awake()">✨ пробудиться</button>
 </div>
 
-<!-- CHATS -->
 <div id="chats" class="screen">
   <div class="topbar">
-    <div class="avatar" onclick="openProfile()">🐱</div>
+    <div class="avatar" onclick="openProfile()">
+      <img id="avatarImg">
+    </div>
     <div>
-      <div id="userName">—</div>
+      <b id="userName"></b>
       <div style="font-size:12px;color:var(--muted)">в сети</div>
     </div>
   </div>
@@ -224,21 +184,17 @@ body {
     <div class="chat-item" onclick="openChat()">
       <div class="avatar">✨</div>
       <div>
-        <div><b>#bestie</b></div>
-        <div style="font-size:13px;color:var(--muted)">эй, ты здесь?</div>
+        <b>#bestie</b>
+        <div style="font-size:13px;color:var(--muted)">онлайн</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- CHAT -->
 <div id="chat" class="screen">
-  <div class="chat-header">
-    <div class="avatar" onclick="openInfo()">✨</div>
-    <div>
-      <div><b>#bestie</b></div>
-      <div style="font-size:12px;color:var(--muted)">онлайн</div>
-    </div>
+  <div class="topbar">
+    <button onclick="goChats()">←</button>
+    <b>#bestie</b>
   </div>
 
   <div class="messages" id="messages">
@@ -251,52 +207,108 @@ body {
   </div>
 </div>
 
-<!-- PROFILE -->
 <div id="profile" class="screen panel">
-  <h2>Профиль</h2>
-  <p id="profileName"></p>
-  <button onclick="goChats()">Назад</button>
+  <div class="avatar" onclick="pickAvatar()" style="width:80px;height:80px">
+    <img id="profileAvatar">
+  </div>
+
+  <b id="profileName"></b>
+
+  <button onclick="openSettings()">⚙️ настройки</button>
+  <button onclick="goChats()">назад</button>
 </div>
 
-<!-- INFO -->
-<div id="info" class="screen panel">
-  <h2>#bestie</h2>
-  <p>статус: онлайн</p>
-  <button onclick="goChat()">Назад</button>
-</div>
+<div id="settings" class="screen panel">
+  <h2>Настройки</h2>
+
+  <div class="settings-item">
+    <label>Цвет кнопок</label>
+    <input type="color" onchange="setAccent(this.value)">
+  </div>
+
+  <div class="settings-item">
+    <label>Обои чата</label>
+    <input type="file" accept="image/*" onchange="setWallpaper(event)">
+  </div>
+
+  <button onclick="openProfile()">назад</button>
+  </div>
+
+<input type="file" id="avatarInput" accept="image/*" hidden>
 
 <script>
-let userName = "";
+const screens = document.querySelectorAll(".screen");
+const avatarInput = document.getElementById("avatarInput");
 
 function show(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  screens.forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
 function awake() {
-  const val = document.getElementById("nameInput").value.trim();
-  if (!val) return;
-  userName = val;
-  document.getElementById("userName").innerText = userName;
-  document.getElementById("profileName").innerText = userName;
+  const name = nameInput.value.trim();
+  if (!name) return;
+  userName.innerText = name;
+  profileName.innerText = name;
+  loadSettings();
   show("chats");
 }
 
 function openChat() { show("chat"); }
 function goChats() { show("chats"); }
 function openProfile() { show("profile"); }
-function openInfo() { show("info"); }
-function goChat() { show("chat"); }
+function openSettings() { show("settings"); }
 
 function send() {
-  const input = document.getElementById("msgInput");
-  if (!input.value.trim()) return;
-  const msg = document.createElement("div");
-  msg.className = "msg me";
-  msg.innerText = input.value;
-  document.getElementById("messages").appendChild(msg);
-  input.value = "";
-  document.getElementById("messages").scrollTop = 999999;
+  const text = msgInput.value.trim();
+  if (!text) return;
+  const m = document.createElement("div");
+  m.className = "msg me";
+  m.innerText = text;
+  messages.appendChild(m);
+  msgInput.value = "";
+}
+
+function pickAvatar() {
+  avatarInput.click();
+}
+
+avatarInput.onchange = e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    localStorage.avatar = reader.result;
+    updateAvatar();
+  };
+  reader.readAsDataURL(file);
+};
+
+function updateAvatar() {
+  if (localStorage.avatar) {
+    avatarImg.src = localStorage.avatar;
+    profileAvatar.src = localStorage.avatar;
+  }
+}
+
+function setAccent(color) {
+  document.documentElement.style.setProperty("--accent", color);
+  localStorage.accent = color;
+}
+
+function setWallpaper(e) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.documentElement.style.setProperty("--wallpaper", `url(${reader.result})`);
+    localStorage.wallpaper = reader.result;
+  };
+  reader.readAsDataURL(e.target.files[0]);
+}
+
+function loadSettings() {
+  if (localStorage.accent) setAccent(localStorage.accent);
+  if (localStorage.wallpaper)
+    document.documentElement.style.setProperty("--wallpaper", `url(${localStorage.wallpaper})`);
+  updateAvatar();
 }
 </script>
 

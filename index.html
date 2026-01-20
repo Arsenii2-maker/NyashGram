@@ -3,23 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <title>NyashGram 🐱</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- КРИТИЧНО для мобильных -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark">
 
-<!-- ===== ЭКРАН ВХОДА ===== -->
 <div id="loginScreen" class="screen active">
   <h1>NyashGram 🐱</h1>
   <p>Пробудись и выбери имя</p>
-  <input id="usernameInput" placeholder="Твоё имя">
+
+  <input
+    id="usernameInput"
+    placeholder="Твоё имя"
+    inputmode="text"
+  >
+
   <button id="enterBtn">Войти</button>
 </div>
 
-<!-- ===== ОСНОВНОЙ ЭКРАН ===== -->
 <div id="appScreen" class="screen">
-
-  <!-- ШАПКА -->
   <header>
     <div id="profileBtn">
       <img id="avatarImg" src="https://via.placeholder.com/40">
@@ -28,25 +34,16 @@
     <button id="settingsBtn">⚙️</button>
   </header>
 
-  <!-- СПИСОК ЧАТОВ -->
-  <div id="chatList">
-    <div class="chat active">#bestie ✨</div>
-  </div>
-
-  <!-- ЧАТ -->
   <div id="chat">
     <div id="messages"></div>
 
     <div id="inputBar">
       <input id="messageInput" placeholder="Сообщение...">
-      <button id="photoBtn">📷</button>
-      <button id="voiceBtn">🎤</button>
       <button id="sendBtn">➡️</button>
     </div>
   </div>
 </div>
 
-<!-- ===== НАСТРОЙКИ / КАСТОМИЗАЦИЯ ===== -->
 <div id="settingsScreen" class="modal">
   <h2>Кастомизация</h2>
 
@@ -56,9 +53,6 @@
   <p>Тема</p>
   <button id="lightTheme">🌕 Светлая</button>
   <button id="darkTheme">🌑 Тёмная</button>
-
-  <p>Обои чата</p>
-  <input type="file" id="bgInput">
 
   <p>Аватар</p>
   <input type="file" id="avatarInput">

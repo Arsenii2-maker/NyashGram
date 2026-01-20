@@ -5,6 +5,7 @@
 
 body {
   margin: 0;
+  overflow: hidden;
   transition: background 0.3s;
 }
 
@@ -20,30 +21,31 @@ body.light {
 
 .screen {
   display: none;
-  height: 100vh;
+  height: 100%;
 }
 
 .screen.active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  padding-top: 15vh; /* ВАЖНО */
 }
 
 #loginScreen input {
-  padding: 12px;
-  margin: 10px;
-  border-radius: 12px;
+  font-size: 16px; /* КРИТИЧНО */
+  padding: 14px;
+  margin: 12px 0;
+  width: 240px;
+  border-radius: 14px;
   border: none;
-  width: 220px;
 }
 
 button {
-  padding: 12px 18px;
-  border-radius: 14px;
+  font-size: 16px;
+  padding: 14px 20px;
+  border-radius: 16px;
   border: none;
   background: var(--accent, #ffd54a);
-  cursor: pointer;
 }
 
 header {
@@ -51,19 +53,6 @@ header {
   padding: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-#profileBtn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-#profileBtn img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
 }
 
 #chat {
@@ -71,7 +60,6 @@ header {
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-size: cover;
 }
 
 #messages {
@@ -81,41 +69,35 @@ header {
 }
 
 .message {
-  background: rgba(255,255,255,0.1);
-  padding: 8px 12px;
+  background: rgba(255,255,255,0.12);
+  padding: 10px;
   border-radius: 12px;
   margin-bottom: 6px;
-  animation: fadeIn 0.2s;
 }
 
 #inputBar {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   padding: 10px;
 }
 
 #inputBar input {
+  font-size: 16px;
   flex: 1;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 14px;
   border: none;
 }
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.9);
   display: none;
   flex-direction: column;
   padding: 20px;
-  gap: 10px;
 }
 
 .modal.active {
   display: flex;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; }
 }

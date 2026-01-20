@@ -1,3 +1,4 @@
+> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,8 +10,9 @@
 :root {
   --accent: #ffd43b;
   --bg: #0f0f10;
-  --card: #1a1a1d;
-  --text: #ffffff;
+  --card: #1c1c1f;
+  --me: #ffd43b;
+  --other: #2a2a2e;
 }
 
 * {
@@ -21,7 +23,7 @@
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
+  color: white;
   height: 100vh;
   overflow: hidden;
 }
@@ -29,18 +31,28 @@ body {
 .screen {
   position: absolute;
   inset: 0;
-  padding: 24px;
   display: none;
   flex-direction: column;
-  justify-content: center;
+  transition: opacity .3s ease, transform .3s ease;
 }
 
 .screen.active {
   display: flex;
 }
 
-h1, h2 {
-  margin-bottom: 16px;
+.fade {
+  animation: fade .35s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- LOGIN --- */
+#login {
+  justify-content: center;
+  padding: 24px;
 }
 
 input {
@@ -48,10 +60,9 @@ input {
   border-radius: 14px;
   border: none;
   background: var(--card);
-  color: var(--text);
-  font-size: 16px;
-  outline: none;
+  color: white;
   margin-bottom: 12px;
+  font-size: 16px;
 }
 
 button {
@@ -59,12 +70,18 @@ button {
   border-radius: 14px;
   border: none;
   background: var(--accent);
-  font-size: 16px;
   font-weight: 600;
 }
 
+/* --- CHAT --- */
 #chat {
-  justify-content: space-between;
+  padding: 16px;
+}
+
+.header {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .messages {
@@ -76,111 +93,143 @@ button {
   max-width: 75%;
   margin-bottom: 10px;
   padding: 12px;
-  border-radius: 14px;
+  border-radius: 16px;
+  animation: fade .25s ease;
 }
 
 .me {
-  background: var(--accent);
-  color: #000;
+  background: var(--me);
+  color: black;
   margin-left: auto;
 }
 
 .other {
-  background: var(--card);
+  background: var(--other);
 }
 
-.input-bar {
+.controls {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
-.input-bar input {
+.controls input[type="text"] {
   flex: 1;
+}
+
+.icon-btn {
+  width: 44px;
+  background: var(--card);
+  font-size: 18px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ЭКРАН 1 -->
-<div id="phone" class="screen active">
+<!-- LOGIN -->
+<div id="login" class="screen active fade">
   <h1>NyashGram 🐱</h1>
-  <input id="phoneInput" placeholder="+7 _ _ __ __">
-  <button id="sendCodeBtn">Получить код</button>
+  <input id="phone" placeholder="+7 _ _ __ __">
+  <button id="loginBtn">Войти</button>
 </div>
 
-<!-- ЭКРАН 2 -->
-<div id="code" class="screen">
-  <h2>Введите код</h2>
-  <input id="codeInput" placeholder="123456">
-  <button id="verifyBtn">Войти</button>
-</div>
+<!-- CHAT -->
+<div id="chat" class="screen fade">
+  <div class="header">💛 Bestie Mode</div>
 
-<!-- ЭКРАН 3 -->
-<div id="chat" class="screen">
-  <div class="messages" id="messages"></div>
-  <div class="input-bar">
-    <input id="msgInput" placeholder="Сообщение…">
-    <button id="sendMsgBtn">➤</button>
+  <div id="messages" class="messages"></div>
+
+  <div class="controls">
+    <input id="text" type="text" placeholder="Напиши что-нибудь…">
+    <input id="photo" type="file" accept="image/*" hidden>
+    <button class="icon-btn" id="photoBtn">🖼</button>
+    <button class="icon-btn" id="voiceBtn">🎤</button>
+    <button class="icon-btn" id="sendBtn">➤</button>
   </div>
 </div>
 
 <script>
-let current = "phone";
+const login = document.getElementById("login");
+const chat = document.getElementById("chat");
+const messages = document.getElementById("messages");
 
-function show(id) {
-  document.getElementById(current).classList.remove("active");
-  current = id;
-  document.getElementById(id).classList.add("active");
-}
+document.getElementById("loginBtn").addEventListener("click", () => {
+  if (!phone.value.trim()) return alert("Введите номер 😿");
+  login.classList.remove("active");
+  chat.classList.add("active");
+});
 
-/* === КНОПКИ === */
-const sendCodeBtn = document.getElementById("sendCodeBtn");
-const verifyBtn = document.getElementById("verifyBtn");
-const sendMsgBtn = document.getElementById("sendMsgBtn");
+document.getElementById("sendBtn").addEventListener("click", sendText);
+document.getElementById("sendBtn").addEventListener("touchstart", sendText);
 
-/* iOS FIX: click + touchstart */
-sendCodeBtn.addEventListener("click", sendCode);
-sendCodeBtn.addEventListener("touchstart", sendCode);
-
-verifyBtn.addEventListener("click", verifyCode);
-verifyBtn.addEventListener("touchstart", verifyCode);
-
-sendMsgBtn.addEventListener("click", sendMsg);
-sendMsgBtn.addEventListener("touchstart", sendMsg);
-
-/* === ЛОГИКА === */
-function sendCode(e) {
-  e.preventDefault();
-  if (!phoneInput.value.trim()) {
-    alert("Введите номер 😿");
-    return;
-  }
-  show("code");
-}
-
-function verifyCode(e) {
-  e.preventDefault();
-  if (codeInput.value === "123456") {
-    show("chat");
-  } else {
-    alert("Неверный код 😿");
-  }
-}
-
-function sendMsg(e) {
-  e.preventDefault();
-  const text = msgInput.value.trim();
-  if (!text) return;
-
-  addMsg(text, "me");
-  msgInput.value = "";
+function sendText() {
+  if (!text.value.trim()) return;
+  addMsg(text.value, "me");
+  text.value = "";
 
   setTimeout(() => {
-    addMsg("ня~ я тут 🐾", "other");
-  }, 500);
+    addMsg("я рядом, bestie 💛", "other");
+  }, 600);
 }
 
+/* --- PHOTO --- */
+photoBtn.onclick = () => photo.click();
+
+photo.onchange = () => {
+  const file = photo.files[0];
+  if (!file) return;
+
+  const img = document.createElement("img");
+  img.src = URL.createObjectURL(file);
+  img.style.maxWidth = "100%";
+  img.style.borderRadius = "12px";
+
+  const div = document.createElement("div");
+  div.className = "msg me";
+  div.appendChild(img);
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+};
+
+/* --- VOICE --- */
+let recorder, chunks = [];
+
+voiceBtn.addEventListener("touchstart", startRec);
+voiceBtn.addEventListener("mousedown", startRec);
+voiceBtn.addEventListener("touchend", stopRec);
+voiceBtn.addEventListener("mouseup", stopRec);
+
+async function startRec(e) {
+  e.preventDefault();
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  recorder = new MediaRecorder(stream);
+  chunks = [];
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.start();
+
+> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
+voiceBtn.textContent = "⏺";
+}
+
+function stopRec() {
+  if (!recorder) return;
+  recorder.stop();
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: "audio/webm" });
+    const audio = document.createElement("audio");
+    audio.src = URL.createObjectURL(blob);
+    audio.controls = true;
+
+    const div = document.createElement("div");
+    div.className = "msg me";
+    div.appendChild(audio);
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  };
+  voiceBtn.textContent = "🎤";
+}
+
+/* --- UTIL --- */
 function addMsg(text, who) {
   const div = document.createElement("div");
   div.className = "msg " + who;
@@ -190,7 +239,5 @@ function addMsg(text, who) {
 }
 </script>
 
-</body>
-</html>
 </body>
 </html>

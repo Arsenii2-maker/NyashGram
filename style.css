@@ -1,0 +1,116 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: #f5f3ff;
+  height: 100vh;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* 🌸 Sidebar */
+.sidebar {
+  width: 260px;
+  background: #ede9fe;
+  padding: 20px;
+}
+
+.sidebar h1 {
+  margin-bottom: 20px;
+}
+
+.souls .soul {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.soul.active {
+  background: #ddd6fe;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.awake { background: #22c55e; }
+.dreaming { background: #94a3b8; }
+
+/* 💌 Room */
+.room {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-header {
+  padding: 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.whispers {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.whisper {
+  max-width: 70%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+}
+
+.incoming {
+  background: #e0e7ff;
+}
+
+.outgoing {
+  background: #c7d2fe;
+  margin-left: auto;
+}
+
+/* ✍️ Composer */
+.composer {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+  background: #fafafa;
+}
+
+.composer input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+}
+
+.composer button {
+  border: none;
+  background: #a78bfa;
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

@@ -1,131 +1,102 @@
+> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NyashGram 🐱</title>
+<title>NyashGram</title>
 
 <style>
 :root {
-  --accent: #ffd86b;
-  --bg: #f7f7fb;
-  --card: #ffffff;
-  --text: #111;
-  --muted: #888;
-  --border: #e5e5ea;
-  --wallpaper: none;
+  --accent: #ffd43b;
+  --bg: #0f0f10;
+  --card: #1a1a1d;
+  --text: #ffffff;
+  --muted: #9a9a9a;
 }
 
 * {
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  overflow: hidden;
 }
 
 .screen {
+  position: absolute;
+  inset: 0;
+  padding: 24px;
   display: none;
-  height: 100vh;
-  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: 0.35s ease;
 }
 
 .screen.active {
   display: flex;
+  opacity: 1;
+  transform: translateY(0);
 }
 
-#welcome {
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 24px;
-  text-align: center;
+h1, h2 {
+  margin-bottom: 16px;
 }
 
-#welcome h1 {
-  font-size: 42px;
-}
-
-#welcome input {
-  width: 100%;
-  max-width: 320px;
+input {
   padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  border-radius: 14px;
+  border: none;
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
   margin-bottom: 12px;
 }
 
 button {
-  background: var(--accent);
+  padding: 14px;
+  border-radius: 14px;
   border: none;
-  border-radius: 999px;
-  padding: 12px 20px;
-  cursor: pointer;
-}
-
-.topbar {
-  padding: 14px;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
   background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.15s;
 }
 
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+button:active {
+  transform: scale(0.96);
 }
 
-.chat-list {
-  flex: 1;
-}
-
-.chat-item {
-  padding: 14px;
-  display: flex;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-
+/* ЧАТ */
 #chat {
-  flex-direction: column;
-  background: var(--wallpaper), var(--bg);
-  background-size: cover;
+  justify-content: space-between;
 }
 
 .messages {
   flex: 1;
-  padding: 16px;
   overflow-y: auto;
+  padding-bottom: 10px;
 }
 
 .msg {
-  max-width: 70%;
-  padding: 12px;
-  border-radius: 16px;
+  max-width: 75%;
   margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  animation: appear 0.3s ease;
 }
 
 .me {
   background: var(--accent);
+  color: #000;
   margin-left: auto;
 }
 
@@ -134,181 +105,148 @@ button {
 }
 
 .input-bar {
-  padding: 12px;
   display: flex;
   gap: 8px;
-  background: var(--card);
 }
 
 .input-bar input {
   flex: 1;
-  padding: 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
 }
 
-.panel {
-  flex-direction: column;
-  padding: 24px;
-  gap: 16px;
+/* ГОЛОСОВЫЕ */
+.voice-btn {
+  background: var(--card);
+  width: 52px;
+  border-radius: 50%;
+  font-size: 20px;
 }
 
-.settings-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* АНИМАЦИИ */
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="welcome" class="screen active">
+<!-- 📱 ВВОД ТЕЛЕФОНА -->
+<div id="phone" class="screen active">
   <h1>NyashGram 🐱</h1>
-  <input id="nameInput" placeholder="Твоё имя">
-  <button onclick="awake()">✨ пробудиться</button>
+  <p>Введите номер телефона</p>
+  <input id="phoneInput" placeholder="+7 _ _ __ __">
+  <button onclick="sendCode()">Получить код</button>
 </div>
 
-<div id="chats" class="screen">
-  <div class="topbar">
-    <div class="avatar" onclick="openProfile()">
-      <img id="avatarImg">
-    </div>
-    <div>
-      <b id="userName"></b>
-      <div style="font-size:12px;color:var(--muted)">в сети</div>
-    </div>
-  </div>
-
-  <div class="chat-list">
-    <div class="chat-item" onclick="openChat()">
-      <div class="avatar">✨</div>
-      <div>
-        <b>#bestie</b>
-        <div style="font-size:13px;color:var(--muted)">онлайн</div>
-      </div>
-    </div>
-  </div>
+<!-- 🔐 КОД -->
+<div id="code" class="screen">
+  <h2>Код из SMS</h2>
+  <input id="codeInput" placeholder="123456">
+  <button onclick="verifyCode()">Войти</button>
 </div>
 
+<!-- 💬 ЧАТ -->
 <div id="chat" class="screen">
-  <div class="topbar">
-    <button onclick="goChats()">←</button>
-    <b>#bestie</b>
-  </div>
-
-  <div class="messages" id="messages">
-    <div class="msg other">привет 💫</div>
-  </div>
+  <div class="messages" id="messages"></div>
 
   <div class="input-bar">
-    <input id="msgInput" placeholder="написать сообщение…">
-    <button onclick="send()">➤</button>
+    <input id="msgInput" placeholder="Сообщение…">
+    <button onclick="sendMsg()">➤</button>
+    <button class="voice-btn" id="voiceBtn">🎙</button>
   </div>
 </div>
-
-<div id="profile" class="screen panel">
-  <div class="avatar" onclick="pickAvatar()" style="width:80px;height:80px">
-    <img id="profileAvatar">
-  </div>
-
-  <b id="profileName"></b>
-
-  <button onclick="openSettings()">⚙️ настройки</button>
-  <button onclick="goChats()">назад</button>
-</div>
-
-<div id="settings" class="screen panel">
-  <h2>Настройки</h2>
-
-  <div class="settings-item">
-    <label>Цвет кнопок</label>
-    <input type="color" onchange="setAccent(this.value)">
-  </div>
-
-  <div class="settings-item">
-    <label>Обои чата</label>
-    <input type="file" accept="image/*" onchange="setWallpaper(event)">
-  </div>
-
-  <button onclick="openProfile()">назад</button>
-  </div>
-
-<input type="file" id="avatarInput" accept="image/*" hidden>
 
 <script>
-const screens = document.querySelectorAll(".screen");
-const avatarInput = document.getElementById("avatarInput");
+let currentScreen = "phone";
+let recorder;
+let audioChunks = [];
 
 function show(id) {
-  screens.forEach(s => s.classList.remove("active"));
+  document.getElementById(currentScreen).classList.remove("active");
+  currentScreen = id;
   document.getElementById(id).classList.add("active");
 }
 
-function awake() {
-  const name = nameInput.value.trim();
-  if (!name) return;
-  userName.innerText = name;
-  profileName.innerText = name;
-  loadSettings();
-  show("chats");
+/* 📱 ФЕЙКОВАЯ SMS */
+function sendCode() {
+  if (!phoneInput.value) return alert("Введите номер 😿");
+  show("code");
 }
 
-function openChat() { show("chat"); }
-function goChats() { show("chats"); }
-function openProfile() { show("profile"); }
-function openSettings() { show("settings"); }
-
-function send() {
-  const text = msgInput.value.trim();
-  if (!text) return;
-  const m = document.createElement("div");
-  m.className = "msg me";
-  m.innerText = text;
-  messages.appendChild(m);
-  msgInput.value = "";
-}
-
-function pickAvatar() {
-  avatarInput.click();
-}
-
-avatarInput.onchange = e => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = () => {
-    localStorage.avatar = reader.result;
-    updateAvatar();
-  };
-  reader.readAsDataURL(file);
-};
-
-function updateAvatar() {
-  if (localStorage.avatar) {
-    avatarImg.src = localStorage.avatar;
-    profileAvatar.src = localStorage.avatar;
+function verifyCode() {
+  if (codeInput.value === "123456") {
+    show("chat");
+  } else {
+    alert("Неверный код 😿");
   }
 }
 
-function setAccent(color) {
-  document.documentElement.style.setProperty("--accent", color);
-  localStorage.accent = color;
+/* 💬 СООБЩЕНИЯ */
+function sendMsg() {
+  const text = msgInput.value.trim();
+  if (!text) return;
+  addMsg(text, "me");
+  msgInput.value = "";
+
+  setTimeout(() => {
+    addMsg("ня~ я тебя слышу 🐾", "other");
+  }, 600);
 }
 
-function setWallpaper(e) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    document.documentElement.style.setProperty("--wallpaper", `url(${reader.result})`);
-    localStorage.wallpaper = reader.result;
+function addMsg(text, who) {
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+/* 🎤 ГОЛОСОВЫЕ */
+const voiceBtn = document.getElementById("voiceBtn");
+
+voiceBtn.addEventListener("touchstart", startRec);
+voiceBtn.addEventListener("mousedown", startRec);
+voiceBtn.addEventListener("touchend", stopRec);
+voiceBtn.addEventListener("mouseup", stopRec);
+
+async function startRec(e) {
+  e.preventDefault();
+  audioChunks = [];
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = e => audioChunks.push(e.data);
+  recorder.
+
+> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
+start();
+  voiceBtn.textContent = "⏺";
+}
+
+function stopRec(e) {
+  if (!recorder) return;
+  recorder.stop();
+  recorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: "audio/webm" });
+    const url = URL.createObjectURL(blob);
+
+    const audio = document.createElement("audio");
+    audio.src = url;
+    audio.controls = true;
+
+    const div = document.createElement("div");
+    div.className = "msg me";
+    div.appendChild(audio);
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
   };
-  reader.readAsDataURL(e.target.files[0]);
-}
-
-function loadSettings() {
-  if (localStorage.accent) setAccent(localStorage.accent);
-  if (localStorage.wallpaper)
-    document.documentElement.style.setProperty("--wallpaper", `url(${localStorage.wallpaper})`);
-  updateAvatar();
+  voiceBtn.textContent = "🎙";
 }
 </script>
 

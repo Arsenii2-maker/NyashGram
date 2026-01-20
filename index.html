@@ -2,43 +2,46 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="app">
+<!-- 🌱 Awakening -->
+<div class="awakening" id="awakening">
+  <h1>NyashGram 🐱</h1>
+  <p>пробудись и выбери имя</p>
+  <input id="nickname" placeholder="@nyasha" />
+  <button onclick="awake()">✨ awaken</button>
+</div>
 
-  <!-- 🌸 Sidebar -->
+<!-- 💌 App -->
+<div class="app hidden" id="app">
+
   <aside class="sidebar">
-    <h1>NyashGram 🐱</h1>
+    <h1>NyashGram</h1>
 
     <div class="souls">
-      <div class="soul active">
+      <div class="soul active" onclick="switchRoom('bestie')">
         <span class="dot awake"></span>
-        <p>@bestie</p>
+        <p>#bestie</p>
       </div>
-      <div class="soul">
+      <div class="soul" onclick="switchRoom('philosopher')">
         <span class="dot dreaming"></span>
-        <p>@philo</p>
+        <p>#philosopher</p>
       </div>
     </div>
   </aside>
 
-  <!-- 💌 Chat Room -->
   <main class="room">
     <header class="room-header">
-      <h2>@bestie ✨</h2>
-      <span class="mood">mood: cozy</span>
+      <h2 id="roomTitle">#bestie ✨</h2>
+      <span class="mood" id="userTag"></span>
     </header>
 
-    <div class="whispers" id="whispers">
-      <div class="whisper incoming">приветик 🫶</div>
-      <div class="whisper outgoing">nyashgram выглядит мило</div>
-    </div>
+    <div class="whispers" id="whispers"></div>
 
-    <!-- ✍️ Input -->
     <div class="composer">
       <button class="purr">🎙</button>
       <input type="text" id="input" placeholder="напиши whisper..." />

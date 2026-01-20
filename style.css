@@ -10,23 +10,48 @@ body {
   height: 100vh;
 }
 
+.hidden {
+  display: none;
+}
+
+/* 🌱 Awakening */
+.awakening {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.awakening input {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+}
+
+.awakening button {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background: #a78bfa;
+  color: white;
+}
+
+/* 🌸 App */
 .app {
   display: flex;
   height: 100vh;
 }
 
-/* 🌸 Sidebar */
 .sidebar {
-  width: 260px;
+  width: 240px;
   background: #ede9fe;
   padding: 20px;
 }
 
-.sidebar h1 {
-  margin-bottom: 20px;
-}
-
-.souls .soul {
+.soul {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -48,7 +73,6 @@ body {
 .awake { background: #22c55e; }
 .dreaming { background: #94a3b8; }
 
-/* 💌 Room */
 .room {
   flex: 1;
   display: flex;
@@ -83,7 +107,6 @@ body {
   margin-left: auto;
 }
 
-/* ✍️ Composer */
 .composer {
   display: flex;
   padding: 10px;
@@ -94,6 +117,7 @@ body {
 .composer input {
   flex: 1;
   padding: 10px;
+  font-size: 16px;
   border-radius: 20px;
   border: 1px solid #ddd;
 }
@@ -105,10 +129,8 @@ body {
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  cursor: pointer;
 }
 
-/* 📱 Mobile */
 @media (max-width: 768px) {
   .sidebar {
     display: none;

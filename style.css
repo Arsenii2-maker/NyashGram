@@ -1,138 +1,121 @@
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
   font-family: system-ui, sans-serif;
 }
 
 body {
-  background: #f5f3ff;
-  height: 100vh;
+  margin: 0;
+  transition: background 0.3s;
 }
 
-.hidden {
-  display: none;
-}
-
-/* 🌱 Awakening */
-.awakening {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.awakening input {
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
-}
-
-.awakening button {
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: none;
-  background: #a78bfa;
+body.dark {
+  background: #0f0f14;
   color: white;
 }
 
-/* 🌸 App */
-.app {
-  display: flex;
+body.light {
+  background: #f5f5f5;
+  color: black;
+}
+
+.screen {
+  display: none;
   height: 100vh;
 }
 
-.sidebar {
-  width: 240px;
-  background: #ede9fe;
-  padding: 20px;
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.soul {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
+#loginScreen input {
+  padding: 12px;
+  margin: 10px;
   border-radius: 12px;
+  border: none;
+  width: 220px;
+}
+
+button {
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent, #ffd54a);
   cursor: pointer;
 }
 
-.soul.active {
-  background: #ddd6fe;
+header {
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.dot {
-  width: 10px;
-  height: 10px;
+#profileBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#profileBtn img {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
 }
 
-.awake { background: #22c55e; }
-.dreaming { background: #94a3b8; }
-
-.room {
+#chat {
   flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
+  background-size: cover;
 }
 
-.room-header {
-  padding: 16px;
-  background: #fafafa;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.whispers {
+#messages {
   flex: 1;
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto;
 }
 
-.whisper {
-  max-width: 70%;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 16px;
+.message {
+  background: rgba(255,255,255,0.1);
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  animation: fadeIn 0.2s;
 }
 
-.incoming {
-  background: #e0e7ff;
-}
-
-.outgoing {
-  background: #c7d2fe;
-  margin-left: auto;
-}
-
-.composer {
+#inputBar {
   display: flex;
+  gap: 6px;
   padding: 10px;
-  gap: 8px;
-  background: #fafafa;
 }
 
-.composer input {
+#inputBar input {
   flex: 1;
   padding: 10px;
-  font-size: 16px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
-}
-
-.composer button {
+  border-radius: 12px;
   border: none;
-  background: #a78bfa;
-  color: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
 }
 
-@media (max-width: 768px) {
-  .sidebar {
-    display: none;
-  }
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  flex-direction: column;
+  padding: 20px;
+  gap: 10px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; }
 }

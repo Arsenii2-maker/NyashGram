@@ -1,168 +1,135 @@
 :root {
-  --accent: #5b9dff;
-  --bg-dark: #0e1621;
-  --bg-light: #ffffff;
-  --card-dark: #17212b;
-  --card-light: #f1f1f1;
+  --accent: #ffd400;
+  --bg: #ffffff;
+  --text: #000000;
+}
+
+body.dark {
+  --bg: #0f0f0f;
+  --text: #ffffff;
 }
 
 * {
   box-sizing: border-box;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
   margin: 0;
-  transition: background 0.3s, color 0.3s;
+  background: var(--bg);
+  color: var(--text);
 }
 
-body.dark {
-  background: var(--bg-dark);
-  color: white;
-}
-
-body.light {
-  background: var(--bg-light);
-  color: black;
+.hidden {
+  display: none;
 }
 
 .screen {
-  display: none;
   height: 100vh;
-}
-
-.screen.active {
   display: flex;
   flex-direction: column;
-}
-
-/* ===== ВХОД ===== */
-#loginScreen {
-  align-items: center;
   justify-content: center;
-  gap: 14px;
+  align-items: center;
 }
 
-#loginScreen input {
-  font-size: 16px;
-  padding: 14px;
-  border-radius: 14px;
-  width: 240px;
-  border: none;
+input {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  width: 80%;
+  margin-bottom: 12px;
 }
 
 button {
-  font-size: 15px;
-  padding: 12px 18px;
+  padding: 12px 16px;
   border-radius: 14px;
   border: none;
   background: var(--accent);
-  color: white;
+  font-weight: 600;
 }
 
-/* ===== ШАПКА ===== */
-.topbar {
-  height: 56px;
-  padding: 0 14px;
+.header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  padding: 12px;
 }
 
-.user-mini {
+#profileBtn {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.user-mini img {
+#avatarSmall {
   width: 36px;
   height: 36px;
   border-radius: 50%;
 }
 
-/* ===== ЧАТ ===== */
-#chat {
-  flex: 1;
+.chats {
+  padding: 12px;
+}
+
+.chatItem {
+  padding: 12px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  background: #f0f0f0;
+}
+
+body.dark .chatItem {
+  background: #1c1c1c;
+}
+
+.chat {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
 }
 
-#messages {
+.chatHeader {
+  padding: 12px;
+  font-weight: 600;
+}
+
+.messages {
   flex: 1;
   padding: 12px;
   overflow-y: auto;
 }
 
 .message {
-  background: rgba(255,255,255,0.12);
-  padding: 10px 14px;
-  border-radius: 14px;
-  margin-bottom: 6px;
-  max-width: 75%;
+  margin-bottom: 8px;
 }
 
-#inputBar {
+.inputArea {
   display: flex;
-  gap: 8px;
-  padding: 10px;
-}
-
-#inputBar input {
-  flex: 1;
-  font-size: 16px;
   padding: 12px;
-  border-radius: 14px;
-  border: none;
+  gap: 8px;
 }
 
-/* ===== МОДАЛКИ ===== */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
+  background: rgba(0,0,0,0.5);
+  display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.modal.active {
-  display: flex;
-}
-
-.profile-card,
-.settings-card {
-  background: var(--card-dark);
+.modalContent {
+  background: var(--bg);
   padding: 20px;
   border-radius: 18px;
   width: 90%;
-  max-width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
-body.light .profile-card,
-body.light .settings-card {
-  background: var(--card-light);
-}
-
-.profile-card img {
-  width: 100px;
-  height: 100px;
+#avatarBig {
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  align-self: center;
-}
-
-.profile-card input,
-.profile-card textarea {
-  font-size: 15px;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-}
-
-.secondary {
-  background: transparent;
-  color: gray;
+  display: block;
+  margin: 12px auto;
 }

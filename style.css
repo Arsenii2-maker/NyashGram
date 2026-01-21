@@ -1,28 +1,25 @@
 * {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
-  margin: 0;
-  height: 100vh;
   background: radial-gradient(circle at top, #ffd86f, #fc6262);
-  overflow: hidden;
-}
-
-:root {
-  --accent: #ffcc00;
-  --glass-bg: rgba(255,255,255,0.18);
-  --blur: blur(20px);
 }
 
 .screen {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: none;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 0.6s ease;
 }
 
 .screen.active {
@@ -30,17 +27,16 @@ body {
 }
 
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(20px);
   border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
 }
 
 .card {
-  padding: 32px;
   width: 90%;
   max-width: 360px;
+  padding: 32px;
   text-align: center;
 }
 
@@ -48,47 +44,43 @@ h1 {
   margin-bottom: 8px;
 }
 
-.subtitle {
+p {
   opacity: 0.8;
   margin-bottom: 24px;
 }
 
-input, textarea {
+/* 🔒 INPUT FIX */
+input {
   width: 100%;
   padding: 14px;
+  font-size: 16px; /* КРИТИЧНО */
   border-radius: 14px;
   border: none;
   outline: none;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 button {
-  padding: 14px;
   width: 100%;
+  padding: 14px;
+  font-size: 16px;
   border-radius: 14px;
   border: none;
-  background: var(--accent);
+  background: #ffcc00;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-button:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
+/* MAIN */
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 16px;
+  padding: 12px;
 }
 
 .profile {
   display: flex;
-  align-items: center;
   gap: 10px;
-  cursor: pointer;
+  align-items: center;
 }
 
 .profile img {
@@ -97,28 +89,9 @@ button:hover {
   border-radius: 50%;
 }
 
-.layout {
-  display: flex;
-  height: calc(100vh - 60px);
-}
-
-.chat-list {
-  width: 220px;
-  padding: 12px;
-}
-
-.chat {
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.chat.active {
-  background: rgba(255,255,255,0.3);
-}
-
 .chat-area {
-  flex: 1;
+  margin: 16px;
+  height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
 }
@@ -130,53 +103,14 @@ button:hover {
 }
 
 .message {
-  margin-bottom: 12px;
-  max-width: 70%;
+  background: rgba(255,255,255,0.3);
   padding: 12px;
   border-radius: 16px;
-}
-
-.message.from {
-  background: rgba(255,255,255,0.3);
-}
-
-.message.to {
-  background: var(--accent);
-  align-self: flex-end;
+  margin-bottom: 10px;
 }
 
 .input-area {
   display: flex;
   gap: 10px;
   padding: 12px;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hidden {
-  display: none;
-}
-
-.modal-card {
-  padding: 24px;
-  width: 90%;
-  max-width: 360px;
-  animation: pop 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0 }
-  to { opacity: 1 }
-}
-
-@keyframes pop {
-  from { transform: scale(0.9); opacity: 0 }
-  to { transform: scale(1); opacity: 1 }
 }

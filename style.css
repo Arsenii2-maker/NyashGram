@@ -1,13 +1,11 @@
 * {
   box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-  -webkit-tap-highlight-color: transparent;
+  font-family: Inter, sans-serif;
 }
 
 html, body {
   margin: 0;
   height: 100%;
-  overscroll-behavior: none;
 }
 
 body {
@@ -18,80 +16,91 @@ body {
   position: fixed;
   inset: 0;
   display: none;
-  justify-content: center;
-  align-items: center;
 }
 
 .screen.active {
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .glass {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.25);
   backdrop-filter: blur(20px);
   border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 40px rgba(0,0,0,.25);
 }
 
 .card {
+  padding: 32px;
   width: 90%;
   max-width: 360px;
-  padding: 32px;
   text-align: center;
 }
 
-h1 {
-  margin-bottom: 8px;
-}
-
-p {
-  opacity: 0.8;
-  margin-bottom: 24px;
-}
-
-/* 🔒 INPUT FIX */
 input {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px; /* КРИТИЧНО */
-  border-radius: 14px;
-  border: none;
-  outline: none;
-  margin-bottom: 16px;
-}
-
-button {
   width: 100%;
   padding: 14px;
   font-size: 16px;
   border-radius: 14px;
   border: none;
-  background: #ffcc00;
-  font-weight: 600;
-  cursor: pointer;
+  margin-bottom: 16px;
 }
 
-/* MAIN */
+button {
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  background: var(--accent, #ffcc00);
+}
 
 .topbar {
+  display: flex;
+  justify-content: space-between;
   padding: 12px;
 }
 
-.profile {
+.profile-btn {
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 10px;
 }
 
-.profile img {
+.avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  background: linear-gradient(135deg, #6ee7ff, #b983ff);
 }
 
-.chat-area {
-  margin: 16px;
-  height: calc(100vh - 80px);
+.avatar.big {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+}
+
+.content {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+.chats {
+  width: 200px;
+  padding: 12px;
+}
+
+.chat-item {
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.chat-item.active {
+  background: rgba(255,255,255,.4);
+}
+
+.chat {
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -99,18 +108,41 @@ button {
 .messages {
   flex: 1;
   padding: 16px;
-  overflow-y: auto;
 }
 
-.message {
-  background: rgba(255,255,255,0.3);
-  padding: 12px;
-  border-radius: 16px;
-  margin-bottom: 10px;
+.msg {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.35);
+  margin-bottom: 8px;
 }
 
 .input-area {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   padding: 12px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-card {
+  padding: 24px;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.dark {
+  background: radial-gradient(circle at top, #1f1f1f, #000);
+  color: #fff;
 }

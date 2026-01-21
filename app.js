@@ -1,16 +1,15 @@
 const startScreen = document.getElementById('startScreen');
 const mainScreen = document.getElementById('mainScreen');
 const enterBtn = document.getElementById('enterBtn');
-const usernameInput = document.getElementById('usernameInput');
-const usernameLabel = document.getElementById('usernameLabel');
+const nameInput = document.getElementById('nameInput');
+const username = document.getElementById('username');
 
 const profileModal = document.getElementById('profileModal');
 const settingsModal = document.getElementById('settingsModal');
 
 enterBtn.onclick = () => {
-  if (!usernameInput.value.trim()) return;
-
-  usernameLabel.textContent = usernameInput.value;
+  if (!nameInput.value.trim()) return;
+  username.textContent = nameInput.value;
   startScreen.classList.remove('active');
   mainScreen.classList.add('active');
 };
@@ -31,14 +30,10 @@ function closeSettings() {
   settingsModal.classList.add('hidden');
 }
 
-// Цвет
-document.getElementById('accentPicker').oninput = e => {
-  document.documentElement.style.setProperty('--accent', e.target.value);
-};
+function setTheme(t) {
+  document.body.classList.toggle('dark', t === 'dark');
+}
 
-// Тема
-document.getElementById('themeToggle').onchange = e => {
-  document.body.style.background = e.target.checked
-    ? 'radial-gradient(circle at top, #222, #000)'
-    : 'radial-gradient(circle at top, #ffd86f, #fc6262)';
+document.getElementById('colorPicker').oninput = e => {
+  document.documentElement.style.setProperty('--accent', e.target.value);
 };

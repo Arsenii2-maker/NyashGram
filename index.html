@@ -6,7 +6,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>NyashGram</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,10 +15,8 @@
 
   <!-- START -->
   <section id="startScreen" class="screen active">
-    <div class="glass card">
+    <div class="glass start-card">
       <h1>NyashGram</h1>
-      <p>Мессенджер нового настроения</p>
-
       <input id="nameInput" placeholder="Твоё имя">
       <button id="enterBtn">Войти</button>
     </div>
@@ -26,59 +24,38 @@
 
   <!-- MAIN -->
   <section id="mainScreen" class="screen">
+
+    <!-- TOP BAR -->
     <header class="topbar glass">
-      <div class="profile-btn" id="openProfile">
+      <div class="profile">
         <div class="avatar" id="avatar"></div>
         <span id="username"></span>
       </div>
       <button id="openSettings">⚙</button>
     </header>
 
-    <div class="content">
-      <aside class="chats glass">
-        <div class="chat-item active">Bestie 💬</div>
-        <div class="chat-item">Философ 🧠</div>
-        <div class="chat-item">Учёба 📚</div>
+    <!-- BODY -->
+    <div class="layout">
+
+      <!-- CHAT LIST -->
+      <aside class="chat-list glass">
+        <div class="chat-item active" data-chat="bestie">Bestie 💬</div>
+        <div class="chat-item" data-chat="philo">Философ 🧠</div>
+        <div class="chat-item" data-chat="study">Учёба 📚</div>
       </aside>
 
+      <!-- CHAT -->
       <main class="chat glass">
-        <div class="messages">
-          <div class="msg from">Привет ✨</div>
-        </div>
+        <div class="messages" id="messages"></div>
+
         <div class="input-area">
-          <input placeholder="Сообщение…">
-          <button>➤</button>
+          <input id="messageInput" placeholder="Сообщение…">
+          <button id="sendBtn">➤</button>
         </div>
       </main>
+
     </div>
   </section>
-
-  <!-- PROFILE -->
-  <div id="profileModal" class="modal hidden">
-    <div class="glass modal-card">
-      <h2>Профиль</h2>
-      <div class="avatar big" id="profileAvatar"></div>
-      <input placeholder="Описание">
-      <button onclick="closeProfile()">Закрыть</button>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="glass modal-card">
-      <h2>Настройки</h2>
-
-      <label>Цвет кнопок</label>
-      <input type="color" id="colorPicker">
-
-      <div class="theme-toggle">
-        <button onclick="setTheme('light')">Светлая</button>
-        <button onclick="setTheme('dark')">Тёмная</button>
-      </div>
-
-      <button onclick="closeSettings()">Закрыть</button>
-    </div>
-  </div>
 
 </div>
 

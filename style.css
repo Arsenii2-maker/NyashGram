@@ -140,10 +140,7 @@ button {
   .chat-list {
     width: 90px;
   }
-
-  .chat-item {
-    font-size: 12px;
-    /* ICON BUTTON (настройки) */
+  /* ICON BUTTON (настройки) */
 .icon-btn {
   width: 36px;
   height: 36px;
@@ -155,5 +152,9 @@ button {
   align-items: center;
   justify-content: center;
 }
+
+  .chat-item {
+    font-size: 12px;
+    
   }
 }

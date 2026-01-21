@@ -1,77 +1,76 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>NyashGram</title>
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-  <!-- Красивый шрифт -->
+  <title>Bestie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark">
+<body>
 
-<!-- ===== ВХОД ===== -->
-<div id="loginScreen" class="screen active">
-  <h1>NyashGram 🐱</h1>
-  <p>Введи имя, чтобы начать</p>
-  <input id="usernameInput" placeholder="Имя">
-  <button id="enterBtn">Продолжить</button>
+<!-- START -->
+<div id="startScreen" class="screen">
+  <h1>Bestie</h1>
+  <input id="nameInput" placeholder="Ваше имя">
+  <button id="enterBtn">Войти</button>
 </div>
 
-<!-- ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ ===== -->
-<div id="appScreen" class="screen">
+<!-- APP -->
+<div id="app" class="hidden">
 
-  <!-- ШАПКА -->
-  <header class="topbar">
-    <div id="openProfile" class="user-mini">
-      <img id="avatarMini" src="https://via.placeholder.com/40">
-      <span id="usernameMini"></span>
+  <!-- HEADER -->
+  <div class="header">
+    <div id="profileBtn">
+      <img id="avatarSmall">
+      <span id="usernameSmall"></span>
     </div>
-    <button id="openSettings">⚙️</button>
-  </header>
+    <button id="settingsBtn">⚙</button>
+  </div>
 
-  <!-- ЧАТ -->
-  <div id="chat">
-    <div id="messages"></div>
+  <!-- CHATS -->
+  <div class="chats" id="chatList"></div>
 
-    <div id="inputBar">
+  <!-- CHAT -->
+  <div class="chat hidden" id="chat">
+    <div class="chatHeader" id="chatTitle"></div>
+    <div class="messages" id="messages"></div>
+    <div class="inputArea">
       <input id="messageInput" placeholder="Сообщение">
       <button id="sendBtn">➤</button>
     </div>
   </div>
+
 </div>
 
-<!-- ===== ПРОФИЛЬ ===== -->
-<div id="profileScreen" class="modal">
-  <div class="profile-card">
-
-    <img id="avatarBig" src="https://via.placeholder.com/100">
-    <input type="file" id="avatarInput">
-
-    <input id="profileNameInput" placeholder="Имя">
-    <textarea id="profileBioInput" placeholder="Описание профиля"></textarea>
-
-    <button id="saveProfile">Сохранить</button>
-    <button class="secondary" id="closeProfile">Закрыть</button>
-
+<!-- PROFILE -->
+<div id="profileModal" class="modal hidden">
+  <div class="modalContent">
+    <h2>Профиль</h2>
+    <img id="avatarBig">
+    <input type="file" id="avatarInput" accept="image/*">
+    <input id="bioInput" placeholder="Описание">
+    <button onclick="closeProfile()">Закрыть</button>
   </div>
 </div>
 
-<!-- ===== НАСТРОЙКИ ===== -->
-<div id="settingsScreen" class="modal">
-  <div class="settings-card">
+<!-- SETTINGS -->
+<div id="settingsModal" class="modal hidden">
+  <div class="modalContent">
     <h2>Настройки</h2>
 
-    <button id="lightTheme">🌕 Светлая тема</button>
-    <button id="darkTheme">🌑 Тёмная тема</button>
+    <label>Цвет кнопок</label>
+    <input type="color" id="colorPicker">
 
-    <button class="secondary" id="closeSettings">Готово</button>
+    <label>Тема</label>
+    <div class="themeSwitch">
+      <button onclick="setTheme('light')">🌤</button>
+      <button onclick="setTheme('dark')">🌙</button>
+    </div>
+
+    <button onclick="closeSettings()">Закрыть</button>
   </div>
 </div>
 

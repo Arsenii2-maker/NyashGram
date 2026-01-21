@@ -1,37 +1,44 @@
 const loginScreen = document.getElementById("loginScreen");
 const appScreen = document.getElementById("appScreen");
 
-const enterBtn = document.getElementById("enterBtn");
 const usernameInput = document.getElementById("usernameInput");
-const profileName = document.getElementById("profileName");
+const enterBtn = document.getElementById("enterBtn");
+
+const usernameMini = document.getElementById("usernameMini");
+const avatarMini = document.getElementById("avatarMini");
+
+const profileScreen = document.getElementById("profileScreen");
+const openProfile = document.getElementById("openProfile");
+const closeProfile = document.getElementById("closeProfile");
+
+const profileNameInput = document.getElementById("profileNameInput");
+const profileBioInput = document.getElementById("profileBioInput");
+const avatarInput = document.getElementById("avatarInput");
+const avatarBig = document.getElementById("avatarBig");
+const saveProfile = document.getElementById("saveProfile");
+
+const settingsScreen = document.getElementById("settingsScreen");
+const openSettings = document.getElementById("openSettings");
+const closeSettings = document.getElementById("closeSettings");
+
+const lightTheme = document.getElementById("lightTheme");
+const darkTheme = document.getElementById("darkTheme");
 
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
 const messages = document.getElementById("messages");
 
-const settingsBtn = document.getElementById("settingsBtn");
-const settingsScreen = document.getElementById("settingsScreen");
-const closeSettings = document.getElementById("closeSettings");
-
-const accentColor = document.getElementById("accentColor");
-const avatarInput = document.getElementById("avatarInput");
-const avatarImg = document.getElementById("avatarImg");
-
-const lightTheme = document.getElementById("lightTheme");
-const darkTheme = document.getElementById("darkTheme");
-
-/* ===== ВХОД (ФИКС) ===== */
-function enterApp() {
+/* ===== ВХОД ===== */
+enterBtn.onclick = () => {
   const name = usernameInput.value.trim();
   if (!name) return;
 
-  profileName.textContent = name;
+  usernameMini.textContent = name;
+  profileNameInput.value = name;
+
   loginScreen.classList.remove("active");
   appScreen.classList.add("active");
-}
-
-enterBtn.addEventListener("click", enterApp);
-enterBtn.addEventListener("touchstart", enterApp);
+};
 
 /* ===== СООБЩЕНИЯ ===== */
 sendBtn.onclick = () => {
@@ -44,27 +51,27 @@ sendBtn.onclick = () => {
   messages.scrollTop = messages.scrollHeight;
 };
 
-/* ===== НАСТРОЙКИ ===== */
-settingsBtn.onclick = () => settingsScreen.classList.add("active");
-closeSettings.onclick = () => settingsScreen.classList.remove("active");
+/* ===== ПРОФИЛЬ ===== */
+openProfile.onclick = () => profileScreen.classList.add("active");
+closeProfile.onclick = () => profileScreen.classList.remove("active");
 
-/* ===== ЦВЕТ ===== */
-accentColor.oninput = () => {
-  document.documentElement.style.setProperty("--accent", accentColor.value);
-};
-
-/* ===== ТЕМА ===== */
-lightTheme.onclick = () => {
-  document.body.className = "light";
-};
-
-darkTheme.onclick = () => {
-  document.body.className = "dark";
+saveProfile.onclick = () => {
+  usernameMini.textContent = profileNameInput.value;
+  profileScreen.classList.remove("active");
 };
 
 /* ===== АВАТАР ===== */
 avatarInput.onchange = e => {
   const file = e.target.files[0];
   if (!file) return;
-  avatarImg.src = URL.createObjectURL(file);
+  const url = URL.createObjectURL(file);
+  avatarBig.src = url;
+  avatarMini.src = url;
 };
+
+/* ===== НАСТРОЙКИ ===== */
+openSettings.onclick = () => settingsScreen.classList.add("active");
+closeSettings.onclick = () => settingsScreen.classList.remove("active");
+
+lightTheme.onclick = () => document.body.className = "light";
+darkTheme.onclick = () => document.body.className = "dark";

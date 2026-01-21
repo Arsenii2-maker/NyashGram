@@ -1,77 +1,109 @@
-const loginScreen = document.getElementById("loginScreen");
-const appScreen = document.getElementById("appScreen");
+const startScreen = document.getElementById('startScreen');
+const app = document.getElementById('app');
 
-const usernameInput = document.getElementById("usernameInput");
-const enterBtn = document.getElementById("enterBtn");
+const nameInput = document.getElementById('nameInput');
+const enterBtn = document.getElementById('enterBtn');
 
-const usernameMini = document.getElementById("usernameMini");
-const avatarMini = document.getElementById("avatarMini");
+const avatarSmall = document.getElementById('avatarSmall');
+const avatarBig = document.getElementById('avatarBig');
+const usernameSmall = document.getElementById('usernameSmall');
 
-const profileScreen = document.getElementById("profileScreen");
-const openProfile = document.getElementById("openProfile");
-const closeProfile = document.getElementById("closeProfile");
+const chatList = document.getElementById('chatList');
+const chat = document.getElementById('chat');
+const chatTitle = document.getElementById('chatTitle');
+const messages = document.getElementById('messages');
+const messageInput = document.getElementById('messageInput');
 
-const profileNameInput = document.getElementById("profileNameInput");
-const profileBioInput = document.getElementById("profileBioInput");
-const avatarInput = document.getElementById("avatarInput");
-const avatarBig = document.getElementById("avatarBig");
-const saveProfile = document.getElementById("saveProfile");
+const profileModal = document.getElementById('profileModal');
+const settingsModal = document.getElementById('settingsModal');
 
-const settingsScreen = document.getElementById("settingsScreen");
-const openSettings = document.getElementById("openSettings");
-const closeSettings = document.getElementById("closeSettings");
+const colorPicker = document.getElementById('colorPicker');
 
-const lightTheme = document.getElementById("lightTheme");
-const darkTheme = document.getElementById("darkTheme");
+const defaultAvatar = "https://i.imgur.com/8Km9tLL.png";
 
-const sendBtn = document.getElementById("sendBtn");
-const messageInput = document.getElementById("messageInput");
-const messages = document.getElementById("messages");
+let currentChat = null;
 
-/* ===== ВХОД ===== */
+const chats = [
+  { id: 1, name: "Аня", messages: [] },
+  { id: 2, name: "Макс", messages: [] },
+  { id: 3, name: "Bestie 💛", messages: [] }
+];
+
 enterBtn.onclick = () => {
-  const name = usernameInput.value.trim();
-  if (!name) return;
+  if (!nameInput.value) return;
 
-  usernameMini.textContent = name;
-  profileNameInput.value = name;
+  startScreen.classList.add('hidden');
+  app.classList.remove('hidden');
 
-  loginScreen.classList.remove("active");
-  appScreen.classList.add("active");
+  usernameSmall.textContent = nameInput.value;
+  avatarSmall.src = defaultAvatar;
+  avatarBig.src = defaultAvatar;
+
+  renderChats();
 };
 
-/* ===== СООБЩЕНИЯ ===== */
+function renderChats() {
+  chatList.innerHTML = "";
+  chats.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'chatItem';
+    div.textContent = c.name;
+    div.onclick = () => openChat(c);
+    chatList.appendChild(div);
+  });
+}
+
+function openChat(c) {
+  currentChat = c;
+  chat.classList.remove('hidden');
+  chatTitle.textContent = c.name;
+  renderMessages();
+}
+
+function renderMessages() {
+  messages.innerHTML = "";
+  currentChat.messages.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'message';
+    div.textContent = m;
+    messages.appendChild(div);
+  });
+}
+
 sendBtn.onclick = () => {
   if (!messageInput.value) return;
-  const msg = document.createElement("div");
-  msg.className = "message";
-  msg.textContent = messageInput.value;
-  messages.appendChild(msg);
+  currentChat.messages.push(messageInput.value);
   messageInput.value = "";
-  messages.scrollTop = messages.scrollHeight;
+  renderMessages();
 };
 
-/* ===== ПРОФИЛЬ ===== */
-openProfile.onclick = () => profileScreen.classList.add("active");
-closeProfile.onclick = () => profileScreen.classList.remove("active");
+profileBtn.onclick = () => profileModal.classList.remove('hidden');
+settingsBtn.onclick = () => settingsModal.classList.remove('hidden');
 
-saveProfile.onclick = () => {
-  usernameMini.textContent = profileNameInput.value;
-  profileScreen.classList.remove("active");
-};
+function closeProfile() {
+  profileModal.classList.add('hidden');
+}
 
-/* ===== АВАТАР ===== */
+function closeSettings() {
+  settingsModal.classList.add('hidden');
+}
+
 avatarInput.onchange = e => {
   const file = e.target.files[0];
   if (!file) return;
-  const url = URL.createObjectURL(file);
-  avatarBig.src = url;
-  avatarMini.src = url;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    avatarBig.src = reader.result;
+    avatarSmall.src = reader.result;
+  };
+  reader.readAsDataURL(file);
 };
 
-/* ===== НАСТРОЙКИ ===== */
-openSettings.onclick = () => settingsScreen.classList.add("active");
-closeSettings.onclick = () => settingsScreen.classList.remove("active");
+colorPicker.oninput = e => {
+  document.documentElement.style.setProperty('--accent', e.target.value);
+};
 
-lightTheme.onclick = () => document.body.className = "light";
-darkTheme.onclick = () => document.body.className = "dark";
+function setTheme(theme) {
+  document.body.className = theme === 'dark' ? 'dark' : '';
+}

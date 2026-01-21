@@ -1,78 +1,105 @@
+:root {
+  --accent: #5b9dff;
+  --bg-dark: #0e1621;
+  --bg-light: #ffffff;
+  --card-dark: #17212b;
+  --card-light: #f1f1f1;
+}
+
 * {
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 body {
   margin: 0;
-  overflow: hidden;
-  transition: background 0.3s;
+  transition: background 0.3s, color 0.3s;
 }
 
 body.dark {
-  background: #0f0f14;
+  background: var(--bg-dark);
   color: white;
 }
 
 body.light {
-  background: #f5f5f5;
+  background: var(--bg-light);
   color: black;
 }
 
 .screen {
   display: none;
-  height: 100%;
+  height: 100vh;
 }
 
 .screen.active {
   display: flex;
   flex-direction: column;
+}
+
+/* ===== ВХОД ===== */
+#loginScreen {
   align-items: center;
-  padding-top: 15vh; /* ВАЖНО */
+  justify-content: center;
+  gap: 14px;
 }
 
 #loginScreen input {
-  font-size: 16px; /* КРИТИЧНО */
+  font-size: 16px;
   padding: 14px;
-  margin: 12px 0;
-  width: 240px;
   border-radius: 14px;
+  width: 240px;
   border: none;
 }
 
 button {
-  font-size: 16px;
-  padding: 14px 20px;
-  border-radius: 16px;
+  font-size: 15px;
+  padding: 12px 18px;
+  border-radius: 14px;
   border: none;
-  background: var(--accent, #ffd54a);
+  background: var(--accent);
+  color: white;
 }
 
-header {
-  width: 100%;
-  padding: 10px;
+/* ===== ШАПКА ===== */
+.topbar {
+  height: 56px;
+  padding: 0 14px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
+.user-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-mini img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+/* ===== ЧАТ ===== */
 #chat {
   flex: 1;
-  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 #messages {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   overflow-y: auto;
 }
 
 .message {
   background: rgba(255,255,255,0.12);
-  padding: 10px;
-  border-radius: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
   margin-bottom: 6px;
+  max-width: 75%;
 }
 
 #inputBar {
@@ -82,22 +109,60 @@ header {
 }
 
 #inputBar input {
-  font-size: 16px;
   flex: 1;
+  font-size: 16px;
   padding: 12px;
   border-radius: 14px;
   border: none;
 }
 
+/* ===== МОДАЛКИ ===== */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.6);
   display: none;
-  flex-direction: column;
-  padding: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal.active {
   display: flex;
+}
+
+.profile-card,
+.settings-card {
+  background: var(--card-dark);
+  padding: 20px;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body.light .profile-card,
+body.light .settings-card {
+  background: var(--card-light);
+}
+
+.profile-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  align-self: center;
+}
+
+.profile-card input,
+.profile-card textarea {
+  font-size: 15px;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+}
+
+.secondary {
+  background: transparent;
+  color: gray;
 }

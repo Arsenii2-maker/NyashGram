@@ -2,92 +2,63 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 🔒 iOS ZOOM FIX -->
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1,
+                 maximum-scale=1,
+                 user-scalable=no" />
+
   <title>NyashGram</title>
 
-  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="app">
 
-  <!-- START SCREEN -->
+  <!-- START -->
   <section id="startScreen" class="screen active">
     <div class="glass card">
       <h1>NyashGram 💬</h1>
-      <p class="subtitle">Мессенджер нового настроения</p>
+      <p>Мессенджер нового настроения</p>
 
-      <input id="usernameInput" type="text" placeholder="Как тебя зовут?" />
-      <button id="enterBtn">Войти</button>
+      <input
+        id="usernameInput"
+        type="text"
+        placeholder="Как тебя зовут?"
+        autocomplete="off"
+      />
+
+      <button id="enterBtn" type="button">Войти</button>
     </div>
   </section>
 
   <!-- MAIN -->
   <section id="mainScreen" class="screen">
     <header class="topbar glass">
-      <div class="profile" id="openProfile">
-        <img id="avatarSmall" src="https://i.imgur.com/8Km9tLL.png">
+      <div class="profile">
+        <img src="https://i.imgur.com/8Km9tLL.png">
         <span id="usernameLabel"></span>
       </div>
-      <button id="openSettings">⚙</button>
     </header>
 
-    <div class="layout">
-      <!-- CHAT LIST -->
-      <aside class="chat-list glass">
-        <div class="chat active">Bestie 💖</div>
-        <div class="chat">Котик 🐱</div>
-        <div class="chat">Группа ✨</div>
-      </aside>
+    <div class="chat-area glass">
+      <div class="messages">
+        <div class="message from">Привет ✨</div>
+      </div>
 
-      <!-- CHAT -->
-      <main class="chat-area glass">
-        <div class="messages" id="messages">
-          <div class="message from">Привет! ✨</div>
-          <div class="message to">Хай 🐾</div>
-        </div>
-
-        <div class="input-area">
-          <input id="messageInput" placeholder="Напиши сообщение…" />
-          <button id="sendBtn">➤</button>
-        </div>
-      </main>
+      <div class="input-area">
+        <input placeholder="Сообщение…" />
+        <button>➤</button>
+      </div>
     </div>
   </section>
 
-  <!-- PROFILE -->
-  <div id="profileModal" class="modal hidden">
-    <div class="glass modal-card">
-      <h2>Профиль</h2>
-      <img id="avatarBig" src="https://i.imgur.com/8Km9tLL.png">
-      <input type="file" id="avatarInput" accept="image/*">
-      <textarea placeholder="Описание"></textarea>
-      <button onclick="closeProfile()">Закрыть</button>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="glass modal-card">
-      <h2>Настройки</h2>
-
-      <label>Цвет интерфейса</label>
-      <input type="color" id="accentPicker" />
-
-      <div class="toggle">
-        <span>Тёмная тема</span>
-        <input type="checkbox" id="themeToggle">
-      </div>
-
-      <button onclick="closeSettings()">Закрыть</button>
-    </div>
-  </div>
-
 </div>
 
-<script src="app.js"></script>
+<script src="app.js" defer></script>
 </body>
 </html>

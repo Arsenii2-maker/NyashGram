@@ -1,3 +1,8 @@
+// жёстко прячем модалки при старте
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('profileModal').classList.add('hidden');
+  document.getElementById('settingsModal').classList.add('hidden');
+});
 const startScreen = document.getElementById('startScreen');
 const app = document.getElementById('app');
 

@@ -1,61 +1,69 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NyashGram</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="app">
+<!-- ===== ЭКРАН СПИСКА ЧАТОВ ===== -->
+<div id="chatListScreen" class="screen active">
 
-  <!-- START -->
-  <section id="startScreen" class="screen active">
-    <div class="glass start-card">
-      <h1>NyashGram</h1>
-      <input id="nameInput" placeholder="Твоё имя">
-      <button id="enterBtn">Войти</button>
+  <header class="topbar">
+    <div class="profile">
+      <div class="avatar"></div>
+      <span class="username">Арсений</span>
     </div>
-  </section>
+    <button class="icon-btn" id="openSettings">⚙</button>
+  </header>
 
-  <!-- MAIN -->
-  <section id="mainScreen" class="screen">
+  <div class="chat-list">
+    <div class="chat-item" data-chat="bestie">💬 Bestie</div>
+    <div class="chat-item" data-chat="philosopher">🧠 Философ</div>
+    <div class="chat-item" data-chat="study">📚 Учёба</div>
+  </div>
 
-    <!-- TOP BAR -->
-    <header class="topbar glass">
-      <div class="profile">
-        <div class="avatar" id="avatar"></div>
-        <span id="username"></span>
-      </div>
-      <button id="openSettings" class="icon-btn">⚙</button>
-    </header>
+</div>
 
-    <!-- BODY -->
-    <div class="layout">
+<!-- ===== ЭКРАН ЧАТА ===== -->
+<div id="chatScreen" class="screen">
 
-      <!-- CHAT LIST -->
-      <aside class="chat-list glass">
-        <div class="chat-item active" data-chat="bestie">Bestie 💬</div>
-        <div class="chat-item" data-chat="philo">Философ 🧠</div>
-        <div class="chat-item" data-chat="study">Учёба 📚</div>
-      </aside>
+  <header class="topbar">
+    <button class="icon-btn" id="backToChats">←</button>
+    <span id="chatTitle">Чат</span>
+  </header>
 
-      <!-- CHAT -->
-      <main class="chat glass">
-        <div class="messages" id="messages"></div>
+  <div id="messages" class="messages"></div>
 
-        <div class="input-area">
-          <input id="messageInput" placeholder="Сообщение…">
-          <button id="sendBtn">➤</button>
-        </div>
-      </main>
+  <div class="input-bar">
+    <input id="messageInput" placeholder="Сообщение…" />
+    <button id="sendBtn">➤</button>
+  </div>
 
-    </div>
-  </section>
+</div>
+
+<!-- ===== НАСТРОЙКИ ===== -->
+<div id="settingsScreen" class="screen">
+
+  <header class="topbar">
+    <button class="icon-btn" id="closeSettings">←</button>
+    <span>Настройки</span>
+  </header>
+
+  <div class="settings">
+
+    <h3>🎨 Цвет кнопок</h3>
+    <input type="color" id="accentColor">
+
+    <h3>🌓 Тема</h3>
+    <button id="toggleTheme">Сменить тему</button>
+
+    <h3>🔤 Шрифт</h3>
+    <input type="file" id="fontPicker" accept=".ttf,.otf">
+
+  </div>
 
 </div>
 

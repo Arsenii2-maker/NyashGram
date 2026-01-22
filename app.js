@@ -1,63 +1,95 @@
-const chatListScreen = document.getElementById("chatListScreen");
-const chatScreen = document.getElementById("chatScreen");
-const settingsScreen = document.getElementById("settingsScreen");
+const screens = {
+  chats: chatListScreen,
+  chat: chatScreen,
+  settings: settingsScreen,
+  profile: profileScreen
+};
 
-const messages = document.getElementById("messages");
-const messageInput = document.getElementById("messageInput");
-const chatTitle = document.getElementById("chatTitle");
+function openScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
 
-document.querySelectorAll(".chat-item").forEach(chat => {
-  chat.onclick = () => {
-    chatTitle.textContent = chat.textContent;
-    chatListScreen.classList.remove("active");
-    chatScreen.classList.add("active");
+// Чаты
+document.querySelectorAll(".chat-item").forEach(item => {
+  item.onclick = () => {
+    chatTitle.textContent = item.dataset.name;
+    chatStatus.textContent = item.dataset.status;
+    profilePhone.textContent = item.dataset.phone;
+    profileName.textContent = item.dataset.name;
+    profileStatus.textContent = item.dataset.status;
+    openScreen("chat");
   };
 });
 
-document.getElementById("backToChats").onclick = () => {
-  chatScreen.classList.remove("active");
-  chatListScreen.classList.add("active");
-};
+backToChats.onclick = () => openScreen("chats");
 
-document.getElementById("sendBtn").onclick = () => {
+// Сообщения
+sendBtn.onclick = () => {
   if (!messageInput.value) return;
-  const msg = document.createElement("div");
-  msg.className = "message me";
-  msg.textContent = messageInput.value;
-  messages.appendChild(msg);
+  const m = document.createElement("div");
+  m.className = "message me";
+  m.textContent = messageInput.value;
+  messages.appendChild(m);
   messageInput.value = "";
   messages.scrollTop = messages.scrollHeight;
 };
 
-document.getElementById("openSettings").onclick = () => {
-  chatListScreen.classList.remove("active");
-  settingsScreen.classList.add("active");
+// Настройки
+openSettings.onclick = () => openScreen("settings");
+closeSettings.onclick = () => openScreen("chats");
+
+// Профиль
+openUserProfile.onclick = () => openScreen("profile");
+closeProfile.onclick = () => openScreen("chat");
+
+// Имя
+nameInput.oninput = e => {
+  myName.textContent = e.target.value;
 };
 
-document.getElementById("closeSettings").onclick = () => {
-  settingsScreen.classList.remove("active");
-  chatListScreen.classList.add("active");
+// Аватар
+avatarPicker.onchange = e => {
+  const url = URL.createObjectURL(e.target.files[0]);
+  myAvatar.style.backgroundImage = url(${url});
 };
 
-document.getElementById("toggleTheme").onclick = () => {
-  document.body.classList.toggle("dark");
-};
-
-document.getElementById("accentColor").oninput = e => {
+// Цвет кнопок
+accentColor.oninput = e => {
   document.documentElement.style.setProperty("--accent", e.target.value);
 };
 
-document.getElementById("fontPicker").onchange = e => {
+// Тема
+toggleTheme.onclick = () => {
+  document.body.classList.toggle("dark");
+};
+
+// ФОН
+bgType.onchange = () => {
+  if (bgType.value === "solid") {
+    document.body.style.background = bgColor1.value;
+  }
+  if (bgType.value === "gradient") {
+    document.body.style.background =
+      linear-gradient(160deg, ${bgColor1.value}, ${bgColor2.value});
+  }
+};
+
+bgImage.onchange = e => {
+  const url = URL.createObjectURL(e.target.files[0]);
+  document.body.style.background = url(${url}) center/cover;
+};
+
+// ШРИФТ (исправлено)
+fontPicker.onchange = e => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    const font = new FontFace("UserFont", reader.result);
-    font.load().then(f => {
-      document.fonts.add(f);
-      document.body.style.fontFamily = "UserFont";
-    });
-  };
-  reader.readAsArrayBuffer(file);
+  const url = URL.createObjectURL(file);
+  const font = new FontFace("UserFont", `url(${url})`);
+
+  font.load().then(() => {
+    document.fonts.add(font);
+    document.documentElement.style.setProperty("--font", "UserFont");
+  });
 };

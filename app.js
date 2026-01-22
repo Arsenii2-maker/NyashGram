@@ -1,57 +1,63 @@
-const startScreen = document.getElementById('startScreen');
-const mainScreen = document.getElementById('mainScreen');
-const enterBtn = document.getElementById('enterBtn');
-const nameInput = document.getElementById('nameInput');
-const username = document.getElementById('username');
+const chatListScreen = document.getElementById("chatListScreen");
+const chatScreen = document.getElementById("chatScreen");
+const settingsScreen = document.getElementById("settingsScreen");
 
-const messagesEl = document.getElementById('messages');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
+const messages = document.getElementById("messages");
+const messageInput = document.getElementById("messageInput");
+const chatTitle = document.getElementById("chatTitle");
 
-let currentChat = 'bestie';
-
-const chats = {
-  bestie: [{ text: 'Привет ✨', from: 'them' }],
-  philo: [{ text: 'Что есть истина?', from: 'them' }],
-  study: [{ text: 'Готов учиться 📚', from: 'them' }]
-};
-
-enterBtn.onclick = () => {
-  if (!nameInput.value.trim()) return;
-  username.textContent = nameInput.value;
-  startScreen.classList.remove('active');
-  mainScreen.classList.add('active');
-  renderChat();
-};
-
-document.querySelectorAll('.chat-item').forEach(item => {
-  item.onclick = () => {
-    document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    currentChat = item.dataset.chat;
-    renderChat();
+document.querySelectorAll(".chat-item").forEach(chat => {
+  chat.onclick = () => {
+    chatTitle.textContent = chat.textContent;
+    chatListScreen.classList.remove("active");
+    chatScreen.classList.add("active");
   };
 });
 
-sendBtn.onclick = sendMessage;
-messageInput.onkeydown = e => {
-  if (e.key === 'Enter') sendMessage();
+document.getElementById("backToChats").onclick = () => {
+  chatScreen.classList.remove("active");
+  chatListScreen.classList.add("active");
 };
 
-function sendMessage() {
-  if (!messageInput.value.trim()) return;
-  chats[currentChat].push({ text: messageInput.value, from: 'me' });
-  messageInput.value = '';
-  renderChat();
-}
+document.getElementById("sendBtn").onclick = () => {
+  if (!messageInput.value) return;
+  const msg = document.createElement("div");
+  msg.className = "message me";
+  msg.textContent = messageInput.value;
+  messages.appendChild(msg);
+  messageInput.value = "";
+  messages.scrollTop = messages.scrollHeight;
+};
 
-function renderChat() {
-  messagesEl.innerHTML = '';
-  chats[currentChat].forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'msg ' + (m.from === 'me' ? 'me' : '');
-    div.textContent = m.text;
-    messagesEl.appendChild(div);
-  });
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
+document.getElementById("openSettings").onclick = () => {
+  chatListScreen.classList.remove("active");
+  settingsScreen.classList.add("active");
+};
+
+document.getElementById("closeSettings").onclick = () => {
+  settingsScreen.classList.remove("active");
+  chatListScreen.classList.add("active");
+};
+
+document.getElementById("toggleTheme").onclick = () => {
+  document.body.classList.toggle("dark");
+};
+
+document.getElementById("accentColor").oninput = e => {
+  document.documentElement.style.setProperty("--accent", e.target.value);
+};
+
+document.getElementById("fontPicker").onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const font = new FontFace("UserFont", reader.result);
+    font.load().then(f => {
+      document.fonts.add(f);
+      document.body.style.fontFamily = "UserFont";
+    });
+  };
+  reader.readAsArrayBuffer(file);
+};

@@ -1,70 +1,97 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ===== ЭКРАН СПИСКА ЧАТОВ ===== -->
+<!-- СПИСОК ЧАТОВ -->
 <div id="chatListScreen" class="screen active">
-
   <header class="topbar">
-    <div class="profile">
-      <div class="avatar"></div>
-      <span class="username">Арсений</span>
+    <div class="profile" id="openMyProfile">
+      <div class="avatar" id="myAvatar"></div>
+      <span id="myName">Арсений</span>
     </div>
     <button class="icon-btn" id="openSettings">⚙</button>
   </header>
 
   <div class="chat-list">
-    <div class="chat-item" data-chat="bestie">💬 Bestie</div>
-    <div class="chat-item" data-chat="philosopher">🧠 Философ</div>
-    <div class="chat-item" data-chat="study">📚 Учёба</div>
+    <div class="chat-item" data-name="Bestie" data-status="онлайн" data-phone="+7 900 111-22-33">💬 Bestie</div>
+    <div class="chat-item" data-name="Философ" data-status="не в сети" data-phone="+7 900 222-33-44">🧠 Философ</div>
+    <div class="chat-item" data-name="Учёба" data-status="онлайн" data-phone="+7 900 333-44-55">📚 Учёба</div>
   </div>
-
 </div>
 
-<!-- ===== ЭКРАН ЧАТА ===== -->
+<!-- ЧАТ -->
 <div id="chatScreen" class="screen">
-
   <header class="topbar">
     <button class="icon-btn" id="backToChats">←</button>
-    <span id="chatTitle">Чат</span>
+    <div class="profile" id="openUserProfile">
+      <div class="avatar" id="chatAvatar"></div>
+      <div>
+        <div id="chatTitle"></div>
+        <div class="status" id="chatStatus"></div>
+      </div>
+    </div>
   </header>
 
   <div id="messages" class="messages"></div>
 
   <div class="input-bar">
-    <input id="messageInput" placeholder="Сообщение…" />
+    <input id="messageInput" placeholder="Сообщение…">
     <button id="sendBtn">➤</button>
   </div>
-
 </div>
 
-<!-- ===== НАСТРОЙКИ ===== -->
+<!-- НАСТРОЙКИ -->
 <div id="settingsScreen" class="screen">
-
   <header class="topbar">
     <button class="icon-btn" id="closeSettings">←</button>
     <span>Настройки</span>
   </header>
 
   <div class="settings">
+    <h3>👤 Профиль</h3>
+    <input id="nameInput" placeholder="Имя">
+    <input type="file" id="avatarPicker" accept="image/*">
 
-    <h3>🎨 Цвет кнопок</h3>
+    <h3>🎨 Фон</h3>
+    <select id="bgType">
+      <option value="solid">Однотонный</option>
+      <option value="gradient">Градиент</option>
+      <option value="image">Изображение</option>
+    </select>
+
+    <input type="color" id="bgColor1">
+    <input type="color" id="bgColor2">
+    <input type="file" id="bgImage" accept="image/*">
+
+    <h3>🔘 Цвет кнопок</h3>
     <input type="color" id="accentColor">
-
-    <h3>🌓 Тема</h3>
-    <button id="toggleTheme">Сменить тему</button>
 
     <h3>🔤 Шрифт</h3>
     <input type="file" id="fontPicker" accept=".ttf,.otf">
 
+    <button id="toggleTheme">Светлая / тёмная</button>
   </div>
+</div>
 
+<!-- ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ -->
+<div id="profileScreen" class="screen">
+  <header class="topbar">
+    <button class="icon-btn" id="closeProfile">←</button>
+    <span>Профиль</span>
+  </header>
+
+  <div class="profile-view">
+    <div class="avatar large" id="profileAvatar"></div>
+    <h2 id="profileName"></h2>
+    <p id="profileStatus"></p>
+    <p id="profilePhone"></p>
+  </div>
 </div>
 
 <script src="app.js"></script>

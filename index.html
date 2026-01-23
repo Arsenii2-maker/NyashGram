@@ -1,66 +1,110 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Chat App</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NyashGram</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div id="app">
 
-  <!-- HEADER -->
-  <header>
-    <img id="myAvatar" src="https://via.placeholder.com/40" class="avatar">
-    <span id="myName">User</span>
-    <button id="settingsBtn">⚙️</button>
+  <!-- ГЛОБАЛЬНАЯ ШАПКА -->
+  <header class="top-bar">
+    <div class="me">
+      <div id="myAvatar" class="avatar"></div>
+      <div id="myName">Арсений</div>
+    </div>
+    <button id="openSettings" class="icon-btn">⚙️</button>
   </header>
 
-  <!-- CHAT LIST -->
-  <div id="chatList" class="screen active">
-    <div class="chat-item" data-chat="alice">
-      <img src="https://via.placeholder.com/50" class="avatar">
+  <!-- ЭКРАН СПИСКА ЧАТОВ -->
+  <section id="chatList" class="screen active">
+    <div class="chat-item" onclick="openChat('Bestie')">
+      <div class="avatar auto"></div>
       <div>
-        <div class="name">Alice</div>
-        <div class="status">online</div>
+        <div class="chat-name">Bestie</div>
+        <div class="chat-status">✨ в сети</div>
       </div>
     </div>
 
-    <div class="chat-item" data-chat="bob">
-      <img src="https://via.placeholder.com/50" class="avatar">
+    <div class="chat-item" onclick="openChat('Философ')">
+      <div class="avatar auto"></div>
       <div>
-        <div class="name">Bob</div>
-        <div class="status">offline</div>
+        <div class="chat-name">Философ</div>
+        <div class="chat-status">🌙 не активен</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- CHAT SCREEN -->
-  <div id="chatScreen" class="screen">
-    <div id="messages"></div>
+  <!-- ЭКРАН ЧАТА -->
+  <section id="chatScreen" class="screen">
+    <div class="chat-header">
+      <button onclick="closeChat()">←</button>
+      <div class="chat-user" onclick="openProfile()">
+        <div class="avatar auto"></div>
+        <div>
+          <div id="chatUserName">Имя</div>
+          <div class="chat-status">✨ в сети</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="start-panel">
+      <div>Начни общение ✨</div>
+      <div class="quick">
+        <button onclick="quickMsg('Привет!')">Привет!</button>
+        <button onclick="quickMsg('Как дела?')">Как дела?</button>
+        <button onclick="quickMsg('Чем занимаешься?')">Чем занимаешься?</button>
+      </div>
+    </div>
+
+    <div id="messages" class="messages"></div>
 
     <div class="input-bar">
-      <input id="messageInput" type="text" placeholder="Сообщение">
-      <button id="sendBtn">➤</button>
+      <input id="messageInput" placeholder="Сообщение..." />
+      <button onclick="sendMessage()">➤</button>
     </div>
-  </div>
+  </section>
 
-  <!-- SETTINGS -->
-  <div id="settings" class="modal">
-    <div class="modal-content">
-      <h3>Настройки</h3>
+  <!-- НАСТРОЙКИ -->
+  <section id="settings" class="screen">
+    <h2>Мой мир ✨</h2>
 
-      <label>Имя</label>
-      <input id="nameInput" type="text">
+    <label>Имя</label>
+    <input id="nameInput" />
 
-      <label>Аватар</label>
-      <input id="avatarInput" type="file" accept="image/*">
+    <label>О себе</label>
+    <textarea id="aboutInput"></textarea>
 
-      <button id="saveSettings">Сохранить</button>
-      <button id="closeSettings">Закрыть</button>
+    <label>Шрифт</label>
+    <select id="fontSelect">
+      <option value="system-ui">System</option>
+      <option value="Arial">Arial</option>
+      <option value="Impact">Impact</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Comic Sans MS">Comic Sans</option>
+    </select>
+
+    <label>Цвет кнопок</label>
+    <input type="color" id="buttonColor" />
+
+    <button onclick="saveSettings()">Сохранить</button>
+    <button onclick="closeSettings()">Закрыть</button>
+  </section>
+
+  <!-- ПРОФИЛЬ -->
+  <section id="profile" class="screen">
+    <div class="profile-card">
+      <div class="avatar big auto"></div>
+      <h2 id="profileName">Имя</h2>
+      <div class="chat-status">✨ в сети</div>
+      <div class="number">+7 900 000 00 00</div>
+      <button onclick="closeProfile()">Назад</button>
     </div>
-  </div>
+  </section>
 
 </div>
 

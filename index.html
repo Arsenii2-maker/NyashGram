@@ -2,92 +2,107 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>NyashGram</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div id="app">
+<!-- ЭКРАН ВВОДА НИКА -->
+<div id="loginScreen" class="screen active">
+  <div class="login-card">
+    <h1>NyashGram</h1>
+    <input id="nicknameInput" type="text" placeholder="Введите ник" />
+    <button id="enterBtn">Войти</button>
+  </div>
+</div>
 
-  <!-- ===== HEADER ===== -->
-  <header class="top-bar">
-    <button id="backBtn" class="icon-btn hidden">←</button>
-
-    <div class="top-info">
-      <img id="topAvatar" class="avatar small" />
-      <div>
-        <div id="topName">Арсений</div>
-        <div id="topStatus" class="status"></div>
-      </div>
+<!-- СПИСОК ЧАТОВ -->
+<div id="chatListScreen" class="screen">
+  <header class="topbar">
+    <div class="user-info">
+      <img id="myAvatar" class="avatar" />
+      <span id="myName"></span>
     </div>
-
-    <button id="settingsBtn" class="icon-btn">⚙️</button>
+    <button id="settingsBtn">⚙️</button>
   </header>
 
-  <!-- ===== CHAT LIST ===== -->
-  <section id="chatList" class="screen active">
-    <div class="chat-item" data-chat="bestie">
-      <div class="avatar gradient"></div>
+  <div class="chat-list">
+    <div class="chat-item" data-user="Alice">
+      <img class="avatar" src="https://i.pravatar.cc/150?img=5">
       <div>
-        <div class="chat-name">Bestie</div>
-        <div class="chat-preview">💬</div>
+        <div class="chat-name">Alice</div>
+        <div class="chat-status">online</div>
       </div>
     </div>
 
-    <div class="chat-item" data-chat="philosophy">
-      <div class="avatar gradient"></div>
+    <div class="chat-item" data-user="Bob">
+      <img class="avatar" src="https://i.pravatar.cc/150?img=12">
       <div>
-        <div class="chat-name">Философ</div>
-        <div class="chat-preview">🧠</div>
+        <div class="chat-name">Bob</div>
+        <div class="chat-status offline">offline</div>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="chat-item" data-chat="study">
-      <div class="avatar gradient"></div>
+<!-- ЭКРАН ЧАТА -->
+<div id="chatScreen" class="screen">
+  <header class="topbar">
+    <button id="backBtn">←</button>
+    <div class="user-info">
+      <img id="chatAvatar" class="avatar" />
       <div>
-        <div class="chat-name">Учёба</div>
-        <div class="chat-preview">📚</div>
+        <div id="chatName"></div>
+        <div id="chatStatus" class="chat-status"></div>
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- ===== CHAT SCREEN ===== -->
-  <section id="chatScreen" class="screen">
-    <div id="chatIntro" class="chat-intro">
-      <div>✨ Начни общение ✨</div>
-      <div class="quick">
-        <button class="quick-btn">Привет!</button>
-        <button class="quick-btn">Как дела?</button>
-        <button class="quick-btn">Чем занимаешься?</button>
-      </div>
+  <div id="messages" class="messages">
+    <div class="hint">
+      <p>Начни общение ✨</p>
+      <button class="quick">Привет!</button>
+      <button class="quick">Как дела?</button>
     </div>
+  </div>
 
-    <div id="messages" class="messages"></div>
-  </section>
+  <div class="input-bar">
+    <input id="messageInput" type="text" placeholder="Сообщение…" />
+    <button id="sendBtn">➤</button>
+  </div>
+</div>
 
-  <!-- ===== SETTINGS ===== -->
-  <section id="settings" class="screen">
+<!-- НАСТРОЙКИ -->
+<div id="settingsScreen" class="screen">
+  <header class="topbar">
+    <button id="closeSettings">←</button>
     <h2>Настройки</h2>
+  </header>
 
+  <div class="settings">
     <label>Имя</label>
-    <input id="nameInput" placeholder="Ваше имя">
+    <input id="nameSetting" type="text" />
+
+    <label>Аватарка</label>
+    <input id="avatarInput" type="file" accept="image/*" />
 
     <label>Шрифт</label>
     <select id="fontSelect">
-      <option value="system">Системный</option>
-      <option value="serif">Times New Roman</option>
-      <option value="impact">Impact</option>
-      <option value="monospace">Monospace</option>
+      <option value="system-ui">System</option>
+      <option value="Arial">Arial</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Impact">Impact</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Comic Sans MS">Comic Sans</option>
     </select>
-  </section>
 
-  <!-- ===== INPUT BAR ===== -->
-  <footer id="inputBar" class="input-bar hidden">
-    <input id="messageInput" placeholder="Сообщение...">
-    <button id="sendBtn">➤</button>
-  </footer>
-  
+    <label>Цвет фона</label>
+    <input id="bgColor" type="color" />
+
+    <button id="saveSettings">Сохранить</button>
+  </div>
 </div>
 
 <script src="app.js"></script>

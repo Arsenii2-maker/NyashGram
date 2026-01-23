@@ -1,49 +1,27 @@
-const chatList = document.getElementById('chatList');
-const chatScreen = document.getElementById('chatScreen');
-const settings = document.getElementById('settings');
-const inputBar = document.getElementById('inputBar');
+const screens = {
+  start: startScreen,
+  list: chatList,
+  chat: chatScreen,
+  settings: settings
+};
 
-const backBtn = document.getElementById('backBtn');
-const settingsBtn = document.getElementById('settingsBtn');
+function show(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
 
-const messages = document.getElementById('messages');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-
-const topName = document.getElementById('topName');
-const topStatus = document.getElementById('topStatus');
-const nameInput = document.getElementById('nameInput');
-const fontSelect = document.getElementById('fontSelect');
-
-let currentScreen = 'list';
-
-function show(screen) {
-  [chatList, chatScreen, settings].forEach(s => s.classList.remove('active'));
-  inputBar.classList.add('hidden');
-  backBtn.classList.add('hidden');
-
-  if (screen === 'list') {
-    chatList.classList.add('active');
-    topStatus.textContent = '';
-  }
-
-  if (screen === 'chat') {
-    chatScreen.classList.add('active');
-    inputBar.classList.remove('hidden');
-    backBtn.classList.remove('hidden');
-    topStatus.textContent = 'в сети';
-  }
-
-  if (screen === 'settings') {
-    settings.classList.add('active');
-    backBtn.classList.remove('hidden');
-  }
-
-  currentScreen = screen;
+  header.classList.toggle('hidden', name === 'start');
+  inputBar.style.display = name === 'chat' ? 'flex' : 'none';
 }
+
+startBtn.onclick = () => {
+  chatName.textContent = startName.value || 'Пользователь';
+  show('list');
+};
 
 document.querySelectorAll('.chat-item').forEach(chat => {
   chat.onclick = () => {
+    chatName.textContent = chat.dataset.name;
+    chatStatus.textContent = chat.dataset.status;
     messages.innerHTML = '';
     show('chat');
   };
@@ -57,31 +35,46 @@ messageInput.onkeydown = e => e.key === 'Enter' && send();
 
 function send() {
   if (!messageInput.value.trim()) return;
+
   const msg = document.createElement('div');
   msg.className = 'message me';
   msg.textContent = messageInput.value;
   messages.appendChild(msg);
+
   messageInput.value = '';
 }
 
-document.querySelectorAll('.quick-btn').forEach(btn => {
-  btn.onclick = () => {
-    messageInput.value = btn.textContent;
-    send();
-    document.getElementById('chatIntro').style.display = 'none';
-  };
-});
-
-nameInput.oninput = () => topName.textContent = nameInput.value || 'Арсений';
-
 fontSelect.onchange = () => {
-  const map = {
-    system: 'system-ui',
-    serif: 'Times New Roman',
-    impact: 'Impact',
-    monospace: 'monospace'
-  };
-  document.body.style.fontFamily = map[fontSelect.value];
+  document.body.style.fontFamily = fontSelect.value;
 };
 
-show('list');
+avatarInput.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  chatAvatar.src = url;
+};
+
+bgType.onchange = updateBG;
+bgColor.oninput = updateBG;
+bgColor2.oninput = updateBG;
+bgImage.onchange = updateBG;
+
+function updateBG() {
+  if (bgType.value === 'color') {
+    document.body.style.background = bgColor.value;
+  }
+  if (bgType.value === 'gradient') {
+    document.body.style.background =
+      `linear-gradient(135deg, ${bgColor.value}, ${bgColor2.value})`;
+  }
+  if (bgType.value === 'image') {
+    const file = bgImage.files[0];
+    if (file) {
+      document.body.style.background =
+        `url(${URL.createObjectURL(file)}) center/cover`;
+    }
+  }
+}
+
+show('start');

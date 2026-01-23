@@ -1,87 +1,76 @@
-const chatList = document.getElementById('chatList');
-const chatScreen = document.getElementById('chatScreen');
-const settings = document.getElementById('settings');
-const inputBar = document.getElementById('inputBar');
+const screens = {
+  login: document.getElementById("loginScreen"),
+  list: document.getElementById("chatListScreen"),
+  chat: document.getElementById("chatScreen"),
+  settings: document.getElementById("settingsScreen")
+};
 
-const backBtn = document.getElementById('backBtn');
-const settingsBtn = document.getElementById('settingsBtn');
-
-const messages = document.getElementById('messages');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-
-const topName = document.getElementById('topName');
-const topStatus = document.getElementById('topStatus');
-const nameInput = document.getElementById('nameInput');
-const fontSelect = document.getElementById('fontSelect');
-
-let currentScreen = 'list';
-
-function show(screen) {
-  [chatList, chatScreen, settings].forEach(s => s.classList.remove('active'));
-  inputBar.classList.add('hidden');
-  backBtn.classList.add('hidden');
-
-  if (screen === 'list') {
-    chatList.classList.add('active');
-    topStatus.textContent = '';
-  }
-
-  if (screen === 'chat') {
-    chatScreen.classList.add('active');
-    inputBar.classList.remove('hidden');
-    backBtn.classList.remove('hidden');
-    topStatus.textContent = 'в сети';
-  }
-
-  if (screen === 'settings') {
-    settings.classList.add('active');
-    backBtn.classList.remove('hidden');
-  }
-
-  currentScreen = screen;
+function show(name) {
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
 }
 
-document.querySelectorAll('.chat-item').forEach(chat => {
-  chat.onclick = () => {
-    messages.innerHTML = '';
-    show('chat');
+const nicknameInput = document.getElementById("nicknameInput");
+const enterBtn = document.getElementById("enterBtn");
+const myName = document.getElementById("myName");
+const myAvatar = document.getElementById("myAvatar");
+
+enterBtn.onclick = () => {
+  if (!nicknameInput.value) return;
+  localStorage.setItem("name", nicknameInput.value);
+  myName.textContent = nicknameInput.value;
+  show("list");
+};
+
+myName.textContent = localStorage.getItem("name") || "";
+
+document.querySelectorAll(".chat-item").forEach(item => {
+  item.onclick = () => {
+    document.getElementById("chatName").textContent = item.dataset.user;
+    document.getElementById("chatAvatar").src = item.querySelector("img").src;
+    document.getElementById("chatStatus").textContent =
+      item.querySelector(".chat-status").textContent;
+    show("chat");
   };
 });
 
-backBtn.onclick = () => show('list');
-settingsBtn.onclick = () => show('settings');
+document.getElementById("backBtn").onclick = () => show("list");
+document.getElementById("settingsBtn").onclick = () => show("settings");
+document.getElementById("closeSettings").onclick = () => show("list");
 
-sendBtn.onclick = send;
-messageInput.onkeydown = e => e.key === 'Enter' && send();
+const messages = document.getElementById("messages");
+const input = document.getElementById("messageInput");
+
+document.getElementById("sendBtn").onclick = send;
+input.addEventListener("keydown", e => e.key === "Enter" && send());
 
 function send() {
-  if (!messageInput.value.trim()) return;
-  const msg = document.createElement('div');
-  msg.className = 'message me';
-  msg.textContent = messageInput.value;
-  messages.appendChild(msg);
-  messageInput.value = '';
+  if (!input.value) return;
+  const div = document.createElement("div");
+  div.className = "message me";
+  div.textContent = input.value;
+  messages.appendChild(div);
+  input.value = "";
+  messages.scrollTop = messages.scrollHeight;
 }
 
-document.querySelectorAll('.quick-btn').forEach(btn => {
-  btn.onclick = () => {
-    messageInput.value = btn.textContent;
-    send();
-    document.getElementById('chatIntro').style.display = 'none';
+document.querySelectorAll(".quick").forEach(b => {
+  b.onclick = () => {
+    input.value = b.textContent;
   };
-}); 
+});
 
-nameInput.oninput = () => topName.textContent = nameInput.value || 'Арсений';
-
-fontSelect.onchange = () => {
-  const map = {
-    system: 'system-ui',
-    serif: 'Times New Roman',
-    impact: 'Impact',
-    monospace: 'monospace'
-  };
-  document.body.style.fontFamily = map[fontSelect.value];
+document.getElementById("fontSelect").onchange = e => {
+  document.body.style.fontFamily = e.target.value;
 };
 
-show('list');
+document.getElementById("bgColor").oninput = e => {
+  document.body.style.background = e.target.value;
+};
+
+document.getElementById("avatarInput").onchange = e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => myAvatar.src = reader.result;
+  reader.readAsDataURL(file);
+};

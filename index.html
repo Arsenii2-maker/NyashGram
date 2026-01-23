@@ -2,109 +2,91 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NyashGram</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="app">
 
-  <!-- ГЛОБАЛЬНАЯ ШАПКА -->
+  <!-- ===== HEADER ===== -->
   <header class="top-bar">
-    <div class="me">
-      <div id="myAvatar" class="avatar"></div>
-      <div id="myName">Арсений</div>
-    </div>
-    <button id="openSettings" class="icon-btn">⚙️</button>
-  </header>
+    <button id="backBtn" class="icon-btn hidden">←</button>
 
-  <!-- ЭКРАН СПИСКА ЧАТОВ -->
-  <section id="chatList" class="screen active">
-    <div class="chat-item" onclick="openChat('Bestie')">
-      <div class="avatar auto"></div>
+    <div class="top-info">
+      <img id="topAvatar" class="avatar small" />
       <div>
-        <div class="chat-name">Bestie</div>
-        <div class="chat-status">✨ в сети</div>
+        <div id="topName">Арсений</div>
+        <div id="topStatus" class="status"></div>
       </div>
     </div>
 
-    <div class="chat-item" onclick="openChat('Философ')">
-      <div class="avatar auto"></div>
+    <button id="settingsBtn" class="icon-btn">⚙️</button>
+  </header>
+
+  <!-- ===== CHAT LIST ===== -->
+  <section id="chatList" class="screen active">
+    <div class="chat-item" data-chat="bestie">
+      <div class="avatar gradient"></div>
+      <div>
+        <div class="chat-name">Bestie</div>
+        <div class="chat-preview">💬</div>
+      </div>
+    </div>
+
+    <div class="chat-item" data-chat="philosophy">
+      <div class="avatar gradient"></div>
       <div>
         <div class="chat-name">Философ</div>
-        <div class="chat-status">🌙 не активен</div>
+        <div class="chat-preview">🧠</div>
+      </div>
+    </div>
+
+    <div class="chat-item" data-chat="study">
+      <div class="avatar gradient"></div>
+      <div>
+        <div class="chat-name">Учёба</div>
+        <div class="chat-preview">📚</div>
       </div>
     </div>
   </section>
 
-  <!-- ЭКРАН ЧАТА -->
+  <!-- ===== CHAT SCREEN ===== -->
   <section id="chatScreen" class="screen">
-    <div class="chat-header">
-      <button onclick="closeChat()">←</button>
-      <div class="chat-user" onclick="openProfile()">
-        <div class="avatar auto"></div>
-        <div>
-          <div id="chatUserName">Имя</div>
-          <div class="chat-status">✨ в сети</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="start-panel">
-      <div>Начни общение ✨</div>
+    <div id="chatIntro" class="chat-intro">
+      <div>✨ Начни общение ✨</div>
       <div class="quick">
-        <button onclick="quickMsg('Привет!')">Привет!</button>
-        <button onclick="quickMsg('Как дела?')">Как дела?</button>
-        <button onclick="quickMsg('Чем занимаешься?')">Чем занимаешься?</button>
+        <button class="quick-btn">Привет!</button>
+        <button class="quick-btn">Как дела?</button>
+        <button class="quick-btn">Чем занимаешься?</button>
       </div>
     </div>
 
     <div id="messages" class="messages"></div>
-
-    <div class="input-bar">
-      <input id="messageInput" placeholder="Сообщение..." />
-      <button onclick="sendMessage()">➤</button>
-    </div>
   </section>
 
-  <!-- НАСТРОЙКИ -->
+  <!-- ===== SETTINGS ===== -->
   <section id="settings" class="screen">
-    <h2>Мой мир ✨</h2>
+    <h2>Настройки</h2>
 
     <label>Имя</label>
-    <input id="nameInput" />
-
-    <label>О себе</label>
-    <textarea id="aboutInput"></textarea>
+    <input id="nameInput" placeholder="Ваше имя">
 
     <label>Шрифт</label>
     <select id="fontSelect">
-      <option value="system-ui">System</option>
-      <option value="Arial">Arial</option>
-      <option value="Impact">Impact</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Comic Sans MS">Comic Sans</option>
+      <option value="system">Системный</option>
+      <option value="serif">Times New Roman</option>
+      <option value="impact">Impact</option>
+      <option value="monospace">Monospace</option>
     </select>
-
-    <label>Цвет кнопок</label>
-    <input type="color" id="buttonColor" />
-
-    <button onclick="saveSettings()">Сохранить</button>
-    <button onclick="closeSettings()">Закрыть</button>
   </section>
 
-  <!-- ПРОФИЛЬ -->
-  <section id="profile" class="screen">
-    <div class="profile-card">
-      <div class="avatar big auto"></div>
-      <h2 id="profileName">Имя</h2>
-      <div class="chat-status">✨ в сети</div>
-      <div class="number">+7 900 000 00 00</div>
-      <button onclick="closeProfile()">Назад</button>
-    </div>
-  </section>
+  <!-- ===== INPUT BAR ===== -->
+  <footer id="inputBar" class="input-bar hidden">
+    <input id="messageInput" placeholder="Сообщение...">
+    <button id="sendBtn">➤</button>
+  </footer>
 
 </div>
 

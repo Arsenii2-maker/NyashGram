@@ -1,139 +1,97 @@
 const screens = {
-  login: loginScreen,
-  list: chatListScreen,
+  start: startScreen,
+  list: chatList,
   chat: chatScreen,
-  settings: settingsScreen
+  settings: settings
 };
 
-function show(name) {
-  Object.values(screens).forEach(s => s.classList.remove("active"));
-  screens[name].classList.add("active");
-}
-
+const chats = {};
 let currentChat = null;
 
-const nicknameInput = nicknameInput;
-const enterBtn = enterBtn;
-const myName = myName;
-const myAvatar = myAvatar;
+function show(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
 
-enterBtn.onclick = () => {
-  if (!nicknameInput.value) return;
-  localStorage.setItem("nyash_name", nicknameInput.value);
-  myName.textContent = nicknameInput.value;
-  show("list");
+  header.classList.toggle('hidden', name === 'start');
+  inputBar.classList.toggle('hidden', name !== 'chat');
+}
+
+startBtn.onclick = () => {
+  const name = startName.value.trim() || 'Пользователь';
+  document.body.dataset.username = name;
+  show('list');
 };
 
-myName.textContent = localStorage.getItem("nyash_name") || "";
+document.querySelectorAll('.chat-item').forEach(chat => {
+  chat.onclick = () => {
+    currentChat = chat.dataset.id;
 
-document.querySelectorAll(".chat-item").forEach(item => {
-  item.onclick = () => {
-    currentChat = item.dataset.user;
-    chatName.textContent = currentChat;
-    chatAvatar.src = item.querySelector("img").src;
-    chatStatus.textContent = item.querySelector(".chat-status").textContent;
-    loadMessages();
-    show("chat");
+    chatName.textContent = chat.dataset.name;
+    chatStatus.textContent = chat.dataset.status;
+
+    messages.innerHTML = '';
+    chatIntro.style.display = chats[currentChat]?.length ? 'none' : 'block';
+
+    (chats[currentChat] || []).forEach(m => addMessage(m.text, m.me));
+    show('chat');
   };
 });
 
-backBtn.onclick = () => show("list");
-settingsBtn.onclick = () => show("settings");
-closeSettings.onclick = () => show("list");
-
-const messagesBox = messages;
-const input = messageInput;
+backBtn.onclick = () => show('list');
+settingsBtn.onclick = () => show('settings');
 
 sendBtn.onclick = send;
-input.addEventListener("keydown", e => e.key === "Enter" && send());
+messageInput.onkeydown = e => e.key === 'Enter' && send();
 
-function loadMessages() {
-  messagesBox.innerHTML = "";
-  const saved = JSON.parse(localStorage.getItem("chat_" + currentChat) || "[]");
+function send(textFromQuick) {
+  const text = textFromQuick || messageInput.value.trim();
+  if (!text) return;
 
-  if (saved.length === 0) {
-    messagesBox.appendChild(createHint());
+  if (!chats[currentChat]) chats[currentChat] = [];
+  chats[currentChat].push({ text, me: true });
+
+  addMessage(text, true);
+  messageInput.value = '';
+  chatIntro.style.display = 'none';
+}
+
+function addMessage(text, me) {
+  const msg = document.createElement('div');
+  msg.className = 'message ' + (me ? 'me' : 'other');
+  msg.textContent = text;
+  messages.appendChild(msg);
+}
+
+document.querySelectorAll('.quick-list button').forEach(b => {
+  b.onclick = () => send(b.textContent);
+});
+
+/* SETTINGS */
+
+fontSelect.onchange = () => {
+  document.body.style.fontFamily = fontSelect.value;
+};
+
+bgType.onchange = updateBG;
+bgColor.oninput = updateBG;
+bgColor2.oninput = updateBG;
+bgImage.onchange = updateBG;
+
+function updateBG() {
+  if (bgType.value === 'color') {
+    document.body.style.background = bgColor.value;
   }
-
-  saved.forEach(text => {
-    const div = document.createElement("div");
-    div.className = "message me";
-    div.textContent = text;
-    messagesBox.appendChild(div);
-  });
-}
-
-function send() {
-  if (!input.value || !currentChat) return;
-
-  const key = "chat_" + currentChat;
-  const saved = JSON.parse(localStorage.getItem(key) || "[]");
-  saved.push(input.value);
-  localStorage.setItem(key, JSON.stringify(saved));
-
-  if (document.querySelector(".hint")) {
-    document.querySelector(".hint").remove();
+  if (bgType.value === 'gradient') {
+    document.body.style.background =
+      `linear-gradient(135deg, ${bgColor.value}, ${bgColor2.value})`;
   }
-
-  const div = document.createElement("div");
-  div.className = "message me";
-  div.textContent = input.value;
-  messagesBox.appendChild(div);
-
-  input.value = "";
-  messagesBox.scrollTop = messagesBox.scrollHeight;
+  if (bgType.value === 'image') {
+    const file = bgImage.files[0];
+    if (file) {
+      document.body.style.background =
+        `url(${URL.createObjectURL(file)}) center/cover`;
+    }
+  }
 }
 
-function createHint() {
-  const hint = document.createElement("div");
-  hint.className = "hint";
-  hint.innerHTML = `
-    <p>Начни общение ✨</p>
-    <button class="quick">Привет!</button>
-    <button class="quick">Как ты?</button>
-    <button class="quick">Что нового?</button>
-    <button class="quick">Чем занимаешься?</button>
-    <button class="quick">NyashGram приветствует тебя 💖</button>
-  `;
-
-  hint.querySelectorAll(".quick").forEach(b => {
-    b.onclick = () => input.value = b.textContent;
-  });
-
-  return hint;
-}
-
-/* ШРИФТЫ */
-fontSelect.onchange = e => {
-  document.body.style.fontFamily = e.target.value;
-  localStorage.setItem("nyash_font", e.target.value);
-};
-
-const savedFont = localStorage.getItem("nyash_font");
-if (savedFont) {
-  document.body.style.fontFamily = savedFont;
-  fontSelect.value = savedFont;
-}
-
-/* ФОН */
-bgColor.oninput = e => {
-  document.body.style.background = e.target.value;
-  localStorage.setItem("nyash_bg", e.target.value);
-};
-
-const savedBg = localStorage.getItem("nyash_bg");
-if (savedBg) document.body.style.background = savedBg;
-
-/* АВАТАР */
-avatarInput.onchange = e => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = () => {
-    myAvatar.src = reader.result;
-    localStorage.setItem("nyash_avatar", reader.result);
-  };
-  reader.readAsDataURL(file);
-};
-
-const savedAvatar = localStorage.getItem("nyash_avatar");
-if (savedAvatar) myAvatar.src = savedAvatar;
+show('start');

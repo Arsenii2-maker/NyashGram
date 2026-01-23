@@ -1,46 +1,56 @@
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font, system-ui);
 }
 
-html, body {
+body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: system-ui, sans-serif;
-  background: #0f0f14;
+  background: linear-gradient(180deg, #1b1b2a, #0e0e18);
   color: white;
 }
 
 #app {
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-header {
-  height: 56px;
+.top-bar {
   display: flex;
-  align-items: center;
-  padding: 0 12px;
-  background: #16161d;
-  gap: 10px;
+  justify-content: space-between;
+  padding: 12px;
+  background: rgba(0,0,0,0.3);
 }
 
-header button {
-  margin-left: auto;
+.me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+}
+
+.avatar.big {
+  width: 120px;
+  height: 120px;
+}
+
+.icon-btn {
+  font-size: 22px;
+  background: none;
+  border: none;
+  color: white;
 }
 
 .screen {
   flex: 1;
   display: none;
-  overflow-y: auto;
+  padding: 12px;
 }
 
 .screen.active {
@@ -49,82 +59,48 @@ header button {
 
 .chat-item {
   display: flex;
-  gap: 10px;
-  padding: 12px;
-  border-bottom: 1px solid #222;
-  cursor: pointer;
-}
-
-.chat-item:hover {
-  background: #1e1e26;
-}
-
-.status {
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-#messages {
-  padding: 12px;
-}
-
-.message {
-  background: #1f1f2a;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 10px;
   border-radius: 12px;
+  background: rgba(255,255,255,0.08);
   margin-bottom: 8px;
-  border: 1px solid black;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.start-panel {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.quick button {
+  margin: 4px;
+}
+
+.messages {
+  flex: 1;
 }
 
 .input-bar {
   display: flex;
-  padding: 10px;
   gap: 8px;
-  border-top: 1px solid #222;
 }
 
-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
   border: none;
-  outline: none;
-  font-size: 16px;
 }
 
 button {
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 10px;
   border: none;
-  font-size: 16px;
-  background: #4f7cff;
+  background: var(--btn, #4e7cff);
   color: white;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal-content {
-  background: #1a1a22;
-  padding: 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }

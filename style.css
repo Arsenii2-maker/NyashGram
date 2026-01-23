@@ -1,276 +1,93 @@
-/* ===================== */
-/* RESET */
-/* ===================== */
-
+/* СБРОС */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* БАЗА */
 html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0b0b14;
-  color: #fff;
+  background: linear-gradient(135deg, #ff3c00, #ff8a00);
 }
 
-/* ===================== */
-/* SCREENS */
-/* ===================== */
-
+/* ЭКРАНЫ */
 .screen {
-  position: absolute;
-  inset: 0;
-
-  width: 100vw;
-  height: 100vh;
-
   display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
+  width: 100%;
+  height: 100%;
   padding: 24px;
-  z-index: 10;
-
-  background: radial-gradient(circle at top, #16162a, #09090f);
-  animation: fadeIn 0.35s ease;
 }
 
 .screen.active {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-/* ===================== */
-/* ANIMATIONS */
-/* ===================== */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* ===================== */
-/* NICKNAME SCREEN */
-/* ===================== */
-
-#screen-nickname {
-  gap: 24px;
+/* ЛОГО */
+.logo {
+  font-size: 36px;
+  color: white;
+  margin-bottom: 32px;
   text-align: center;
 }
 
-#screen-nickname .logo {
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-#screen-nickname input {
+/* ВВОД */
+input {
   width: 100%;
-  max-width: 340px;
-
-  font-size: 18px;
-  padding: 16px 18px;
-
+  max-width: 320px;
+  height: 52px;
   border-radius: 14px;
   border: none;
-  outline: none;
-
-  background: #1a1a2a;
-  color: #fff;
+  padding: 0 16px;
+  font-size: 18px;
+  margin-bottom: 16px;
 }
 
-#screen-nickname button {
+/* КНОПКА */
+button {
   width: 100%;
-  max-width: 340px;
-
-  font-size: 18px;
-  padding: 16px;
-
+  max-width: 320px;
+  height: 52px;
   border-radius: 14px;
   border: none;
-
-  background: linear-gradient(135deg, #6b6bff, #9a7cff);
-  color: #fff;
+  background: white;
+  font-size: 18px;
   font-weight: 600;
-
   cursor: pointer;
 }
 
-/* ===================== */
-/* CHAT SCREEN */
-/* ===================== */
-
-#screen-chat {
-  justify-content: space-between;
-}
-
-/* HEADER */
-
-.chat-header {
+/* ТОПБАР */
+.topbar {
   width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
   padding: 16px;
   background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
-}
-
-.chat-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #333;
-}
-
-.chat-user {
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-name {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.chat-status {
-  font-size: 13px;
-  opacity: 0.6;
-}
-
-/* MESSAGES */
-
-.chat-messages {
-  flex: 1;
-  width: 100%;
-  padding: 16px;
-  overflow-y: auto;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.message {
-  max-width: 75%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  font-size: 15px;
-  line-height: 1.3;
-}
-
-.message.me {
-  align-self: flex-end;
-  background: linear-gradient(135deg, #6b6bff, #9a7cff);
-}
-
-.message.other {
-  align-self: flex-start;
-  background: #1e1e2e;
-}
-
-/* INPUT BAR */
-
-.chat-input {
-  width: 100%;
-  display: flex;
-  gap: 12px;
-
-  padding: 16px;
-  background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 14px 16px;
-  font-size: 16px;
-
-  border-radius: 14px;
-  border: none;
-  outline: none;
-
-  background: #1a1a2a;
-  color: #fff;
-}
-
-.chat-input button {
-  padding: 14px 18px;
-  font-size: 16px;
-
-  border-radius: 14px;
-  border: none;
-
-  background: #6b6bff;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* ===================== */
-/* SETTINGS SCREEN */
-/* ===================== */
-
-#screen-settings {
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.settings-block {
-  width: 100%;
-  background: rgba(255,255,255,0.05);
   border-radius: 16px;
-  padding: 16px;
+  margin-bottom: 16px;
 }
 
-.settings-title {
+.top-title {
+  color: white;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* СПИСОК ЧАТОВ */
+.chat-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-item {
+  padding: 18px;
+  background: rgba(0,0,0,0.35);
+  color: white;
+  border-radius: 16px;
   font-size: 18px;
-  margin-bottom: 12px;
-}
-
-/* ===================== */
-/* FONT PRESETS */
-/* ===================== */
-
-.font-system { font-family: system-ui; }
-.font-impact { font-family: Impact, sans-serif; }
-.font-times { font-family: "Times New Roman", serif; }
-.font-mono { font-family: monospace; }
-.font-comic { font-family: "Comic Sans MS", cursive; }
-
-/* ===================== */
-/* BACKGROUNDS */
-/* ===================== */
-
-.bg-gradient {
-  background: linear-gradient(135deg, #1a1a40, #09090f);
-}
-
-.bg-color {
-  background: #12121c;
-}
-
-.bg-image {
-  background-size: cover;
-  background-position: center;
-}
-
-/* ===================== */
-/* SAFETY */
-/* ===================== */
-
-button, input {
-  pointer-events: auto;
-  z-index: 20;
 }

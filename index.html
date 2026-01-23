@@ -3,95 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>NyashGram</title>
+  <title>Chat App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- СПИСОК ЧАТОВ -->
-<div id="chatListScreen" class="screen active">
-  <header class="topbar">
-    <div class="profile" id="openMyProfile">
-      <div class="avatar" id="myAvatar"></div>
-      <span id="myName">Арсений</span>
-    </div>
-    <button class="icon-btn" id="openSettings">⚙</button>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <img id="myAvatar" src="https://via.placeholder.com/40" class="avatar">
+    <span id="myName">User</span>
+    <button id="settingsBtn">⚙️</button>
   </header>
 
-  <div class="chat-list">
-    <div class="chat-item" data-name="Bestie" data-status="онлайн" data-phone="+7 900 111-22-33">💬 Bestie</div>
-    <div class="chat-item" data-name="Философ" data-status="не в сети" data-phone="+7 900 222-33-44">🧠 Философ</div>
-    <div class="chat-item" data-name="Учёба" data-status="онлайн" data-phone="+7 900 333-44-55">📚 Учёба</div>
-  </div>
-</div>
-
-<!-- ЧАТ -->
-<div id="chatScreen" class="screen">
-  <header class="topbar">
-    <button class="icon-btn" id="backToChats">←</button>
-    <div class="profile" id="openUserProfile">
-      <div class="avatar" id="chatAvatar"></div>
+  <!-- CHAT LIST -->
+  <div id="chatList" class="screen active">
+    <div class="chat-item" data-chat="alice">
+      <img src="https://via.placeholder.com/50" class="avatar">
       <div>
-        <div id="chatTitle"></div>
-        <div class="status" id="chatStatus"></div>
+        <div class="name">Alice</div>
+        <div class="status">online</div>
       </div>
     </div>
-  </header>
 
-  <div id="messages" class="messages"></div>
-
-  <div class="input-bar">
-    <input id="messageInput" placeholder="Сообщение…">
-    <button id="sendBtn">➤</button>
+    <div class="chat-item" data-chat="bob">
+      <img src="https://via.placeholder.com/50" class="avatar">
+      <div>
+        <div class="name">Bob</div>
+        <div class="status">offline</div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- НАСТРОЙКИ -->
-<div id="settingsScreen" class="screen">
-  <header class="topbar">
-    <button class="icon-btn" id="closeSettings">←</button>
-    <span>Настройки</span>
-  </header>
+  <!-- CHAT SCREEN -->
+  <div id="chatScreen" class="screen">
+    <div id="messages"></div>
 
-  <div class="settings">
-    <h3>👤 Профиль</h3>
-    <input id="nameInput" placeholder="Имя">
-    <input type="file" id="avatarPicker" accept="image/*">
-
-    <h3>🎨 Фон</h3>
-    <select id="bgType">
-      <option value="solid">Однотонный</option>
-      <option value="gradient">Градиент</option>
-      <option value="image">Изображение</option>
-    </select>
-
-    <input type="color" id="bgColor1">
-    <input type="color" id="bgColor2">
-    <input type="file" id="bgImage" accept="image/*">
-
-    <h3>🔘 Цвет кнопок</h3>
-    <input type="color" id="accentColor">
-
-    <h3>🔤 Шрифт</h3>
-    <input type="file" id="fontPicker" accept=".ttf,.otf">
-
-    <button id="toggleTheme">Светлая / тёмная</button>
+    <div class="input-bar">
+      <input id="messageInput" type="text" placeholder="Сообщение">
+      <button id="sendBtn">➤</button>
+    </div>
   </div>
-</div>
 
-<!-- ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ -->
-<div id="profileScreen" class="screen">
-  <header class="topbar">
-    <button class="icon-btn" id="closeProfile">←</button>
-    <span>Профиль</span>
-  </header>
+  <!-- SETTINGS -->
+  <div id="settings" class="modal">
+    <div class="modal-content">
+      <h3>Настройки</h3>
 
-  <div class="profile-view">
-    <div class="avatar large" id="profileAvatar"></div>
-    <h2 id="profileName"></h2>
-    <p id="profileStatus"></p>
-    <p id="profilePhone"></p>
+      <label>Имя</label>
+      <input id="nameInput" type="text">
+
+      <label>Аватар</label>
+      <input id="avatarInput" type="file" accept="image/*">
+
+      <button id="saveSettings">Сохранить</button>
+      <button id="closeSettings">Закрыть</button>
+    </div>
   </div>
+
 </div>
 
 <script src="app.js"></script>

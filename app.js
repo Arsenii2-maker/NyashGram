@@ -70,7 +70,7 @@ document.querySelectorAll('.quick-btn').forEach(btn => {
     send();
     document.getElementById('chatIntro').style.display = 'none';
   };
-});
+}); 
 
 nameInput.oninput = () => topName.textContent = nameInput.value || 'Арсений';
 

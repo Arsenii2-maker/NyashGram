@@ -1,53 +1,40 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NyashGram ✨</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ЭКРАН ВВОДА НИКА -->
-<div id="screen-nickname" class="screen active">
-  <h1 class="logo">NyashGram ✨</h1>
-  <input id="nicknameInput" placeholder="Ваш ник">
-  <button id="saveNickname">Продолжить</button>
-</div>
+  <!-- Экран ввода ника -->
+  <div class="screen active" id="screen-nick">
+    <h1 class="logo">NyashGram ✨</h1>
 
-<!-- СПИСОК ЧАТОВ -->
-<div id="screen-chats" class="screen">
-  <header class="topbar">NyashGram ✨</header>
+    <input
+      type="text"
+      id="nicknameInput"
+      placeholder="Введи свой ник"
+      maxlength="20"
+    />
 
-  <div class="chat-list">
-    <div class="chat-item" data-name="Bestie">Bestie</div>
-    <div class="chat-item" data-name="Философ">Философ</div>
-    <div class="chat-item" data-name="Учёба">Учёба</div>
+    <button id="startBtn">Продолжить</button>
   </div>
 
-  <button class="settings-btn">⚙️</button>
-</div>
+  <!-- Экран чатов -->
+  <div class="screen" id="screen-chats">
+    <header class="topbar">
+      <span class="top-title">Чаты</span>
+    </header>
 
-<!-- ЧАТ -->
-<div id="screen-chat" class="screen">
-  <header class="chat-header">
-    <button id="backBtn">←</button>
-    <div class="chat-user">
-      <img id="chatAvatar">
-      <div>
-        <div id="chatName"></div>
-        <div class="status">в сети</div>
-      </div>
+    <div class="chat-list">
+      <div class="chat-item">Bestie</div>
+      <div class="chat-item">Философ</div>
+      <div class="chat-item">Учёба</div>
     </div>
-  </header>
-
-  <div id="messages"></div>
-
-  <div class="input-bar">
-    <input id="messageInput" placeholder="Сообщение...">
-    <button id="sendBtn">➤</button>
   </div>
-</div>
 
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

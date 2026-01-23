@@ -3,29 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NyashGram ✨</title>
+  <title>NyashGram</title>
 
-  <!-- ===== GOOGLE FONTS ===== -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- ШРИФТЫ -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter&family=Poppins&family=Montserrat&family=Roboto&family=Playfair+Display&display=swap" rel="stylesheet">
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@400;600&family=Nunito:wght@400;700&family=Roboto:wght@400;700&family=JetBrains+Mono&family=Pacifico&display=swap" rel="stylesheet">
-
-  <!-- ===== STYLES ===== -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="app">
 
-  <!-- ===== START SCREEN ===== -->
+  <!-- START -->
   <section id="startScreen" class="screen active center">
-    <h1 class="logo">NyashGram ✨</h1>
+    <h1>NyashGram ✨</h1>
     <input id="startName" placeholder="Введите имя">
-    <button id="enterBtn" type="button">Войти</button>
+    <button id="startBtn">Войти</button>
   </section>
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header id="header" class="top-bar hidden">
     <button id="backBtn" class="icon-btn">←</button>
 
@@ -40,59 +36,55 @@
     <button id="settingsBtn" class="icon-btn">⚙️</button>
   </header>
 
-  <!-- ===== CHAT LIST ===== -->
+  <!-- CHAT LIST -->
   <section id="chatList" class="screen">
-    <div class="chat-item" data-name="Bestie" data-status="в сети">
+    <div class="chat-item" data-id="bestie" data-name="Bestie" data-status="в сети">
       <div class="avatar gradient"></div>
       <div class="chat-name">Bestie</div>
     </div>
 
-    <div class="chat-item" data-name="Философ" data-status="не в сети">
+    <div class="chat-item" data-id="philosophy" data-name="Философ" data-status="не в сети">
       <div class="avatar gradient"></div>
       <div class="chat-name">Философ</div>
     </div>
 
-    <div class="chat-item" data-name="Учёба" data-status="в сети">
+    <div class="chat-item" data-id="study" data-name="Учёба" data-status="в сети">
       <div class="avatar gradient"></div>
       <div class="chat-name">Учёба</div>
     </div>
   </section>
 
-  <!-- ===== CHAT ===== -->
+  <!-- CHAT -->
   <section id="chatScreen" class="screen">
-    <div id="intro" class="intro">
-      <div class="intro-title">✨ Начни общение ✨</div>
-      <div class="quick vertical">
+    <div id="chatIntro" class="chat-intro">
+      <h2>✨ Начни общение ✨</h2>
+      <div class="quick-list">
         <button>Привет!</button>
-        <button>Как дела?</button>
-        <button>Чем занимаешься?</button>
-        <button>Что нового?</button>
-        <button>Хочешь поболтать?</button>
+        <button>Как ты?</button>
+        <button>Что делаешь?</button>
+        <button>Есть новости?</button>
+        <button>Хочешь поговорить?</button>
       </div>
     </div>
 
     <div id="messages"></div>
   </section>
 
-  <!-- ===== SETTINGS ===== -->
+  <!-- SETTINGS -->
   <section id="settings" class="screen">
-    <h2>Настройки NyashGram 🐾</h2>
+    <h2>Настройки</h2>
 
-    <label>Имя</label>
+    <label>Ваше имя</label>
     <input id="nameInput">
-
-    <label>Аватарка</label>
-    <input type="file" id="avatarInput" accept="image/*">
 
     <label>Шрифт</label>
     <select id="fontSelect">
+      <option value="Inter">Inter</option>
+      <option value="Poppins">Poppins</option>
+      <option value="Montserrat">Montserrat</option>
+      <option value="Roboto">Roboto</option>
+      <option value="Playfair Display">Playfair Display</option>
       <option value="system-ui">System</option>
-      <option value="'Inter', system-ui">Inter</option>
-      <option value="'Montserrat', system-ui">Montserrat</option>
-      <option value="'Nunito', system-ui">Nunito</option>
-      <option value="'Roboto', system-ui">Roboto</option>
-      <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-      <option value="'Pacifico', cursive">Pacifico ✨</option>
     </select>
 
     <label>Фон</label>
@@ -102,13 +94,13 @@
       <option value="image">Фото</option>
     </select>
 
-    <input type="color" id="bgColor" value="#0e0e16">
-    <input type="color" id="bgColor2" value="#2a5bff">
+    <input type="color" id="bgColor">
+    <input type="color" id="bgColor2">
     <input type="file" id="bgImage" accept="image/*">
   </section>
 
-  <!-- ===== INPUT ===== -->
-  <footer id="inputBar">
+  <!-- INPUT -->
+  <footer id="inputBar" class="hidden">
     <input id="messageInput" placeholder="Сообщение...">
     <button id="sendBtn">➤</button>
   </footer>

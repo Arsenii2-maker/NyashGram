@@ -1,108 +1,118 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>NyashGram</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NyashGram ✨</title>
+
+  <!-- ===== GOOGLE FONTS ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@400;600&family=Nunito:wght@400;700&family=Roboto:wght@400;700&family=JetBrains+Mono&family=Pacifico&display=swap" rel="stylesheet">
+
+  <!-- ===== STYLES ===== -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
-<!-- ЭКРАН ВВОДА НИКА -->
-<div id="loginScreen" class="screen active">
-  <div class="login-card">
-    <h1>NyashGram</h1>
-    <input id="nicknameInput" type="text" placeholder="Введите ник" />
+
+<div id="app">
+
+  <!-- ===== START SCREEN ===== -->
+  <section id="startScreen" class="screen active center">
+    <h1 class="logo">NyashGram ✨</h1>
+    <input id="startName" placeholder="Введите имя">
     <button id="enterBtn" type="button">Войти</button>
-  </div>
-</div>
+  </section>
 
-<!-- СПИСОК ЧАТОВ -->
-<div id="chatListScreen" class="screen">
-  <header class="topbar">
-    <div class="user-info">
-      <img id="myAvatar" class="avatar" />
-      <span id="myName"></span>
-    </div>
-    <button id="settingsBtn">⚙️</button>
-  </header>
+  <!-- ===== HEADER ===== -->
+  <header id="header" class="top-bar hidden">
+    <button id="backBtn" class="icon-btn">←</button>
 
-  <div class="chat-list">
-    <div class="chat-item" data-user="Alice">
-      <img class="avatar" src="https://i.pravatar.cc/150?img=5">
-      <div>
-        <div class="chat-name">Alice</div>
-        <div class="chat-status">online</div>
-      </div>
-    </div>
-
-    <div class="chat-item" data-user="Bob">
-      <img class="avatar" src="https://i.pravatar.cc/150?img=12">
-      <div>
-        <div class="chat-name">Bob</div>
-        <div class="chat-status offline">offline</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ЭКРАН ЧАТА -->
-<div id="chatScreen" class="screen">
-  <header class="topbar">
-    <button id="backBtn">←</button>
-    <div class="user-info">
-      <img id="chatAvatar" class="avatar" />
+    <div class="top-info">
+      <img id="chatAvatar" class="avatar gradient">
       <div>
         <div id="chatName"></div>
-        <div id="chatStatus" class="chat-status"></div>
+        <div id="chatStatus" class="status"></div>
       </div>
     </div>
+
+    <button id="settingsBtn" class="icon-btn">⚙️</button>
   </header>
 
-  <div id="messages" class="messages">
-    <div class="hint">
-      <p>Начни общение ✨</p>
-      <button class="quick">Привет!</button>
-      <button class="quick">Как дела?</button>
+  <!-- ===== CHAT LIST ===== -->
+  <section id="chatList" class="screen">
+    <div class="chat-item" data-name="Bestie" data-status="в сети">
+      <div class="avatar gradient"></div>
+      <div class="chat-name">Bestie</div>
     </div>
-  </div>
 
-  <div class="input-bar">
-    <input id="messageInput" type="text" placeholder="Сообщение…" />
-    <button id="sendBtn">➤</button>
-  </div>
-</div>
+    <div class="chat-item" data-name="Философ" data-status="не в сети">
+      <div class="avatar gradient"></div>
+      <div class="chat-name">Философ</div>
+    </div>
 
-<!-- НАСТРОЙКИ -->
-<div id="settingsScreen" class="screen">
-  <header class="topbar">
-    <button id="closeSettings">←</button>
-    <h2>Настройки</h2>
-  </header>
+    <div class="chat-item" data-name="Учёба" data-status="в сети">
+      <div class="avatar gradient"></div>
+      <div class="chat-name">Учёба</div>
+    </div>
+  </section>
 
-  <div class="settings">
+  <!-- ===== CHAT ===== -->
+  <section id="chatScreen" class="screen">
+    <div id="intro" class="intro">
+      <div class="intro-title">✨ Начни общение ✨</div>
+      <div class="quick vertical">
+        <button>Привет!</button>
+        <button>Как дела?</button>
+        <button>Чем занимаешься?</button>
+        <button>Что нового?</button>
+        <button>Хочешь поболтать?</button>
+      </div>
+    </div>
+
+    <div id="messages"></div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section id="settings" class="screen">
+    <h2>Настройки NyashGram 🐾</h2>
+
     <label>Имя</label>
-    <input id="nameSetting" type="text" />
+    <input id="nameInput">
 
     <label>Аватарка</label>
-    <input id="avatarInput" type="file" accept="image/*" />
+    <input type="file" id="avatarInput" accept="image/*">
 
     <label>Шрифт</label>
     <select id="fontSelect">
       <option value="system-ui">System</option>
-      <option value="Arial">Arial</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Impact">Impact</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Comic Sans MS">Comic Sans</option>
+      <option value="'Inter', system-ui">Inter</option>
+      <option value="'Montserrat', system-ui">Montserrat</option>
+      <option value="'Nunito', system-ui">Nunito</option>
+      <option value="'Roboto', system-ui">Roboto</option>
+      <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+      <option value="'Pacifico', cursive">Pacifico ✨</option>
     </select>
 
-    <label>Цвет фона</label>
-    <input id="bgColor" type="color" />
+    <label>Фон</label>
+    <select id="bgType">
+      <option value="color">Цвет</option>
+      <option value="gradient">Градиент</option>
+      <option value="image">Фото</option>
+    </select>
 
-    <button id="saveSettings">Сохранить</button>
-  </div>
+    <input type="color" id="bgColor" value="#0e0e16">
+    <input type="color" id="bgColor2" value="#2a5bff">
+    <input type="file" id="bgImage" accept="image/*">
+  </section>
+
+  <!-- ===== INPUT ===== -->
+  <footer id="inputBar">
+    <input id="messageInput" placeholder="Сообщение...">
+    <button id="sendBtn">➤</button>
+  </footer>
+
 </div>
 
 <script src="app.js"></script>

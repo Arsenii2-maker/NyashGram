@@ -2,11 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+  >
   <title>NyashGram</title>
 
   <!-- ШРИФТЫ -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter&family=Poppins&family=Montserrat&family=Roboto&family=Playfair+Display&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter&family=Montserrat&family=Playfair+Display&family=Bebas+Neue&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -17,54 +20,40 @@
   <!-- START -->
   <section id="startScreen" class="screen active center">
     <h1>NyashGram ✨</h1>
-    <input id="startName" placeholder="Введите имя">
+    <input id="startName" placeholder="Ваш ник">
     <button id="startBtn">Войти</button>
   </section>
 
   <!-- HEADER -->
-  <header id="header" class="top-bar hidden">
-    <button id="backBtn" class="icon-btn">←</button>
+  <header id="header" class="hidden">
+    <button id="backBtn">←</button>
 
     <div class="top-info">
-      <img id="chatAvatar" class="avatar gradient">
+      <div id="chatAvatar" class="avatar gradient"></div>
       <div>
-        <div id="chatName"></div>
-        <div id="chatStatus" class="status"></div>
+        <div id="chatTitle"></div>
+        <div id="chatStatus"></div>
       </div>
     </div>
 
-    <button id="settingsBtn" class="icon-btn">⚙️</button>
+    <button id="settingsBtn">⚙️</button>
   </header>
 
   <!-- CHAT LIST -->
   <section id="chatList" class="screen">
-    <div class="chat-item" data-id="bestie" data-name="Bestie" data-status="в сети">
-      <div class="avatar gradient"></div>
-      <div class="chat-name">Bestie</div>
-    </div>
-
-    <div class="chat-item" data-id="philosophy" data-name="Философ" data-status="не в сети">
-      <div class="avatar gradient"></div>
-      <div class="chat-name">Философ</div>
-    </div>
-
-    <div class="chat-item" data-id="study" data-name="Учёба" data-status="в сети">
-      <div class="avatar gradient"></div>
-      <div class="chat-name">Учёба</div>
-    </div>
+    <div class="chat-item" data-id="bestie" data-name="Bestie" data-status="в сети"></div>
+    <div class="chat-item" data-id="philo" data-name="Философ" data-status="не в сети"></div>
+    <div class="chat-item" data-id="study" data-name="Учёба" data-status="в сети"></div>
   </section>
 
   <!-- CHAT -->
   <section id="chatScreen" class="screen">
-    <div id="chatIntro" class="chat-intro">
+    <div id="chatIntro">
       <h2>✨ Начни общение ✨</h2>
-      <div class="quick-list">
-        <button>Привет!</button>
-        <button>Как ты?</button>
-        <button>Что делаешь?</button>
-        <button>Есть новости?</button>
-        <button>Хочешь поговорить?</button>
-      </div>
+      <button class="quick">Привет!</button>
+      <button class="quick">Как ты?</button>
+      <button class="quick">Что нового?</button>
+      <button class="quick">Поговорим?</button>
     </div>
 
     <div id="messages"></div>
@@ -74,34 +63,39 @@
   <section id="settings" class="screen">
     <h2>Настройки</h2>
 
-    <label>Ваше имя</label>
-    <input id="nameInput">
+    <div class="block">
+      <h3>Профиль</h3>
+      <input id="nameInput" placeholder="Имя">
+    </div>
 
-    <label>Шрифт</label>
-    <select id="fontSelect">
-      <option value="Inter">Inter</option>
-      <option value="Poppins">Poppins</option>
-      <option value="Montserrat">Montserrat</option>
-      <option value="Roboto">Roboto</option>
-      <option value="Playfair Display">Playfair Display</option>
-      <option value="system-ui">System</option>
-    </select>
+    <div class="block">
+      <h3>Шрифт</h3>
+      <select id="fontSelect">
+        <option value="Inter">Inter</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Impact, sans-serif">Impact</option>
+        <option value="'Bebas Neue', cursive">Bebas Neue</option>
+        <option value="'Playfair Display', serif">Playfair Display</option>
+      </select>
+    </div>
 
-    <label>Фон</label>
-    <select id="bgType">
-      <option value="color">Цвет</option>
-      <option value="gradient">Градиент</option>
-      <option value="image">Фото</option>
-    </select>
+    <div class="block">
+      <h3>Фон</h3>
+      <select id="bgType">
+        <option value="color">Цвет</option>
+        <option value="gradient">Градиент</option>
+        <option value="image">Фото</option>
+      </select>
 
-    <input type="color" id="bgColor">
-    <input type="color" id="bgColor2">
-    <input type="file" id="bgImage" accept="image/*">
+      <input type="color" id="bg1">
+      <input type="color" id="bg2">
+      <input type="file" id="bgImg" accept="image/*">
+    </div>
   </section>
 
   <!-- INPUT -->
   <footer id="inputBar" class="hidden">
-    <input id="messageInput" placeholder="Сообщение...">
+    <input id="messageInput" placeholder="Сообщение">
     <button id="sendBtn">➤</button>
   </footer>
 

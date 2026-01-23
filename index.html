@@ -2,39 +2,94 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NyashGram ✨</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NyashGram</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Экран ввода ника -->
-  <div class="screen active" id="screen-nick">
-    <h1 class="logo">NyashGram ✨</h1>
+<div id="app">
 
-    <input
-      type="text"
-      id="nicknameInput"
-      placeholder="Введи свой ник"
-      maxlength="20"
-    />
+  <!-- ===== HEADER ===== -->
+  <header class="top-bar">
+    <button id="backBtn" class="icon-btn hidden">←</button>
 
-    <button id="startBtn">Продолжить</button>
-  </div>
-
-  <!-- Экран чатов -->
-  <div class="screen" id="screen-chats">
-    <header class="topbar">
-      <span class="top-title">Чаты</span>
-    </header>
-
-    <div class="chat-list">
-      <div class="chat-item">Bestie</div>
-      <div class="chat-item">Философ</div>
-      <div class="chat-item">Учёба</div>
+    <div class="top-info">
+      <img id="topAvatar" class="avatar small" />
+      <div>
+        <div id="topName">Арсений</div>
+        <div id="topStatus" class="status"></div>
+      </div>
     </div>
-  </div>
 
-  <script src="app.js"></script>
+    <button id="settingsBtn" class="icon-btn">⚙️</button>
+  </header>
+
+  <!-- ===== CHAT LIST ===== -->
+  <section id="chatList" class="screen active">
+    <div class="chat-item" data-chat="bestie">
+      <div class="avatar gradient"></div>
+      <div>
+        <div class="chat-name">Bestie</div>
+        <div class="chat-preview">💬</div>
+      </div>
+    </div>
+
+    <div class="chat-item" data-chat="philosophy">
+      <div class="avatar gradient"></div>
+      <div>
+        <div class="chat-name">Философ</div>
+        <div class="chat-preview">🧠</div>
+      </div>
+    </div>
+
+    <div class="chat-item" data-chat="study">
+      <div class="avatar gradient"></div>
+      <div>
+        <div class="chat-name">Учёба</div>
+        <div class="chat-preview">📚</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CHAT SCREEN ===== -->
+  <section id="chatScreen" class="screen">
+    <div id="chatIntro" class="chat-intro">
+      <div>✨ Начни общение ✨</div>
+      <div class="quick">
+        <button class="quick-btn">Привет!</button>
+        <button class="quick-btn">Как дела?</button>
+        <button class="quick-btn">Чем занимаешься?</button>
+      </div>
+    </div>
+
+    <div id="messages" class="messages"></div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section id="settings" class="screen">
+    <h2>Настройки</h2>
+
+    <label>Имя</label>
+    <input id="nameInput" placeholder="Ваше имя">
+
+    <label>Шрифт</label>
+    <select id="fontSelect">
+      <option value="system">Системный</option>
+      <option value="serif">Times New Roman</option>
+      <option value="impact">Impact</option>
+      <option value="monospace">Monospace</option>
+    </select>
+  </section>
+
+  <!-- ===== INPUT BAR ===== -->
+  <footer id="inputBar" class="input-bar hidden">
+    <input id="messageInput" placeholder="Сообщение...">
+    <button id="sendBtn">➤</button>
+  </footer>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
@@ -10,15 +10,22 @@
 
 <div id="app">
 
+  <!-- ===== START SCREEN ===== -->
+  <section id="startScreen" class="screen active center">
+    <h1>NyashGram ✨</h1>
+    <input id="startName" placeholder="Введите имя">
+    <button id="startBtn">Продолжить</button>
+  </section>
+
   <!-- ===== HEADER ===== -->
-  <header class="top-bar">
-    <button id="backBtn" class="icon-btn hidden">←</button>
+  <header id="header" class="top-bar hidden">
+    <button id="backBtn" class="icon-btn">←</button>
 
     <div class="top-info">
-      <img id="topAvatar" class="avatar small" />
+      <img id="chatAvatar" class="avatar">
       <div>
-        <div id="topName">Арсений</div>
-        <div id="topStatus" class="status"></div>
+        <div id="chatName"></div>
+        <div id="chatStatus" class="status"></div>
       </div>
     </div>
 
@@ -26,44 +33,35 @@
   </header>
 
   <!-- ===== CHAT LIST ===== -->
-  <section id="chatList" class="screen active">
-    <div class="chat-item" data-chat="bestie">
+  <section id="chatList" class="screen">
+    <div class="chat-item" data-name="Bestie" data-status="в сети">
       <div class="avatar gradient"></div>
-      <div>
-        <div class="chat-name">Bestie</div>
-        <div class="chat-preview">💬</div>
-      </div>
+      <div class="chat-name">Bestie</div>
     </div>
 
-    <div class="chat-item" data-chat="philosophy">
+    <div class="chat-item" data-name="Философ" data-status="не в сети">
       <div class="avatar gradient"></div>
-      <div>
-        <div class="chat-name">Философ</div>
-        <div class="chat-preview">🧠</div>
-      </div>
+      <div class="chat-name">Философ</div>
     </div>
 
-    <div class="chat-item" data-chat="study">
+    <div class="chat-item" data-name="Учёба" data-status="в сети">
       <div class="avatar gradient"></div>
-      <div>
-        <div class="chat-name">Учёба</div>
-        <div class="chat-preview">📚</div>
-      </div>
+      <div class="chat-name">Учёба</div>
     </div>
   </section>
 
-  <!-- ===== CHAT SCREEN ===== -->
+  <!-- ===== CHAT ===== -->
   <section id="chatScreen" class="screen">
-    <div id="chatIntro" class="chat-intro">
-      <div>✨ Начни общение ✨</div>
+    <div class="intro">
+      ✨ Начни общение ✨
       <div class="quick">
-        <button class="quick-btn">Привет!</button>
-        <button class="quick-btn">Как дела?</button>
-        <button class="quick-btn">Чем занимаешься?</button>
+        <button>Привет!</button>
+        <button>Как дела?</button>
+        <button>Чем занимаешься?</button>
       </div>
     </div>
 
-    <div id="messages" class="messages"></div>
+    <div id="messages"></div>
   </section>
 
   <!-- ===== SETTINGS ===== -->
@@ -71,19 +69,37 @@
     <h2>Настройки</h2>
 
     <label>Имя</label>
-    <input id="nameInput" placeholder="Ваше имя">
+    <input id="nameInput">
+
+    <label>Аватарка</label>
+    <input type="file" id="avatarInput" accept="image/*">
 
     <label>Шрифт</label>
     <select id="fontSelect">
-      <option value="system">Системный</option>
-      <option value="serif">Times New Roman</option>
-      <option value="impact">Impact</option>
-      <option value="monospace">Monospace</option>
+      <option value="system-ui">System</option>
+      <option value="Arial">Arial</option>
+      <option value="Verdana">Verdana</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Impact">Impact</option>
+      <option value="Comic Sans MS">Comic Sans</option>
     </select>
+
+    <label>Фон</label>
+    <select id="bgType">
+      <option value="color">Цвет</option>
+      <option value="gradient">Градиент</option>
+      <option value="image">Фото</option>
+    </select>
+
+    <input type="color" id="bgColor">
+    <input type="color" id="bgColor2">
+    <input type="file" id="bgImage" accept="image/*">
   </section>
 
-  <!-- ===== INPUT BAR ===== -->
-  <footer id="inputBar" class="input-bar hidden">
+  <!-- ===== INPUT ===== -->
+  <footer id="inputBar">
     <input id="messageInput" placeholder="Сообщение...">
     <button id="sendBtn">➤</button>
   </footer>

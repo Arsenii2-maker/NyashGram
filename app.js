@@ -1,52 +1,19 @@
-const screens = {
-  nick: document.getElementById('screen-nickname'),
-  chats: document.getElementById('screen-chats'),
-  chat: document.getElementById('screen-chat')
-}
+const startBtn = document.getElementById("startBtn");
+const nicknameInput = document.getElementById("nicknameInput");
 
-let myName = localStorage.getItem('myName')
-let currentChat = null
+const screenNick = document.getElementById("screen-nick");
+const screenChats = document.getElementById("screen-chats");
 
-function show(screen) {
-  Object.values(screens).forEach(s => s.classList.remove('active'))
-  screens[screen].classList.add('active')
-}
+startBtn.addEventListener("click", () => {
+  const nick = nicknameInput.value.trim();
 
-if (myName) show('chats')
-
-document.getElementById('saveNickname').onclick = () => {
-  myName = document.getElementById('nicknameInput').value.trim()
-  if (!myName) return
-  localStorage.setItem('myName', myName)
-  show('chats')
-}
-
-document.querySelectorAll('.chat-item').forEach(item => {
-  item.onclick = () => {
-    currentChat = item.dataset.name
-    document.getElementById('chatName').innerText = currentChat
-    document.getElementById('chatAvatar').src =
-      `https://api.dicebear.com/7.x/identicon/svg?seed=${currentChat}`
-    document.getElementById('messages').innerHTML = ''
-    show('chat')
+  if (nick.length < 2) {
+    alert("Ник слишком короткий ✨");
+    return;
   }
-})
 
-document.getElementById('backBtn').onclick = () => show('chats')
+  localStorage.setItem("nyash_nick", nick);
 
-document.getElementById('sendBtn').onclick = send
-document.getElementById('messageInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') send()
-})
-
-function send() {
-  const input = document.getElementById('messageInput')
-  if (!input.value.trim()) return
-
-  const msg = document.createElement('div')
-  msg.className = 'message me'
-  msg.innerText = input.value
-  document.getElementById('messages').appendChild(msg)
-
-  input.value = ''
-}
+  screenNick.classList.remove("active");
+  screenChats.classList.add("active");
+});

@@ -1,57 +1,51 @@
-const chatList = document.getElementById("chatList");
-const chatScreen = document.getElementById("chatScreen");
-const messages = document.getElementById("messages");
+const screens = {
+  list: chatList,
+  chat: chatScreen,
+  settings,
+  profile
+};
 
-const sendBtn = document.getElementById("sendBtn");
-const messageInput = document.getElementById("messageInput");
+function show(screen) {
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screen.classList.add("active");
+}
 
-const settings = document.getElementById("settings");
-const settingsBtn = document.getElementById("settingsBtn");
-const closeSettings = document.getElementById("closeSettings");
-const saveSettings = document.getElementById("saveSettings");
+openSettings.onclick = () => show(settings);
+function closeSettings() { show(chatList); }
 
-const myName = document.getElementById("myName");
-const myAvatar = document.getElementById("myAvatar");
-const nameInput = document.getElementById("nameInput");
-const avatarInput = document.getElementById("avatarInput");
+function openChat(name) {
+  chatUserName.textContent = name;
+  show(chatScreen);
+}
 
-document.querySelectorAll(".chat-item").forEach(chat => {
-  chat.addEventListener("click", () => {
-    chatList.classList.remove("active");
-    chatScreen.classList.add("active");
-    messages.innerHTML = "";
-  });
-});
+function closeChat() {
+  show(chatList);
+}
 
-sendBtn.addEventListener("click", () => {
-  if (!messageInput.value.trim()) return;
+function openProfile() {
+  profileName.textContent = chatUserName.textContent;
+  show(profile);
+}
 
+function closeProfile() {
+  show(chatScreen);
+}
+
+function quickMsg(text) {
+  messageInput.value = text;
+}
+
+function sendMessage() {
+  if (!messageInput.value) return;
   const div = document.createElement("div");
-  div.className = "message";
   div.textContent = messageInput.value;
-
   messages.appendChild(div);
   messageInput.value = "";
-  messages.scrollTop = messages.scrollHeight;
-});
+}
 
-settingsBtn.addEventListener("click", () => {
-  settings.style.display = "flex";
-  nameInput.value = myName.textContent;
-});
-
-closeSettings.addEventListener("click", () => {
-  settings.style.display = "none";
-});
-
-saveSettings.addEventListener("click", () => {
-  myName.textContent = nameInput.value || "User";
-
-  if (avatarInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => myAvatar.src = e.target.result;
-    reader.readAsDataURL(avatarInput.files[0]);
-  }
-
-  settings.style.display = "none";
-});
+function saveSettings() {
+  myName.textContent = nameInput.value || "Я";
+  document.documentElement.style.setProperty("--font", fontSelect.value);
+  document.documentElement.style.setProperty("--btn", buttonColor.value);
+  closeSettings();
+}

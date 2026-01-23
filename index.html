@@ -2,108 +2,50 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NyashGram</title>
+  <title>NyashGram ✨</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="app">
+<!-- ЭКРАН ВВОДА НИКА -->
+<div id="screen-nickname" class="screen active">
+  <h1 class="logo">NyashGram ✨</h1>
+  <input id="nicknameInput" placeholder="Ваш ник">
+  <button id="saveNickname">Продолжить</button>
+</div>
 
-  <!-- ===== START SCREEN ===== -->
-  <section id="startScreen" class="screen active center">
-    <h1>NyashGram ✨</h1>
-    <input id="startName" placeholder="Введите имя">
-    <button id="startBtn">Продолжить</button>
-  </section>
+<!-- СПИСОК ЧАТОВ -->
+<div id="screen-chats" class="screen">
+  <header class="topbar">NyashGram ✨</header>
 
-  <!-- ===== HEADER ===== -->
-  <header id="header" class="top-bar hidden">
-    <button id="backBtn" class="icon-btn">←</button>
+  <div class="chat-list">
+    <div class="chat-item" data-name="Bestie">Bestie</div>
+    <div class="chat-item" data-name="Философ">Философ</div>
+    <div class="chat-item" data-name="Учёба">Учёба</div>
+  </div>
 
-    <div class="top-info">
-      <img id="chatAvatar" class="avatar">
+  <button class="settings-btn">⚙️</button>
+</div>
+
+<!-- ЧАТ -->
+<div id="screen-chat" class="screen">
+  <header class="chat-header">
+    <button id="backBtn">←</button>
+    <div class="chat-user">
+      <img id="chatAvatar">
       <div>
         <div id="chatName"></div>
-        <div id="chatStatus" class="status"></div>
+        <div class="status">в сети</div>
       </div>
     </div>
-
-    <button id="settingsBtn" class="icon-btn">⚙️</button>
   </header>
 
-  <!-- ===== CHAT LIST ===== -->
-  <section id="chatList" class="screen">
-    <div class="chat-item" data-name="Bestie" data-status="в сети">
-      <div class="avatar gradient"></div>
-      <div class="chat-name">Bestie</div>
-    </div>
+  <div id="messages"></div>
 
-    <div class="chat-item" data-name="Философ" data-status="не в сети">
-      <div class="avatar gradient"></div>
-      <div class="chat-name">Философ</div>
-    </div>
-
-    <div class="chat-item" data-name="Учёба" data-status="в сети">
-      <div class="avatar gradient"></div>
-      <div class="chat-name">Учёба</div>
-    </div>
-  </section>
-
-  <!-- ===== CHAT ===== -->
-  <section id="chatScreen" class="screen">
-    <div class="intro">
-      ✨ Начни общение ✨
-      <div class="quick">
-        <button>Привет!</button>
-        <button>Как дела?</button>
-        <button>Чем занимаешься?</button>
-      </div>
-    </div>
-
-    <div id="messages"></div>
-  </section>
-
-  <!-- ===== SETTINGS ===== -->
-  <section id="settings" class="screen">
-    <h2>Настройки</h2>
-
-    <label>Имя</label>
-    <input id="nameInput">
-
-    <label>Аватарка</label>
-    <input type="file" id="avatarInput" accept="image/*">
-
-    <label>Шрифт</label>
-    <select id="fontSelect">
-      <option value="system-ui">System</option>
-      <option value="Arial">Arial</option>
-      <option value="Verdana">Verdana</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Impact">Impact</option>
-      <option value="Comic Sans MS">Comic Sans</option>
-    </select>
-
-    <label>Фон</label>
-    <select id="bgType">
-      <option value="color">Цвет</option>
-      <option value="gradient">Градиент</option>
-      <option value="image">Фото</option>
-    </select>
-
-    <input type="color" id="bgColor">
-    <input type="color" id="bgColor2">
-    <input type="file" id="bgImage" accept="image/*">
-  </section>
-
-  <!-- ===== INPUT ===== -->
-  <footer id="inputBar">
+  <div class="input-bar">
     <input id="messageInput" placeholder="Сообщение...">
     <button id="sendBtn">➤</button>
-  </footer>
-
+  </div>
 </div>
 
 <script src="app.js"></script>

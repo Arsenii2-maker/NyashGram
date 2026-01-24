@@ -1,88 +1,124 @@
-const screens = {
-  start: startScreen,
-  contacts: contactsScreen,
-  chat: chatScreen,
-  settings: settingsScreen
-};
+// ===== Screens =====
+const startScreen = document.getElementById("startScreen");
+const contactsScreen = document.getElementById("contactsScreen");
+const chatScreen = document.getElementById("chatScreen");
+const settingsScreen = document.getElementById("settingsScreen");
 
-let currentChat = null;
+const screens = [startScreen, contactsScreen, chatScreen, settingsScreen];
+
+// ===== Elements =====
+const nicknameInput = document.getElementById("nicknameInput");
+const enterBtn = document.getElementById("enterBtn");
+const myNameEl = document.getElementById("myName");
+const contactsList = document.getElementById("contactsList");
+
+const chatUserInfo = document.getElementById("chatUserInfo");
+const messages = document.getElementById("messages");
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const quickPanel = document.getElementById("quickPanel");
+
+const backBtn = document.getElementById("backBtn");
+const openSettings = document.getElementById("openSettings");
+const closeSettings = document.getElementById("closeSettings");
+
+const fontSelect = document.getElementById("fontSelect");
+const themeSelect = document.getElementById("themeSelect");
+
+// ===== State =====
 let myName = "";
+let currentChatId = null;
 
-function show(screen) {
-  Object.values(screens).forEach(s => s.classList.remove("active"));
+// ===== Helpers =====
+function showScreen(screen) {
+  screens.forEach(s => s.classList.remove("active"));
   screen.classList.add("active");
 }
 
-enterBtn.onclick = () => {
-  myName = nicknameInput.value || "Nyash 💗";
-  myNameSpan();
-  show(contactsScreen);
+// ===== START =====
+enterBtn.addEventListener("click", () => {
+  myName = nicknameInput.value.trim() || "Nyash 💗";
+  myNameEl.textContent = myName;
+  showScreen(contactsScreen);
   renderContacts();
-};
+});
 
-function myNameSpan() {
-  myName && (myNameEl = document.getElementById("myName")).textContent = myName;
-}
-
+// ===== CONTACTS =====
 function renderContacts() {
   contactsList.innerHTML = "";
-  contacts.forEach(c => {
+  window.contacts.forEach(contact => {
     const div = document.createElement("div");
     div.className = "contact";
-    div.textContent = `${c.name} • ${c.status}`;
-    div.onclick = () => openChat(c);
+    div.textContent = `${contact.name} • ${contact.status}`;
+    div.addEventListener("click", () => openChat(contact));
     contactsList.appendChild(div);
   });
 }
 
+// ===== CHAT =====
 function openChat(contact) {
-  currentChat = contact.id;
+  currentChatId = contact.id;
   chatUserInfo.textContent = `${contact.name} (${contact.status})`;
+  quickPanel.style.display = "flex";
   renderMessages();
-  show(chatScreen);
+  showScreen(chatScreen);
 }
 
 function renderMessages() {
   messages.innerHTML = "";
-  chats[currentChat].forEach(m => {
+  window.chats[currentChatId].forEach(msg => {
     const div = document.createElement("div");
-    div.className = `msg ${m.fromMe ? "me" : "other"}`;
-    div.textContent = m.text;
+    div.className = `msg ${msg.fromMe ? "me" : "other"}`;
+    div.textContent = msg.text;
     messages.appendChild(div);
   });
+  messages.scrollTop = messages.scrollHeight;
 }
 
-sendBtn.onclick = () => {
+sendBtn.addEventListener("click", () => {
   const text = messageInput.value.trim();
   if (!text) return;
-  sendMessage(currentChat, text, true);
+
+  sendMessage(currentChatId, text, true);
   messageInput.value = "";
   quickPanel.style.display = "none";
   renderMessages();
-};
-
-document.querySelectorAll(".quick").forEach(b => {
-  b.onclick = () => {
-    sendMessage(currentChat, b.textContent, true);
-    quickPanel.style.display = "none";
-    renderMessages();
-  };
 });
 
-backBtn.onclick = () => show(contactsScreen);
+document.querySelectorAll(".quick").forEach(btn => {
+  btn.addEventListener("click", () => {
+    sendMessage(currentChatId, btn.textContent, true);
+    quickPanel.style.display = "none";
+    renderMessages();
+  });
+});
 
-openSettings.onclick = () => show(settingsScreen);
-closeSettings.onclick = () => show(contactsScreen);
+// ===== NAV =====
+backBtn.addEventListener("click", () => {
+  showScreen(contactsScreen);
+});
 
-fontSelect.onchange = e => {
+openSettings.addEventListener("click", () => {
+  showScreen(settingsScreen);
+});
+
+closeSettings.addEventListener("click", () => {
+  showScreen(contactsScreen);
+});
+
+// ===== SETTINGS =====
+fontSelect.addEventListener("change", e => {
   document.body.style.fontFamily = e.target.value;
-};
+});
 
-themeSelect.onchange = e => {
+themeSelect.addEventListener("change", e => {
   const t = e.target.value;
-  if (t === "mint") document.documentElement.style.setProperty("--bg", "#eafff3");
-  if (t === "cyber") document.documentElement.style.setProperty("--bg", "#0f0f1a");
-  if (t === "loft") document.documentElement.style.setProperty("--bg", "#f1f1f1");
-  if (t === "night") document.documentElement.style.setProperty("--bg", "#101018");
-  if (t === "lofi") document.documentElement.style.setProperty("--bg", "#f7f2ff");
-};
+  const root = document.documentElement;
+
+  if (t === "cozy") root.style.setProperty("--bg", "#ffe9f2");
+  if (t === "mint") root.style.setProperty("--bg", "#eafff3");
+  if (t === "cyber") root.style.setProperty("--bg", "#0f0f1a");
+  if (t === "loft") root.style.setProperty("--bg", "#f1f1f1");
+  if (t === "night") root.style.setProperty("--bg", "#101018");
+  if (t === "lofi") root.style.setProperty("--bg", "#f7f2ff");
+});

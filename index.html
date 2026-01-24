@@ -3,51 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Messenger</title>
+  <title>Mobile Messenger</title>
+  <link rel="stylesheet" href="style.css">
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@500&family=Impact&display=swap" rel="stylesheet">
 </head>
-<body class="theme-dark font-system">
+<body>
 
-  <div class="app">
+<!-- START SCREEN -->
+<div id="screen-start" class="screen active">
+  <h1>Добро пожаловать</h1>
+  <input id="nameInput" placeholder="Твой ник" />
+  <button onclick="enterApp()">Войти</button>
+</div>
 
-    <!-- CONTACTS -->
-    <aside class="contacts">
-      <h2>Контакты</h2>
-      <!-- contacts.js -->
-    </aside>
+<!-- CONTACTS -->
+<div id="screen-contacts" class="screen">
+  <header>
+    <h2>Чаты</h2>
+    <button onclick="openSettings()">⚙️</button>
+  </header>
+  <div id="contactsList"></div>
+</div>
 
-    <!-- CHAT -->
-    <main class="chat">
+<!-- CHAT -->
+<div id="screen-chat" class="screen">
+  <header>
+    <button onclick="backToContacts()">←</button>
+    <h2 id="chatTitle"></h2>
+  </header>
 
-      <div class="chat-header">
-        Выбери контакт
-      </div>
+  <div id="messages"></div>
 
-      <div class="messages">
-        <!-- chat.js -->
-      </div>
-
-      <div class="quick-messages">
-        <!-- chat.js -->
-      </div>
-
-      <div class="chat-input">
-        <input type="text" placeholder="Сообщение..." />
-      </div>
-
-    </main>
-
+  <div class="quick">
+    <button onclick="sendQuick('Привет!')">👋</button>
+    <button onclick="sendQuick('Как дела?')">💬</button>
+    <button onclick="sendQuick('Ок')">✅</button>
   </div>
 
-  <!-- Scripts -->
-  <script src="app.js"></script>
-  <script src="contacts.js"></script>
-  <script src="chat.js"></script>
+  <div class="input">
+    <input id="messageInput" placeholder="Сообщение..." />
+    <button onclick="sendMessage()">➤</button>
+  </div>
+</div>
 
+<!-- SETTINGS -->
+<div id="screen-settings" class="screen">
+  <header>
+    <button onclick="backToContacts()">←</button>
+    <h2>Настройки</h2>
+  </header>
+
+  <section>
+    <h3>Имя</h3>
+    <input id="settingsName" />
+    <button onclick="saveName()">Сохранить</button>
+  </section>
+
+  <section>
+    <h3>Тема</h3>
+    <button onclick="setTheme('pink')">🌸 Pink</button>
+    <button onclick="setTheme('dark')">🌙 Dark</button>
+  </section>
+
+  <section>
+    <h3>Шрифт</h3>
+    <button onclick="setFont('inter')">Inter</button>
+    <button onclick="setFont('impact')">Impact</button>
+    <button onclick="setFont('elegant')">Elegant</button>
+  </section>
+</div>
+
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

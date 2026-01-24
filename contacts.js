@@ -2,7 +2,7 @@ const contacts = [
   { name: "Luna 💗", avatar: "https://i.pravatar.cc/100?img=5" },
   { name: "Miko 🌸", avatar: "https://i.pravatar.cc/100?img=12" }
 ];
-
+ 
 const contactsList = document.getElementById("contacts-list");
 
 contacts.forEach(c => {

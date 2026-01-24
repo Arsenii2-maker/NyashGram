@@ -89,3 +89,92 @@ body {
   border-radius: 12px;
   border: none;
 }
+/* === NYASHGRAM SCALE FIX === */
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* всё приложение как карточка */
+.screen {
+  max-width: 420px;
+  width: 100%;
+  height: 92vh;
+
+  background: linear-gradient(180deg, #fff1f6, #fde7ef);
+  border-radius: 26px;
+
+  box-shadow:
+    0 20px 40px rgba(255, 182, 193, 0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
+}
+
+/* логин — крупный и по центру */
+#loginScreen h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: #ff6fae;
+}
+
+#loginScreen input,
+#loginScreen button {
+  width: 85%;
+  font-size: 18px;
+  padding: 14px;
+  border-radius: 18px;
+}
+/* === MESSAGE STYLE UPGRADE === */
+
+.messages {
+  padding: 16px;
+}
+
+.message {
+  font-size: 16px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  line-height: 1.35;
+}
+
+.message.me {
+  background: linear-gradient(135deg, #ff9acb, #ff6fae);
+  color: white;
+}
+
+.message.other {
+  background: #ffffff;
+  color: #333;
+}
+/* === TOPBAR BIG & SOFT === */
+
+.topbar {
+  padding: 16px;
+  font-size: 18px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.7);
+}
+
+.topbar button {
+  font-size: 18px;
+}
+/* === INPUT BAR === */
+
+.inputBar {
+  padding: 14px;
+  gap: 10px;
+}
+
+.inputBar input {
+  font-size: 17px;
+  padding: 14px;
+  border-radius: 20px;
+}
+
+.inputBar button {
+  font-size: 18px;
+  padding: 14px 18px;
+  border-radius: 20px;
+}

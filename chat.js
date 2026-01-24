@@ -1,37 +1,33 @@
-let messagesStore = {};
+let current;
 
-function openChat(contact) {
-  state.chat = contact;
-  chatTitle.textContent = contact.name;
-  chatAvatar.src = contact.avatar;
-  showScreen('chat');
-  renderMessages();
+function openChat(c) {
+  current = c;
+  document.getElementById('chat-name').textContent = c.name;
+  document.getElementById('chat-status').textContent = c.status;
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('start-panel').style.display = 'block';
+  show('chat-screen');
 }
 
-function renderMessages() {
-  messages.innerHTML = '';
-  (messagesStore[state.chat.name] || []).forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'message ' + m.from;
-    div.textContent = m.text;
-    messages.appendChild(div);
-  });
+document.getElementById('back-btn').onclick = () => show('contacts-screen');
+
+document.getElementById('send-btn').onclick = send;
+
+function send(text) {
+  const input = document.getElementById('message-input');
+  const msg = text || input.value;
+  if (!msg) return;
+
+  document.getElementById('start-panel').style.display = 'none';
+
+  const div = document.createElement('div');
+  div.className = 'message me';
+  div.textContent = msg;
+  document.getElementById('messages').appendChild(div);
+
+  input.value = '';
 }
 
-function sendMessage() {
-  const text = messageInput.value.trim();
-  if (!text) return;
-  pushMessage(text);
-  messageInput.value = '';
-}
-
-function sendQuick(text) {
-  pushMessage(text);
-}
-
-function pushMessage(text) {
-  messagesStore[state.chat.name] ||= [];
-  messagesStore[state.chat.name].push({ from: 'me', text });
-  messagesStore[state.chat.name].push({ from: 'other', text: '...' });
-  renderMessages();
-}
+document.querySelectorAll('.quick').forEach(b => {
+  b.onclick = () => send(b.textContent);
+});

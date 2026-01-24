@@ -1,98 +1,202 @@
-:root {
-  --bg: #fff5f8;
-  --card: #ffe4ec;
-  --accent: #ff8fb3;
-  --text: #4a2c38;
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== VARIABLES ===== */
+:root {
+  --bg: #0f0f14;
+  --panel: #171722;
+  --text: #ffffff;
+  --subtext: #b5b5c8;
+  --accent: #6c7cff;
+
+  --radius: 18px;
+  --font: system-ui, sans-serif;
+}
+
+/* ===== THEMES ===== */
+body.theme-light {
+  --bg: #ffffff;
+  --panel: #f2f2f7;
+  --text: #111111;
+  --subtext: #666;
+  --accent: #4f6cff;
+}
+
+body.theme-neon {
+  --bg: #090014;
+  --panel: #12001f;
+  --text: #f5e9ff;
+  --subtext: #c7b7ff;
+  --accent: #ff4fd8;
+}
+
+body.theme-cyber {
+  --bg: #020b0a;
+  --panel: #041413;
+  --text: #00ffe1;
+  --subtext: #00c7b0;
+  --accent: #00ff9c;
+}
+
+/* ===== FONTS ===== */
+body.font-system {
+  font-family: system-ui, sans-serif;
+}
+
+body.font-mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+body.font-rounded {
+  font-family: "Nunito", sans-serif;
+}
+
+body.font-future {
+  font-family: "Orbitron", sans-serif;
+}
+
+/* ===== BODY ===== */
 body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--font);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.screen {
-  display: none;
-  height: 100vh;
+/* ===== APP ===== */
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  background: var(--bg);
 }
 
-.screen.active {
+/* ===== CONTACTS ===== */
+.contacts {
+  width: 280px;
+  background: var(--panel);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact {
+  padding: 12px;
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+}
+
+.contact:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* ===== CHAT ===== */
+.chat {
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.top-bar {
+.chat-header {
   padding: 16px;
-  background: var(--card);
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background: var(--panel);
+  font-weight: 600;
 }
 
-#contacts-list {
-  padding: 20px;
-}
-
-.contact {
-  background: white;
-  border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 14px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-#messages {
+.messages {
   flex: 1;
-  padding: 20px;
-}
-
-.message {
-  background: var(--card);
-  padding: 14px 18px;
-  border-radius: 18px;
-  margin-bottom: 10px;
-  max-width: 70%;
-  font-size: 17px;
-}
-
-.input-bar {
-  display: flex;
   padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-.input-bar input {
-  flex: 1;
-  padding: 14px;
-  border-radius: 18px;
-  border: none;
-  font-size: 16px;
-}
-
-.settings-card {
-  margin: 20px;
-  background: white;
-  padding: 18px;
-  border-radius: 20px;
-}
-
-.settings-card input,
-.settings-card select {
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px;
+.message {
+  max-width: 70%;
+  padding: 12px 14px;
   border-radius: 14px;
-  border: none;
+  background: var(--panel);
 }
 
-.save-btn {
-  margin: 20px;
-  padding: 16px;
-  border-radius: 20px;
+.message.me {
   background: var(--accent);
-  color: white;
+  color: #fff;
+  align-self: flex-end;
+}
+
+/* ===== INPUT ===== */
+.chat-input {
+  padding: 12px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-input input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
   border: none;
-  font-size: 18px;
+  outline: none;
+  background: #0c0c14;
+  color: var(--text);
+}
+
+/* ===== QUICK MESSAGES ===== */
+.quick-messages {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.quick-messages button {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ===== DESKTOP MODE ===== */
+body[data-device="desktop"] .app {
+  max-width: 1000px;
+  max-height: 600px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* ===== MOBILE MODE ===== */
+body[data-device="mobile"] {
+  align-items: stretch;
+}
+
+body[data-device="mobile"] .contacts {
+  display: none;
+}
+
+body[data-device="mobile"] .app {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+body[data-device="mobile"] .message {
+  max-width: 85%;
 }

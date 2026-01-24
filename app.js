@@ -3,7 +3,7 @@ function detectDevice() {
   const isMobile = window.innerWidth <= 768;
   document.body.dataset.device = isMobile ? "mobile" : "desktop";
 }
-
+ 
 window.addEventListener("resize", detectDevice);
 detectDevice();
 

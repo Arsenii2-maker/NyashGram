@@ -2,34 +2,77 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>NyashGram ✨</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NyashGram 💗</title>
+
+  <!-- Шрифты -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@500;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div id="loginScreen" class="screen active">
-    <h1>NyashGram ✨</h1>
-    <input id="usernameInput" placeholder="Имя">
+<!-- ЭКРАН ВХОДА -->
+<div id="loginScreen" class="screen active">
+  <div class="login-card">
+    <h1>NyashGram 💗</h1>
+    <p class="subtitle">безопасные и уютные чаты</p>
+    <input id="nicknameInput" type="text" placeholder="Введи свой ник" />
     <button id="loginBtn">Войти</button>
   </div>
+</div>
 
-  <!-- CHAT -->
-  <div id="chatScreen" class="screen">
-    <div class="topbar">
-      <button id="backBtn">←</button>
-      <span id="chatName">Bestie</span>
+<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+<div id="appScreen" class="screen">
+
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+  <header class="top-bar">
+    <div class="me">
+      <span id="myName">Ты</span>
       <button id="settingsBtn">⚙</button>
     </div>
 
-    <div id="messages" class="messages"></div>
-
-    <div class="inputBar">
-      <input id="messageInput" placeholder="Сообщение">
-      <button id="sendBtn">▶</button>
+    <div id="chatHeader" class="chat-header hidden">
+      <img id="chatAvatar" />
+      <div>
+        <div id="chatName"></div>
+        <div id="chatStatus" class="status"></div>
+      </div>
+      <button id="exitChat">✕</button>
     </div>
+  </header>
+
+  <!-- КОНТЕНТ -->
+  <div class="content">
+
+    <!-- КОНТАКТЫ -->
+    <aside class="contacts">
+      <div class="contact" data-name="Алиса" data-status="в сети">Алиса</div>
+      <div class="contact" data-name="Милана" data-status="была недавно">Милана</div>
+      <div class="contact" data-name="Соня" data-status="не в сети">Соня</div>
+    </aside>
+
+    <!-- ЧАТ -->
+    <main class="chat">
+      <div id="startPanel" class="start-panel">
+        <h2>Начни общение ✨</h2>
+        <button class="template">Привет! Как дела?</button>
+        <button class="template">Хочешь поболтать? 💗</button>
+        <button class="template">Как настроение сегодня?</button>
+        <button class="template">Расскажи что-нибудь уютное ☕</button>
+      </div>
+
+      <div id="messages" class="messages"></div>
+
+      <div class="input-bar">
+        <input id="messageInput" type="text" placeholder="Сообщение..." />
+        <button id="sendBtn">➤</button>
+      </div>
+    </main>
   </div>
 
-  <script src="app.js"></script>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

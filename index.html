@@ -1,94 +1,59 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>NyashGram 💗</title>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&family=Nunito:wght@400;700&family=Quicksand:wght@400;600&family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;600&family=Montserrat:wght@400;600&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="app">
 
-  <!-- START SCREEN -->
-  <section id="startScreen" class="screen active">
-    <h1>NyashGram 💗</h1>
-    <input id="nicknameInput" placeholder="Твой ник…" />
-    <button id="enterBtn">Войти</button>
+  <!-- LOGIN -->
+  <section id="loginScreen" class="screen active center">
+    <h1>NyashGram 🩷</h1>
+    <input id="loginInput" placeholder="Ваш никнейм">
+    <button id="loginBtn">Войти</button>
   </section>
 
   <!-- CONTACTS -->
   <section id="contactsScreen" class="screen">
-    <header>
-      <span id="myName"></span>
-      <button id="openSettings">⚙️</button>
+    <header class="top-bar">
+      <div class="top-title">Контакты</div>
     </header>
     <div id="contactsList"></div>
   </section>
 
   <!-- CHAT -->
   <section id="chatScreen" class="screen">
-    <header>
+    <header class="top-bar">
       <button id="backBtn">←</button>
-      <div id="chatUserInfo"></div>
+      <div class="chat-header">
+        <div id="chatAvatar" class="avatar"></div>
+        <div>
+          <div id="chatName"></div>
+          <div id="chatStatus" class="status"></div>
+        </div>
+      </div>
     </header>
+
+    <div id="chatIntro" class="chat-intro">
+      <div class="intro-title">✨ Начни общение ✨</div>
+      <div class="intro-buttons">
+        <button>Привет! Как дела?</button>
+        <button>Чем занимаешься?</button>
+        <button>Хочешь поболтать?</button>
+        <button>Какой вайб сегодня?</button>
+      </div>
+    </div>
 
     <div id="messages"></div>
 
-    <div id="quickPanel">
-      <button class="quick">Привет! 💗</button>
-      <button class="quick">Как дела?</button>
-      <button class="quick">Чем занимаешься?</button>
-      <button class="quick">Хочешь поболтать? ✨</button>
-    </div>
-
-    <div id="inputBar">
-      <input id="messageInput" placeholder="Сообщение…" />
+    <footer class="input-bar">
+      <input id="messageInput" placeholder="Сообщение...">
       <button id="sendBtn">➤</button>
-    </div>
-  </section>
-
-  <!-- SETTINGS -->
-  <section id="settingsScreen" class="screen">
-    <header>
-      <button id="closeSettings">←</button>
-      <h2>Настройки</h2>
-    </header>
-
-    <div class="block">
-      <label>Имя</label>
-      <input id="settingsName">
-    </div>
-
-    <div class="block">
-      <label>Шрифт</label>
-      <select id="fontSelect">
-        <option value="Inter">Inter</option>
-        <option value="Poppins">Poppins</option>
-        <option value="Nunito">Nunito</option>
-        <option value="Quicksand">Quicksand</option>
-        <option value="Playfair Display">Playfair</option>
-        <option value="DM Sans">DM Sans</option>
-        <option value="Montserrat">Montserrat</option>
-        <option value="Manrope">Manrope</option>
-      </select>
-    </div>
-
-    <div class="block">
-      <label>Тема</label>
-      <select id="themeSelect">
-        <option value="cozy">Cozy Pink</option>
-        <option value="mint">Mint</option>
-        <option value="cyber">Cyber</option>
-        <option value="loft">Loft</option>
-        <option value="night">Night</option>
-        <option value="lofi">Lofi</option>
-      </select>
-    </div>
+    </footer>
   </section>
 
 </div>

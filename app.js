@@ -1,70 +1,41 @@
-let state = {
-  username: localStorage.getItem('username'),
-  avatar: localStorage.getItem('avatar'),
-  theme: localStorage.getItem('theme') || 'pink',
-  font: localStorage.getItem('font') || 'inter',
-  chat: null
+const screens = document.querySelectorAll('.screen');
+
+function show(id) {
+  screens.forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+const name = localStorage.getItem('name');
+if (!name) show('login-screen');
+else {
+  document.getElementById('my-name').textContent = name;
+  show('contacts-screen');
+}
+
+document.getElementById('login-btn').onclick = () => {
+  const n = document.getElementById('nickname-input').value;
+  if (!n) return;
+  localStorage.setItem('name', n);
+  document.getElementById('my-name').textContent = n;
+  show('contacts-screen');
 };
 
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-}
+document.getElementById('settings-btn').onclick = () => show('settings-screen');
+document.getElementById('settings-back').onclick = () => show('contacts-screen');
 
-function enterApp() {
-  const name = nameInput.value.trim();
-  if (!name) return;
-  state.username = name;
-  localStorage.setItem('username', name);
-  showScreen('contacts');
-  renderContacts();
-}
+document.getElementById('theme-select').onchange = e => {
+  if (e.target.value === 'night') {
+    document.documentElement.style.setProperty('--bg', '#0f0f1a');
+    document.documentElement.style.setProperty('--text', '#fff');
+  }
+};
 
-function openSettings() {
-  settingsName.value = state.username;
-  showScreen('settings');
-}
-
-function backToContacts() {
-  showScreen('contacts');
-}
-
-function saveName() {
-  state.username = settingsName.value;
-  localStorage.setItem('username', state.username);
-  backToContacts();
-}
-
-function setAvatar(e) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    state.avatar = reader.result;
-    localStorage.setItem('avatar', state.avatar);
+document.getElementById('font-select').onchange = e => {
+  const f = {
+    inter: 'Inter',
+    poppins: 'Poppins',
+    playfair: 'Playfair Display',
+    mono: 'Roboto Mono'
   };
-  reader.readAsDataURL(e.target.files[0]);
-}
-
-function applyTheme() {
-  document.body.className = '';
-  if (state.theme === 'dark') document.body.classList.add('dark');
-  document.body.classList.add(state.font);
-}
-
-function setTheme(t) {
-  state.theme = t;
-  localStorage.setItem('theme', t);
-  applyTheme();
-}
-
-function setFont(f) {
-  state.font = f;
-  localStorage.setItem('font', f);
-  applyTheme();
-}
-
-applyTheme();
-
-if (state.username) {
-  showScreen('contacts');
-  renderContacts();
-}
+  document.documentElement.style.setProperty('--font', f[e.target.value]);
+};

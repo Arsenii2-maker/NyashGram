@@ -1,83 +1,53 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>NyashGram</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Messenger</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-dark font-system">
 
-<div id="app">
+  <div class="app">
 
-  <!-- ЭКРАН КОНТАКТОВ -->
-  <section id="contacts-screen" class="screen active">
-    <header class="top-bar">
-      <h1>NyashGram 🩷</h1>
-      <button onclick="openSettings()">⚙️</button>
-    </header>
+    <!-- CONTACTS -->
+    <aside class="contacts">
+      <h2>Контакты</h2>
+      <!-- contacts.js -->
+    </aside>
 
-    <div id="contacts-list"></div>
-  </section>
+    <!-- CHAT -->
+    <main class="chat">
 
-  <!-- ЭКРАН ЧАТА -->
-  <section id="chat-screen" class="screen">
-    <header class="top-bar">
-      <button onclick="goBack()">←</button>
-      <div class="chat-user">
-        <img id="chat-avatar">
-        <span id="chat-name"></span>
+      <div class="chat-header">
+        Выбери контакт
       </div>
-    </header>
 
-    <div id="messages"></div>
+      <div class="messages">
+        <!-- chat.js -->
+      </div>
 
-    <div class="input-bar">
-      <input id="messageInput" placeholder="Написать нежно..." />
-      <button onclick="sendMessage()">➤</button>
-    </div>
-  </section>
+      <div class="quick-messages">
+        <!-- chat.js -->
+      </div>
 
-  <!-- ЭКРАН НАСТРОЕК -->
-  <section id="settings-screen" class="screen">
-    <header class="top-bar">
-      <button onclick="goBack()">←</button>
-      <h2>Настройки 💗</h2>
-    </header>
+      <div class="chat-input">
+        <input type="text" placeholder="Сообщение..." />
+      </div>
 
-    <div class="settings-card">
-      <label>Имя</label>
-      <input id="nameSetting" placeholder="Твоё имя">
-    </div>
+    </main>
 
-    <div class="settings-card">
-      <label>Аватар (URL)</label>
-      <input id="avatarSetting" placeholder="https://...">
-    </div>
+  </div>
 
-    <div class="settings-card">
-      <label>Тема</label>
-      <select id="themeSetting">
-        <option value="cozy">💗 Cozy</option>
-        <option value="night">🌙 Night</option>
-        <option value="lofi">🎧 Lo-Fi</option>
-      </select>
-    </div>
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script src="contacts.js"></script>
+  <script src="chat.js"></script>
 
-    <div class="settings-card">
-      <label>Шрифт</label>
-      <select id="fontSetting">
-        <option value="rounded">Rounded</option>
-        <option value="soft">Soft</option>
-      </select>
-    </div>
-
-    <button class="save-btn" onclick="saveSettings()">Сохранить</button>
-  </section>
-
-</div>
-
-<script src="contacts.js"></script>
-<script src="chat.js"></script>
-<script src="app.js"></script>
 </body>
 </html>

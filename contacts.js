@@ -1,38 +1,12 @@
-const contacts = [
-  {
-    id: 1,
-    name: "Alex",
-    avatar: "🙂"
-  },
-  {
-    id: 2,
-    name: "Mira",
-    avatar: "🌸"
-  },
-  {
-    id: 3,
-    name: "Noah",
-    avatar: "🌀"
-  }
-];
-
-const contactsContainer = document.querySelector(".contacts");
-let activeContact = null;
+const contacts = ['Alex', 'Mia', 'Luna'];
 
 function renderContacts() {
-  contactsContainer.innerHTML = "";
-
-  contacts.forEach(contact => {
-    const div = document.createElement("div");
-    div.className = "contact";
-    div.textContent = `${contact.avatar} ${contact.name}`;
-
-    div.onclick = () => {
-      openChat(contact);
-    };
-
-    contactsContainer.appendChild(div);
+  const list = document.getElementById('contactsList');
+  list.innerHTML = '';
+  contacts.forEach(c => {
+    const div = document.createElement('div');
+    div.textContent = c;
+    div.onclick = () => openChat(c);
+    list.appendChild(div);
   });
 }
-
-renderContacts();

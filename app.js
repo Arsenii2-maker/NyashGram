@@ -1,30 +1,34 @@
-function switchScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+// ===== DEVICE DETECTION =====
+function detectDevice() {
+  const isMobile = window.innerWidth <= 768;
+  document.body.dataset.device = isMobile ? "mobile" : "desktop";
 }
 
-function goBack() {
-  switchScreen("contacts-screen");
+window.addEventListener("resize", detectDevice);
+detectDevice();
+
+// ===== THEMES =====
+const themes = ["theme-dark", "theme-light", "theme-neon", "theme-cyber"];
+let currentTheme = 0;
+
+function nextTheme() {
+  document.body.classList.remove(...themes);
+  currentTheme = (currentTheme + 1) % themes.length;
+  document.body.classList.add(themes[currentTheme]);
 }
 
-function openSettings() {
-  switchScreen("settings-screen");
+// ===== FONTS =====
+const fonts = ["font-system", "font-mono", "font-rounded", "font-future"];
+let currentFont = 0;
+
+function nextFont() {
+  document.body.classList.remove(...fonts);
+  currentFont = (currentFont + 1) % fonts.length;
+  document.body.classList.add(fonts[currentFont]);
 }
 
-function saveSettings() {
-  const theme = document.getElementById("themeSetting").value;
-
-  if (theme === "night") {
-    document.documentElement.style.setProperty("--bg", "#1e1b2e");
-    document.documentElement.style.setProperty("--card", "#2b2740");
-    document.documentElement.style.setProperty("--text", "#f5e9ff");
-  }
-
-  if (theme === "cozy") {
-    document.documentElement.style.setProperty("--bg", "#fff5f8");
-    document.documentElement.style.setProperty("--card", "#ffe4ec");
-    document.documentElement.style.setProperty("--text", "#4a2c38");
-  }
-
-  goBack();
-}
+// ===== SETTINGS SHORTCUTS (TEMP) =====
+document.addEventListener("keydown", e => {
+  if (e.key === "t") nextTheme();
+  if (e.key === "f") nextFont();
+});

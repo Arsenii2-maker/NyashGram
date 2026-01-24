@@ -2,77 +2,82 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NyashGram 💗</title>
-
-  <!-- Шрифты -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@500;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css" />
+  <title>NyashGram</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ЭКРАН ВХОДА -->
-<div id="loginScreen" class="screen active">
-  <div class="login-card">
-    <h1>NyashGram 💗</h1>
-    <p class="subtitle">безопасные и уютные чаты</p>
-    <input id="nicknameInput" type="text" placeholder="Введи свой ник" />
-    <button id="loginBtn">Войти</button>
-  </div>
-</div>
+<div id="app">
 
-<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
-<div id="appScreen" class="screen">
+  <!-- ЭКРАН КОНТАКТОВ -->
+  <section id="contacts-screen" class="screen active">
+    <header class="top-bar">
+      <h1>NyashGram 🩷</h1>
+      <button onclick="openSettings()">⚙️</button>
+    </header>
 
-  <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
-  <header class="top-bar">
-    <div class="me">
-      <span id="myName">Ты</span>
-      <button id="settingsBtn">⚙</button>
+    <div id="contacts-list"></div>
+  </section>
+
+  <!-- ЭКРАН ЧАТА -->
+  <section id="chat-screen" class="screen">
+    <header class="top-bar">
+      <button onclick="goBack()">←</button>
+      <div class="chat-user">
+        <img id="chat-avatar">
+        <span id="chat-name"></span>
+      </div>
+    </header>
+
+    <div id="messages"></div>
+
+    <div class="input-bar">
+      <input id="messageInput" placeholder="Написать нежно..." />
+      <button onclick="sendMessage()">➤</button>
+    </div>
+  </section>
+
+  <!-- ЭКРАН НАСТРОЕК -->
+  <section id="settings-screen" class="screen">
+    <header class="top-bar">
+      <button onclick="goBack()">←</button>
+      <h2>Настройки 💗</h2>
+    </header>
+
+    <div class="settings-card">
+      <label>Имя</label>
+      <input id="nameSetting" placeholder="Твоё имя">
     </div>
 
-    <div id="chatHeader" class="chat-header hidden">
-      <img id="chatAvatar" />
-      <div>
-        <div id="chatName"></div>
-        <div id="chatStatus" class="status"></div>
-      </div>
-      <button id="exitChat">✕</button>
+    <div class="settings-card">
+      <label>Аватар (URL)</label>
+      <input id="avatarSetting" placeholder="https://...">
     </div>
-  </header>
 
-  <!-- КОНТЕНТ -->
-  <div class="content">
+    <div class="settings-card">
+      <label>Тема</label>
+      <select id="themeSetting">
+        <option value="cozy">💗 Cozy</option>
+        <option value="night">🌙 Night</option>
+        <option value="lofi">🎧 Lo-Fi</option>
+      </select>
+    </div>
 
-    <!-- КОНТАКТЫ -->
-    <aside class="contacts">
-      <div class="contact" data-name="Алиса" data-status="в сети">Алиса</div>
-      <div class="contact" data-name="Милана" data-status="была недавно">Милана</div>
-      <div class="contact" data-name="Соня" data-status="не в сети">Соня</div>
-    </aside>
+    <div class="settings-card">
+      <label>Шрифт</label>
+      <select id="fontSetting">
+        <option value="rounded">Rounded</option>
+        <option value="soft">Soft</option>
+      </select>
+    </div>
 
-    <!-- ЧАТ -->
-    <main class="chat">
-      <div id="startPanel" class="start-panel">
-        <h2>Начни общение ✨</h2>
-        <button class="template">Привет! Как дела?</button>
-        <button class="template">Хочешь поболтать? 💗</button>
-        <button class="template">Как настроение сегодня?</button>
-        <button class="template">Расскажи что-нибудь уютное ☕</button>
-      </div>
-
-      <div id="messages" class="messages"></div>
-
-      <div class="input-bar">
-        <input id="messageInput" type="text" placeholder="Сообщение..." />
-        <button id="sendBtn">➤</button>
-      </div>
-    </main>
-  </div>
+    <button class="save-btn" onclick="saveSettings()">Сохранить</button>
+  </section>
 
 </div>
 
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,86 +1,97 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mobile Messenger</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NyashGram</title>
+
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@500&family=Impact&display=swap" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display&family=Poppins:wght@500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<!-- START -->
-<div id="screen-start" class="screen active">
-  <h1>Добро пожаловать</h1>
-  <input id="nameInput" placeholder="Твой ник">
-  <button onclick="enterApp()">Войти</button>
-</div>
-
-<!-- CONTACTS -->
-<div id="screen-contacts" class="screen">
-  <header>
-    <h2>Чаты</h2>
-    <button onclick="openSettings()">⚙️</button>
-  </header>
-  <div id="contactsList"></div>
-</div>
-
-<!-- CHAT -->
-<div id="screen-chat" class="screen">
-  <header>
-    <button onclick="backToContacts()">←</button>
-    <img id="chatAvatar" class="avatar">
-    <h2 id="chatTitle"></h2>
-  </header>
-
-  <div id="messages"></div>
-
-  <div class="quick">
-    <button onclick="sendQuick('Привет! Как ты?')">Привет! Как ты?</button>
-    <button onclick="sendQuick('У меня всё хорошо')">У меня всё хорошо</button>
-    <button onclick="sendQuick('Поговорим позже')">Поговорим позже</button>
+  <!-- LOGIN -->
+  <div id="login-screen" class="screen active">
+    <div class="login-card">
+      <h1>NyashGram 🩷</h1>
+      <input id="nickname-input" placeholder="Твой ник" />
+      <button id="login-btn">Войти</button>
+    </div>
   </div>
 
-  <div class="input">
-    <input id="messageInput" placeholder="Сообщение...">
-    <button onclick="sendMessage()">➤</button>
+  <!-- CONTACTS -->
+  <div id="contacts-screen" class="screen">
+    <header class="top-bar">
+      <span id="my-name"></span>
+      <button id="settings-btn">⚙</button>
+    </header>
+    <div id="contacts-list"></div>
   </div>
-</div>
 
-<!-- SETTINGS -->
-<div id="screen-settings" class="screen">
-  <header>
-    <button onclick="backToContacts()">←</button>
-    <h2>Настройки</h2>
-  </header>
+  <!-- CHAT -->
+  <div id="chat-screen" class="screen">
+    <header class="chat-header">
+      <button id="back-btn">←</button>
+      <img id="chat-avatar">
+      <div>
+        <div id="chat-name"></div>
+        <div id="chat-status"></div>
+      </div>
+    </header>
 
-  <section>
-    <h3>Имя</h3>
-    <input id="settingsName">
-    <button onclick="saveName()">Сохранить</button>
-  </section>
+    <div id="messages"></div>
 
-  <section>
-    <h3>Аватар</h3>
-    <input type="file" accept="image/*" onchange="setAvatar(event)">
-  </section>
+    <div id="start-panel">
+      <p>Начни общение ✨</p>
+      <button class="quick">Привет! Как дела?</button>
+      <button class="quick">Чем занимаешься?</button>
+      <button class="quick">Какой сегодня вайб?</button>
+      <button class="quick">Хочешь поболтать?</button>
+    </div>
 
-  <section>
-    <h3>Тема</h3>
-    <button onclick="setTheme('pink')">🌸 Pink</button>
-    <button onclick="setTheme('dark')">🌙 Dark</button>
-  </section>
+    <div class="input-bar">
+      <input id="message-input" placeholder="Сообщение..." />
+      <button id="send-btn">➤</button>
+    </div>
+  </div>
 
-  <section>
-    <h3>Шрифт</h3>
-    <button onclick="setFont('inter')">Inter</button>
-    <button onclick="setFont('impact')">Impact</button>
-    <button onclick="setFont('elegant')">Elegant</button>
-  </section>
-</div>
+  <!-- SETTINGS -->
+  <div id="settings-screen" class="screen">
+    <header class="top-bar">
+      <button id="settings-back">←</button>
+      <span>Настройки</span>
+    </header>
 
-<script src="contacts.js"></script>
-<script src="chat.js"></script>
-<script src="app.js"></script>
+    <section>
+      <h3>Профиль</h3>
+      <input id="name-setting" placeholder="Имя">
+      <input type="file" id="avatar-setting" accept="image/*">
+    </section>
+
+    <section>
+      <h3>Тема</h3>
+      <select id="theme-select">
+        <option value="pink">Pastel Pink</option>
+        <option value="night">Night</option>
+        <option value="lilac">Lilac</option>
+      </select>
+    </section>
+
+    <section>
+      <h3>Шрифт</h3>
+      <select id="font-select">
+        <option value="inter">Soft</option>
+        <option value="poppins">Bold</option>
+        <option value="playfair">Elegant</option>
+        <option value="mono">Mono Cozy</option>
+      </select>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="contacts.js"></script>
+  <script src="chat.js"></script>
 </body>
 </html>

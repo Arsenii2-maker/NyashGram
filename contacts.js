@@ -1,14 +1,5 @@
-const contacts = [
-  { name: 'Мия', status: 'online' },
-  { name: 'Луна', status: 'offline' }
+window.contacts = [
+  { id: 1, name: "Мила 💗", status: "online" },
+  { id: 2, name: "Кира ✨", status: "offline" },
+  { id: 3, name: "Лея 🌙", status: "online" }
 ];
-
-const list = document.getElementById('contacts-list');
-
-contacts.forEach(c => {
-  const div = document.createElement('div');
-  div.className = 'contact';
-  div.innerHTML = `<strong>${c.name}</strong><span>${c.status}</span>`;
-  div.onclick = () => openChat(c);
-  list.appendChild(div);
-});

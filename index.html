@@ -1,106 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  >
-  <title>NyashGram</title>
-
-  <!-- ШРИФТЫ -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter&family=Montserrat&family=Playfair+Display&family=Bebas+Neue&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>NyashGram ✨</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div id="app">
-
-  <!-- START -->
-  <section id="startScreen" class="screen active center">
+  <!-- LOGIN -->
+  <div id="login-screen" class="screen active">
     <h1>NyashGram ✨</h1>
-    <input id="startName" placeholder="Ваш ник">
-    <button id="startBtn">Войти</button>
-  </section>
-
-  <!-- HEADER -->
-  <header id="header" class="hidden">
-    <button id="backBtn">←</button>
-
-    <div class="top-info">
-      <div id="chatAvatar" class="avatar gradient"></div>
-      <div>
-        <div id="chatTitle"></div>
-        <div id="chatStatus"></div>
-      </div>
-    </div>
-
-    <button id="settingsBtn">⚙️</button>
-  </header>
-
-  <!-- CHAT LIST -->
-  <section id="chatList" class="screen">
-    <div class="chat-item" data-id="bestie" data-name="Bestie" data-status="в сети"></div>
-    <div class="chat-item" data-id="philo" data-name="Философ" data-status="не в сети"></div>
-    <div class="chat-item" data-id="study" data-name="Учёба" data-status="в сети"></div>
-  </section>
+    <input id="username-input" placeholder="Имя" />
+    <button id="login-btn">Войти</button>
+  </div>
 
   <!-- CHAT -->
-  <section id="chatScreen" class="screen">
-    <div id="chatIntro">
-      <h2>✨ Начни общение ✨</h2>
-      <button class="quick">Привет!</button>
-      <button class="quick">Как ты?</button>
-      <button class="quick">Что нового?</button>
-      <button class="quick">Поговорим?</button>
+  <div id="chat-screen" class="screen">
+    <div class="chat-header">
+      <span>Bestie</span>
     </div>
 
-    <div id="messages"></div>
-  </section>
+    <div id="messages" class="messages"></div>
 
-  <!-- SETTINGS -->
-  <section id="settings" class="screen">
-    <h2>Настройки</h2>
-
-    <div class="block">
-      <h3>Профиль</h3>
-      <input id="nameInput" placeholder="Имя">
+    <div class="chat-input">
+      <input id="message-input" placeholder="Сообщение" />
+      <button id="send-btn">▶</button>
     </div>
+  </div>
 
-    <div class="block">
-      <h3>Шрифт</h3>
-      <select id="fontSelect">
-        <option value="Inter">Inter</option>
-        <option value="Montserrat">Montserrat</option>
-        <option value="Impact, sans-serif">Impact</option>
-        <option value="'Bebas Neue', cursive">Bebas Neue</option>
-        <option value="'Playfair Display', serif">Playfair Display</option>
-      </select>
-    </div>
-
-    <div class="block">
-      <h3>Фон</h3>
-      <select id="bgType">
-        <option value="color">Цвет</option>
-        <option value="gradient">Градиент</option>
-        <option value="image">Фото</option>
-      </select>
-
-      <input type="color" id="bg1">
-      <input type="color" id="bg2">
-      <input type="file" id="bgImg" accept="image/*">
-    </div>
-  </section>
-
-  <!-- INPUT -->
-  <footer id="inputBar" class="hidden">
-    <input id="messageInput" placeholder="Сообщение">
-    <button id="sendBtn">➤</button>
-  </footer>
-
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
-</html> 
+</html>

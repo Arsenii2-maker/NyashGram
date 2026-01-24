@@ -1,35 +1,37 @@
 let messagesStore = {};
 
-function openChat(name) {
-  state.chat = name;
-  document.getElementById('chatTitle').textContent = name;
+function openChat(contact) {
+  state.chat = contact;
+  chatTitle.textContent = contact.name;
+  chatAvatar.src = contact.avatar;
   showScreen('chat');
   renderMessages();
 }
 
 function renderMessages() {
-  const box = document.getElementById('messages');
-  box.innerHTML = '';
-  (messagesStore[state.chat] || []).forEach(m => {
+  messages.innerHTML = '';
+  (messagesStore[state.chat.name] || []).forEach(m => {
     const div = document.createElement('div');
-    div.className = 'message';
-    div.textContent = m;
-    box.appendChild(div);
+    div.className = 'message ' + m.from;
+    div.textContent = m.text;
+    messages.appendChild(div);
   });
 }
 
 function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const text = input.value.trim();
+  const text = messageInput.value.trim();
   if (!text) return;
-  messagesStore[state.chat] = messagesStore[state.chat] || [];
-  messagesStore[state.chat].push(state.username + ': ' + text);
-  input.value = '';
-  renderMessages();
+  pushMessage(text);
+  messageInput.value = '';
 }
 
 function sendQuick(text) {
-  messagesStore[state.chat] = messagesStore[state.chat] || [];
-  messagesStore[state.chat].push(state.username + ': ' + text);
+  pushMessage(text);
+}
+
+function pushMessage(text) {
+  messagesStore[state.chat.name] ||= [];
+  messagesStore[state.chat.name].push({ from: 'me', text });
+  messagesStore[state.chat.name].push({ from: 'other', text: '...' });
   renderMessages();
 }

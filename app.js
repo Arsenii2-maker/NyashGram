@@ -1,73 +1,39 @@
-let myName = '';
-let currentChat = null;
-const chats = {};
+document.addEventListener('DOMContentLoaded', () => {
+  const loginScreen = document.getElementById('login-screen');
+  const chatScreen = document.getElementById('chat-screen');
 
-const screens = {
-  start: startScreen,
-  list: chatList,
-  chat: chatScreen,
-  settings
-};
+  const loginBtn = document.getElementById('login-btn');
+  const usernameInput = document.getElementById('username-input');
 
-function show(name) {
-  Object.values(screens).forEach(s => s.classList.remove('active'));
-  screens[name].classList.add('active');
+  const sendBtn = document.getElementById('send-btn');
+  const messageInput = document.getElementById('message-input');
+  const messages = document.getElementById('messages');
 
-  header.classList.toggle('hidden', name === 'start');
-  inputBar.classList.toggle('hidden', name !== 'chat');
-}
+  loginBtn.addEventListener('click', () => {
+    const name = usernameInput.value.trim();
+    if (!name) return;
 
-startBtn.onclick = () => {
-  myName = startName.value.trim() || 'Пользователь';
-  show('list');
-};
+    loginScreen.classList.remove('active');
+    chatScreen.classList.add('active');
+    chatScreen.style.display = 'flex';
+  });
 
-document.querySelectorAll('.chat-item').forEach(item => {
-  item.textContent = item.dataset.name;
+  sendBtn.addEventListener('click', sendMessage);
 
-  item.onclick = () => {
-    currentChat = item.dataset.id;
+  messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
 
-    chatTitle.textContent = item.dataset.name;
-    chatStatus.textContent = item.dataset.status;
+  function sendMessage() {
+    const text = messageInput.value.trim();
+    if (!text) return;
 
-    messages.innerHTML = '';
-    (chats[currentChat] || []).forEach(m => render(m));
+    const msg = document.createElement('div');
+    msg.className = 'message';
+    msg.textContent = text;
 
-    chatIntro.style.display = chats[currentChat]?.length ? 'none' : 'block';
-    show('chat');
-  };
+    messages.appendChild(msg);
+    messageInput.value = '';
+    messages.scrollTop = messages.scrollHeight;
+  }
 });
-
-sendBtn.onclick = send;
-messageInput.onkeydown = e => e.key === 'Enter' && send();
-
-function send(textFromQuick) {
-  const text = textFromQuick || messageInput.value.trim();
-  if (!text) return;
-
-  chats[currentChat] ??= [];
-  chats[currentChat].push({ text });
-
-  render({ text });
-  messageInput.value = '';
-  chatIntro.style.display = 'none';
-}
-
-function render(msg) {
-  const el = document.createElement('div');
-  el.className = 'message me';
-  el.textContent = msg.text;
-  messages.appendChild(el);
-}
-
-document.querySelectorAll('.quick').forEach(b =>
-  b.onclick = () => send(b.textContent)
-);
-
-/* SETTINGS */
-fontSelect.onchange = () => {
-  document.body.style.fontFamily = fontSelect.value;
-};
-
-show('start');

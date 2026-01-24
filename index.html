@@ -3,31 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <title>NyashGram ✨</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- LOGIN -->
-  <div id="login-screen" class="screen active">
+  <div id="loginScreen" class="screen active">
     <h1>NyashGram ✨</h1>
-    <input id="username-input" placeholder="Имя" />
-    <button id="login-btn">Войти</button>
+    <input id="usernameInput" placeholder="Имя">
+    <button id="loginBtn">Войти</button>
   </div>
 
   <!-- CHAT -->
-  <div id="chat-screen" class="screen">
-    <div class="chat-header">
-      <span>Bestie</span>
+  <div id="chatScreen" class="screen">
+    <div class="topbar">
+      <button id="backBtn">←</button>
+      <span id="chatName">Bestie</span>
+      <button id="settingsBtn">⚙</button>
     </div>
 
     <div id="messages" class="messages"></div>
 
-    <div class="chat-input">
-      <input id="message-input" placeholder="Сообщение" />
-      <button id="send-btn">▶</button>
+    <div class="inputBar">
+      <input id="messageInput" placeholder="Сообщение">
+      <button id="sendBtn">▶</button>
     </div>
   </div>
 

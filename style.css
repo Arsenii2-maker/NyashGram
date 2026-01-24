@@ -1,202 +1,103 @@
-/* ===== RESET ===== */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
-}
-
-/* ===== VARIABLES ===== */
-:root {
-  --bg: #0f0f14;
-  --panel: #171722;
-  --text: #ffffff;
-  --subtext: #b5b5c8;
-  --accent: #6c7cff;
-
-  --radius: 18px;
-  --font: system-ui, sans-serif;
-}
-
-/* ===== THEMES ===== */
-body.theme-light {
-  --bg: #ffffff;
-  --panel: #f2f2f7;
-  --text: #111111;
-  --subtext: #666;
-  --accent: #4f6cff;
-}
-
-body.theme-neon {
-  --bg: #090014;
-  --panel: #12001f;
-  --text: #f5e9ff;
-  --subtext: #c7b7ff;
-  --accent: #ff4fd8;
-}
-
-body.theme-cyber {
-  --bg: #020b0a;
-  --panel: #041413;
-  --text: #00ffe1;
-  --subtext: #00c7b0;
-  --accent: #00ff9c;
-}
-
-/* ===== FONTS ===== */
-body.font-system {
-  font-family: system-ui, sans-serif;
-}
-
-body.font-mono {
-  font-family: "JetBrains Mono", monospace;
-}
-
-body.font-rounded {
-  font-family: "Nunito", sans-serif;
-}
-
-body.font-future {
-  font-family: "Orbitron", sans-serif;
-}
-
-/* ===== BODY ===== */
 body {
+  margin: 0;
+  font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-/* ===== APP ===== */
-.app {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  background: var(--bg);
+:root {
+  --bg: #fde7f3;
+  --card: #ffffff;
+  --accent: #ff7ab6;
+  --text: #222;
+  --font: 'Inter', sans-serif;
 }
 
-/* ===== CONTACTS ===== */
-.contacts {
-  width: 280px;
-  background: var(--panel);
+body.dark {
+  --bg: #121212;
+  --card: #1e1e1e;
+  --accent: #bb86fc;
+  --text: #fff;
+}
+
+body.impact {
+  --font: 'Impact', sans-serif;
+}
+
+body.elegant {
+  --font: 'Playfair Display', serif;
+}
+
+.screen {
+  display: none;
+  height: 100vh;
   padding: 16px;
+}
+
+.screen.active {
   display: flex;
   flex-direction: column;
+}
+
+header {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
-.contact {
-  padding: 12px;
-  border-radius: var(--radius);
-  background: transparent;
-  cursor: pointer;
+h1, h2 {
+  margin: 0;
 }
 
-.contact:hover {
-  background: rgba(255,255,255,0.05);
+input {
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: none;
+  margin: 10px 0;
 }
 
-/* ===== CHAT ===== */
-.chat {
+button {
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 16px;
+}
+
+#contactsList div {
+  background: var(--card);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+#messages {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-header {
-  padding: 16px;
-  background: var(--panel);
-  font-weight: 600;
-}
-
-.messages {
-  flex: 1;
-  padding: 16px;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  margin: 10px 0;
 }
 
 .message {
-  max-width: 70%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--panel);
-}
-
-.message.me {
-  background: var(--accent);
-  color: #fff;
-  align-self: flex-end;
-}
-
-/* ===== INPUT ===== */
-.chat-input {
-  padding: 12px;
-  background: var(--panel);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.chat-input input {
-  width: 100%;
-  padding: 12px;
+  background: var(--card);
+  padding: 10px;
   border-radius: 12px;
-  border: none;
-  outline: none;
-  background: #0c0c14;
-  color: var(--text);
+  margin-bottom: 6px;
 }
 
-/* ===== QUICK MESSAGES ===== */
-.quick-messages {
+.quick {
   display: flex;
   gap: 8px;
-  overflow-x: auto;
+  margin-bottom: 8px;
 }
 
-.quick-messages button {
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: none;
-  background: rgba(255,255,255,0.08);
-  color: var(--text);
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-/* ===== DESKTOP MODE ===== */
-body[data-device="desktop"] .app {
-  max-width: 1000px;
-  max-height: 600px;
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-/* ===== MOBILE MODE ===== */
-body[data-device="mobile"] {
-  align-items: stretch;
-}
-
-body[data-device="mobile"] .contacts {
-  display: none;
-}
-
-body[data-device="mobile"] .app {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-}
-
-body[data-device="mobile"] .message {
-  max-width: 85%;
+.input {
+  display: flex;
+  gap: 8px;
 }

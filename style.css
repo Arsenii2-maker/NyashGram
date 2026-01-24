@@ -1,15 +1,15 @@
 * {
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
 }
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #0b0b14, #06060d);
-  color: white;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #ffd6e8, #fff1f7);
   height: 100vh;
 }
 
+/* ЭКРАНЫ */
 .screen {
   display: none;
   width: 100%;
@@ -18,163 +18,160 @@ body {
 
 .screen.active {
   display: flex;
-  flex-direction: column;
 }
 
-/* LOGIN */
+/* ВХОД */
 #loginScreen {
   justify-content: center;
   align-items: center;
-  gap: 12px;
 }
 
-#loginScreen input,
-#loginScreen button {
-  padding: 10px 14px;
+.login-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 24px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,.15);
+}
+
+.login-card h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
   border-radius: 12px;
-  border: none;
-  font-size: 16px;
+  border: 1px solid #ddd;
+  margin-top: 20px;
 }
 
-/* CHAT */
-.topbar {
+.login-card button {
+  margin-top: 20px;
+  padding: 14px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 14px;
+  border: none;
+  background: #ff8fc7;
+  color: white;
+  cursor: pointer;
+}
+
+/* ПРИЛОЖЕНИЕ */
+#appScreen {
+  flex-direction: column;
+}
+
+/* ВЕРХ */
+.top-bar {
+  padding: 16px;
+  background: rgba(255,255,255,0.85);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+}
+
+.me {
+  font-size: 20px;
+}
+
+.me button {
+  margin-left: 10px;
+  font-size: 20px;
+}
+
+/* КОНТЕНТ */
+.content {
+  display: flex;
+  flex: 1;
+}
+
+/* КОНТАКТЫ */
+.contacts {
+  width: 200px;
+  background: rgba(255,255,255,0.7);
   padding: 10px;
-  background: #111;
+}
+
+.contact {
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* ЧАТ */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .messages {
   flex: 1;
-  padding: 10px;
+  padding: 20px;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .message {
   max-width: 70%;
-  padding: 8px 12px;
-  border-radius: 14px;
-}
-
-.message.me {
-  align-self: flex-end;
-  background: #3b82f6;
-}
-
-.message.other {
-  align-self: flex-start;
-  background: #222;
-}
-
-.inputBar {
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  background: #0d0d15;
-}
-
-.inputBar input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-}
-
-.inputBar button {
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: none;
-}
-/* === NYASHGRAM SCALE FIX === */
-
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* всё приложение как карточка */
-.screen {
-  max-width: 420px;
-  width: 100%;
-  height: 92vh;
-
-  background: linear-gradient(180deg, #fff1f6, #fde7ef);
-  border-radius: 26px;
-
-  box-shadow:
-    0 20px 40px rgba(255, 182, 193, 0.35),
-    inset 0 0 0 1px rgba(255,255,255,0.6);
-}
-
-/* логин — крупный и по центру */
-#loginScreen h1 {
-  font-size: 32px;
+  padding: 14px;
   margin-bottom: 10px;
-  color: #ff6fae;
-}
-
-#loginScreen input,
-#loginScreen button {
-  width: 85%;
-  font-size: 18px;
-  padding: 14px;
   border-radius: 18px;
-}
-/* === MESSAGE STYLE UPGRADE === */
-
-.messages {
-  padding: 16px;
-}
-
-.message {
-  font-size: 16px;
-  padding: 14px 18px;
-  border-radius: 22px;
-  line-height: 1.35;
+  background: #fff;
+  border: 1px solid #000;
 }
 
 .message.me {
-  background: linear-gradient(135deg, #ff9acb, #ff6fae);
-  color: white;
+  margin-left: auto;
+  background: #ffe1ef;
 }
 
-.message.other {
-  background: #ffffff;
-  color: #333;
-}
-/* === TOPBAR BIG & SOFT === */
-
-.topbar {
-  padding: 16px;
-  font-size: 18px;
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.7);
+.input-bar {
+  display: flex;
+  padding: 10px;
+  background: #fff;
 }
 
-.topbar button {
-  font-size: 18px;
-}
-/* === INPUT BAR === */
-
-.inputBar {
+.input-bar input {
+  flex: 1;
   padding: 14px;
-  gap: 10px;
-}
-
-.inputBar input {
-  font-size: 17px;
-  padding: 14px;
-  border-radius: 20px;
-}
-
-.inputBar button {
   font-size: 18px;
-  padding: 14px 18px;
-  border-radius: 20px;
+  border-radius: 14px;
+  border: 1px solid #ccc;
+}
+
+.input-bar button {
+  margin-left: 10px;
+  font-size: 20px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: #ff8fc7;
+  color: #fff;
+  border: none;
+}
+
+/* СТАРТОВАЯ ПАНЕЛЬ */
+.start-panel {
+  padding: 40px;
+  text-align: center;
+}
+
+.start-panel button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: none;
+  background: #ffd6e8;
+}
+.hidden {
+  display: none;
 }

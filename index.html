@@ -2,96 +2,99 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NyashGram</title>
-
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>NyashGram 💗</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display&family=Poppins:wght@500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&family=Nunito:wght@400;700&family=Quicksand:wght@400;600&family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;600&family=Montserrat:wght@400;600&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div id="login-screen" class="screen active">
-    <div class="login-card">
-      <h1>NyashGram 🩷</h1>
-      <input id="nickname-input" placeholder="Твой ник" />
-      <button id="login-btn">Войти</button>
-    </div>
-  </div>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <section id="startScreen" class="screen active">
+    <h1>NyashGram 💗</h1>
+    <input id="nicknameInput" placeholder="Твой ник…" />
+    <button id="enterBtn">Войти</button>
+  </section>
 
   <!-- CONTACTS -->
-  <div id="contacts-screen" class="screen">
-    <header class="top-bar">
-      <span id="my-name"></span>
-      <button id="settings-btn">⚙</button>
+  <section id="contactsScreen" class="screen">
+    <header>
+      <span id="myName"></span>
+      <button id="openSettings">⚙️</button>
     </header>
-    <div id="contacts-list"></div>
-  </div>
+    <div id="contactsList"></div>
+  </section>
 
   <!-- CHAT -->
-  <div id="chat-screen" class="screen">
-    <header class="chat-header">
-      <button id="back-btn">←</button>
-      <img id="chat-avatar">
-      <div>
-        <div id="chat-name"></div>
-        <div id="chat-status"></div>
-      </div>
+  <section id="chatScreen" class="screen">
+    <header>
+      <button id="backBtn">←</button>
+      <div id="chatUserInfo"></div>
     </header>
 
     <div id="messages"></div>
 
-    <div id="start-panel">
-      <p>Начни общение ✨</p>
-      <button class="quick">Привет! Как дела?</button>
+    <div id="quickPanel">
+      <button class="quick">Привет! 💗</button>
+      <button class="quick">Как дела?</button>
       <button class="quick">Чем занимаешься?</button>
-      <button class="quick">Какой сегодня вайб?</button>
-      <button class="quick">Хочешь поболтать?</button>
+      <button class="quick">Хочешь поболтать? ✨</button>
     </div>
 
-    <div class="input-bar">
-      <input id="message-input" placeholder="Сообщение..." />
-      <button id="send-btn">➤</button>
+    <div id="inputBar">
+      <input id="messageInput" placeholder="Сообщение…" />
+      <button id="sendBtn">➤</button>
     </div>
-  </div>
+  </section>
 
   <!-- SETTINGS -->
-  <div id="settings-screen" class="screen">
-    <header class="top-bar">
-      <button id="settings-back">←</button>
-      <span>Настройки</span>
+  <section id="settingsScreen" class="screen">
+    <header>
+      <button id="closeSettings">←</button>
+      <h2>Настройки</h2>
     </header>
 
-    <section>
-      <h3>Профиль</h3>
-      <input id="name-setting" placeholder="Имя">
-      <input type="file" id="avatar-setting" accept="image/*">
-    </section>
+    <div class="block">
+      <label>Имя</label>
+      <input id="settingsName">
+    </div>
 
-    <section>
-      <h3>Тема</h3>
-      <select id="theme-select">
-        <option value="pink">Pastel Pink</option>
+    <div class="block">
+      <label>Шрифт</label>
+      <select id="fontSelect">
+        <option value="Inter">Inter</option>
+        <option value="Poppins">Poppins</option>
+        <option value="Nunito">Nunito</option>
+        <option value="Quicksand">Quicksand</option>
+        <option value="Playfair Display">Playfair</option>
+        <option value="DM Sans">DM Sans</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Manrope">Manrope</option>
+      </select>
+    </div>
+
+    <div class="block">
+      <label>Тема</label>
+      <select id="themeSelect">
+        <option value="cozy">Cozy Pink</option>
+        <option value="mint">Mint</option>
+        <option value="cyber">Cyber</option>
+        <option value="loft">Loft</option>
         <option value="night">Night</option>
-        <option value="lilac">Lilac</option>
+        <option value="lofi">Lofi</option>
       </select>
-    </section>
+    </div>
+  </section>
 
-    <section>
-      <h3>Шрифт</h3>
-      <select id="font-select">
-        <option value="inter">Soft</option>
-        <option value="poppins">Bold</option>
-        <option value="playfair">Elegant</option>
-        <option value="mono">Mono Cozy</option>
-      </select>
-    </section>
-  </div>
+</div>
 
-  <script src="app.js"></script>
-  <script src="contacts.js"></script>
-  <script src="chat.js"></script>
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

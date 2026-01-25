@@ -6,12 +6,7 @@
 html, body {
   height: 100%;
   margin: 0;
-}
-
-body {
-  font-family: var(--font-main, system-ui);
-  background: var(--bg);
-  color: var(--text);
+  font-family: system-ui, -apple-system;
 }
 
 #app {
@@ -29,23 +24,24 @@ body {
 }
 
 /* ===== FONTS ===== */
-.font-system { --font-main: system-ui, -apple-system; }
-.font-rounded { --font-main: "Arial Rounded MT Bold", system-ui; }
-.font-mono { --font-main: ui-monospace, SFMono-Regular, monospace; }
-.font-elegant { --font-main: "Georgia", serif; }
-.font-softbold { --font-main: "Trebuchet MS", system-ui; }
-.font-impact {
-  --font-main: system-ui;
+.font-system {
+  font-family: system-ui, -apple-system;
 }
-.font-impact h1,
-.font-impact .top-title,
-.font-impact .contact-name,
-.font-impact #chatName {
+
+.font-rounded {
+  font-family: "Arial Rounded MT Bold", system-ui;
+}
+
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.font-impact {
   font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
 }
 
-/* ===== THEMES via data-theme ===== */
-:root {
+/* ===== THEMES ===== */
+.theme-pink {
   --bg: #fff0f6;
   --panel: #ffd6e8;
   --card: #ffe4f0;
@@ -53,27 +49,29 @@ body {
   --text: #4b0033;
 }
 
-body[data-theme="pastel-pink"] {
-  --bg:#fff0f6; --panel:#ffd6e8; --card:#ffe4f0; --accent:#ff9acb; --text:#4b0033;
+.theme-dark {
+  --bg: #0f0f14;
+  --panel: #1b1b22;
+  --card: #242430;
+  --accent: #ff7abf;
+  --text: #ffffff;
 }
 
-body[data-theme="milk-rose"] {
-  --bg:#fff5f8; --panel:#ffe1ea; --card:#ffe9f0; --accent:#f7a1c4; --text:#5a1f3c;
+.theme-mint {
+  --bg: #eafff7;
+  --panel: #c9f5e6;
+  --card: #dffaf0;
+  --accent: #3fd2a2;
+  --text: #053b2f;
 }
 
-body[data-theme="night-blue"] {
-  --bg:#0f1220; --panel:#1a1e33; --card:#22284a; --accent:#7aa2ff; --text:#ffffff;
+/* ===== GLOBAL COLORS ===== */
+body {
+  background: var(--bg);
+  color: var(--text);
 }
 
-body[data-theme="lofi-beige"] {
-  --bg:#f6f1e7; --panel:#e9e1d2; --card:#f1eadc; --accent:#c49a6c; --text:#3b2f1e;
-}
-
-body[data-theme="soft-lilac"] {
-  --bg:#f4f0ff; --panel:#e6ddff; --card:#efe9ff; --accent:#b79cff; --text:#33245c;
-}
-
-/* ===== UI ===== */
+/* ===== LOGIN ===== */
 .center {
   justify-content: center;
   align-items: center;
@@ -82,13 +80,15 @@ body[data-theme="soft-lilac"] {
   text-align: center;
 }
 
-h1 { font-size: 32px; }
+h1 {
+  font-size: 32px;
+}
 
-input, select {
+input {
   width: 100%;
   max-width: 320px;
-  padding: 14px;
-  font-size: 17px;
+  padding: 16px;
+  font-size: 18px;
   border-radius: 14px;
   border: none;
 }
@@ -111,7 +111,10 @@ button {
   background: var(--panel);
 }
 
-.top-title { font-size: 22px; font-weight: 600; }
+.top-title {
+  font-size: 22px;
+  font-weight: 600;
+}
 
 /* ===== AVATAR ===== */
 .avatar {
@@ -120,10 +123,13 @@ button {
   border-radius: 50%;
   background-size: cover;
   background-position: center;
+  background-image: linear-gradient(135deg, #ff9acb, #ffd6e8);
 }
 
 /* ===== CONTACTS ===== */
-#contactsList { padding: 16px; }
+#contactsList {
+  padding: 16px;
+}
 
 .contact {
   display: flex;
@@ -136,12 +142,17 @@ button {
   font-size: 18px;
 }
 
-.contact-name { font-weight: 600; }
-
 /* ===== CHAT ===== */
-.chat-header { display: flex; gap: 12px; align-items: center; }
+.chat-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
 
-.status { font-size: 14px; opacity: 0.7; }
+.status {
+  font-size: 14px;
+  opacity: 0.7;
+}
 
 #messages {
   flex: 1;
@@ -165,7 +176,7 @@ button {
 
 .message.other {
   align-self: flex-start;
-  background: #fff;
+  background: #ffffff;
   color: #000;
 }
 
@@ -174,4 +185,21 @@ button {
   gap: 10px;
   padding: 14px;
   background: var(--panel);
+}
+
+/* ===== INTRO ===== */
+.chat-intro {
+  padding: 24px;
+  text-align: center;
+}
+
+.intro-title {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.intro-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

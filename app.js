@@ -26,8 +26,8 @@ const settings = {
 
 function applySettings() {
   document.body.className = "";
-  document.body.setAttribute("data-theme", settings.theme);
-  document.body.classList.add(`font-${settings.font}`);
+  document.body.dataset.theme = settings.theme;
+  document.body.dataset.font = settings.font;
 }
 
 applySettings();

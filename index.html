@@ -2,91 +2,133 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
-<body data-theme="pastel-pink" data-font="system">
+<body>
 
 <div id="app">
 
-<section id="loginScreen" class="screen center">
-  <h1>NyashGram 🩷</h1>
-  <input id="loginInput" placeholder="Ваш никнейм">
-  <button id="loginBtn">Войти</button>
-</section>
-
-<section id="settingsScreen" class="screen">
-  <div class="top-bar">
+  <!-- LOGIN -->
+  <section id="loginScreen" class="screen center">
+    <h1>NyashGram 🩷</h1>
+    <input id="loginInput" placeholder="Ваш никнейм">
+    <button id="loginBtn">Войти</button>
+  </section>
+  
+  <section id="settingsScreen" class="screen">
+  <header class="top-bar">
     <button id="settingsBackBtn">←</button>
-    <b>Настройки</b>
-  </div>
+    <div class="top-title">Настройки</div>
+  </header>
+  <!-- ВНУТРИ settingsScreen, после никнейма -->
 
-  <div style="padding:16px; display:flex; flex-direction:column; gap:14px">
-    <label>Никнейм <input id="settingsName"></label>
+<label>
+  Аватар
+  <input type="file" id="avatarInput" accept="image/*">
+</label>
 
-    <label>Статус
-      <select id="statusSelect">
-        <option value="online">online</option>
-        <option value="offline">offline</option>
-      </select>
+<label>
+  Статус
+  <select id="statusSelect">
+    <option value="online">online</option>
+    <option value="offline">offline</option>
+  </select>
+</label>
+
+<label>
+  Тема
+  <select id="themeSelect">
+    <option value="pastel-pink">Pastel Pink</option>
+    <option value="milk-rose">Milk Rose</option>
+    <option value="night-blue">Night Blue</option>
+    <option value="lofi-beige">Lo-fi Beige</option>
+    <option value="soft-lilac">Soft Lilac</option>
+  </select>
+</label>
+
+<label>
+  Шрифт
+  <select id="fontSelect">
+    <option value="system">System</option>
+    <option value="rounded">Rounded</option>
+    <option value="mono">Mono</option>
+    <option value="elegant">Elegant</option>
+    <option value="softbold">Soft Bold</option>
+    <option value="impact">Impact</option>
+  </select>
+</label>
+
+  <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
+
+    <label>
+      Никнейм
+      <input id="settingsName">
     </label>
 
-    <label>Аватарка
-      <input type="file" id="avatarInput" accept="image/*">
-    </label>
-
-    <label>Тема
+    <label>
+      Тема
       <select id="themeSelect">
-        <option value="pastel-pink">Pastel Pink</option>
-        <option value="milk-rose">Milk Rose</option>
-        <option value="night-blue">Night Blue</option>
-        <option value="lofi-beige">Lo-Fi Beige</option>
-        <option value="soft-lilac">Soft Lilac</option>
+        <option value="pink">Розовая</option>
+        <option value="dark">Тёмная</option>
+        <option value="mint">Мятная</option>
       </select>
     </label>
 
-    <label>Шрифт
+    <label>
+      Шрифт
       <select id="fontSelect">
         <option value="system">System</option>
         <option value="rounded">Rounded</option>
         <option value="mono">Mono</option>
-        <option value="elegant">Elegant</option>
-        <option value="soft-bold">Soft Bold</option>
-        <option value="impact">Impact</option>
       </select>
     </label>
 
     <button id="saveSettingsBtn">Сохранить</button>
+
   </div>
 </section>
 
-<section id="contactsScreen" class="screen">
-  <div class="top-bar">
-    <button id="settingsBtn">⚙️</button>
-    <b>Контакты</b>
-  </div>
-  <div id="contactsList"></div>
-</section>
+  <!-- CONTACTS -->
+  <section id="contactsScreen" class="screen">
+    <header class="top-bar">
+      <button id="settingsBtn">⚙️</button>
+      <div class="top-title">Контакты</div>
+    </header>
+    <div id="contactsList"></div>
+  </section>
 
-<section id="chatScreen" class="screen">
-  <div class="top-bar">
-    <button id="backBtn">←</button>
-    <div id="chatAvatar" class="avatar"></div>
-    <div>
-      <div id="chatName"></div>
-      <div id="chatStatus"></div>
+  <!-- CHAT -->
+  <section id="chatScreen" class="screen">
+    <header class="top-bar">
+      <button id="backBtn">←</button>
+      <div class="chat-header">
+        <div id="chatAvatar" class="avatar"></div>
+        <div>
+          <div id="chatName"></div>
+          <div id="chatStatus" class="status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div id="chatIntro" class="chat-intro">
+      <div class="intro-title">✨ Начни общение ✨</div>
+      <div class="intro-buttons">
+        <button>Привет! Как дела?</button>
+        <button>Чем занимаешься?</button>
+        <button>Хочешь поболтать?</button>
+        <button>Какой вайб сегодня?</button>
+      </div>
     </div>
-  </div>
 
-  <div id="messages"></div>
+    <div id="messages"></div>
 
-  <footer class="input-bar">
-    <input id="messageInput">
-    <button id="sendBtn">➤</button>
-  </footer>
-</section>
+    <footer class="input-bar">
+      <input id="messageInput" placeholder="Сообщение...">
+      <button id="sendBtn">➤</button>
+    </footer>
+  </section>
 
 </div>
 

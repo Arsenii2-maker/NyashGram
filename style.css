@@ -1,86 +1,146 @@
-:root {
-  --bg: #fff0f6;
-  --panel: #ffffff;
-  --text: #2b2b2b;
-  --accent: #ff7eb9;
-  --bubble-me: #ffd6e8;
-  --bubble-other: #ffffff;
-  --font-main: system-ui;
+* {
+  box-sizing: border-box;
 }
 
-/* THEMES */
-[data-theme="pastel"] {
-  --bg: #fff0f6;
-  --accent: #ff7eb9;
-}
-[data-theme="milk"] {
-  --bg: #fff7f9;
-  --accent: #f3a6b8;
-}
-[data-theme="night"] {
-  --bg: #0f172a;
-  --panel: #1e293b;
-  --text: #e5e7eb;
-  --accent: #7dd3fc;
-}
-[data-theme="lofi"] {
-  --bg: #f5efe6;
-  --accent: #c7a17a;
-}
-[data-theme="lilac"] {
-  --bg: #f3e8ff;
-  --accent: #c084fc;
-}
-
-/* FONTS */
-[data-font="soft"] { --font-main: system-ui; }
-[data-font="rounded"] { --font-main: "Arial Rounded MT Bold", system-ui; }
-[data-font="elegant"] { --font-main: "Georgia", serif; }
-[data-font="bold"] { --font-main: "Trebuchet MS", system-ui; }
-[data-font="impact"] { --font-main: Impact, Haettenschweiler, sans-serif; }
-[data-font="mono"] { --font-main: "Courier New", monospace; }
-
-body {
+html, body {
+  height: 100%;
   margin: 0;
-  background: var(--bg);
-  font-family: var(--font-main);
-  color: var(--text);
+  background: #fff0f6;
+  font-family: system-ui, -apple-system;
 }
 
-.hidden { display: none; }
+#app {
+  height: 100%;
+}
 
-.center-screen {
-  height: 100vh;
+.screen {
+  display: none;
+  height: 100%;
+}
+
+.screen.active {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
 }
 
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+.center {
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  gap: 16px;
 }
-.avatar.big {
-  width: 96px;
-  height: 96px;
+
+h1 {
+  font-size: 32px;
+}
+
+input {
+  width: 100%;
+  max-width: 320px;
+  padding: 16px;
+  font-size: 18px;
+  border-radius: 14px;
+  border: none;
+}
+
+button {
+  padding: 16px 20px;
+  font-size: 18px;
+  border-radius: 16px;
+  border: none;
+  background: #ff9acb;
+  color: #4b0033;
 }
 
 .top-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
-  background: var(--panel);
+  gap: 12px;
+  padding: 16px;
+  background: #ffd6e8;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  background: var(--panel);
-  padding: 20px;
-  z-index: 10;
+.top-title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.chat-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.status {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+#contactsList {
+  padding: 16px;
+}
+
+.contact {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: #ffe4f0;
+  padding: 14px;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+#messages {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 75%;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 18px;
+}
+
+.message.me {
+  align-self: flex-end;
+  background: #ff9acb;
+}
+
+.message.other {
+  align-self: flex-start;
+  background: #ffffff;
+}
+
+.input-bar {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: #ffd6e8;
+}
+
+.chat-intro {
+  padding: 24px;
+  text-align: center;
+}
+
+.intro-title {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.intro-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

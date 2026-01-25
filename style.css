@@ -63,7 +63,7 @@ html, body {
 }
 
 /* ===== THEMES ===== */
-.theme-pink {
+[data-theme="pink"] {
   --bg: #fff0f6;
   --panel: #ffd6e8;
   --card: #ffe4f0;
@@ -71,7 +71,7 @@ html, body {
   --text: #4b0033;
 }
 
-.theme-dark {
+[data-theme="dark"] {
   --bg: #0f0f14;
   --panel: #1b1b22;
   --card: #242430;
@@ -79,7 +79,7 @@ html, body {
   --text: #ffffff;
 }
 
-.theme-mint {
+[data-theme="mint"] {
   --bg: #eafff7;
   --panel: #c9f5e6;
   --card: #dffaf0;

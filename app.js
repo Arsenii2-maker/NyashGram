@@ -1,22 +1,9 @@
-// ---------- SCREENS ----------
-const screens = {
-  login: document.getElementById("loginScreen"),
-  contacts: document.getElementById("contactsScreen"),
-  chat: document.getElementById("chatScreen"),
-  settings: document.getElementById("settingsScreen")
-};
-
-function showScreen(name) {
-  Object.values(screens).forEach(s => s.classList.remove("active"));
-  screens[name].classList.add("active");
-}
-
-// ---------- SETTINGS ----------
 const defaultSettings = {
   name: "",
-  theme: "pink",
-  font: "system",
-  avatar: ""
+  avatar: "",
+  status: "online",
+  theme: "pastel-pink",
+  font: "system"
 };
 
 const settings = {
@@ -24,92 +11,56 @@ const settings = {
   ...JSON.parse(localStorage.getItem("nyashSettings") || "{}")
 };
 
-function applySettings() {
-  document.body.className = "";
-  document.body.classList.add(`theme-${settings.theme}`);
-  document.body.classList.add(`font-${settings.font}`);
-}
-
-applySettings();
-
-// ---------- LOGIN ----------
-const loginBtn = document.getElementById("loginBtn");
-const loginInput = document.getElementById("loginInput");
-
-loginBtn.onclick = () => {
-  const nick = loginInput.value.trim();
-  if (!nick) return;
-
-  settings.name = nick;
-  saveSettings();
-  showScreen("contacts");
-  renderContacts();
-};
-
-if (settings.name) {
-  showScreen("contacts");
-  renderContacts();
-} else {
-  showScreen("login");
-}
-
-// ---------- SETTINGS UI ----------
-document.getElementById("settingsBtn").onclick = () => {
-  document.getElementById("settingsName").value = settings.name;
-  document.getElementById("themeSelect").value = settings.theme;
-  document.getElementById("fontSelect").value = settings.font;
-  showScreen("settings");
-};
-
-document.getElementById("settingsBackBtn").onclick = () =>
-  showScreen("contacts");
-
-document.getElementById("saveSettingsBtn").onclick = () => {
-  settings.name = document.getElementById("settingsName").value.trim();
-  settings.theme = document.getElementById("themeSelect").value;
-  settings.font = document.getElementById("fontSelect").value;
-
-  saveSettings();
-  applySettings();
-  renderContacts();
-  showScreen("contacts");
-};
-
-// ---------- AVATAR ----------
-function generateAvatar(el, image) {
-  if (image) {
-    el.style.backgroundImage = `url(${image})`;
-  } else {
-    const colors = ["#ff9acb", "#ffd6e8", "#c9f5e6", "#3fd2a2"];
-    const c1 = colors[Math.floor(Math.random() * colors.length)];
-    const c2 = colors[Math.floor(Math.random() * colors.length)];
-    el.style.backgroundImage = `linear-gradient(135deg, ${c1}, ${c2})`;
-  }
-}
-
-// ---------- STORAGE ----------
-function saveSettings() {
+function save() {
   localStorage.setItem("nyashSettings", JSON.stringify(settings));
 }
 
-// ---------- CHAT ----------
-document.getElementById("backBtn").onclick =
-  () => showScreen("contacts");
+function apply() {
+  document.body.dataset.theme = settings.theme;
+  document.body.dataset.font = settings.font;
+}
 
-document.getElementById("sendBtn").onclick = () => {
-  const input = document.getElementById("messageInput");
-  sendMessage(input.value);
-  input.value = "";
+apply();
+
+/* LOGIN */
+loginBtn.onclick = () => {
+  settings.name = loginInput.value.trim();
+  if (!settings.name) return;
+  save();
+  showScreen("contacts");
+  renderContacts();
 };
 
-document.getElementById("messageInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    sendMessage(e.target.value);
-    e.target.value = "";
-  }
-});
+/* SETTINGS */
+settingsBtn.onclick = () => {
+  settingsName.value = settings.name;
+  themeSelect.value = settings.theme;
+  fontSelect.value = settings.font;
+  statusSelect.value = settings.status;
+  showScreen("settings");
+};
 
-document.querySelectorAll(".intro-buttons button")
-  .forEach(btn => {
-    btn.onclick = () => sendMessage(btn.textContent);
-  });
+settingsBackBtn.onclick = () => showScreen("contacts");
+
+saveSettingsBtn.onclick = () => {
+  settings.name = settingsName.value;
+  settings.theme = themeSelect.value;
+  settings.font = fontSelect.value;
+  settings.status = statusSelect.value;
+  save();
+  apply();
+  renderContacts();
+  showScreen("contacts");
+};
+
+/* AVATAR */
+avatarInput.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    settings.avatar = reader.result;
+    save();
+  };
+  reader.readAsDataURL(file);
+};

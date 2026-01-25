@@ -1,42 +1,65 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Chat App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NyashGram</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body data-theme="dark" data-font="inter">
+<body>
 
-  <header class="topbar">
-    <h1>Chat</h1>
+<div id="app">
 
-    <div class="controls">
-      <select id="themeSelect">
-        <option value="dark">🌑 Dark</option>
-        <option value="light">☀️ Light</option>
-        <option value="neon">💜 Neon</option>
-        <option value="dream">🌫 Dream</option>
-        <option value="retro">🟦 Retro</option>
-      </select>
+  <!-- LOGIN -->
+  <section id="loginScreen" class="screen active center">
+    <h1>NyashGram 🩷</h1>
+    <input id="loginInput" placeholder="Ваш никнейм">
+    <button id="loginBtn">Войти</button>
+  </section>
 
-      <select id="fontSelect">
-        <option value="inter">Inter</option>
-        <option value="mono">Mono</option>
-        <option value="pixel">Pixel</option>
-        <option value="rounded">Rounded</option>
-      </select>
+  <!-- CONTACTS -->
+  <section id="contactsScreen" class="screen">
+    <header class="top-bar">
+      <div class="top-title">Контакты</div>
+    </header>
+    <div id="contactsList"></div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="chatScreen" class="screen">
+    <header class="top-bar">
+      <button id="backBtn">←</button>
+      <div class="chat-header">
+        <div id="chatAvatar" class="avatar"></div>
+        <div>
+          <div id="chatName"></div>
+          <div id="chatStatus" class="status"></div>
+        </div>
+      </div>
+    </header>
+
+    <div id="chatIntro" class="chat-intro">
+      <div class="intro-title">✨ Начни общение ✨</div>
+      <div class="intro-buttons">
+        <button>Привет! Как дела?</button>
+        <button>Чем занимаешься?</button>
+        <button>Хочешь поболтать?</button>
+        <button>Какой вайб сегодня?</button>
+      </div>
     </div>
-  </header>
 
-  <main class="layout">
-    <aside class="sidebar" id="contacts"></aside>
-    <section class="chat" id="chat"></section>
-  </main>
+    <div id="messages"></div>
 
-  <script src="app.js"></script>
-  <script src="contacts.js"></script>
-  <script src="chat.js"></script>
+    <footer class="input-bar">
+      <input id="messageInput" placeholder="Сообщение...">
+      <button id="sendBtn">➤</button>
+    </footer>
+  </section>
+
+</div>
+
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

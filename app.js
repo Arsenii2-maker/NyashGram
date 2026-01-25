@@ -1,96 +1,102 @@
-// ---------- SCREENS ----------
-const screens = {
-  login: loginScreen,
-  contacts: contactsScreen,
-  chat: chatScreen,
-  settings: settingsScreen
-};
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NyashGram</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-function showScreen(name) {
-  Object.values(screens).forEach(s => s.classList.remove("active"));
-  screens[name].classList.add("active");
-}
+<div id="app">
 
-// ---------- SETTINGS ----------
-const defaultSettings = {
-  name: "",
-  theme: "pastel-pink",
-  font: "system",
-  avatar: "",
-  status: "online"
-};
+  <!-- LOGIN -->
+  <section id="loginScreen" class="screen center">
+    <h1>NyashGram 🩷</h1>
+    <input id="loginInput" placeholder="Ваш никнейм">
+    <button id="loginBtn">Войти</button>
+  </section>
+  
+  <section id="settingsScreen" class="screen">
+  <header class="top-bar">
+    <button id="settingsBackBtn">←</button>
+    <div class="top-title">Настройки</div>
+  </header>
 
-const settings = {
-  ...defaultSettings,
-  ...JSON.parse(localStorage.getItem("nyashSettings") || "{}")
-};
+  <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
 
-function saveSettings() {
-  localStorage.setItem("nyashSettings", JSON.stringify(settings));
-}
+    <label>
+      Никнейм
+      <input id="settingsName">
+    </label>
 
-function applySettings() {
-  document.body.dataset.theme = settings.theme;
-  document.body.className = `font-${settings.font}`;
-}
+    <label>
+      Тема
+      <select id="themeSelect">
+        <option value="pink">Розовая</option>
+        <option value="dark">Тёмная</option>
+        <option value="mint">Мятная</option>
+      </select>
+    </label>
 
-applySettings();
+    <label>
+      Шрифт
+      <select id="fontSelect">
+        <option value="system">System</option>
+        <option value="rounded">Rounded</option>
+        <option value="mono">Mono</option>
+      </select>
+    </label>
 
-// ---------- LOGIN ----------
-loginBtn.onclick = () => {
-  if (!loginInput.value.trim()) return;
-  settings.name = loginInput.value.trim();
-  saveSettings();
-  showScreen("contacts");
-  renderContacts();
-};
+    <button id="saveSettingsBtn">Сохранить</button>
 
-settings.name ? showScreen("contacts") : showScreen("login");
+  </div>
+</section>
 
-// ---------- SETTINGS UI ----------
-settingsBtn.onclick = () => {
-  settingsName.value = settings.name;
-  themeSelect.value = settings.theme;
-  fontSelect.value = settings.font;
-  statusSelect.value = settings.status;
-  showScreen("settings");
-};
+  <!-- CONTACTS -->
+  <section id="contactsScreen" class="screen">
+    <header class="top-bar">
+      <button id="settingsBtn">⚙️</button>
+      <div class="top-title">Контакты</div>
+    </header>
+    <div id="contactsList"></div>
+  </section>
 
-settingsBackBtn.onclick = () => showScreen("contacts");
+  <!-- CHAT -->
+  <section id="chatScreen" class="screen">
+    <header class="top-bar">
+      <button id="backBtn">←</button>
+      <div class="chat-header">
+        <div id="chatAvatar" class="avatar"></div>
+        <div>
+          <div id="chatName"></div>
+          <div id="chatStatus" class="status"></div>
+        </div>
+      </div>
+    </header>
 
-saveSettingsBtn.onclick = () => {
-  settings.name = settingsName.value.trim();
-  settings.theme = themeSelect.value;
-  settings.font = fontSelect.value;
-  settings.status = statusSelect.value;
-  saveSettings();
-  applySettings();
-  renderContacts();
-  showScreen("contacts");
-};
+    <div id="chatIntro" class="chat-intro">
+      <div class="intro-title">✨ Начни общение ✨</div>
+      <div class="intro-buttons">
+        <button>Привет! Как дела?</button>
+        <button>Чем занимаешься?</button>
+        <button>Хочешь поболтать?</button>
+        <button>Какой вайб сегодня?</button>
+      </div>
+    </div>
 
-// ---------- AVATAR ----------
-avatarInput.onchange = e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    settings.avatar = reader.result;
-    saveSettings();
-    renderContacts();
-  };
-  reader.readAsDataURL(file);
-};
+    <div id="messages"></div>
 
-// ---------- CHAT ----------
-backBtn.onclick = () => showScreen("contacts");
+    <footer class="input-bar">
+      <input id="messageInput" placeholder="Сообщение...">
+      <button id="sendBtn">➤</button>
+    </footer>
+  </section>
 
-sendBtn.onclick = () => {
-  if (!messageInput.value) return;
-  sendMessage(messageInput.value);
-  messageInput.value = "";
-};
+</div>
 
-messageInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") sendBtn.click();
-});
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

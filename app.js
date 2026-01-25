@@ -1,43 +1,29 @@
-const loginScreen = document.getElementById("loginScreen");
-const contactsScreen = document.getElementById("contactsScreen");
-const chatScreen = document.getElementById("chatScreen");
+const themeSelect = document.getElementById('themeSelect');
+const fontSelect = document.getElementById('fontSelect');
+const body = document.body;
 
-function showScreen(name) {
-  [loginScreen, contactsScreen, chatScreen].forEach(s => s.classList.remove("active"));
-  if (name === "login") loginScreen.classList.add("active");
-  if (name === "contacts") contactsScreen.classList.add("active");
-  if (name === "chat") chatScreen.classList.add("active");
+/* ===== LOAD SETTINGS ===== */
+const savedTheme = localStorage.getItem('theme');
+const savedFont = localStorage.getItem('font');
+
+if (savedTheme) {
+  body.dataset.theme = savedTheme;
+  themeSelect.value = savedTheme;
 }
 
-const loginBtn = document.getElementById("loginBtn");
-loginBtn.onclick = () => {
-  const nick = document.getElementById("loginInput").value.trim();
-  if (!nick) return;
-  localStorage.setItem("nyashNick", nick);
-  showScreen("contacts");
-  renderContacts();
-};
-
-if (localStorage.getItem("nyashNick")) {
-  showScreen("contacts");
-  renderContacts();
+if (savedFont) {
+  body.dataset.font = savedFont;
+  fontSelect.value = savedFont;
 }
 
-document.getElementById("backBtn").onclick = () => showScreen("contacts");
-
-document.getElementById("sendBtn").onclick = () => {
-  const input = document.getElementById("messageInput");
-  sendMessage(input.value);
-  input.value = "";
-};
-
-document.getElementById("messageInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    sendMessage(e.target.value);
-    e.target.value = "";
-  }
+/* ===== CHANGE THEME ===== */
+themeSelect.addEventListener('change', () => {
+  body.dataset.theme = themeSelect.value;
+  localStorage.setItem('theme', themeSelect.value);
 });
 
-document.querySelectorAll(".intro-buttons button").forEach(btn => {
-  btn.onclick = () => sendMessage(btn.textContent);
+/* ===== CHANGE FONT ===== */
+fontSelect.addEventListener('change', () => {
+  body.dataset.font = fontSelect.value;
+  localStorage.setItem('font', fontSelect.value);
 });

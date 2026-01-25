@@ -1,146 +1,127 @@
+/* ====== FONTS ====== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&family=Nunito&display=swap');
+
+/* ====== RESET ====== */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  background: #fff0f6;
-  font-family: system-ui, -apple-system;
+/* ====== VARIABLES ====== */
+:root {
+  --radius: 14px;
+  --transition: 0.25s ease;
 }
 
-#app {
-  height: 100%;
+/* ====== THEMES ====== */
+body[data-theme="dark"] {
+  --bg: #0e0e11;
+  --panel: #16161c;
+  --text: #ffffff;
+  --muted: #9a9aa2;
+  --accent: #5b7cff;
 }
 
-.screen {
-  display: none;
-  height: 100%;
+body[data-theme="light"] {
+  --bg: #f5f5f7;
+  --panel: #ffffff;
+  --text: #111;
+  --muted: #666;
+  --accent: #3b6cff;
 }
 
-.screen.active {
+body[data-theme="neon"] {
+  --bg: #0b0014;
+  --panel: #1a0033;
+  --text: #f4e9ff;
+  --muted: #b08cff;
+  --accent: #d400ff;
+}
+
+body[data-theme="dream"] {
+  --bg: #101820;
+  --panel: #1c2a35;
+  --text: #e6f1ff;
+  --muted: #91a4b7;
+  --accent: #7fd7ff;
+}
+
+body[data-theme="retro"] {
+  --bg: #0c1a2b;
+  --panel: #112d4e;
+  --text: #eaf6ff;
+  --muted: #8db1d9;
+  --accent: #4fa3ff;
+}
+
+/* ====== FONTS ====== */
+body[data-font="inter"] { font-family: 'Inter', sans-serif; }
+body[data-font="mono"] { font-family: 'JetBrains Mono', monospace; }
+body[data-font="pixel"] { font-family: monospace; letter-spacing: 1px; }
+body[data-font="rounded"] { font-family: 'Nunito', sans-serif; }
+
+/* ====== BASE ====== */
+body {
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: background var(--transition), color var(--transition);
 }
 
-.center {
-  justify-content: center;
+/* ====== TOPBAR ====== */
+.topbar {
+  height: 56px;
+  background: var(--panel);
+  display: flex;
   align-items: center;
-  padding: 24px;
-  gap: 16px;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-h1 {
-  font-size: 32px;
-}
-
-input {
-  width: 100%;
-  max-width: 320px;
-  padding: 16px;
-  font-size: 18px;
-  border-radius: 14px;
+.controls select {
+  background: var(--bg);
+  color: var(--text);
   border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-left: 8px;
 }
 
-button {
-  padding: 16px 20px;
-  font-size: 18px;
-  border-radius: 16px;
-  border: none;
-  background: #ff9acb;
-  color: #4b0033;
-}
-
-.top-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: #ffd6e8;
-}
-
-.top-title {
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.chat-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-}
-
-.status {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-#contactsList {
-  padding: 16px;
-}
-
-.contact {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  background: #ffe4f0;
-  padding: 14px;
-  border-radius: 18px;
-  margin-bottom: 12px;
-  font-size: 18px;
-}
-
-#messages {
+/* ====== LAYOUT ====== */
+.layout {
   flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--panel);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  overflow-y: auto;
+}
+
+.chat {
+  flex: 1;
+  background: var(--bg);
   padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  overflow-y: auto;
 }
 
-.message {
-  max-width: 75%;
-  padding: 14px 18px;
-  border-radius: 18px;
-  font-size: 18px;
+/* ====== UI ELEMENTS ====== */
+.sidebar div,
+.chat div {
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+  transition: background var(--transition);
 }
 
-.message.me {
-  align-self: flex-end;
-  background: #ff9acb;
-}
-
-.message.other {
-  align-self: flex-start;
-  background: #ffffff;
-}
-
-.input-bar {
-  display: flex;
-  gap: 10px;
-  padding: 14px;
-  background: #ffd6e8;
-}
-
-.chat-intro {
-  padding: 24px;
-  text-align: center;
-}
-
-.intro-title {
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-
-.intro-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.sidebar div:hover {
+  background: rgba(255,255,255,0.08);
 }

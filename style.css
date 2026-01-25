@@ -64,6 +64,45 @@ html, body {
   --accent: #3fd2a2;
   --text: #053b2f;
 }
+[data-theme="pastel-pink"] {
+  --bg:#fff0f6;
+  --panel:#ffd6e8;
+  --card:#ffe4f0;
+  --accent:#ff9acb;
+  --text:#4b0033;
+}
+
+[data-theme="milk-rose"] {
+  --bg:#fff7fa;
+  --panel:#ffe1ec;
+  --card:#fff0f5;
+  --accent:#f7a8c8;
+  --text:#5a1f35;
+}
+
+[data-theme="night-blue"] {
+  --bg:#0b1020;
+  --panel:#141a33;
+  --card:#1c2448;
+  --accent:#5b7cfa;
+  --text:#ffffff;
+}
+
+[data-theme="lofi-beige"] {
+  --bg:#f6f1eb;
+  --panel:#e9e2d9;
+  --card:#f2ebe3;
+  --accent:#c6a77a;
+  --text:#3b2f23;
+}
+
+[data-theme="soft-lilac"] {
+  --bg:#f7f2fb;
+  --panel:#e8dcf5;
+  --card:#f1e9fa;
+  --accent:#b58fe6;
+  --text:#3b214f;
+}
 
 /* ===== GLOBAL COLORS ===== */
 body {

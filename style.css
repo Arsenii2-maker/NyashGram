@@ -168,15 +168,12 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px;
-  background: var(--panel);
 }
 
 .top-title {
   font-size: 22px;
   font-weight: 600;
 }
-
 /* ===== AVATAR ===== */
 .avatar {
   width: 48px;

@@ -32,6 +32,12 @@ function applySettings() {
 
 applySettings();
 
+const myAvatar = document.getElementById("myAvatar");
+
+if (myAvatar) {
+  generateAvatar(myAvatar, settings.avatar);
+}
+
 // ---------- LOGIN ----------
 const loginBtn = document.getElementById("loginBtn");
 const loginInput = document.getElementById("loginInput");

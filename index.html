@@ -16,6 +16,42 @@
     <input id="loginInput" placeholder="Ваш никнейм">
     <button id="loginBtn">Войти</button>
   </section>
+  
+  <section id="settingsScreen" class="screen">
+  <header class="top-bar">
+    <button id="settingsBackBtn">←</button>
+    <div class="top-title">Настройки</div>
+  </header>
+
+  <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
+
+    <label>
+      Никнейм
+      <input id="settingsName">
+    </label>
+
+    <label>
+      Тема
+      <select id="themeSelect">
+        <option value="pink">Розовая</option>
+        <option value="dark">Тёмная</option>
+        <option value="mint">Мятная</option>
+      </select>
+    </label>
+
+    <label>
+      Шрифт
+      <select id="fontSelect">
+        <option value="system">System</option>
+        <option value="rounded">Rounded</option>
+        <option value="mono">Mono</option>
+      </select>
+    </label>
+
+    <button id="saveSettingsBtn">Сохранить</button>
+
+  </div>
+</section>
 
   <!-- CONTACTS -->
   <section id="contactsScreen" class="screen">

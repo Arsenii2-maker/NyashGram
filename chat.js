@@ -10,8 +10,7 @@ function openChat(contact) {
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;
   document.getElementById("chatAvatar").style.background =
-    `linear-gradient(135deg,#ff9acb,#ffd6e8)`;
-
+  gradientFor(contact.name);
   renderMessages();
 }
 

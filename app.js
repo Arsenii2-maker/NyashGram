@@ -113,3 +113,12 @@ document.querySelectorAll(".intro-buttons button")
   .forEach(btn => {
     btn.onclick = () => sendMessage(btn.textContent);
   });
+  const sounds = {
+  soft: new Audio("sounds/soft.mp3"),
+  pop: new Audio("sounds/pop.mp3")
+};
+
+function playSendSound() {
+  sounds.soft.currentTime = 0;
+  sounds.soft.play();
+}

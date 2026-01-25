@@ -1,17 +1,18 @@
 /* ===== RESET ===== */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   height: 100%;
   margin: 0;
-  font-family: system-ui, -apple-system;
 }
 
-#app {
-  height: 100%;
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
 }
+
+#app { height: 100%; }
 
 .screen {
   display: none;
@@ -24,24 +25,15 @@ html, body {
 }
 
 /* ===== FONTS ===== */
-.font-system {
-  font-family: system-ui, -apple-system;
-}
-
-.font-rounded {
-  font-family: "Arial Rounded MT Bold", system-ui;
-}
-
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, monospace;
-}
-
-.font-impact {
-  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-}
+body[data-font="system"] { --font: system-ui, -apple-system; }
+body[data-font="rounded"] { --font: "Arial Rounded MT Bold", system-ui; }
+body[data-font="mono"] { --font: ui-monospace, monospace; }
+body[data-font="elegant"] { --font: "Georgia", serif; }
+body[data-font="soft-bold"] { --font: "Trebuchet MS", system-ui; }
+body[data-font="impact"] { --font: Impact, Haettenschweiler, "Arial Black", sans-serif; }
 
 /* ===== THEMES ===== */
-.theme-pink {
+body[data-theme="pastel-pink"] {
   --bg: #fff0f6;
   --panel: #ffd6e8;
   --card: #ffe4f0;
@@ -49,29 +41,39 @@ html, body {
   --text: #4b0033;
 }
 
-.theme-dark {
-  --bg: #0f0f14;
-  --panel: #1b1b22;
-  --card: #242430;
-  --accent: #ff7abf;
+body[data-theme="milk-rose"] {
+  --bg: #fff7fa;
+  --panel: #f8dce6;
+  --card: #fdeaf1;
+  --accent: #f4a3c2;
+  --text: #5a2a3c;
+}
+
+body[data-theme="night-blue"] {
+  --bg: #0f1320;
+  --panel: #1b2138;
+  --card: #232a48;
+  --accent: #6f7cff;
   --text: #ffffff;
 }
 
-.theme-mint {
-  --bg: #eafff7;
-  --panel: #c9f5e6;
-  --card: #dffaf0;
-  --accent: #3fd2a2;
-  --text: #053b2f;
+body[data-theme="lofi-beige"] {
+  --bg: #f5efe6;
+  --panel: #e7dccb;
+  --card: #efe6d8;
+  --accent: #c8a97e;
+  --text: #3b2f23;
 }
 
-/* ===== GLOBAL COLORS ===== */
-body {
-  background: var(--bg);
-  color: var(--text);
+body[data-theme="soft-lilac"] {
+  --bg: #f6f1ff;
+  --panel: #e4dcff;
+  --card: #ede8ff;
+  --accent: #b69cff;
+  --text: #3b2a5a;
 }
 
-/* ===== LOGIN ===== */
+/* ===== UI ===== */
 .center {
   justify-content: center;
   align-items: center;
@@ -80,29 +82,22 @@ body {
   text-align: center;
 }
 
-h1 {
-  font-size: 32px;
-}
-
-input {
-  width: 100%;
-  max-width: 320px;
-  padding: 16px;
-  font-size: 18px;
+input, select {
+  padding: 14px;
+  font-size: 16px;
   border-radius: 14px;
   border: none;
 }
 
 button {
-  padding: 16px 20px;
-  font-size: 18px;
+  padding: 14px 18px;
+  font-size: 16px;
   border-radius: 16px;
   border: none;
   background: var(--accent);
   color: var(--text);
 }
 
-/* ===== TOP BAR ===== */
 .top-bar {
   display: flex;
   align-items: center;
@@ -111,24 +106,12 @@ button {
   background: var(--panel);
 }
 
-.top-title {
-  font-size: 22px;
-  font-weight: 600;
-}
-
-/* ===== AVATAR ===== */
 .avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   background-size: cover;
   background-position: center;
-  background-image: linear-gradient(135deg, #ff9acb, #ffd6e8);
-}
-
-/* ===== CONTACTS ===== */
-#contactsList {
-  padding: 16px;
 }
 
 .contact {
@@ -139,34 +122,6 @@ button {
   padding: 14px;
   border-radius: 18px;
   margin-bottom: 12px;
-  font-size: 18px;
-}
-
-/* ===== CHAT ===== */
-.chat-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.status {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-#messages {
-  flex: 1;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.message {
-  max-width: 75%;
-  padding: 14px 18px;
-  border-radius: 18px;
-  font-size: 18px;
 }
 
 .message.me {
@@ -176,30 +131,6 @@ button {
 
 .message.other {
   align-self: flex-start;
-  background: #ffffff;
+  background: #fff;
   color: #000;
-}
-
-.input-bar {
-  display: flex;
-  gap: 10px;
-  padding: 14px;
-  background: var(--panel);
-}
-
-/* ===== INTRO ===== */
-.chat-intro {
-  padding: 24px;
-  text-align: center;
-}
-
-.intro-title {
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-
-.intro-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }

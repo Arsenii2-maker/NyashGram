@@ -26,7 +26,7 @@ const settings = {
 
 function applySettings() {
   document.body.className = "";
-  document.body.classList.add(`theme-${settings.theme}`);
+  document.body.setAttribute("data-theme", settings.theme);
   document.body.classList.add(`font-${settings.font}`);
 }
 

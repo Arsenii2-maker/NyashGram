@@ -1,4 +1,14 @@
 /* ===== RESET ===== */
+body {
+  --bg: #fff0f6;
+  --panel: #ffd6e8;
+  --card: #ffe4f0;
+  --accent: #ff9acb;
+  --text: #4b0033;
+
+  background: var(--bg);
+  color: var(--text);
+}
 * {
   box-sizing: border-box;
 }

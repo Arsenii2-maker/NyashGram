@@ -1,102 +1,115 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NyashGram</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+// ---------- SCREENS ----------
+const screens = {
+  login: document.getElementById("loginScreen"),
+  contacts: document.getElementById("contactsScreen"),
+  chat: document.getElementById("chatScreen"),
+  settings: document.getElementById("settingsScreen")
+};
 
-<div id="app">
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
 
-  <!-- LOGIN -->
-  <section id="loginScreen" class="screen center">
-    <h1>NyashGram 🩷</h1>
-    <input id="loginInput" placeholder="Ваш никнейм">
-    <button id="loginBtn">Войти</button>
-  </section>
-  
-  <section id="settingsScreen" class="screen">
-  <header class="top-bar">
-    <button id="settingsBackBtn">←</button>
-    <div class="top-title">Настройки</div>
-  </header>
+// ---------- SETTINGS ----------
+const defaultSettings = {
+  name: "",
+  theme: "pink",
+  font: "system",
+  avatar: ""
+};
 
-  <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
+const settings = {
+  ...defaultSettings,
+  ...JSON.parse(localStorage.getItem("nyashSettings") || "{}")
+};
 
-    <label>
-      Никнейм
-      <input id="settingsName">
-    </label>
+function applySettings() {
+  document.body.className = "";
+  document.body.classList.add(`theme-${settings.theme}`);
+  document.body.classList.add(`font-${settings.font}`);
+}
 
-    <label>
-      Тема
-      <select id="themeSelect">
-        <option value="pink">Розовая</option>
-        <option value="dark">Тёмная</option>
-        <option value="mint">Мятная</option>
-      </select>
-    </label>
+applySettings();
 
-    <label>
-      Шрифт
-      <select id="fontSelect">
-        <option value="system">System</option>
-        <option value="rounded">Rounded</option>
-        <option value="mono">Mono</option>
-      </select>
-    </label>
+// ---------- LOGIN ----------
+const loginBtn = document.getElementById("loginBtn");
+const loginInput = document.getElementById("loginInput");
 
-    <button id="saveSettingsBtn">Сохранить</button>
+loginBtn.onclick = () => {
+  const nick = loginInput.value.trim();
+  if (!nick) return;
 
-  </div>
-</section>
+  settings.name = nick;
+  saveSettings();
+  showScreen("contacts");
+  renderContacts();
+};
 
-  <!-- CONTACTS -->
-  <section id="contactsScreen" class="screen">
-    <header class="top-bar">
-      <button id="settingsBtn">⚙️</button>
-      <div class="top-title">Контакты</div>
-    </header>
-    <div id="contactsList"></div>
-  </section>
+if (settings.name) {
+  showScreen("contacts");
+  renderContacts();
+} else {
+  showScreen("login");
+}
 
-  <!-- CHAT -->
-  <section id="chatScreen" class="screen">
-    <header class="top-bar">
-      <button id="backBtn">←</button>
-      <div class="chat-header">
-        <div id="chatAvatar" class="avatar"></div>
-        <div>
-          <div id="chatName"></div>
-          <div id="chatStatus" class="status"></div>
-        </div>
-      </div>
-    </header>
+// ---------- SETTINGS UI ----------
+document.getElementById("settingsBtn").onclick = () => {
+  document.getElementById("settingsName").value = settings.name;
+  document.getElementById("themeSelect").value = settings.theme;
+  document.getElementById("fontSelect").value = settings.font;
+  showScreen("settings");
+};
 
-    <div id="chatIntro" class="chat-intro">
-      <div class="intro-title">✨ Начни общение ✨</div>
-      <div class="intro-buttons">
-        <button>Привет! Как дела?</button>
-        <button>Чем занимаешься?</button>
-        <button>Хочешь поболтать?</button>
-        <button>Какой вайб сегодня?</button>
-      </div>
-    </div>
+document.getElementById("settingsBackBtn").onclick = () =>
+  showScreen("contacts");
 
-    <div id="messages"></div>
+document.getElementById("saveSettingsBtn").onclick = () => {
+  settings.name = document.getElementById("settingsName").value.trim();
+  settings.theme = document.getElementById("themeSelect").value;
+  settings.font = document.getElementById("fontSelect").value;
 
-    <footer class="input-bar">
-      <input id="messageInput" placeholder="Сообщение...">
-      <button id="sendBtn">➤</button>
-    </footer>
-  </section>
+  saveSettings();
+  applySettings();
+  renderContacts();
+  showScreen("contacts");
+};
 
-</div>
+// ---------- AVATAR ----------
+function generateAvatar(el, image) {
+  if (image) {
+    el.style.backgroundImage = `url(${image})`;
+  } else {
+    const colors = ["#ff9acb", "#ffd6e8", "#c9f5e6", "#3fd2a2"];
+    const c1 = colors[Math.floor(Math.random() * colors.length)];
+    const c2 = colors[Math.floor(Math.random() * colors.length)];
+    el.style.backgroundImage = `linear-gradient(135deg, ${c1}, ${c2})`;
+  }
+}
 
-<script src="contacts.js"></script>
-<script src="chat.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+// ---------- STORAGE ----------
+function saveSettings() {
+  localStorage.setItem("nyashSettings", JSON.stringify(settings));
+}
+
+// ---------- CHAT ----------
+document.getElementById("backBtn").onclick =
+  () => showScreen("contacts");
+
+document.getElementById("sendBtn").onclick = () => {
+  const input = document.getElementById("messageInput");
+  sendMessage(input.value);
+  input.value = "";
+};
+
+document.getElementById("messageInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    sendMessage(e.target.value);
+    e.target.value = "";
+  }
+});
+
+document.querySelectorAll(".intro-buttons button")
+  .forEach(btn => {
+    btn.onclick = () => sendMessage(btn.textContent);
+  });

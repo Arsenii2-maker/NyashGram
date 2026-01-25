@@ -39,6 +39,18 @@ html, body {
 .font-impact {
   font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
 }
+.font-elegant {
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+.font-softbold {
+  font-family: system-ui;
+  font-weight: 600;
+}
+
+.font-impact {
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+}
 
 /* ===== THEMES ===== */
 .theme-pink {

@@ -1,5 +1,7 @@
 /* ===== RESET ===== */
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   height: 100%;
@@ -7,12 +9,14 @@ html, body {
 }
 
 body {
+  font-family: var(--font-main, system-ui);
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font);
 }
 
-#app { height: 100%; }
+#app {
+  height: 100%;
+}
 
 .screen {
   display: none;
@@ -25,15 +29,23 @@ body {
 }
 
 /* ===== FONTS ===== */
-body[data-font="system"] { --font: system-ui, -apple-system; }
-body[data-font="rounded"] { --font: "Arial Rounded MT Bold", system-ui; }
-body[data-font="mono"] { --font: ui-monospace, monospace; }
-body[data-font="elegant"] { --font: "Georgia", serif; }
-body[data-font="soft-bold"] { --font: "Trebuchet MS", system-ui; }
-body[data-font="impact"] { --font: Impact, Haettenschweiler, "Arial Black", sans-serif; }
+.font-system { --font-main: system-ui, -apple-system; }
+.font-rounded { --font-main: "Arial Rounded MT Bold", system-ui; }
+.font-mono { --font-main: ui-monospace, SFMono-Regular, monospace; }
+.font-elegant { --font-main: "Georgia", serif; }
+.font-softbold { --font-main: "Trebuchet MS", system-ui; }
+.font-impact {
+  --font-main: system-ui;
+}
+.font-impact h1,
+.font-impact .top-title,
+.font-impact .contact-name,
+.font-impact #chatName {
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+}
 
-/* ===== THEMES ===== */
-body[data-theme="pastel-pink"] {
+/* ===== THEMES via data-theme ===== */
+:root {
   --bg: #fff0f6;
   --panel: #ffd6e8;
   --card: #ffe4f0;
@@ -41,36 +53,24 @@ body[data-theme="pastel-pink"] {
   --text: #4b0033;
 }
 
+body[data-theme="pastel-pink"] {
+  --bg:#fff0f6; --panel:#ffd6e8; --card:#ffe4f0; --accent:#ff9acb; --text:#4b0033;
+}
+
 body[data-theme="milk-rose"] {
-  --bg: #fff7fa;
-  --panel: #f8dce6;
-  --card: #fdeaf1;
-  --accent: #f4a3c2;
-  --text: #5a2a3c;
+  --bg:#fff5f8; --panel:#ffe1ea; --card:#ffe9f0; --accent:#f7a1c4; --text:#5a1f3c;
 }
 
 body[data-theme="night-blue"] {
-  --bg: #0f1320;
-  --panel: #1b2138;
-  --card: #232a48;
-  --accent: #6f7cff;
-  --text: #ffffff;
+  --bg:#0f1220; --panel:#1a1e33; --card:#22284a; --accent:#7aa2ff; --text:#ffffff;
 }
 
 body[data-theme="lofi-beige"] {
-  --bg: #f5efe6;
-  --panel: #e7dccb;
-  --card: #efe6d8;
-  --accent: #c8a97e;
-  --text: #3b2f23;
+  --bg:#f6f1e7; --panel:#e9e1d2; --card:#f1eadc; --accent:#c49a6c; --text:#3b2f1e;
 }
 
 body[data-theme="soft-lilac"] {
-  --bg: #f6f1ff;
-  --panel: #e4dcff;
-  --card: #ede8ff;
-  --accent: #b69cff;
-  --text: #3b2a5a;
+  --bg:#f4f0ff; --panel:#e6ddff; --card:#efe9ff; --accent:#b79cff; --text:#33245c;
 }
 
 /* ===== UI ===== */
@@ -82,22 +82,27 @@ body[data-theme="soft-lilac"] {
   text-align: center;
 }
 
+h1 { font-size: 32px; }
+
 input, select {
+  width: 100%;
+  max-width: 320px;
   padding: 14px;
-  font-size: 16px;
+  font-size: 17px;
   border-radius: 14px;
   border: none;
 }
 
 button {
-  padding: 14px 18px;
-  font-size: 16px;
+  padding: 16px 20px;
+  font-size: 18px;
   border-radius: 16px;
   border: none;
   background: var(--accent);
   color: var(--text);
 }
 
+/* ===== TOP BAR ===== */
 .top-bar {
   display: flex;
   align-items: center;
@@ -106,6 +111,9 @@ button {
   background: var(--panel);
 }
 
+.top-title { font-size: 22px; font-weight: 600; }
+
+/* ===== AVATAR ===== */
 .avatar {
   width: 48px;
   height: 48px;
@@ -113,6 +121,9 @@ button {
   background-size: cover;
   background-position: center;
 }
+
+/* ===== CONTACTS ===== */
+#contactsList { padding: 16px; }
 
 .contact {
   display: flex;
@@ -122,6 +133,29 @@ button {
   padding: 14px;
   border-radius: 18px;
   margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.contact-name { font-weight: 600; }
+
+/* ===== CHAT ===== */
+.chat-header { display: flex; gap: 12px; align-items: center; }
+
+.status { font-size: 14px; opacity: 0.7; }
+
+#messages {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 75%;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 18px;
 }
 
 .message.me {
@@ -133,4 +167,11 @@ button {
   align-self: flex-start;
   background: #fff;
   color: #000;
+}
+
+.input-bar {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: var(--panel);
 }

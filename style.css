@@ -144,3 +144,70 @@ button {
   flex-direction: column;
   gap: 10px;
 }
+/* =========================
+   THEMES
+========================= */
+
+.theme-pink {
+  --bg: #fff0f6;
+  --panel: #ffd6e8;
+  --accent: #ff9acb;
+  --text: #4b0033;
+}
+
+.theme-dark {
+  --bg: #0f0f14;
+  --panel: #1b1b22;
+  --accent: #ff77aa;
+  --text: #f2f2f2;
+}
+
+.theme-mint {
+  --bg: #eafff7;
+  --panel: #c9f5e6;
+  --accent: #4fd1b3;
+  --text: #063b32;
+}
+
+/* =========================
+   APPLY VARIABLES
+========================= */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.top-bar,
+.input-bar {
+  background: var(--panel);
+}
+
+button {
+  background: var(--accent);
+  color: var(--text);
+}
+
+.contact {
+  background: color-mix(in srgb, var(--panel) 80%, white);
+}
+
+.message.me {
+  background: var(--accent);
+}
+
+/* =========================
+   FONTS
+========================= */
+
+.font-system {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-rounded {
+  font-family: "SF Rounded", "Nunito", system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}

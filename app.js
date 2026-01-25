@@ -1,51 +1,92 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const loginScreen = document.getElementById("loginScreen");
-  const contactsScreen = document.getElementById("contactsScreen");
-  const chatScreen = document.getElementById("chatScreen");
+  const screens = {
+    login: document.getElementById("loginScreen"),
+    contacts: document.getElementById("contactsScreen"),
+    chat: document.getElementById("chatScreen"),
+    settings: document.getElementById("settingsScreen")
+  };
 
   function showScreen(name) {
-    [loginScreen, contactsScreen, chatScreen]
-      .forEach(s => s.classList.remove("active"));
-
-    if (name === "login") loginScreen.classList.add("active");
-    if (name === "contacts") contactsScreen.classList.add("active");
-    if (name === "chat") chatScreen.classList.add("active");
+    Object.values(screens).forEach(s => s.classList.remove("active"));
+    screens[name].classList.add("active");
   }
+
+  // ---------- SETTINGS DATA ----------
+  const defaultSettings = {
+    name: "",
+    theme: "pink",
+    font: "system"
+  };
+
+  const settings = {
+    ...defaultSettings,
+    ...JSON.parse(localStorage.getItem("nyashSettings") || "{}")
+  };
+
+  function applySettings() {
+    document.body.className = "";
+    document.body.classList.add(`theme-${settings.theme}`);
+    document.body.classList.add(`font-${settings.font}`);
+  }
+
+  applySettings();
 
   // ---------- LOGIN ----------
   const loginBtn = document.getElementById("loginBtn");
   const loginInput = document.getElementById("loginInput");
 
-  loginBtn.addEventListener("click", () => {
+  loginBtn.onclick = () => {
     const nick = loginInput.value.trim();
     if (!nick) return;
 
-    localStorage.setItem("nyashNick", nick);
+    settings.name = nick;
+    localStorage.setItem("nyashSettings", JSON.stringify(settings));
     showScreen("contacts");
     renderContacts();
-  });
+  };
 
-  // ---------- AUTO LOGIN ----------
-  if (localStorage.getItem("nyashNick")) {
+  if (settings.name) {
     showScreen("contacts");
     renderContacts();
   } else {
     showScreen("login");
   }
 
+  // ---------- SETTINGS OPEN ----------
+  document.getElementById("settingsBtn").onclick = () => {
+    document.getElementById("settingsName").value = settings.name;
+    document.getElementById("themeSelect").value = settings.theme;
+    document.getElementById("fontSelect").value = settings.font;
+    showScreen("settings");
+  };
+
+  document.getElementById("settingsBackBtn").onclick =
+    () => showScreen("contacts");
+
+  document.getElementById("saveSettingsBtn").onclick = () => {
+    settings.name = document.getElementById("settingsName").value.trim();
+    settings.theme = document.getElementById("themeSelect").value;
+    settings.font = document.getElementById("fontSelect").value;
+
+    localStorage.setItem("nyashSettings", JSON.stringify(settings));
+    applySettings();
+    renderContacts();
+    showScreen("contacts");
+  };
+
   // ---------- BACK ----------
-  document.getElementById("backBtn")
-    .addEventListener("click", () => showScreen("contacts"));
+  document.getElementById("backBtn").onclick =
+    () => showScreen("contacts");
 
   // ---------- SEND ----------
   const sendBtn = document.getElementById("sendBtn");
   const messageInput = document.getElementById("messageInput");
 
-  sendBtn.addEventListener("click", () => {
+  sendBtn.onclick = () => {
     sendMessage(messageInput.value);
     messageInput.value = "";
-  });
+  };
 
   messageInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
@@ -54,12 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---------- INTRO BUTTONS ----------
   document.querySelectorAll(".intro-buttons button")
     .forEach(btn => {
-      btn.addEventListener("click", () => {
-        sendMessage(btn.textContent);
-      });
+      btn.onclick = () => sendMessage(btn.textContent);
     });
 
 });

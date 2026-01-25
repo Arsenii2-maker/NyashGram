@@ -1,3 +1,4 @@
+/* ===== RESET ===== */
 * {
   box-sizing: border-box;
 }
@@ -5,7 +6,6 @@
 html, body {
   height: 100%;
   margin: 0;
-  background: #fff0f6;
   font-family: system-ui, -apple-system;
 }
 
@@ -23,11 +23,61 @@ html, body {
   flex-direction: column;
 }
 
+/* ===== FONTS ===== */
+.font-system {
+  font-family: system-ui, -apple-system;
+}
+
+.font-rounded {
+  font-family: "Arial Rounded MT Bold", system-ui;
+}
+
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.font-impact {
+  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+}
+
+/* ===== THEMES ===== */
+.theme-pink {
+  --bg: #fff0f6;
+  --panel: #ffd6e8;
+  --card: #ffe4f0;
+  --accent: #ff9acb;
+  --text: #4b0033;
+}
+
+.theme-dark {
+  --bg: #0f0f14;
+  --panel: #1b1b22;
+  --card: #242430;
+  --accent: #ff7abf;
+  --text: #ffffff;
+}
+
+.theme-mint {
+  --bg: #eafff7;
+  --panel: #c9f5e6;
+  --card: #dffaf0;
+  --accent: #3fd2a2;
+  --text: #053b2f;
+}
+
+/* ===== GLOBAL COLORS ===== */
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== LOGIN ===== */
 .center {
   justify-content: center;
   align-items: center;
   padding: 24px;
   gap: 16px;
+  text-align: center;
 }
 
 h1 {
@@ -48,16 +98,17 @@ button {
   font-size: 18px;
   border-radius: 16px;
   border: none;
-  background: #ff9acb;
-  color: #4b0033;
+  background: var(--accent);
+  color: var(--text);
 }
 
+/* ===== TOP BAR ===== */
 .top-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: #ffd6e8;
+  background: var(--panel);
 }
 
 .top-title {
@@ -65,23 +116,17 @@ button {
   font-weight: 600;
 }
 
-.chat-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
+/* ===== AVATAR ===== */
 .avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-image: linear-gradient(135deg, #ff9acb, #ffd6e8);
 }
 
-.status {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
+/* ===== CONTACTS ===== */
 #contactsList {
   padding: 16px;
 }
@@ -90,11 +135,23 @@ button {
   display: flex;
   gap: 14px;
   align-items: center;
-  background: #ffe4f0;
+  background: var(--card);
   padding: 14px;
   border-radius: 18px;
   margin-bottom: 12px;
   font-size: 18px;
+}
+
+/* ===== CHAT ===== */
+.chat-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.status {
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 #messages {
@@ -114,21 +171,23 @@ button {
 
 .message.me {
   align-self: flex-end;
-  background: #ff9acb;
+  background: var(--accent);
 }
 
 .message.other {
   align-self: flex-start;
   background: #ffffff;
+  color: #000;
 }
 
 .input-bar {
   display: flex;
   gap: 10px;
   padding: 14px;
-  background: #ffd6e8;
+  background: var(--panel);
 }
 
+/* ===== INTRO ===== */
 .chat-intro {
   padding: 24px;
   text-align: center;

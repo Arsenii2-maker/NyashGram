@@ -15,7 +15,8 @@ function showScreen(name) {
 const defaultSettings = {
   name: "",
   theme: "pink",
-  font: "system"
+  font: "system",
+  avatar: ""
 };
 
 const settings = {
@@ -40,7 +41,7 @@ loginBtn.onclick = () => {
   if (!nick) return;
 
   settings.name = nick;
-  localStorage.setItem("nyashSettings", JSON.stringify(settings));
+  saveSettings();
   showScreen("contacts");
   renderContacts();
 };
@@ -68,11 +69,28 @@ document.getElementById("saveSettingsBtn").onclick = () => {
   settings.theme = document.getElementById("themeSelect").value;
   settings.font = document.getElementById("fontSelect").value;
 
-  localStorage.setItem("nyashSettings", JSON.stringify(settings));
+  saveSettings();
   applySettings();
   renderContacts();
   showScreen("contacts");
 };
+
+// ---------- AVATAR ----------
+function generateAvatar(el, image) {
+  if (image) {
+    el.style.backgroundImage = `url(${image})`;
+  } else {
+    const colors = ["#ff9acb", "#ffd6e8", "#c9f5e6", "#3fd2a2"];
+    const c1 = colors[Math.floor(Math.random() * colors.length)];
+    const c2 = colors[Math.floor(Math.random() * colors.length)];
+    el.style.backgroundImage = `linear-gradient(135deg, ${c1}, ${c2})`;
+  }
+}
+
+// ---------- STORAGE ----------
+function saveSettings() {
+  localStorage.setItem("nyashSettings", JSON.stringify(settings));
+}
 
 // ---------- CHAT ----------
 document.getElementById("backBtn").onclick =

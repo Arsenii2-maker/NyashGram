@@ -86,7 +86,7 @@ html, body {
   --accent: #3fd2a2;
   --text: #053b2f;
 }
-theme-pastel-pink {
+.theme-pastel-pink {
   --bg:#fff0f6;
   --panel:#ffd6e8;
   --card:#ffe4f0;

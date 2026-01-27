@@ -256,10 +256,3 @@ button {
   flex-direction: column;
   gap: 10px;
 }
-body {
-  background: #ffe4f0 !important; /* ярко-розовый, чтобы сразу видно */
-}
-
-#loginScreen {
-  display: flex !important;
-}

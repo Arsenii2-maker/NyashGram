@@ -14,7 +14,7 @@ function showScreen(name) {
 // ---------- SETTINGS ----------
 const defaultSettings = {
   name: "",
-  theme: "pink",
+  theme: "pastel-pink",       // меняем на новую
   font: "system",
   avatar: ""
 };
@@ -26,17 +26,11 @@ const settings = {
 
 function applySettings() {
   document.body.className = "";
-  document.body.dataset.theme = settings.theme;
-  document.body.dataset.font = settings.font;
+  document.body.classList.add(`theme-${settings.theme}`);
+  document.body.classList.add(`font-${settings.font}`);
 }
 
 applySettings();
-
-const myAvatar = document.getElementById("myAvatar");
-
-if (myAvatar) {
-  generateAvatar(myAvatar, settings.avatar);
-}
 
 // ---------- LOGIN ----------
 const loginBtn = document.getElementById("loginBtn");
@@ -119,12 +113,3 @@ document.querySelectorAll(".intro-buttons button")
   .forEach(btn => {
     btn.onclick = () => sendMessage(btn.textContent);
   });
-  const sounds = {
-  soft: new Audio("sounds/soft.mp3"),
-  pop: new Audio("sounds/pop.mp3")
-};
-
-function playSendSound() {
-  sounds.soft.currentTime = 0;
-  sounds.soft.play();
-}

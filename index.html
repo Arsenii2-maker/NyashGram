@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Fredoka:wght@400;500;600&family=Nunito:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Kosugi+Maru&family=M+PLUS+Rounded+1c:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -30,28 +33,28 @@
       <input id="settingsName">
     </label>
 
-    <label>
-      Тема
-      <select id="themeSelect">
-  <option value="Pastel Pink">Pastel Pink</option>
-  <option value="Milk Rose">Milk Rose</option>
-  <option value="Night Blue">Night Blue</option>
-  <option value="Lo-fi Beige">Lo-fi Beige</option>
-  <option value="Soft Lilac">Soft Lilac</option>
-</select>
-    </label>
+   <label>
+  Тема
+  <select id="themeSelect">
+    <option value="pastel-pink">Pastel Pink 🩷</option>
+    <option value="milk-rose">Milk Rose 🌸</option>
+    <option value="night-blue">Night Blue 🌙</option>
+    <option value="lo-fi-beige">Lo-Fi Beige ☕</option>
+    <option value="soft-lilac">Soft Lilac 💜</option>
+  </select>
+</label>
 
-    <label>
-      Шрифт
-      <select id="fontSelect">
-  <option value="system">System</option>
-  <option value="rounded">Rounded</option>
-  <option value="mono">Mono</option>
-  <option value="elegant">Elegant</option>
-  <option value="soft">Soft Bold</option>
-  <option value="impact">Impact</option>
-</select>
-    </label>
+<label>
+  Шрифт
+  <select id="fontSelect">
+    <option value="system">System (стандартный)</option>
+    <option value="rounded">Rounded (кругленький)</option>
+    <option value="cozy">Cozy (уютный)</option>
+    <option value="elegant">Elegant (элегантный)</option>
+    <option value="bold-soft">Bold Soft (мягкий жирный)</option>
+    <option value="mono-cozy">Mono Cozy (моно уютный)</option>
+  </select>
+</label>
 
     <button id="saveSettingsBtn">Сохранить</button>
 
@@ -61,10 +64,9 @@
   <!-- CONTACTS -->
   <section id="contactsScreen" class="screen">
     <header class="top-bar">
-  <div class="avatar" id="myAvatar"></div>
-  <button id="settingsBtn">⚙️</button>
-  <div class="top-title">Контакты</div>
-</header>
+      <button id="settingsBtn">⚙️</button>
+      <div class="top-title">Контакты</div>
+    </header>
     <div id="contactsList"></div>
   </section>
 

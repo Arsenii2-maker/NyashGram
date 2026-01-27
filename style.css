@@ -1,14 +1,4 @@
 /* ===== RESET ===== */
-body {
-  --bg: #fff0f6;
-  --panel: #ffd6e8;
-  --card: #ffe4f0;
-  --accent: #ff9acb;
-  --text: #4b0033;
-
-  background: var(--bg);
-  color: var(--text);
-}
 * {
   box-sizing: border-box;
 }
@@ -35,96 +25,98 @@ html, body {
 
 /* ===== FONTS ===== */
 .font-system {
-  font-family: system-ui, -apple-system;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .font-rounded {
-  font-family: "Arial Rounded MT Bold", system-ui;
+  font-family: 'M PLUS Rounded 1c', 'Fredoka', system-ui, sans-serif;
+  font-weight: 500;
 }
 
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, monospace;
+.font-cozy {
+  font-family: 'Comfortaa', cursive;
+  font-weight: 500;
 }
 
-.font-impact {
-  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
-}
 .font-elegant {
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 500;
 }
 
-.font-softbold {
-  font-family: system-ui;
+.font-bold-soft {
+  font-family: 'Nunito', sans-serif;
   font-weight: 600;
 }
 
+.font-mono-cozy {
+  font-family: 'Kosugi Maru', 'NTR', monospace;
+  font-weight: 400;
+}
+
 .font-impact {
-  font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font-family: Impact, Haettenschweiler, 'Arial Black', sans-serif; /* оставляем как был */
 }
 
 /* ===== THEMES ===== */
-[data-theme="pink"] {
-  --bg: #fff0f6;
-  --panel: #ffd6e8;
-  --card: #ffe4f0;
-  --accent: #ff9acb;
-  --text: #4b0033;
-}
-
-[data-theme="dark"] {
-  --bg: #0f0f14;
-  --panel: #1b1b22;
-  --card: #242430;
-  --accent: #9932CC;
-  --text: #ffffff;
-}
-
-[data-theme="mint"] {
-  --bg: #eafff7;
-  --panel: #c9f5e6;
-  --card: #dffaf0;
-  --accent: #3fd2a2;
-  --text: #053b2f;
-}
 .theme-pastel-pink {
-  --bg:#fff0f6;
-  --panel:#ffd6e8;
-  --card:#ffe4f0;
-  --accent:#ff9acb;
-  --text:#4b0033;
+  --bg: #fff5fb;
+  --panel: #ffe4f0;
+  --card: #fff0f7;
+  --accent: #ffadd6;
+  --text: #5c003a;
+  --chat-bg: #fff8fc;
+  --bubble-me: #ffadd6;
+  --bubble-other: #ffffff;
 }
 
 .theme-milk-rose {
-  --bg:#fff7fa;
-  --panel:#ffe1ec;
-  --card:#fff0f5;
-  --accent:#f7a8c8;
-  --text:#5a1f35;
+  --bg: #fff8f5;
+  --panel: #ffe8e0;
+  --card: #fff0e8;
+  --accent: #ffb199;
+  --text: #4a2c1f;
+  --chat-bg: #fffcf9;
+  --bubble-me: #ffb199;
+  --bubble-other: #f9f5f2;
 }
 
 .theme-night-blue {
-  --bg:#0b1020;
-  --panel:#141a33;
-  --card:#1c2448;
-  --accent:#5b7cfa;
-  --text:#ffffff;
+  --bg: #0a1420;
+  --panel: #131f2e;
+  --card: #1a2a3f;
+  --accent: #7ab8ff;
+  --text: #e0f0ff;
+  --chat-bg: #0d1a2b;
+  --bubble-me: #7ab8ff;
+  --bubble-other: #2a3b52;
 }
 
-.theme-lofi-beige {
-  --bg:#f6f1eb;
-  --panel:#e9e2d9;
-  --card:#f2ebe3;
-  --accent:#c6a77a;
-  --text:#3b2f23;
+.theme-lo-fi-beige {
+  --bg: #f9f5ee;
+  --panel: #f0e6d9;
+  --card: #f5f0e4;
+  --accent: #d9b99b;
+  --text: #4a3c2e;
+  --chat-bg: #fdfaf5;
+  --bubble-me: #d9b99b;
+  --bubble-other: #ffffff;
 }
 
 .theme-soft-lilac {
-  --bg:#f7f2fb;
-  --panel:#e8dcf5;
-  --card:#f1e9fa;
-  --accent:#b58fe6;
-  --text:#3b214f;
+  --bg: #f5f0ff;
+  --panel: #e6d9ff;
+  --card: #efe8ff;
+  --accent: #c4a0ff;
+  --text: #3c1f5c;
+  --chat-bg: #faf8ff;
+  --bubble-me: #c4a0ff;
+  --bubble-other: #ffffff;
 }
+
+/* Темы по умолчанию переименовываем для совместимости */
+.theme-pink { @extend .theme-pastel-pink; } /* или просто оставь как есть */
+.theme-dark { --bg: #0f0f14; --panel: #1b1b22; --card: #242430; --accent: #a78bfa; --text: #e0e0ff; --chat-bg: #12121a; --bubble-me: #a78bfa; --bubble-other: #2a2a3a; }
+.theme-mint { --bg: #eafff7; --panel: #c9f5e6; --card: #dffaf0; --accent: #4ae4b0; --text: #004d3a; --chat-bg: #f0fff9; --bubble-me: #4ae4b0; --bubble-other: #ffffff; }
 
 /* ===== GLOBAL COLORS ===== */
 body {
@@ -168,12 +160,15 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 16px;
+  background: var(--panel);
 }
 
 .top-title {
   font-size: 22px;
   font-weight: 600;
 }
+
 /* ===== AVATAR ===== */
 .avatar {
   width: 48px;
@@ -261,25 +256,3 @@ button {
   flex-direction: column;
   gap: 10px;
 }
-.screen {
-  animation: fadeIn 0.25s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-
-.message {
-  animation: pop 0.2s ease;
-}
-
-@keyframes pop {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-button:active {
-  transform: scale(0.96);
-}
-

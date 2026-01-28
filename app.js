@@ -102,14 +102,25 @@ document.getElementById("sendBtn").onclick = () => {
   input.value = "";
 };
 
-document.getElementById("messageInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    sendMessage(e.target.value);
-    e.target.value = "";
-  }
-});
+
 
 document.querySelectorAll(".intro-buttons button")
   .forEach(btn => {
     btn.onclick = () => sendMessage(btn.textContent);
   });
+  const messageInput = document.getElementById("messageInput");
+
+messageInput.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {  // Enter без Shift → отправить
+    e.preventDefault();                     // не даём браузеру делать перенос
+    sendMessage(messageInput.value);
+    messageInput.value = "";
+  }
+  // Shift + Enter → перенос строки (браузер сам сделает \n)
+});
+
+// Авто-увеличение высоты textarea по мере ввода (чтобы не было скролла)
+messageInput.addEventListener("input", () => {
+  messageInput.style.height = "auto";
+  messageInput.style.height = (messageInput.scrollHeight) + "px";
+});

@@ -124,3 +124,53 @@ messageInput.addEventListener("input", () => {
   messageInput.style.height = "auto";
   messageInput.style.height = (messageInput.scrollHeight) + "px";
 });
+// Аватарка: предпросмотр и сохранение
+const avatarInput = document.getElementById("avatarInput");
+const avatarPreview = document.getElementById("avatarPreview");
+
+function updateAvatarPreview(base64) {
+  if (base64) {
+    avatarPreview.style.backgroundImage = `url(${base64})`;
+    avatarPreview.style.backgroundSize = "cover";
+  } else {
+    generateAvatar(avatarPreview);  // твой существующий градиент
+  }
+}
+
+// При выборе файла → предпросмотр + сохранение
+avatarInput.addEventListener("change", () => {
+  const file = avatarInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const base64 = e.target.result;
+    settings.avatar = base64;
+    saveSettings();
+    updateAvatarPreview(base64);
+
+    // Обновляем везде сразу
+    renderContacts();  // если есть аватар в списке контактов (пока нет, но на будущее)
+  };
+  reader.readAsDataURL(file);
+});
+
+// При загрузке страницы — показываем сохранённый аватар
+if (settings.avatar) {
+  updateAvatarPreview(settings.avatar);
+} else {
+  generateAvatar(avatarPreview);
+}
+
+// Показываем аватар в шапке контактов (добавь в contactsScreen header, если хочешь)
+const contactsHeader = document.querySelector("#contactsScreen .top-bar");
+if (contactsHeader && !document.getElementById("myAvatarInContacts")) {
+  const myAvatar = document.createElement("div");
+  myAvatar.id = "myAvatarInContacts";
+  myAvatar.className = "avatar";
+  myAvatar.style.width = "36px";
+  myAvatar.style.height = "36px";
+  myAvatar.style.marginLeft = "auto";
+  contactsHeader.appendChild(myAvatar);
+  updateAvatarPreview(settings.avatar);  // вызовет обновление
+}

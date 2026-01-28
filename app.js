@@ -113,7 +113,7 @@ document.querySelectorAll(".intro-buttons button")
 document.getElementById("messageInput").addEventListener("keydown", e => {
   if (e.key === "Enter") {
     //sendMessage(e.target.value);
-    e.target.value = "";
+    //e.target.value = "";
   }
 });
 // ------------------ АВАТАРКА ------------------

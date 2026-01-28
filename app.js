@@ -110,31 +110,11 @@ document.querySelectorAll(".intro-buttons button")
   });
   const messageInput = document.getElementById("messageInput");
 
-// Обработка клавиатуры в поле ввода
-const messageInput = document.getElementById("messageInput");
-
-messageInput.addEventListener("keydown", e => {
+document.getElementById("messageInput").addEventListener("keydown", e => {
   if (e.key === "Enter") {
-    // Enter → всегда перенос строки (даже без Shift)
-    // Ничего не делаем, браузер сам вставит \n
-    // e.preventDefault() НЕ ставим — пусть Enter делает перенос
+    sendMessage(e.target.value);
+    e.target.value = "";
   }
-});
-
-// Кнопка отправки остаётся единственным способом отправить
-document.getElementById("sendBtn").onclick = () => {
-  const text = messageInput.value.trim();
-  if (text) {
-    sendMessage(text);
-    messageInput.value = "";
-    messageInput.style.height = "44px";  // возвращаем начальную высоту
-  }
-};
-
-// Авто-рост высоты (чтобы поле росло при переносах строк)
-messageInput.addEventListener("input", () => {
-  messageInput.style.height = "auto";
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 // ------------------ АВАТАРКА ------------------
 const avatarInput = document.getElementById("avatarInput");

@@ -220,6 +220,11 @@ button {
   padding: 14px 18px;
   border-radius: 18px;
   font-size: 18px;
+  word-wrap: break-word;          /* старое название, работает везде */
+  overflow-wrap: break-word;      /* современное, рекомендуемое */
+  hyphens: auto;                  /* автоматический перенос с дефисами, если язык позволяет */
+  white-space: pre-wrap;          /* сохраняет переносы строк от пользователя */
+  box-sizing: border-box;
 }
 
 .message.me {

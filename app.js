@@ -110,19 +110,31 @@ document.querySelectorAll(".intro-buttons button")
   });
   const messageInput = document.getElementById("messageInput");
 
+// Обработка клавиатуры в поле ввода
+const messageInput = document.getElementById("messageInput");
+
 messageInput.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {  // Enter без Shift → отправить
-    e.preventDefault();                     // не даём браузеру делать перенос
-    sendMessage(messageInput.value);
-    messageInput.value = "";
+  if (e.key === "Enter") {
+    // Enter → всегда перенос строки (даже без Shift)
+    // Ничего не делаем, браузер сам вставит \n
+    // e.preventDefault() НЕ ставим — пусть Enter делает перенос
   }
-  // Shift + Enter → перенос строки (браузер сам сделает \n)
 });
 
-// Авто-увеличение высоты textarea по мере ввода (чтобы не было скролла)
+// Кнопка отправки остаётся единственным способом отправить
+document.getElementById("sendBtn").onclick = () => {
+  const text = messageInput.value.trim();
+  if (text) {
+    sendMessage(text);
+    messageInput.value = "";
+    messageInput.style.height = "44px";  // возвращаем начальную высоту
+  }
+};
+
+// Авто-рост высоты (чтобы поле росло при переносах строк)
 messageInput.addEventListener("input", () => {
   messageInput.style.height = "auto";
-  messageInput.style.height = (messageInput.scrollHeight) + "px";
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 // Аватарка: предпросмотр и сохранение
 const avatarInput = document.getElementById("avatarInput");

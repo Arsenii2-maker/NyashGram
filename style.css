@@ -261,10 +261,33 @@ button {
   flex-direction: column;
   gap: 10px;
 }
+/* ===== INPUT BAR (панель ввода сообщений) ===== */
 .input-bar {
   display: flex;
-  align-items: flex-end;          /* кнопка снизу, а не по центру */
-  gap: 10px;
+  align-items: flex-end;          /* кнопка прижимается к нижнему краю textarea */
+  gap: 8px;
   padding: 12px 14px;
   background: var(--panel);
+}
+
+#messageInput {
+  flex: 1 1 auto;                 /* ← это главное: растягивает поле на всю ширину */
+  min-height: 44px;               /* начальная высота как у обычного input */
+  max-height: 140px;              /* максимум, чтобы не росло слишком сильно */
+  padding: 12px 16px;
+  font-size: 17px;
+  line-height: 1.4;
+  border-radius: 22px;
+  border: none;
+  background: #ffffff;
+  color: var(--text);
+  resize: none;
+  overflow-y: auto;
+  box-sizing: border-box;
+  outline: none;
+}
+
+#messageInput::placeholder {
+  color: #a0a0a0;
+  opacity: 1;
 }

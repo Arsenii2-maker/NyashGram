@@ -248,5 +248,6 @@ document.querySelectorAll('.mood-btn').forEach(btn => {
   btn.onclick = () => {
     currentMood = btn.dataset.mood;
     applyMood();
+    initMoodOrbs();
   };
 });

@@ -76,7 +76,10 @@ function sendMessage(text) {
   // Анимация + звук
 const settings = moodSettings[currentMood];
 new Audio(`sounds/${settings.sound}`).play(); // звук отправки
-
+// Звук отправки в зависимости от mood
+const currentSound = moodSettings[currentMood]?.sound || 'cozy-pop.mp3';
+const audio = new Audio(`sounds/${currentSound}`);
+audio.play().catch(err => console.log("Звук не сыграл:", err));  // если браузер блокирует — не паникуй
 // Добавляем класс mood-anim к новому сообщению
   renderMessages();
   el.className = `message ${m.from} appear ${currentMood}`;

@@ -73,5 +73,37 @@ function renderMessages() {
 function sendMessage(text) {
   if (!text.trim()) return;
   chatData[currentChat].push({ from: "me", text });
+  // Анимация + звук
+const settings = moodSettings[currentMood];
+new Audio(`sounds/${settings.sound}`).play(); // звук отправки
+
+// Добавляем класс mood-anim к новому сообщению
   renderMessages();
+  el.className = `message ${m.from} appear ${currentMood}`;
 }
+function applyMood() {
+  const settings = moodSettings[currentMood];
+  
+  // Фон чата
+  document.getElementById("chatScreen").style.background = settings.bg;
+  document.getElementById("messages").style.background = settings.bg;
+  
+  // Цвета пузырей (переопределяем глобальные переменные)
+  document.documentElement.style.setProperty('--bubble-me', settings.bubbleMe);
+  document.documentElement.style.setProperty('--bubble-other', settings.bubbleOther);
+  
+  // Активная кнопка mood
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mood === currentMood);
+  });
+  
+  // Сохраняем в chatData
+  if (!chatData[currentChat]) chatData[currentChat] = [];
+  chatData[currentChat].mood = currentMood;
+}
+document.querySelectorAll('.mood-btn').forEach(btn => {
+  btn.onclick = () => {
+    currentMood = btn.dataset.mood;
+    applyMood();
+  };
+});

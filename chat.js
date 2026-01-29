@@ -38,6 +38,9 @@ function openChat(contact) {
   if (!chatData[currentChat]) chatData[currentChat] = [];
 
   showScreen("chat");
+  // Загружаем сохранённый mood для этого чата (если был)
+currentMood = chatData[currentChat]?.mood || 'cozy';
+applyMood();
 
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;

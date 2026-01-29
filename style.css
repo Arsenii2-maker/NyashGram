@@ -291,3 +291,44 @@ button {
   color: #a0a0a0;
   opacity: 1;
 }
+.mood-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  font-size: 24px;
+  background: var(--card);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.mood-btn:hover {
+  transform: scale(1.15);
+}
+
+.mood-btn.active {
+  background: var(--accent);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Анимации появления сообщений в зависимости от mood */
+.message.appear {
+  animation: appear 0.4s ease-out forwards;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Вариации по mood (добавим в JS) */
+.message.cozy.appear    { animation-duration: 0.6s; animation-timing-function: ease-in-out; }
+.message.night.appear   { animation: nightAppear 0.5s ease-out; }
+.message.lofi.appear    { animation: lofiAppear 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.message.chaotic.appear { animation: chaoticAppear 0.4s ease-out; }
+
+@keyframes nightAppear   { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes lofiAppear    { from { opacity: 0; transform: scale(0.8) rotate(-5deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes chaoticAppear { 0% { opacity: 0; transform: scale(0.5) rotate(10deg); } 50% { transform: scale(1.2) rotate(-10deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }

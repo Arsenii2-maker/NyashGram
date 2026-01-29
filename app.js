@@ -110,7 +110,7 @@ document.querySelectorAll(".intro-buttons button")
   });
   const messageInput = document.getElementById("messageInput");
 
-document.getElementById("messageInput").addEventListener("keydown", e => {
+messageInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     //sendMessage(e.target.value);
     //e.target.value = "";

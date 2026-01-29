@@ -15,7 +15,7 @@ function initMoodOrbs() {
   if (!moodOrbContainer) return;
 
   // Загрузка сохранённого mood и позиции
-  currentMood = chatData[currentChat]?.mood || 'cozy';
+  //currentMood = chatData[currentChat]?.mood || 'cozy';
   updateMainOrb();
 
   const savedPos = localStorage.getItem(`moodOrbPos_${currentChat}`);
@@ -37,7 +37,7 @@ function initMoodOrbs() {
   // Клик по опциям → выбор mood
   orbOptions.querySelectorAll('.orb').forEach(orb => {
     orb.addEventListener('click', () => {
-      currentMood = orb.dataset.mood;
+      //currentMood = orb.dataset.mood;
       chatData[currentChat].mood = currentMood;
       updateMainOrb();
       toggleOrbOptions(); // сворачиваем после выбора
@@ -179,7 +179,7 @@ function openChat(contact) {
 
   showScreen("chat");
   // Загружаем сохранённый mood для этого чата (если был)
-currentMood = chatData[currentChat]?.mood || 'cozy';
+//currentMood = chatData[currentChat]?.mood || 'cozy';
 applyMood();
 
   document.getElementById("chatName").textContent = contact.name;
@@ -242,11 +242,11 @@ function applyMood() {
   
   // Сохраняем в chatData
   if (!chatData[currentChat]) chatData[currentChat] = [];
-  chatData[currentChat].mood = currentMood;
+  //chatData[currentChat].mood = currentMood;
 }
 document.querySelectorAll('.mood-btn').forEach(btn => {
   btn.onclick = () => {
-    currentMood = btn.dataset.mood;
+    //currentMood = btn.dataset.mood;
     applyMood();
     initMoodOrbs();
   };

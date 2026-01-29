@@ -55,12 +55,12 @@
 <label>
   Шрифт
   <select id="fontSelect">
-    <option value="system">System (стандартный)</option>
-    <option value="rounded">Rounded (кругленький)</option>
-    <option value="cozy">Cozy (уютный)</option>
-    <option value="elegant">Elegant (элегантный)</option>
-    <option value="bold-soft">Bold Soft (мягкий жирный)</option>
-    <option value="mono-cozy">Mono Cozy (моно уютный)</option>
+    <option value="system">System </option>
+    <option value="rounded">Rounded </option>
+    <option value="cozy">Cozy </option>
+    <option value="elegant">Elegant </option>
+    <option value="bold-soft">Bold Soft </option>
+    <option value="mono-cozy">Mono Cozy </option>
   </select>
 </label>
 
@@ -117,6 +117,18 @@
     style="resize: none; min-height: 50px; max-height: 200px; overflow-y: auto;"
   ></textarea>
   <button id="sendBtn">➤</button>
+</div>
+<div id="moodOrbContainer" class="mood-orb-container">
+  <div class="main-orb" id="mainMoodOrb" title="Текущее настроение">
+    <!-- Здесь будет эмодзи текущего mood -->
+  </div>
+  
+  <div class="orb-options" id="orbOptions">
+    <div class="orb cozy" data-mood="cozy" title="Cozy 💗">💗</div>
+    <div class="orb night" data-mood="night" title="Night 🌙">🌙</div>
+    <div class="orb lofi" data-mood="lofi" title="Lo-fi 🎧">🎧</div>
+    <div class="orb chaotic" data-mood="chaotic" title="Chaotic 💥">💥</div>
+  </div>
 </div>
 
 <script src="contacts.js"></script>

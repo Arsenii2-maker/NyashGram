@@ -1,4 +1,12 @@
 let currentChat = null;
+// Глобальные переменные
+let currentMood = 'cozy';
+let moodOrbContainer = null;
+let mainOrb = null;
+let orbOptions = null;
+let isDragging = false;
+let currentX = 0, currentY = 0, initialX = 0, initialY = 0;
+
 const chatData = {};
 
 function openChat(contact) {
@@ -40,13 +48,6 @@ function sendMessage(text) {
   chatData[currentChat].push({ from: "me", text });
   renderMessages();
 }
-// Глобальные переменные
-let currentMood = 'cozy';
-let moodOrbContainer = null;
-let mainOrb = null;
-let orbOptions = null;
-let isDragging = false;
-let currentX = 0, currentY = 0, initialX = 0, initialY = 0;
 
 // Инициализация при открытии чата
 function initMoodOrbs() {

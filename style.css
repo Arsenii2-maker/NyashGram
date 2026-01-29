@@ -332,3 +332,92 @@ button {
 @keyframes nightAppear   { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes lofiAppear    { from { opacity: 0; transform: scale(0.8) rotate(-5deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
 @keyframes chaoticAppear { 0% { opacity: 0; transform: scale(0.5) rotate(10deg); } 50% { transform: scale(1.2) rotate(-10deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+/* Контейнер для всего блока orb'ов */
+.mood-orb-container {
+  position: fixed;
+  z-index: 100;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.25s ease;
+}
+
+/* Основной orb (всегда виден) */
+.main-orb {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: grab;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.main-orb:active {
+  cursor: grabbing;
+  transform: scale(1.15);
+}
+
+.main-orb::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.2;
+  filter: blur(15px);
+  z-index: -1;
+}
+
+/* Опции (скрыты по умолчанию) */
+.orb-options {
+  position: absolute;
+  top: -9999px; /* спрятано */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.orb-options.expanded {
+  opacity: 1;
+  pointer-events: auto;
+  top: - (64px + 12px * 3 + 64px * 3 + 12px); /* пример расчёта для раскрытия вверх; подгони под себя */
+  transform: translateX(-50%) scale(1);
+}
+
+/* Каждый orb в опциях */
+.orb {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  opacity: 0.85;
+}
+
+.orb:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+/* Градиенты (можно менять) */
+.main-orb.cozy, .orb.cozy    { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
+.main-orb.night, .orb.night   { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
+.main-orb.lofi, .orb.lofi     { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
+.main-orb.chaotic, .orb.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
+
+/* Класс для активного (текущего) */
+.main-orb.active { transform: scale(1.12); box-shadow: 0 12px 35px rgba(0,0,0,0.28); }

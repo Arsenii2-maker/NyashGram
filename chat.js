@@ -15,7 +15,6 @@ function openChat(contact) {
 
   renderMessages();
 
-  // Инициализация mood-орба
   initMoodOrb();
 }
 
@@ -58,9 +57,7 @@ function updateMainOrb() {
 
 function toggleOrbOptions() {
   const options = document.getElementById('orbOptions');
-  if (options) {
-    options.classList.toggle('expanded');
-  }
+  if (options) options.classList.toggle('expanded');
 }
 
 function initMoodOrb() {
@@ -68,7 +65,6 @@ function initMoodOrb() {
   if (!orb) return;
 
   updateMainOrb();
-
   orb.onclick = toggleOrbOptions;
 
   const options = document.getElementById('orbOptions');
@@ -79,7 +75,6 @@ function initMoodOrb() {
         chatData[currentChat].mood = currentMood;
         updateMainOrb();
         toggleOrbOptions();
-        // applyMood(); // если добавишь функцию — она здесь
       };
     });
   }

@@ -48,12 +48,14 @@ loginBtn.onclick = () => {
 
 if (settings.name) {
   showScreen("contacts");
-  if (typeof renderContacts === 'function') {
-    renderContacts();
-  } else {
-    console.warn("renderContacts ещё не загружен — подождём...");
-    // или можно добавить setTimeout, но лучше менять порядок
-  }
+  setTimeout(() => {
+    if (typeof renderContacts === 'function') {
+      renderContacts();
+    } else {
+      console.warn("renderContacts ещё не готова — подождём 100 мс");
+      setTimeout(renderContacts, 100); // повторная попытка
+    }
+  }, 50); // даём время скриптам загрузиться
 }
 
 // ---------- SETTINGS UI ----------

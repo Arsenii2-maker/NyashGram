@@ -1,5 +1,5 @@
 let currentChat = null;
-let currentMood = 'cozy'; // только одна объявление!
+let currentMood = 'cozy';
 
 const chatData = {};
 
@@ -11,14 +11,12 @@ function openChat(contact) {
 
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;
-
-  // Используем gradientFor из contacts.js (она доступна, если порядок скриптов правильный)
   document.getElementById("chatAvatar").style.background = gradientFor(contact.name);
 
   renderMessages();
 
-  // Инициализируем mood-орбы только когда чат открыт
-  initMoodOrbs();
+  // Инициализация mood-орба
+  initMoodOrb();
 }
 
 function renderMessages() {
@@ -48,37 +46,40 @@ function sendMessage(text) {
   renderMessages();
 }
 
-// Mood orb функции
+// Mood orb
 function updateMainOrb() {
-  const mainOrb = document.getElementById('mainMoodOrb');
-  if (!mainOrb) return;
+  const orb = document.getElementById('mainMoodOrb');
+  if (!orb) return;
 
-  mainOrb.textContent = { cozy: '💗', night: '🌙', lofi: '🎧', chaotic: '💥' }[currentMood];
-  mainOrb.className = `main-orb ${currentMood}`;
+  const emojis = { cozy: '💗', night: '🌙', lofi: '🎧', chaotic: '💥' };
+  orb.textContent = emojis[currentMood] || '💗';
+  orb.className = `main-orb ${currentMood}`;
 }
 
 function toggleOrbOptions() {
   const options = document.getElementById('orbOptions');
-  if (options) options.classList.toggle('expanded');
+  if (options) {
+    options.classList.toggle('expanded');
+  }
 }
 
-function initMoodOrbs() {
-  const mainOrb = document.getElementById('mainMoodOrb');
-  if (!mainOrb) return;
+function initMoodOrb() {
+  const orb = document.getElementById('mainMoodOrb');
+  if (!orb) return;
 
   updateMainOrb();
 
-  mainOrb.onclick = toggleOrbOptions;
+  orb.onclick = toggleOrbOptions;
 
   const options = document.getElementById('orbOptions');
   if (options) {
-    options.querySelectorAll('.orb').forEach(orb => {
-      orb.onclick = () => {
-        currentMood = orb.dataset.mood;
+    options.querySelectorAll('.orb').forEach(opt => {
+      opt.onclick = () => {
+        currentMood = opt.dataset.mood;
         chatData[currentChat].mood = currentMood;
         updateMainOrb();
         toggleOrbOptions();
-        // applyMood(); // если есть — вызови здесь
+        // applyMood(); // если добавишь функцию — она здесь
       };
     });
   }

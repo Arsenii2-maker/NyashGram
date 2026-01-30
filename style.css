@@ -235,14 +235,14 @@ button {
   color: #000;
 }
 
-/* ===== INPUT BAR ===== */
+/* ===== INPUT BAR — красивая и компактная версия ===== */
 .input-bar {
   display: flex;
   align-items: flex-end;
   gap: 10px;
   padding: 12px 16px;
   background: var(--panel);
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0,0,0,0.06);
   position: sticky;
   bottom: 0;
   z-index: 20;
@@ -257,24 +257,26 @@ button {
   line-height: 1.45;
   border-radius: 24px;
   border: none;
-  background: #ffffff;
+  background: white;
   color: var(--text);
   resize: none;
   overflow-y: auto;
   box-sizing: border-box;
   outline: none;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+
+#messageInput:focus {
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 #messageInput::placeholder {
   color: #b0b0b0;
-  opacity: 1;
 }
 
 #sendBtn {
   width: 48px;
   height: 48px;
-  min-width: 48px;
   border-radius: 50%;
   background: var(--accent);
   color: white;
@@ -284,18 +286,18 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s;
 }
 
 #sendBtn:active {
   transform: scale(0.92);
 }
 
-/* ===== MOOD ORBS — чистая версия ===== */
+/* ===== MOOD ORB — рабочая версия ===== */
 #moodOrbContainer {
   position: fixed;
-  bottom: 90px;
-  right: 16px;
+  bottom: 100px;
+  right: 20px;
   z-index: 9999;
   pointer-events: none;
 }
@@ -304,7 +306,7 @@ button {
   pointer-events: auto;
 }
 
-#mainMoodOrb {
+.main-orb {
   width: 70px;
   height: 70px;
   border-radius: 50%;
@@ -312,30 +314,29 @@ button {
   align-items: center;
   justify-content: center;
   font-size: 36px;
-  background: linear-gradient(135deg, #ff9acb, #ff6b9d);
-  box-shadow: 0 8px 32px rgba(255, 105, 180, 0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-#mainMoodOrb:active {
-  transform: scale(1.12);
+.main-orb:active {
+  transform: scale(1.1);
 }
 
-#orbOptions {
+.orb-options {
   position: absolute;
   bottom: 90px;
-  right: 0;
+  right: 5px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease, transform 0.4s ease;
-  transform: translateY(20px);
+  transform: translateY(30px);
 }
 
-#orbOptions.expanded {
+.orb-options.expanded {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
@@ -350,7 +351,7 @@ button {
   justify-content: center;
   font-size: 30px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
   transition: transform 0.3s ease;
 }
 
@@ -358,7 +359,8 @@ button {
   transform: scale(1.15);
 }
 
-.orb.cozy, #mainMoodOrb.cozy     { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
-.orb.night, #mainMoodOrb.night    { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
-.orb.lofi, #mainMoodOrb.lofi      { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
-.orb.chaotic, #mainMoodOrb.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
+/* Градиенты */
+.cozy    { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
+.night   { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
+.lofi    { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
+.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }

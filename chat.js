@@ -48,7 +48,7 @@ function sendMessage(text) {
   chatData[currentChat].push({ from: "me", text });
   renderMessages();
 }
-let currentMood = 'cozy';
+//let currentMood = 'cozy';
 
 function updateMainOrb() {
   const mainOrb = document.getElementById('mainMoodOrb');

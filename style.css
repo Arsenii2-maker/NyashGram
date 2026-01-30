@@ -53,10 +53,6 @@ html, body {
   font-weight: 400;
 }
 
-.font-impact {
-  font-family: Impact, Haettenschweiler, 'Arial Black', sans-serif; /* оставляем как был */
-}
-
 /* ===== THEMES ===== */
 .theme-pastel-pink {
   --bg: #fff5fb;
@@ -113,18 +109,13 @@ html, body {
   --bubble-other: #ffffff;
 }
 
-/* Темы по умолчанию переименовываем для совместимости */
-.theme-pink { @extend .theme-pastel-pink; } /* или просто оставь как есть */
-.theme-dark { --bg: #0f0f14; --panel: #1b1b22; --card: #242430; --accent: #a78bfa; --text: #e0e0ff; --chat-bg: #12121a; --bubble-me: #a78bfa; --bubble-other: #2a2a3a; }
-.theme-mint { --bg: #eafff7; --panel: #c9f5e6; --card: #dffaf0; --accent: #4ae4b0; --text: #004d3a; --chat-bg: #f0fff9; --bubble-me: #4ae4b0; --bubble-other: #ffffff; }
-
-/* ===== GLOBAL COLORS ===== */
+/* GLOBAL COLORS */
 body {
   background: var(--bg);
   color: var(--text);
 }
 
-/* ===== LOGIN ===== */
+/* LOGIN */
 .center {
   justify-content: center;
   align-items: center;
@@ -155,13 +146,16 @@ button {
   color: var(--text);
 }
 
-/* ===== TOP BAR ===== */
+/* TOP BAR */
 .top-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 16px;
   background: var(--panel);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .top-title {
@@ -169,7 +163,7 @@ button {
   font-weight: 600;
 }
 
-/* ===== AVATAR ===== */
+/* AVATAR */
 .avatar {
   width: 48px;
   height: 48px;
@@ -179,7 +173,7 @@ button {
   background-image: linear-gradient(135deg, #ff9acb, #ffd6e8);
 }
 
-/* ===== CONTACTS ===== */
+/* CONTACTS */
 #contactsList {
   padding: 16px;
 }
@@ -195,7 +189,7 @@ button {
   font-size: 18px;
 }
 
-/* ===== CHAT ===== */
+/* CHAT */
 .chat-header {
   display: flex;
   gap: 12px;
@@ -213,6 +207,9 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .message {
@@ -220,10 +217,10 @@ button {
   padding: 14px 18px;
   border-radius: 18px;
   font-size: 18px;
-  word-wrap: break-word;          /* старое название, работает везде */
-  overflow-wrap: break-word;      /* современное, рекомендуемое */
-  hyphens: auto;                  /* автоматический перенос с дефисами, если язык позволяет */
-  white-space: pre-wrap;          /* сохраняет переносы строк от пользователя */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  white-space: pre-wrap;
   box-sizing: border-box;
 }
 
@@ -238,42 +235,22 @@ button {
   color: #000;
 }
 
+/* INPUT BAR */
 .input-bar {
   display: flex;
-  gap: 10px;
-  padding: 14px;
-  background: var(--panel);
-}
-
-/* ===== INTRO ===== */
-.chat-intro {
-  padding: 24px;
-  text-align: center;
-}
-
-.intro-title {
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-
-.intro-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-/* ===== INPUT BAR (панель ввода сообщений) ===== */
-.input-bar {
-  display: flex;
-  align-items: flex-end;          /* кнопка прижимается к нижнему краю textarea */
+  align-items: flex-end;
   gap: 8px;
   padding: 12px 14px;
   background: var(--panel);
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
 }
 
 #messageInput {
-  flex: 1 1 auto;                 /* ← это главное: растягивает поле на всю ширину */
-  min-height: 44px;               /* начальная высота как у обычного input */
-  max-height: 140px;              /* максимум, чтобы не росло слишком сильно */
+  flex: 1 1 auto;
+  min-height: 44px;
+  max-height: 140px;
   padding: 12px 16px;
   font-size: 17px;
   line-height: 1.4;
@@ -291,10 +268,11 @@ button {
   color: #a0a0a0;
   opacity: 1;
 }
+
 /* ===== MOOD ORBS — чистая версия ===== */
 #moodOrbContainer {
   position: fixed;
-  bottom: 90px;          /* над клавиатурой/input */
+  bottom: 90px;
   right: 16px;
   z-index: 9999;
   pointer-events: none;
@@ -304,7 +282,6 @@ button {
   pointer-events: auto;
 }
 
-/* Главный orb */
 #mainMoodOrb {
   width: 70px;
   height: 70px;
@@ -323,7 +300,6 @@ button {
   transform: scale(1.12);
 }
 
-/* Опции — раскрываются вверх */
 #orbOptions {
   position: absolute;
   bottom: 90px;
@@ -343,7 +319,6 @@ button {
   transform: translateY(0);
 }
 
-/* Каждый orb */
 .orb {
   width: 60px;
   height: 60px;
@@ -361,23 +336,7 @@ button {
   transform: scale(1.15);
 }
 
-/* Градиенты */
 .orb.cozy, #mainMoodOrb.cozy     { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
 .orb.night, #mainMoodOrb.night    { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
 .orb.lofi, #mainMoodOrb.lofi      { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
 .orb.chaotic, #mainMoodOrb.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
-/* Фиксируем панель ввода */
-.input-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 20;
-  background: var(--panel);
-}
-
-/* Зона сообщений — прокручиваемая */
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  padding-bottom: 20px; /* отступ снизу, чтобы не налезало на input */
-  -webkit-overflow-scrolling: touch; /* плавная прокрутка на iOS */
-}

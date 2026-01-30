@@ -368,3 +368,26 @@ button {
 .orb.night, #mainMoodOrb.night   { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
 .orb.lofi, #mainMoodOrb.lofi     { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
 .orb.chaotic, #mainMoodOrb.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
+/* Фиксируем шапку чата */
+#chatScreen .top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--panel);
+}
+
+/* Фиксируем панель ввода */
+.input-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  background: var(--panel);
+}
+
+/* Зона сообщений — прокручиваемая */
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px; /* отступ снизу, чтобы не налезало на input */
+  -webkit-overflow-scrolling: touch; /* плавная прокрутка на iOS */
+}

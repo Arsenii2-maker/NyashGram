@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Fredoka:wght@400;500;600&family=Nunito:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Kosugi+Maru&family=M+PLUS+Rounded+1c:wght@400;500&display=swap" rel="stylesheet">
- </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Fredoka:wght@400;500;600&family=Nunito:wght@400;500;600&family=Quicksand:wght@400;500;600&family=Kosugi+Maru&family=M+PLUS+Rounded+1c:wght@400;500&display=swap" rel="stylesheet">
+</head>
 <body>
- 
+
 <div id="app">
 
   <!-- LOGIN -->
@@ -19,55 +19,54 @@
     <input id="loginInput" placeholder="Ваш никнейм">
     <button id="loginBtn">Войти</button>
   </section>
-  
+
+  <!-- SETTINGS -->
   <section id="settingsScreen" class="screen">
-  <header class="top-bar">
-    <button id="settingsBackBtn">←</button>
-    <div class="top-title">Настройки</div>
-  </header>
+    <header class="top-bar">
+      <button id="settingsBackBtn">←</button>
+      <div class="top-title">Настройки</div>
+    </header>
 
-  <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
+    <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
+      <label>
+        Никнейм
+        <input id="settingsName">
+      </label>
 
-    <label>
-      Никнейм
-      <input id="settingsName">
-    </label>
-    
-    <label>
-  Аватарка
-  <input type="file" id="avatarInput" accept="image/*">
-  <div style="margin-top:8px;">
-    <div id="avatarPreview" class="avatar" style="width:80px; height:80px; margin:0 auto;"></div>
-  </div>
-</label>
+      <label>
+        Аватарка
+        <input type="file" id="avatarInput" accept="image/*">
+        <div style="margin-top:8px;">
+          <div id="avatarPreview" class="avatar" style="width:80px; height:80px; margin:0 auto;"></div>
+        </div>
+      </label>
 
-   <label>
-  Тема
-  <select id="themeSelect">
-    <option value="pastel-pink">Pastel Pink 🩷</option>
-    <option value="milk-rose">Milk Rose 🌸</option>
-    <option value="night-blue">Night Blue 🌙</option>
-    <option value="lo-fi-beige">Lo-Fi Beige ☕</option>
-    <option value="soft-lilac">Soft Lilac 💜</option>
-  </select>
-</label>
+      <label>
+        Тема
+        <select id="themeSelect">
+          <option value="pastel-pink">Pastel Pink 🩷</option>
+          <option value="milk-rose">Milk Rose 🌸</option>
+          <option value="night-blue">Night Blue 🌙</option>
+          <option value="lo-fi-beige">Lo-Fi Beige ☕</option>
+          <option value="soft-lilac">Soft Lilac 💜</option>
+        </select>
+      </label>
 
-<label>
-  Шрифт
-  <select id="fontSelect">
-    <option value="system">System </option>
-    <option value="rounded">Rounded </option>
-    <option value="cozy">Cozy </option>
-    <option value="elegant">Elegant </option>
-    <option value="bold-soft">Bold Soft </option>
-    <option value="mono-cozy">Mono Cozy </option>
-  </select>
-</label>
+      <label>
+        Шрифт
+        <select id="fontSelect">
+          <option value="system">System</option>
+          <option value="rounded">Rounded</option>
+          <option value="cozy">Cozy</option>
+          <option value="elegant">Elegant</option>
+          <option value="bold-soft">Bold Soft</option>
+          <option value="mono-cozy">Mono Cozy</option>
+        </select>
+      </label>
 
-    <button id="saveSettingsBtn">Сохранить</button>
-
-  </div>
-</section>
+      <button id="saveSettingsBtn">Сохранить</button>
+    </div>
+  </section>
 
   <!-- CONTACTS -->
   <section id="contactsScreen" class="screen">
@@ -81,7 +80,6 @@
   <!-- CHAT -->
   <section id="chatScreen" class="screen">
     <header class="top-bar">
-</div>
       <button id="backBtn">←</button>
       <div class="chat-header">
         <div id="chatAvatar" class="avatar"></div>
@@ -90,18 +88,6 @@
           <div id="chatStatus" class="status"></div>
         </div>
       </div>
-      <div id="moodOrbContainer" class="mood-orb-container">
-  <div id="mainMoodOrb" class="main-orb cozy">
-    💗 <!-- дефолт -->
-  </div>
-  
-  <div id="orbOptions" class="orb-options">
-    <div class="orb cozy" data-mood="cozy">💗</div>
-    <div class="orb night" data-mood="night">🌙</div>
-    <div class="orb lofi" data-mood="lofi">🎧</div>
-    <div class="orb chaotic" data-mood="chaotic">💥</div>
-  </div>
-</div>
     </header>
 
     <div id="chatIntro" class="chat-intro">
@@ -116,26 +102,31 @@
 
     <div id="messages"></div>
 
- <div class="input-bar">
-  <textarea 
-    id="messageInput" 
-    placeholder="Сообщение..." 
-    rows="1"
-    style="resize: none; min-height: 50px; max-height: 200px; overflow-y: auto;"
-  ></textarea>
-  <button id="sendBtn">➤</button>
-</div>
-<div id="moodOrbContainer" class="mood-orb-container">
-  <div class="main-orb" id="mainMoodOrb" title="Текущее настроение">
-    <!-- Здесь будет эмодзи текущего mood -->
-  </div>
-  
-  <div class="orb-options" id="orbOptions">
-    <div class="orb cozy" data-mood="cozy" title="Cozy 💗">💗</div>
-    <div class="orb night" data-mood="night" title="Night 🌙">🌙</div>
-    <div class="orb lofi" data-mood="lofi" title="Lo-fi 🎧">🎧</div>
-    <div class="orb chaotic" data-mood="chaotic" title="Chaotic 💥">💥</div>
-  </div>
+    <div class="input-bar">
+      <textarea 
+        id="messageInput" 
+        placeholder="Сообщение..." 
+        rows="1"
+        style="resize: none; min-height: 50px; max-height: 200px; overflow-y: auto;"
+      ></textarea>
+      <button id="sendBtn">➤</button>
+    </div>
+
+    <!-- Только один mood-orb блок -->
+    <div id="moodOrbContainer" class="mood-orb-container">
+      <div id="mainMoodOrb" class="main-orb cozy">
+        💗
+      </div>
+      
+      <div id="orbOptions" class="orb-options">
+        <div class="orb cozy" data-mood="cozy">💗</div>
+        <div class="orb night" data-mood="night">🌙</div>
+        <div class="orb lofi" data-mood="lofi">🎧</div>
+        <div class="orb chaotic" data-mood="chaotic">💥</div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <script src="app.js"></script>

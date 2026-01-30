@@ -1,11 +1,5 @@
 let currentChat = null;
-// Глобальные переменные
-let currentMood = 'cozy';
-let moodOrbContainer = null;
-let mainOrb = null;
-let orbOptions = null;
-let isDragging = false;
-let currentX = 0, currentY = 0, initialX = 0, initialY = 0;
+let currentMood = 'cozy'; // только одна объявление!
 
 const chatData = {};
 
@@ -17,9 +11,14 @@ function openChat(contact) {
 
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;
-  document.getElementById("chatAvatar").style.background =
-  gradientFor(contact.name);
+
+  // Используем gradientFor из contacts.js (она доступна, если порядок скриптов правильный)
+  document.getElementById("chatAvatar").style.background = gradientFor(contact.name);
+
   renderMessages();
+
+  // Инициализируем mood-орбы только когда чат открыт
+  initMoodOrbs();
 }
 
 function renderMessages() {
@@ -48,12 +47,12 @@ function sendMessage(text) {
   chatData[currentChat].push({ from: "me", text });
   renderMessages();
 }
-//let currentMood = 'cozy';
 
+// Mood orb функции
 function updateMainOrb() {
   const mainOrb = document.getElementById('mainMoodOrb');
   if (!mainOrb) return;
-  
+
   mainOrb.textContent = { cozy: '💗', night: '🌙', lofi: '🎧', chaotic: '💥' }[currentMood];
   mainOrb.className = `main-orb ${currentMood}`;
 }
@@ -71,15 +70,16 @@ function initMoodOrbs() {
 
   mainOrb.onclick = toggleOrbOptions;
 
-  document.getElementById('orbOptions')?.querySelectorAll('.orb').forEach(orb => {
-    orb.onclick = () => {
-      currentMood = orb.dataset.mood;
-      chatData[currentChat].mood = currentMood;
-      updateMainOrb();
-      toggleOrbOptions();
-      applyMood(); // твоя функция изменения фона/цветов
-    };
-  });
+  const options = document.getElementById('orbOptions');
+  if (options) {
+    options.querySelectorAll('.orb').forEach(orb => {
+      orb.onclick = () => {
+        currentMood = orb.dataset.mood;
+        chatData[currentChat].mood = currentMood;
+        updateMainOrb();
+        toggleOrbOptions();
+        // applyMood(); // если есть — вызови здесь
+      };
+    });
+  }
 }
-
-// Вызываем только когда чат открыт

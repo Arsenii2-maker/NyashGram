@@ -340,84 +340,79 @@ button {
   touch-action: none;
   transition: transform 0.25s ease;
 }
+/* Mood Orbs — независимый плавающий блок */
+#moodOrbContainer {
+  position: fixed !important;
+  z-index: 9999;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
 
-/* Основной orb (всегда виден) */
-.main-orb {
-  width: 64px;
-  height: 64px;
+.mood-orb-container {
+  pointer-events: auto; /* только сам блок кликабелен */
+}
+
+/* Главный orb — всегда виден */
+#mainMoodOrb {
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
+  background: linear-gradient(135deg, #ff9acb, #ff6b9d); /* дефолт cozy */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  cursor: grab;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  font-size: 34px;
+  cursor: pointer;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
 }
 
-.main-orb:active {
-  cursor: grabbing;
-  transform: scale(1.15);
+#mainMoodOrb:active {
+  transform: scale(1.18);
 }
 
-.main-orb::after {
-  content: '';
+/* Опции — раскрываются вверх от главного orb */
+#orbOptions {
   position: absolute;
-  inset: -10px;
-  border-radius: 50%;
-  background: inherit;
-  opacity: 0.2;
-  filter: blur(15px);
-  z-index: -1;
-}
-
-/* Опции (скрыты по умолчанию) */
-.orb-options {
-  position: absolute;
-  top: -9999px; /* спрятано */
+  bottom: 80px; /* выше главного orb */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-.orb-options.expanded {
+#orbOptions.expanded {
   opacity: 1;
   pointer-events: auto;
-  top: - (64px + 12px * 3 + 64px * 3 + 12px); /* пример расчёта для раскрытия вверх; подгони под себя */
-  transform: translateX(-50%) scale(1);
+  transform: translateX(-50%) translateY(-10px);
 }
 
 /* Каждый orb в опциях */
 .orb {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 30px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .orb:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
   opacity: 1;
 }
 
-/* Градиенты (можно менять) */
-.main-orb.cozy, .orb.cozy    { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
-.main-orb.night, .orb.night   { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
-.main-orb.lofi, .orb.lofi     { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
-.main-orb.chaotic, .orb.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
-
-/* Класс для активного (текущего) */
-.main-orb.active { transform: scale(1.12); box-shadow: 0 12px 35px rgba(0,0,0,0.28); }
+/* Градиенты для каждого mood */
+.orb.cozy, #mainMoodOrb.cozy    { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
+.orb.night, #mainMoodOrb.night   { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
+.orb.lofi, #mainMoodOrb.lofi     { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
+.orb.chaotic, #mainMoodOrb.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }

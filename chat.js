@@ -55,9 +55,9 @@ function updateMainOrb() {
   orb.className = `main-orb ${currentMood}`;
 }
 
-function toggleOrbOptions() {
-  const options = document.getElementById('orbOptions');
-  if (options) options.classList.toggle('expanded');
+function toggleOptions() {
+  const opts = document.getElementById('orbOptions');
+  if (opts) opts.classList.toggle('expanded');
 }
 
 function initMoodOrb() {
@@ -65,16 +65,16 @@ function initMoodOrb() {
   if (!orb) return;
 
   updateMainOrb();
-  orb.onclick = toggleOrbOptions;
+  orb.onclick = toggleOptions;
 
-  const options = document.getElementById('orbOptions');
-  if (options) {
-    options.querySelectorAll('.orb').forEach(opt => {
+  const opts = document.getElementById('orbOptions');
+  if (opts) {
+    opts.querySelectorAll('.orb').forEach(opt => {
       opt.onclick = () => {
         currentMood = opt.dataset.mood;
         chatData[currentChat].mood = currentMood;
         updateMainOrb();
-        toggleOrbOptions();
+        toggleOptions();
       };
     });
   }

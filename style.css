@@ -208,7 +208,7 @@ button {
   flex-direction: column;
   gap: 10px;
   overflow-y: auto;
-  padding-bottom: 80px; /* чтобы сообщения не залезали под orb и input */
+  padding-bottom: 90px; /* чтобы сообщения не залезали под orb и input */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -235,7 +235,7 @@ button {
   color: #000;
 }
 
-/* INPUT BAR — чистая и красивая */
+/* INPUT BAR — красивая и компактная */
 .input-bar {
   display: flex;
   align-items: flex-end;
@@ -294,7 +294,7 @@ button {
   transform: scale(0.92);
 }
 
-/* ===== MOOD ORB — рабочая версия ===== */
+/* ===== MOOD ORB — финальная рабочая версия ===== */
 #moodOrbContainer {
   position: fixed;
   bottom: 100px;

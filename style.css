@@ -237,3 +237,50 @@ button {
   padding: 14px;
   background: var(--panel);
 }
+/* ЧАТ-ИНТРО — вертикальная панель быстрых сообщений */
+.chat-intro {
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--chat-bg);
+  flex-shrink: 0;
+}
+
+.intro-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.intro-buttons {
+  display: flex;
+  flex-direction: column;  /* вертикально */
+  gap: 12px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.intro-buttons button {
+  padding: 14px 20px;
+  font-size: 17px;
+  border-radius: 20px;
+  border: none;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.intro-buttons button:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.intro-buttons button:active {
+  transform: scale(0.98);
+}

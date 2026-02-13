@@ -38,7 +38,7 @@ function getNyashHelpResponse(text) {
 }
 
 // ==================== NYASHGPT ====================
-const GEMINI_API_KEY = "AIzaSyDUckk5gPc64ApBZD5nCWVn-vpIuZUd-BQ"; // ← вставь свой ключ сюда!
+const GEMINI_API_KEY = AIzaSyDUckk5gPc64ApBZD5nCWVn-vpIuZUd-BQ; // ← вставь свой ключ сюда!
 
 async function getNyashGPTResponse(text) {
   try {

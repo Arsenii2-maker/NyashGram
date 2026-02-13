@@ -284,3 +284,39 @@ button {
 .intro-buttons button:active {
   transform: scale(0.98);
 }
+/* NYASHHELP — своя панель быстрых вопросов */
+.nyashhelp-quick {
+  padding: 24px 16px;
+  background: var(--chat-bg);
+}
+
+.nyashhelp-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.nyashhelp-buttons button {
+  padding: 14px 20px;
+  font-size: 17px;
+  border-radius: 20px;
+  border: none;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.nyashhelp-buttons button:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.nyashhelp-buttons button:active {
+  transform: scale(0.98);
+}

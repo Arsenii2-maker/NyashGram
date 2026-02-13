@@ -3,12 +3,13 @@ const chatData = {};
 
 // ==================== NYASHHELP ====================
 const nyashHelpResponses = {
-  "тема": "Чтобы сменить тему — зайди в Настройки → Тема 🩷",
+  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
   "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
   "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
   "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
   "mood": "Mood — это настроение чата! Тапни по orb внизу справа → выбирай вайб 💗🌙🎧💥",
   "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
+  "добавить": "Пока друзей добавлять нельзя, но скоро будет! Пока наслаждайся болтовнёй с NyashHelp 🩷",
   "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
 };
 
@@ -27,18 +28,19 @@ function isNyashHelp() {
 }
 
 function getNyashHelpResponse(text) {
-  text = text.toLowerCase();
-  if (text.includes("тема")) return nyashHelpResponses["тема"];
-  if (text.includes("шрифт")) return nyashHelpResponses["шрифт"];
-  if (text.includes("аватар")) return nyashHelpResponses["аватар"];
-  if (text.includes("сообщ")) return nyashHelpResponses["сообщение"];
-  if (text.includes("mood")) return nyashHelpResponses["mood"];
-  if (text.includes("звук")) return nyashHelpResponses["звук"];
+  text = text.toLowerCase().trim();
+  if (text.includes("тема") || text.includes("тему")) return nyashHelpResponses["тема"];
+  if (text.includes("шрифт") || text.includes("шрифты")) return nyashHelpResponses["шрифт"];
+  if (text.includes("аватар") || text.includes("фото")) return nyashHelpResponses["аватар"];
+  if (text.includes("сообщ") || text.includes("отправ")) return nyashHelpResponses["сообщение"];
+  if (text.includes("mood") || text.includes("настроение")) return nyashHelpResponses["mood"];
+  if (text.includes("звук") || text.includes("звук")) return nyashHelpResponses["звук"];
+  if (text.includes("добавить") || text.includes("друга")) return nyashHelpResponses["добавить"];
   return nyashHelpResponses["default"];
 }
 
 // ==================== NYASHGPT ====================
-const GEMINI_API_KEY = AIzaSyDUckk5gPc64ApBZD5nCWVn-vpIuZUd-BQ; // ← вставь свой ключ сюда!
+const GEMINI_API_KEY = "AIzaSyDUckk5gPc64ApBZD5nCWVn-vpIuZUd-BQ"; // твой ключ уже вставлен
 
 async function getNyashGPTResponse(text) {
   try {
@@ -62,6 +64,10 @@ async function getNyashGPTResponse(text) {
         })
       }
     );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ошибка: ${response.status}`);
+    }
 
     const data = await response.json();
     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
@@ -142,7 +148,6 @@ function renderMessages() {
   if (isNyashHelp()) {
     intro.style.display = "none";
 
-    // Панель быстрых вопросов NyashHelp
     const helpPanel = document.createElement("div");
     helpPanel.className = "nyashhelp-quick";
     helpPanel.innerHTML = `

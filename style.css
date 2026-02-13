@@ -153,9 +153,6 @@ button {
   gap: 12px;
   padding: 16px;
   background: var(--panel);
-  position: sticky;
-  top: 0;
-  z-index: 20;
 }
 
 .top-title {
@@ -208,8 +205,6 @@ button {
   flex-direction: column;
   gap: 10px;
   overflow-y: auto;
-  padding-bottom: 90px; /* чтобы сообщения не залезали под orb и input */
-  -webkit-overflow-scrolling: touch;
 }
 
 .message {
@@ -235,133 +230,10 @@ button {
   color: #000;
 }
 
-/* INPUT BAR — красивая и компактная */
+/* INPUT BAR */
 .input-bar {
   display: flex;
-  align-items: flex-end;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 14px;
   background: var(--panel);
-  border-top: 1px solid rgba(255, 182, 193, 0.3);
-  position: sticky;
-  bottom: 0;
-  z-index: 20;
 }
-
-#messageInput {
-  flex: 1;
-  min-height: 46px;
-  max-height: 140px;
-  padding: 12px 18px;
-  font-size: 17px;
-  line-height: 1.4;
-  border-radius: 24px;
-  border: none;
-  background: white;
-  color: var(--text);
-  resize: none;
-  overflow-y: auto;
-  box-sizing: border-box;
-  outline: none;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-}
-
-#messageInput:focus {
-  box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.3);
-}
-
-#messageInput::placeholder {
-  color: #b0b0b0;
-}
-
-#sendBtn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  font-size: 22px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.3);
-}
-
-#sendBtn:active {
-  transform: scale(0.92);
-}
-
-/* ===== MOOD ORB — финальная рабочая версия ===== */
-#moodOrbContainer {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  z-index: 9999;
-  pointer-events: none;
-}
-
-.mood-orb-container {
-  pointer-events: auto;
-}
-
-.main-orb {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-  cursor: pointer;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
-
-.main-orb:active {
-  transform: scale(1.1);
-}
-
-.orb-options {
-  position: absolute;
-  bottom: 90px;
-  right: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  transform: translateY(30px);
-}
-
-.orb-options.expanded {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.orb {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  transition: transform 0.3s ease;
-}
-
-.orb:hover {
-  transform: scale(1.15);
-}
-
-/* Градиенты */
-.cozy    { background: linear-gradient(135deg, #ff9acb, #ff6b9d); }
-.night   { background: linear-gradient(135deg, #4a6fa1, #1e3a5f); }
-.lofi    { background: linear-gradient(135deg, #d9b99b, #b38b6d); }
-.chaotic { background: linear-gradient(135deg, #ff6b6b, #ff4757); }

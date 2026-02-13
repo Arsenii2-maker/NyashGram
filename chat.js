@@ -1,6 +1,4 @@
 let currentChat = null;
-let currentMood = 'cozy';
-
 const chatData = {};
 
 function openChat(contact) {
@@ -12,10 +10,7 @@ function openChat(contact) {
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;
   document.getElementById("chatAvatar").style.background = gradientFor(contact.name);
-
   renderMessages();
-
-  initMoodOrb();
 }
 
 function renderMessages() {
@@ -43,39 +38,4 @@ function sendMessage(text) {
   if (!text.trim()) return;
   chatData[currentChat].push({ from: "me", text });
   renderMessages();
-}
-
-// Mood orb
-function updateMainOrb() {
-  const orb = document.getElementById('mainMoodOrb');
-  if (!orb) return;
-
-  const emojis = { cozy: '💗', night: '🌙', lofi: '🎧', chaotic: '💥' };
-  orb.textContent = emojis[currentMood] || '💗';
-  orb.className = `main-orb ${currentMood}`;
-}
-
-function toggleOptions() {
-  const opts = document.getElementById('orbOptions');
-  if (opts) opts.classList.toggle('expanded');
-}
-
-function initMoodOrb() {
-  const orb = document.getElementById('mainMoodOrb');
-  if (!orb) return;
-
-  updateMainOrb();
-  orb.onclick = toggleOptions;
-
-  const opts = document.getElementById('orbOptions');
-  if (opts) {
-    opts.querySelectorAll('.orb').forEach(opt => {
-      opt.onclick = () => {
-        currentMood = opt.dataset.mood;
-        chatData[currentChat].mood = currentMood;
-        updateMainOrb();
-        toggleOptions();
-      };
-    });
-  }
 }

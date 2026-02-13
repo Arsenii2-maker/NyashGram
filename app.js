@@ -1,5 +1,3 @@
-alert("app.js запустился!");  // временно
-console.log("app.js успешно загрузился");
 // ---------- SCREENS ----------
 const screens = {
   login: document.getElementById("loginScreen"),
@@ -40,18 +38,35 @@ const loginInput = document.getElementById("loginInput");
 
 loginBtn.onclick = () => {
   const nick = loginInput.value.trim();
-  if (!nick) return;
+  if (!nick) return alert("Введите никнейм!");  // тест
 
   settings.name = nick;
   saveSettings();
   showScreen("contacts");
-  renderContacts();
+  if (typeof renderContacts === 'function') {
+    renderContacts();
+  } else {
+    alert("renderContacts не найдена!");
+  }
 };
 
+// Принудительно показываем логин при запуске (тест)
+console.log("Проверяем settings.name:", settings.name);
 if (settings.name) {
+  console.log("Есть имя — показываем контакты");
   showScreen("contacts");
-  renderContacts();
+  setTimeout(() => {
+    if (typeof renderContacts === 'function') {
+      renderContacts();
+    } else {
+      alert("renderContacts не загрузилась!");
+    }
+  }, 100);
+} else {
+  console.log("Имени нет — показываем логин");
+  showScreen("login");
 }
+
 
 // ---------- SETTINGS UI ----------
 document.getElementById("settingsBtn").onclick = () => {
@@ -113,3 +128,5 @@ document.querySelectorAll(".intro-buttons button")
   .forEach(btn => {
     btn.onclick = () => sendMessage(btn.textContent);
   });
+  // Добавь это в конец app.js (для теста)
+console.log("app.js дошёл до конца");

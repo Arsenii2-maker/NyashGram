@@ -13,12 +13,6 @@ const fixedChats = [
     name: "NyashHelp",
     status: "🩷 всегда на связи",
     avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)"
-  },
-  {
-    id: "nyashgpt",
-    name: "NyashGPT",
-    status: "🌍 в интернете",
-    avatar: "linear-gradient(135deg, #a78bfa, #7ab8ff)"
   }
 ];
 
@@ -31,10 +25,10 @@ function renderContacts() {
   const list = document.getElementById("contactsList");
   list.innerHTML = "";
 
-  // Фиксированные чаты
+  // NyashHelp всегда первый
   fixedChats.forEach(c => {
     const el = document.createElement("div");
-    el.className = "contact fixed";
+    el.className = "contact fixed nyashhelp";
     el.innerHTML = `
       <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}"></div>
       <div>

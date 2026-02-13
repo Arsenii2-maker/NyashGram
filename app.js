@@ -14,7 +14,7 @@ function showScreen(name) {
 // ---------- SETTINGS ----------
 const defaultSettings = {
   name: "",
-  theme: "pastel-pink",       // меняем на новую
+  theme: "pastel-pink",
   font: "system",
   avatar: ""
 };
@@ -48,14 +48,7 @@ loginBtn.onclick = () => {
 
 if (settings.name) {
   showScreen("contacts");
-  setTimeout(() => {
-    if (typeof renderContacts === 'function') {
-      renderContacts();
-    } else {
-      console.warn("renderContacts ещё не готова — подождём 100 мс");
-      setTimeout(renderContacts, 100); // повторная попытка
-    }
-  }, 50); // даём время скриптам загрузиться
+  renderContacts();
 }
 
 // ---------- SETTINGS UI ----------
@@ -107,65 +100,14 @@ document.getElementById("sendBtn").onclick = () => {
   input.value = "";
 };
 
-
+document.getElementById("messageInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    sendMessage(e.target.value);
+    e.target.value = "";
+  }
+});
 
 document.querySelectorAll(".intro-buttons button")
   .forEach(btn => {
     btn.onclick = () => sendMessage(btn.textContent);
   });
-  const messageInput = document.getElementById("messageInput");
-
-messageInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    //sendMessage(e.target.value);
-    //e.target.value = "";
-  }
-});
-// ------------------ АВАТАРКА ------------------
-const avatarInput = document.getElementById("avatarInput");
-const avatarPreview = document.getElementById("avatarPreview");
-
-// Функция для установки аватарки (base64 или градиент)
-function setAvatar(element, base64 = null) {
-  if (base64) {
-    element.style.backgroundImage = `url(${base64})`;
-    element.style.backgroundSize = "cover";
-    element.style.backgroundPosition = "center";
-  } else {
-    // твой градиент-фallback
-    const colors = ["#ff9acb", "#ffd6e8", "#c9f5e6", "#3fd2a2"];
-    const c1 = colors[Math.floor(Math.random() * colors.length)];
-    const c2 = colors[Math.floor(Math.random() * colors.length)];
-    element.style.backgroundImage = `linear-gradient(135deg, ${c1}, ${c2})`;
-  }
-}
-
-// При выборе файла
-if (avatarInput && avatarPreview) {
-  avatarInput.addEventListener("change", () => {
-    const file = avatarInput.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target.result;
-      settings.avatar = base64;
-      saveSettings();
-      setAvatar(avatarPreview, base64);
-      
-      // Можно сразу обновить другие места, если они есть
-      const myAvatarInContacts = document.getElementById("myAvatarInContacts");
-      if (myAvatarInContacts) setAvatar(myAvatarInContacts, base64);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// При загрузке страницы — показываем сохранённый или дефолт
-window.addEventListener("load", () => {
-  if (settings.avatar && avatarPreview) {
-    setAvatar(avatarPreview, settings.avatar);
-  } else if (avatarPreview) {
-    setAvatar(avatarPreview);
-  }
-});

@@ -13,6 +13,12 @@ const fixedChats = [
     name: "NyashHelp",
     status: "🩷 всегда на связи",
     avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)"
+  },
+  {
+    id: "nyashgpt",
+    name: "NyashGPT",
+    status: "🌍 в интернете",
+    avatar: "linear-gradient(135deg, #a78bfa, #7ab8ff)"
   }
 ];
 
@@ -25,7 +31,7 @@ function renderContacts() {
   const list = document.getElementById("contactsList");
   list.innerHTML = "";
 
-  // Сначала фиксированные чаты
+  // Фиксированные чаты
   fixedChats.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact fixed";
@@ -40,7 +46,7 @@ function renderContacts() {
     list.appendChild(el);
   });
 
-  // Потом обычные контакты
+  // Обычные контакты
   contacts.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact";

@@ -3,13 +3,12 @@ const chatData = {};
 
 // ==================== NYASHHELP ====================
 const nyashHelpResponses = {
-  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
+  "тема": "Чтобы сменить тему — зайди в Настройки → Тема 🩷",
   "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
   "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
   "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
   "mood": "Mood — это настроение чата! Тапни по orb внизу справа → выбирай вайб 💗🌙🎧💥",
   "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
-  "добавить": "Пока друзей добавлять нельзя, но скоро будет! Пока наслаждайся болтовнёй с NyashHelp 🩷",
   "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
 };
 
@@ -34,36 +33,37 @@ function getNyashHelpResponse(text) {
   if (text.includes("аватар") || text.includes("фото")) return nyashHelpResponses["аватар"];
   if (text.includes("сообщ") || text.includes("отправ")) return nyashHelpResponses["сообщение"];
   if (text.includes("mood") || text.includes("настроение")) return nyashHelpResponses["mood"];
-  if (text.includes("звук") || text.includes("звук")) return nyashHelpResponses["звук"];
-  if (text.includes("добавить") || text.includes("друга")) return nyashHelpResponses["добавить"];
+  if (text.includes("звук")) return nyashHelpResponses["звук"];
   return nyashHelpResponses["default"];
 }
 
-// ==================== NYASHGPT ====================
-const GEMINI_API_KEY = "AIzaSyCxwrtIx9r3t-EqgSuu-ZAP-VFoTbwU1K0"; // твой ключ уже вставлен
+// ==================== NYASHGPT (GROK) ====================
+const GROK_API_KEY = "gsk_вставь_только_для_локального_теста";
 
 async function getNyashGPTResponse(text) {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `Ты NyashGPT — милый, добрый и немного игривый ИИ-помощник. Отвечай мило, с эмодзи, на русском языке. Вопрос пользователя: ${text}`
-                }
-              ]
-            }
-          ]
-        })
-      }
-    );
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "grok-beta",
+        messages: [
+          {
+            role: "system",
+            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 800
+      })
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -71,14 +71,11 @@ async function getNyashGPTResponse(text) {
     }
 
     const data = await response.json();
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return data.candidates[0].content.parts[0].text.trim();
-    } else {
-      return "Ой... что-то пошло не так 😿 Попробуй ещё разок~";
-    }
+    return data.choices[0].message.content.trim();
+
   } catch (error) {
-    console.error("NyashGPT ошибка:", error);
-    return `Упс... ошибка: ${error.message} 😿 Попробуй позже или другой вопрос!`;
+    console.error("NyashGPT (Grok) ошибка:", error);
+    return "Упс... что-то пошло не так 😿 Попробуй позже или другой вопрос!";
   }
 }
 

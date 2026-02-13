@@ -1,3 +1,5 @@
+alert("app.js запустился!");  // временно
+console.log("app.js успешно загрузился");
 // ---------- SCREENS ----------
 const screens = {
   login: document.getElementById("loginScreen"),

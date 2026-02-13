@@ -6,6 +6,16 @@ const contacts = [
   { id: 5, name: "Night Chat", status: "offline" }
 ];
 
+// Фиксированные чаты (всегда сверху)
+const fixedChats = [
+  {
+    id: "nyashhelp",
+    name: "NyashHelp",
+    status: "🩷 всегда на связи",
+    avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)"
+  }
+];
+
 function gradientFor(name) {
   const hash = name.length * 77;
   return `linear-gradient(135deg, hsl(${hash},80%,75%), hsl(${hash+40},90%,85%))`;
@@ -15,6 +25,22 @@ function renderContacts() {
   const list = document.getElementById("contactsList");
   list.innerHTML = "";
 
+  // Сначала фиксированные чаты
+  fixedChats.forEach(c => {
+    const el = document.createElement("div");
+    el.className = "contact fixed";
+    el.innerHTML = `
+      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}"></div>
+      <div>
+        <div>${c.name}</div>
+        <div class="status">${c.status}</div>
+      </div>
+    `;
+    el.onclick = () => openChat(c);
+    list.appendChild(el);
+  });
+
+  // Потом обычные контакты
   contacts.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact";

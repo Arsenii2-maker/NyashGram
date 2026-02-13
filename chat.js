@@ -45,7 +45,7 @@ const GEMINI_API_KEY = "AIzaSyCxwrtIx9r3t-EqgSuu-ZAP-VFoTbwU1K0"; // твой к
 async function getNyashGPTResponse(text) {
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -66,7 +66,8 @@ async function getNyashGPTResponse(text) {
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP ошибка: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
@@ -77,7 +78,7 @@ async function getNyashGPTResponse(text) {
     }
   } catch (error) {
     console.error("NyashGPT ошибка:", error);
-    return "Упс... интернет шалит 😿 Попробуй позже!";
+    return `Упс... ошибка: ${error.message} 😿 Попробуй позже или другой вопрос!`;
   }
 }
 

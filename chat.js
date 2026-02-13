@@ -1,6 +1,44 @@
 let currentChat = null;
 const chatData = {};
 
+// ==================== NYASHHELP ====================
+const nyashHelpResponses = {
+  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
+  "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
+  "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
+  "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
+  "mood": "Mood — это настроение чата! Тапни по orb внизу справа и выбери вайб 💗🌙🎧💥",
+  "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
+  "как добавить": "Пока друзей добавлять нельзя, но скоро будет! Пока наслаждайся болтовнёй с NyashHelp 🩷",
+  "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
+};
+
+const nyashHelpQuickQuestions = [
+  "Как сменить тему?",
+  "Как поменять шрифт?",
+  "Как загрузить аватарку?",
+  "Как отправить сообщение?",
+  "Что такое mood?",
+  "Как включить звук?",
+  "Как добавить друга?"
+];
+
+function isNyashHelp() {
+  return currentChat === "nyashhelp";
+}
+
+function getNyashHelpResponse(text) {
+  text = text.toLowerCase();
+  if (text.includes("тема")) return nyashHelpResponses["тема"];
+  if (text.includes("шрифт")) return nyashHelpResponses["шрифт"];
+  if (text.includes("аватар")) return nyashHelpResponses["аватар"];
+  if (text.includes("сообщ")) return nyashHelpResponses["сообщение"];
+  if (text.includes("mood")) return nyashHelpResponses["mood"];
+  if (text.includes("звук")) return nyashHelpResponses["звук"];
+  if (text.includes("добавить")) return nyashHelpResponses["как добавить"];
+  return nyashHelpResponses["default"];
+}
+
 function openChat(contact) {
   currentChat = contact.id;
   if (!chatData[currentChat]) chatData[currentChat] = [];
@@ -11,6 +49,14 @@ function openChat(contact) {
   document.getElementById("chatStatus").textContent = contact.status;
   document.getElementById("chatAvatar").style.background = gradientFor(contact.name);
 
+  // Для NyashHelp — своё приветствие и панель вопросов
+  if (isNyashHelp()) {
+    chatData[currentChat].push({
+      from: "nyashhelp",
+      text: "Привет! Я NyashHelp 🩷 Спрашивай про приложение, я знаю всё-всё~ 💕"
+    });
+  }
+
   renderMessages();
 }
 
@@ -20,12 +66,32 @@ function renderMessages() {
 
   messages.innerHTML = "";
 
-  if (chatData[currentChat].length === 0) {
-    intro.style.display = "block";
-    return;
-  }
+  if (isNyashHelp()) {
+    intro.style.display = "none"; // скрываем стандартную панель
 
-  intro.style.display = "none";
+    // Своя панель быстрых вопросов для NyashHelp
+    const helpPanel = document.createElement("div");
+    helpPanel.className = "nyashhelp-quick";
+    helpPanel.innerHTML = `
+      <div class="intro-title">Частые вопросы 🩷</div>
+      <div class="intro-buttons nyashhelp-buttons"></div>
+    `;
+    messages.appendChild(helpPanel);
+
+    const buttonsContainer = helpPanel.querySelector(".nyashhelp-buttons");
+    nyashHelpQuickQuestions.forEach(q => {
+      const btn = document.createElement("button");
+      btn.textContent = q;
+      btn.onclick = () => {
+        sendMessage(q);
+      };
+      buttonsContainer.appendChild(btn);
+    });
+  } else if (chatData[currentChat].length === 0) {
+    intro.style.display = "block";
+  } else {
+    intro.style.display = "none";
+  }
 
   chatData[currentChat].forEach(m => {
     const el = document.createElement("div");
@@ -33,10 +99,22 @@ function renderMessages() {
     el.textContent = m.text;
     messages.appendChild(el);
   });
+
+  messages.scrollTop = messages.scrollHeight;
 }
 
 function sendMessage(text) {
   if (!text.trim()) return;
+
   chatData[currentChat].push({ from: "me", text });
+
+  if (isNyashHelp()) {
+    setTimeout(() => {
+      const response = getNyashHelpResponse(text);
+      chatData[currentChat].push({ from: "nyashhelp", text: response });
+      renderMessages();
+    }, 800);
+  }
+
   renderMessages();
 }

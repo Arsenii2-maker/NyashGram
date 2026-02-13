@@ -19,6 +19,12 @@ function renderMessages() {
 
   messages.innerHTML = "";
 
+  if (currentChat === "nyashhelp") {
+    intro.style.display = "none"; // скрываем стандартную панель в NyashHelp
+    // Здесь можно добавить свою карусель вопросов, если хочешь
+    return;
+  }
+
   if (chatData[currentChat].length === 0) {
     intro.style.display = "block";
     return;

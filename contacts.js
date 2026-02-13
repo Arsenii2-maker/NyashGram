@@ -6,13 +6,18 @@ const contacts = [
   { id: 5, name: "Night Chat", status: "offline" }
 ];
  
-// Фиксированные чаты (всегда сверху)
 const fixedChats = [
   {
     id: "nyashhelp",
     name: "NyashHelp",
     status: "🩷 всегда на связи",
     avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)"
+  },
+  {
+    id: "nyashgpt",
+    name: "NyashGPT",
+    status: "🌍 ИИ в интернете",
+    avatar: "linear-gradient(135deg, #a78bfa, #7ab8ff)"
   }
 ];
 

@@ -38,22 +38,22 @@ function getNyashHelpResponse(text) {
 }
 
 // ==================== NYASHGPT (DeepSeek) ====================
-const DEEPSEEK_API_KEY = "sk-1daeabf12ea842909222e28cfe1d9f8f"; // ← ВСТАВЬ СВОЙ НОВЫЙ КЛЮЧ СЮДА (sk-...)
+const DEEPSEEK_API_KEY = "sk-1daeabf12ea842909222e28cfe1d9f8f"; // ← ВСТАВЬ СВОЙ КЛЮЧ СЮДА (sk-...)
 
 async function getNyashGPTResponse(text) {
   try {
-    const response = await fetch("https://api.deepseek.com/chat/completions", {
+    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "deepseek-chat", // самая актуальная модель на 2026 год
         messages: [
           {
             role: "system",
-            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
+            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле. Никогда не пиши длинные стены текста."
           },
           {
             role: "user",
@@ -67,7 +67,8 @@ async function getNyashGPTResponse(text) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();

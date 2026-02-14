@@ -1,3 +1,4 @@
+> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
 let currentChat = null;
 const chatData = {};
 
@@ -49,16 +50,14 @@ async function getNyashGPTResponse(text) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": Bearer ${GROQ_API_KEY},
-        "Origin": "https://nyash-gram.vercel.app", // добавили для прокси
-        "X-Requested-With": "XMLHttpRequest"
+        "Authorization": Bearer ${GROQ_API_KEY}
       },
       body: JSON.stringify({
         model: "llama-3.1-70b-versatile",
         messages: [
           {
             role: "system",
-            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле. Коротко и мило."
+            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
           },
           {
             role: "user",
@@ -116,17 +115,16 @@ function openChat(contact) {
 
 // ==================== SENDMESSAGE ====================
 async function sendMessage(text) {
-  if (!text.
-
-> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
-trim()) return;
+  if (!text.trim()) return;
 
   chatData[currentChat].push({ from: "me", text });
   renderMessages();
 
   if (isNyashHelp()) {
     setTimeout(() => {
-      const response = getNyashHelpResponse(text);
+
+> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
+const response = getNyashHelpResponse(text);
       chatData[currentChat].push({ from: "nyashhelp", text: response });
       renderMessages();
     }, 800);
@@ -162,25 +160,4 @@ function renderMessages() {
     `;
     messages.appendChild(helpPanel);
 
-    const buttonsContainer = helpPanel.querySelector(".nyashhelp-buttons");
-    nyashHelpQuickQuestions.forEach(q => {
-      const btn = document.createElement("button");
-      btn.textContent = q;
-      btn.onclick = () => sendMessage(q);
-      buttonsContainer.appendChild(btn);
-    });
-  } else if (chatData[currentChat].length === 0) {
-    intro.style.display = "block";
-  } else {
-    intro.style.display = "none";
-  }
-
-  chatData[currentChat].forEach(m => {
-    const el = document.createElement("div");
-    el.className = message ${m.from};
-    el.textContent = m.text;
-    messages.appendChild(el);
-  });
-
-  messages.scrollTop = messages.scrollHeight;
-}
+    const buttonsContainer

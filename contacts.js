@@ -31,12 +31,12 @@ function renderContacts() {
   const list = document.getElementById("contactsList");
   list.innerHTML = "";
 
-  // Фиксированные чаты (NyashHelp и NyashTalk)
+  // Фиксированные чаты
   fixedChats.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact fixed";
     el.innerHTML = `
-      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}"></div>
+      <div class="avatar" style="background:${c.avatar}"></div>
       <div>
         <div>${c.name}</div>
         <div class="status">${c.status}</div>

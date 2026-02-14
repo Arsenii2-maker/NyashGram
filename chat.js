@@ -52,7 +52,7 @@ const nyashTalkTopics = [
       "Муррррр~ *трется об тебя* Ты самый милый хозяин! 💕"
     ]
   },
-  // Добавляй новые темы сюда
+  // добавляй новые темы сюда
 ];
 
 function isNyashHelp() {
@@ -99,14 +99,15 @@ function openChat(contact) {
 
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;
-  document.getElementById("chatAvatar").style.background = gradientFor(contact.name);
+  document.getElementById("chatAvatar").style.background = contact.avatar || gradientFor(contact.name);
 
-  if (isNyashHelp()) {
+  // Приветствие только один раз
+  if (isNyashHelp() && chatData[currentChat].length === 0) {
     chatData[currentChat].push({
       from: "nyashhelp",
       text: "Привет! Я NyashHelp 🩷 Спрашивай про приложение, я знаю всё-всё~ 💕"
     });
-  } else if (isNyashTalk()) {
+  } else if (isNyashTalk() && chatData[currentChat].length === 0) {
     chatData[currentChat].push({
       from: "nyashtalk",
       text: "Приветик! Я NyashTalk 🌸 Давай поболтаем о чём угодно милом~ Выбирай тему или просто пиши! 💕"
@@ -145,7 +146,6 @@ function renderMessages() {
   const messages = document.getElementById("messages");
   const intro = document.getElementById("chatIntro");
 
-  // Очищаем сообщения
   messages.innerHTML = "";
 
   // Скрываем стандартную панель для NyashHelp и NyashTalk
@@ -171,7 +171,7 @@ function renderMessages() {
     nyashHelpQuickQuestions.forEach(q => {
       const btn = document.createElement("button");
       btn.textContent = q;
-      btn.onclick = () => sendMessage(q);
+      btn.addEventListener("click", () => sendMessage(q));
       buttonsContainer.appendChild(btn);
     });
   }
@@ -188,20 +188,19 @@ function renderMessages() {
 
     const buttonsContainer = talkPanel.querySelector(".nyashtalk-buttons");
     nyashTalkTopics.forEach(topic => {
-      if (topic.keys.length > 0) { // пропускаем fallback
+      if (topic.keys.length > 0) {
         const btn = document.createElement("button");
         btn.textContent = topic.title;
-        btn.onclick = () => {
-          // Отправляем случайное сообщение из темы
+        btn.addEventListener("click", () => {
           const randomMsg = topic.quickMessages[Math.floor(Math.random() * topic.quickMessages.length)];
           sendMessage(randomMsg);
-        };
+        });
         buttonsContainer.appendChild(btn);
       }
     });
   }
 
-  // Отрисовываем сообщения
+  // Отрисовка сообщений
   chatData[currentChat].forEach(m => {
     const el = document.createElement("div");
     el.className = `message ${m.from}`;

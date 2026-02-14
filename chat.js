@@ -42,7 +42,7 @@ const DEEPSEEK_API_KEY = "sk-1daeabf12ea842909222e28cfe1d9f8f"; // ← ВСТА�
 
 async function getNyashGPTResponse(text) {
   try {
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    //const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,14 +68,14 @@ async function getNyashGPTResponse(text) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      //throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
     return data.choices[0].message.content.trim();
 
   } catch (error) {
-    console.error("NyashGPT (DeepSeek) ошибка:", error);
+    //console.error("NyashGPT (DeepSeek) ошибка:", error);
     return "Упс... что-то пошло не так 😿 Попробуй позже или другой вопрос!";
   }
 }
@@ -130,7 +130,7 @@ async function sendMessage(text) {
     chatData[currentChat].push(loadingMsg);
     renderMessages();
 
-    const response = await getNyashGPTResponse(text);
+    //const response = await getNyashGPTResponse(text);
     chatData[currentChat].pop(); // убираем "Думаю..."
     chatData[currentChat].push({ from: "nyashgpt", text: response });
     renderMessages();

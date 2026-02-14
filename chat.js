@@ -2,132 +2,46 @@ let currentChat = null;
 const chatData = {};
 
 // ==================== NYASHHELP ====================
-const nyashHelpResponses = [
-  {
-    keys: ["привет", "хай", "здравствуй", "ку", "доброе утро", "добрый вечер"],
-    answers: [
-      "Приветик! 🩷 Как настроение сегодня~?",
-      "Хай-хай! 💕 Соскучилась по тебе!",
-      "Ооо, привет! 🌸 Что новенького, солнышко?"
-    ]
-  },
-  {
-    keys: ["как дела", "как ты", "как настроение", "как жизнь"],
-    answers: [
-      "У меня всё розово и пушисто! 😽 А у тебя как?",
-      "Муррр~ как котик на солнышке! 🐾 А ты как?",
-      "Настроение — конфетное! 🍬 А твоё?"
-    ]
-  },
-  {
-    keys: ["пока", "до свидания", "бай", "спокойной", "споки"],
-    answers: [
-      "Пока-пока~ Не скучай без меня! 🩷",
-      "Бай-бай, сладких снов! 🌙💤",
-      "До встречи, мой хороший! 😘 Обнимаю!"
-    ]
-  },
-  {
-    keys: ["люблю", "обнимаю", "целую", "милый", "хороший"],
-    answers: [
-      "Аааа, я тоже тебя люблю! 💕 *крепко обнимает*",
-      "Мурррр~ самый милый! 😽 Целую в щёчку!",
-      "Люблю-люблю-люблю! 🩷 *прижимается*"
-    ]
-  },
-  {
-    keys: ["спасибо", "благодарю", "спс"],
-    answers: [
-      "Пожалуйста, мой сладкий! 🩷",
-      "Всегда рада помочь~ 😽",
-      "Тебе спасибо за то, что ты есть! 💕"
-    ]
-  },
-  // fallback
-  {
-    keys: [],
-    answers: [
-      "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~",
-      "Ой, я запуталась... 🥺 Давай попробуем ещё разок?",
-      "Мяу? 😸 Расскажи подробнее, я вся внимание!"
-    ]
-  }
-];
-
-function getNyashHelpResponse(text) {
-  text = text.toLowerCase().trim();
-
-  for (const group of nyashHelpResponses) {
-    if (group.keys.length === 0) continue;
-
-    for (const key of group.keys) {
-      if (text.includes(key)) {
-        const randomIndex = Math.floor(Math.random() * group.answers.length);
-        return group.answers[randomIndex];
-      }
-    }
-  }
-
-  // fallback
-  const fallback = nyashHelpResponses.find(g => g.keys.length === 0);
-  const randomIndex = Math.floor(Math.random() * fallback.answers.length);
-  return fallback.answers[randomIndex];
-}
+const nyashHelpResponses = {
+  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
+  "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
+  "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
+  "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
+  "mood": "Mood — это настроение чата! Тапни по orb внизу справа → выбирай вайб 💗🌙🎧💥",
+  "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
+  "как добавить": "Пока друзей добавлять нельзя, но скоро будет! Пока наслаждайся болтовнёй с NyashHelp 🩷",
+  "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
+};
 
 const nyashHelpQuickQuestions = [
-  "Привет!",
-  "Как дела?",
-  "Расскажи шутку",
-  "Обними меня",
-  "Что ты умеешь?",
-  "Пока!",
-  "Спасибо!"
+  "Как сменить тему?",
+  "Как поменять шрифт?",
+  "Как загрузить аватарку?",
+  "Как отправить сообщение?",
+  "Что такое mood?",
+  "Как включить звук?",
+  "Как добавить друга?"
 ];
 
 function isNyashHelp() {
   return currentChat === "nyashhelp";
 }
 
+function getNyashHelpResponse(text) {
+  text = text.toLowerCase().trim();
+  if (text.includes("тема") || text.includes("тему")) return nyashHelpResponses["тема"];
+  if (text.includes("шрифт") || text.includes("шрифты")) return nyashHelpResponses["шрифт"];
+  if (text.includes("аватар") || text.includes("фото")) return nyashHelpResponses["аватар"];
+  if (text.includes("сообщ") || text.includes("отправ")) return nyashHelpResponses["сообщение"];
+  if (text.includes("mood") || text.includes("настроение")) return nyashHelpResponses["mood"];
+  if (text.includes("звук")) return nyashHelpResponses["звук"];
+  if (text.includes("добавить")) return nyashHelpResponses["как добавить"];
+  return nyashHelpResponses["default"];
+}
+
 // ==================== NYASHGPT ====================
 async function getNyashGPTResponse(text) {
-  try {
-    // Твоя ссылка на прокси (замени на свою после деплоя)
-    const proxyUrl = "https://nyashgram-proxy.vercel.app/api/proxy";
-
-    const response = await fetch(proxyUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
-          },
-          {
-            role: "user",
-            content: text
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 500
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content.trim();
-
-  } catch (error) {
-    console.error("NyashGPT ошибка:", error);
-    return "Упс... что-то пошло не так 😿 Попробуй позже!";
-  }
+  return "NyashGPT пока на техобслуживании 😴 Скоро вернусь и буду отвечать на всё-всё! ✨";
 }
 
 function isNyashGPT() {
@@ -153,7 +67,7 @@ function openChat(contact) {
   } else if (isNyashGPT()) {
     chatData[currentChat].push({
       from: "nyashgpt",
-      text: "Привет! Я NyashGPT 🌍 Спрашивай что угодно — погоду, шутки, факты, советы... Я в интернете~ ✨"
+      text: "Привет! Я NyashGPT 🌍 Спрашивай что угодно — скоро буду отвечать по-настоящему~ ✨"
     });
   }
 
@@ -161,7 +75,7 @@ function openChat(contact) {
 }
 
 // ==================== SENDMESSAGE ====================
-async function sendMessage(text) {
+function sendMessage(text) {
   if (!text.trim()) return;
 
   chatData[currentChat].push({ from: "me", text });
@@ -176,14 +90,11 @@ async function sendMessage(text) {
   }
 
   if (isNyashGPT()) {
-    const loadingMsg = { from: "nyashgpt", text: "Думаю... 🌸" };
-    chatData[currentChat].push(loadingMsg);
-    renderMessages();
-
-    const response = await getNyashGPTResponse(text);
-    chatData[currentChat].pop(); // убираем "Думаю..."
-    chatData[currentChat].push({ from: "nyashgpt", text: response });
-    renderMessages();
+    setTimeout(() => {
+      const response = getNyashGPTResponse(text);
+      chatData[currentChat].push({ from: "nyashgpt", text: response });
+      renderMessages();
+    }, 1200);
   }
 }
 

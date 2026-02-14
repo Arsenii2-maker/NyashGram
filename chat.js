@@ -38,7 +38,7 @@ function getNyashHelpResponse(text) {
 }
 
 // ==================== NYASHGPT (Groq) ====================
-
+const GROQ_API_KEY = "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"; // ← ВСТАВЬ СВОЙ КЛЮЧ ОТ GROQ СЮДА (gsk_...)
 
 async function getNyashGPTResponse(text) {
   try {

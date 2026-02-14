@@ -46,7 +46,7 @@ async function getNyashGPTResponse(text) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROK_API_KEY}`
+        "Authorization": "Bearer gsk_твой_ключ_без_пробелов_и_символов"
       },
       body: JSON.stringify({
         model: "grok-beta",
@@ -66,8 +66,7 @@ async function getNyashGPTResponse(text) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     const data = await response.json();
@@ -75,7 +74,7 @@ async function getNyashGPTResponse(text) {
 
   } catch (error) {
     console.error("NyashGPT (Grok) ошибка:", error);
-    return "Упс... что-то пошло не так 😿 Попробуй позже или другой вопрос!";
+    return "Упс... что-то пошло не так 😿 Попробуй позже!";
   }
 }
 

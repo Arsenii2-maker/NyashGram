@@ -1,4 +1,3 @@
-> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
 let currentChat = null;
 const chatData = {};
 

@@ -41,7 +41,44 @@ function getNyashHelpResponse(text) {
 
 // ==================== NYASHGPT ====================
 async function getNyashGPTResponse(text) {
-  return "NyashGPT пока на техобслуживании 😴 Скоро вернусь и буду отвечать на всё-всё! ✨";
+  try {
+    // ← ВСТАВЬ СВОЮ ССЫЛКУ НА ПРОКСИ ОТ VERCEL
+    const proxyUrl = "https://nyashgram-proxy.vercel.app/api/proxy"; // ← измени на свою реальную
+
+    const response = await fetch(proxyUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 500
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+
+  } catch (error) {
+    console.error("NyashGPT ошибка:", error);
+    return "Упс... что-то пошло не так 😿 Попробуй позже!";
+  }
 }
 
 function isNyashGPT() {
@@ -67,7 +104,7 @@ function openChat(contact) {
   } else if (isNyashGPT()) {
     chatData[currentChat].push({
       from: "nyashgpt",
-      text: "Привет! Я NyashGPT 🌍 Спрашивай что угодно — скоро буду отвечать по-настоящему~ ✨"
+      text: "Привет! Я NyashGPT 🌍 Спрашивай что угодно — погоду, шутки, факты, советы... Я в интернете~ ✨"
     });
   }
 
@@ -75,7 +112,7 @@ function openChat(contact) {
 }
 
 // ==================== SENDMESSAGE ====================
-function sendMessage(text) {
+async function sendMessage(text) {
   if (!text.trim()) return;
 
   chatData[currentChat].push({ from: "me", text });
@@ -90,11 +127,14 @@ function sendMessage(text) {
   }
 
   if (isNyashGPT()) {
-    setTimeout(() => {
-      const response = getNyashGPTResponse(text);
-      chatData[currentChat].push({ from: "nyashgpt", text: response });
-      renderMessages();
-    }, 1200);
+    const loadingMsg = { from: "nyashgpt", text: "Думаю... 🌸" };
+    chatData[currentChat].push(loadingMsg);
+    renderMessages();
+
+    const response = await getNyashGPTResponse(text);
+    chatData[currentChat].pop(); // убираем "Думаю..."
+    chatData[currentChat].push({ from: "nyashgpt", text: response });
+    renderMessages();
   }
 }
 

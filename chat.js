@@ -50,7 +50,7 @@ async function getNyashGPTResponse(text) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer gsk_твой_ключ_от_Groq" // ← вставь ключ здесь
+        "Authorization": "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" // ← вставь ключ здесь
       },
       body: JSON.stringify({
         model: "llama-3.1-70b-versatile",

@@ -10,7 +10,7 @@ const nyashHelpResponses = {
   "mood": "Mood — это настроение чата! Тапни по orb внизу справа → выбирай вайб 💗🌙🎧💥",
   "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
   "как добавить": "Пока друзей добавлять нельзя, но скоро будет! Пока наслаждайся болтовнёй с NyashHelp 🩷",
-  "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
+  "default": "Хмм... не совсем понял 😿 Спроси по-другому или выбери вопрос ниже~"
 };
 
 const nyashHelpQuickQuestions = [
@@ -76,8 +76,7 @@ const nyashTalkTopics = [
     responses: [
       "Люблю все милые аниме про школу и любовь~ 💕 А ты что смотришь?",
       "Новое аниме? Обязательно посмотрю! 😻 Что посоветуешь?",
-      "Рекомендую 'Kimi no Na wa' — очень трогательно! 🌟"
-    ]
+      "Рекомендую 'Kimi no Na wa' — очень трогательно! 🌟    ]
   },
   {
     title: "О музыке 🎧",
@@ -134,121 +133,3 @@ function getNyashTalkResponse(text) {
 
 // ==================== OPENCHAT ====================
 function openChat(contact) {
-  currentChat = contact.id;
-  if (!chatData[currentChat]) chatData[currentChat] = [];
-
-  showScreen("chat");
-
-  document.getElementById("chatName").textContent = contact.name;
-  document.getElementById("chatStatus").textContent = contact.status;
-  document.getElementById("chatAvatar").style.background = contact.avatar || gradientFor(contact.name);
-
-  // Приветствие только один раз
-  if (isNyashHelp() && chatData[currentChat].length === 0) {
-    chatData[currentChat].push({
-      from: "nyashhelp",
-      text: "Привет! Я NyashHelp 🩷 Спрашивай про приложение, я знаю всё-всё~ 💕"
-    });
-  } else if (isNyashTalk() && chatData[currentChat].length === 0) {
-    chatData[currentChat].push({
-      from: "nyashtalk",
-      text: "Приветик! Я NyashTalk 🌸 Давай поболтаем о чём угодно милом~ Выбирай тему или просто пиши! 💕"
-    });
-  }
-
-  renderMessages();
-}
-
-// ==================== SENDMESSAGE ====================
-function sendMessage(text) {
-  if (!text.trim()) return;
-
-  chatData[currentChat].push({ from: "me", text });
-  renderMessages();
-
-  if (isNyashHelp()) {
-    setTimeout(() => {
-      const response = getNyashHelpResponse(text);
-      chatData[currentChat].push({ from: "nyashhelp", text: response });
-      renderMessages();
-    }, 800);
-  }
-
-  if (isNyashTalk()) {
-    setTimeout(() => {
-      const response = getNyashTalkResponse(text);
-      chatData[currentChat].push({ from: "nyashtalk", text: response });
-      renderMessages();
-    }, 800);
-  }
-}
-
-// ==================== RENDERMESSAGES ====================
-function renderMessages() {
-  const messages = document.getElementById("messages");
-  const intro = document.getElementById("chatIntro");
-
-  messages.innerHTML = "";
-
-  // Скрываем стандартную панель для NyashHelp и NyashTalk
-  if (isNyashHelp() || isNyashTalk()) {
-    intro.style.display = "none";
-  } else if (chatData[currentChat].length === 0) {
-    intro.style.display = "block";
-  } else {
-    intro.style.display = "none";
-  }
-
-  // Панель для NyashHelp
-  if (isNyashHelp()) {
-    const helpPanel = document.createElement("div");
-    helpPanel.className = "nyashhelp-quick";
-    helpPanel.innerHTML = `
-      <div class="intro-title">Частые вопросы 🩷</div>
-      <div class="intro-buttons nyashhelp-buttons"></div>
-    `;
-    messages.appendChild(helpPanel);
-
-    const buttonsContainer = helpPanel.querySelector(".nyashhelp-buttons");
-    nyashHelpQuickQuestions.forEach(q => {
-      const btn = document.createElement("button");
-      btn.textContent = q;
-      btn.addEventListener("click", () => sendMessage(q));
-      buttonsContainer.appendChild(btn);
-    });
-  }
-
-  // Панель для NyashTalk — теперь точно есть и работает
-  if (isNyashTalk()) {
-    const talkPanel = document.createElement("div");
-    talkPanel.className = "nyashtalk-quick";
-    talkPanel.innerHTML = `
-      <div class="intro-title">Выбери тему разговора 💕</div>
-      <div class="intro-buttons nyashtalk-buttons"></div>
-    `;
-    messages.appendChild(talkPanel);
-
-    const buttonsContainer = talkPanel.querySelector(".nyashtalk-buttons");
-    nyashTalkTopics.forEach(topic => {
-      if (topic.keys.length > 0) { // только темы с quickMessages
-        const btn = document.createElement("button");
-        btn.textContent = topic.title;
-        btn.addEventListener("click", () => {
-          const randomMsg = topic.quickMessages[Math.floor(Math.random() * topic.quickMessages.length)];
-          sendMessage(randomMsg);
-        });
-        buttonsContainer.appendChild(btn);
-      }
-    });
-  }
-
-  // Отрисовка сообщений
-  chatData[currentChat].forEach(m => {
-    const el = document.createElement("div");
-    el.className = `message ${m.from}`;
-    el.textContent = m.text;
-    messages.appendChild(el);
-  });
-
-  messages.scrollTop = messages.scrollHeight;
-}

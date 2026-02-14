@@ -38,22 +38,26 @@ function getNyashHelpResponse(text) {
 }
 
 // ==================== NYASHGPT (Groq) ====================
-const GROQ_API_KEY = "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"; // ← ВСТАВЬ СВОЙ КЛЮЧ ОТ GROQ СЮДА (gsk_...)
+
 
 async function getNyashGPTResponse(text) {
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    // Публичный прокси для Groq (бесплатный, работает в браузере)
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    const groqUrl = "https://api.groq.com/openai/v1/chat/completions";
+
+    const response = await fetch(proxyUrl + groqUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`
+        "Authorization": "Bearer gsk_твой_ключ_от_Groq" // ← вставь ключ здесь
       },
       body: JSON.stringify({
-        model: "llama-3.1-70b-versatile", // самая мощная бесплатная модель Groq
+        model: "llama-3.1-70b-versatile",
         messages: [
           {
             role: "system",
-            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле. Никогда не пиши длинные стены текста."
+            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
           },
           {
             role: "user",
@@ -66,16 +70,15 @@ async function getNyashGPTResponse(text) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     const data = await response.json();
     return data.choices[0].message.content.trim();
 
   } catch (error) {
-    console.error("NyashGPT (Groq) ошибка:", error);
-    return "Упс... что-то пошло не так 😿 Попробуй позже или другой вопрос!";
+    console.error("NyashGPT ошибка:", error);
+    return "Упс... что-то пошло не так 😿 Попробуй позже!";
   }
 }
 

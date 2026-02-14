@@ -43,7 +43,7 @@ function getNyashHelpResponse(text) {
 async function getNyashGPTResponse(text) {
   try {
     // ← ВСТАВЬ СВОЮ ССЫЛКУ НА ПРОКСИ ОТ VERCEL
-    const proxyUrl = "https://nyashgram-proxy.vercel.app/api/proxy"; // ← измени на свою реальную
+    const proxyUrl = "https://vercel.com/nyashiks-projects?repo=https://github.com/Arsenii2-maker/nyashgram-proxy"; // ← измени на свою реальную
 
     const response = await fetch(proxyUrl, {
       method: "POST",

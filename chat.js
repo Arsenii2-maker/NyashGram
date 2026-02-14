@@ -3,7 +3,7 @@ const chatData = {};
 
 // ==================== NYASHHELP ====================
 const nyashHelpResponses = {
-  "тема": "Чтобы сменить тему — зайди в Настройки → Тема 🩷",
+  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
   "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
   "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
   "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
@@ -37,19 +37,19 @@ function getNyashHelpResponse(text) {
   return nyashHelpResponses["default"];
 }
 
-// ==================== NYASHGPT (GROK) ====================
-const GROK_API_KEY = "gsk_вставь_только_для_локального_теста";
+// ==================== NYASHGPT (DeepSeek) ====================
+const DEEPSEEK_API_KEY = "sk-1daeabf12ea842909222e28cfe1d9f8f"; // ← ВСТАВЬ СВОЙ НОВЫЙ КЛЮЧ СЮДА (sk-...)
 
 async function getNyashGPTResponse(text) {
   try {
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+    const response = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer gsk_твой_ключ_без_пробелов_и_символов"
+        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify({
-        model: "grok-beta",
+        model: "deepseek-chat",
         messages: [
           {
             role: "system",
@@ -61,7 +61,8 @@ async function getNyashGPTResponse(text) {
           }
         ],
         temperature: 0.8,
-        max_tokens: 800
+        max_tokens: 800,
+        stream: false
       })
     });
 
@@ -73,8 +74,8 @@ async function getNyashGPTResponse(text) {
     return data.choices[0].message.content.trim();
 
   } catch (error) {
-    console.error("NyashGPT (Grok) ошибка:", error);
-    return "Упс... что-то пошло не так 😿 Попробуй позже!";
+    console.error("NyashGPT (DeepSeek) ошибка:", error);
+    return "Упс... что-то пошло не так 😿 Попробуй позже или другой вопрос!";
   }
 }
 

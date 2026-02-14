@@ -2,54 +2,102 @@ let currentChat = null;
 const chatData = {};
 
 // ==================== NYASHHELP ====================
-const nyashHelpResponses = {
-  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
-  "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
-  "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
-  "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
-  "mood": "Mood — это настроение чата! Тапни по orb внизу справа → выбирай вайб 💗🌙🎧💥",
-  "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
-  "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
-};
+const nyashHelpResponses = [
+  {
+    keys: ["привет", "хай", "здравствуй", "ку", "доброе утро", "добрый вечер"],
+    answers: [
+      "Приветик! 🩷 Как настроение сегодня~?",
+      "Хай-хай! 💕 Соскучилась по тебе!",
+      "Ооо, привет! 🌸 Что новенького, солнышко?"
+    ]
+  },
+  {
+    keys: ["как дела", "как ты", "как настроение", "как жизнь"],
+    answers: [
+      "У меня всё розово и пушисто! 😽 А у тебя как?",
+      "Муррр~ как котик на солнышке! 🐾 А ты как?",
+      "Настроение — конфетное! 🍬 А твоё?"
+    ]
+  },
+  {
+    keys: ["пока", "до свидания", "бай", "спокойной", "споки"],
+    answers: [
+      "Пока-пока~ Не скучай без меня! 🩷",
+      "Бай-бай, сладких снов! 🌙💤",
+      "До встречи, мой хороший! 😘 Обнимаю!"
+    ]
+  },
+  {
+    keys: ["люблю", "обнимаю", "целую", "милый", "хороший"],
+    answers: [
+      "Аааа, я тоже тебя люблю! 💕 *крепко обнимает*",
+      "Мурррр~ самый милый! 😽 Целую в щёчку!",
+      "Люблю-люблю-люблю! 🩷 *прижимается*"
+    ]
+  },
+  {
+    keys: ["спасибо", "благодарю", "спс"],
+    answers: [
+      "Пожалуйста, мой сладкий! 🩷",
+      "Всегда рада помочь~ 😽",
+      "Тебе спасибо за то, что ты есть! 💕"
+    ]
+  },
+  // fallback
+  {
+    keys: [],
+    answers: [
+      "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~",
+      "Ой, я запуталась... 🥺 Давай попробуем ещё разок?",
+      "Мяу? 😸 Расскажи подробнее, я вся внимание!"
+    ]
+  }
+];
+
+function getNyashHelpResponse(text) {
+  text = text.toLowerCase().trim();
+
+  for (const group of nyashHelpResponses) {
+    if (group.keys.length === 0) continue;
+
+    for (const key of group.keys) {
+      if (text.includes(key)) {
+        const randomIndex = Math.floor(Math.random() * group.answers.length);
+        return group.answers[randomIndex];
+      }
+    }
+  }
+
+  // fallback
+  const fallback = nyashHelpResponses.find(g => g.keys.length === 0);
+  const randomIndex = Math.floor(Math.random() * fallback.answers.length);
+  return fallback.answers[randomIndex];
+}
 
 const nyashHelpQuickQuestions = [
-  "Как сменить тему?",
-  "Как поменять шрифт?",
-  "Как загрузить аватарку?",
-  "Как отправить сообщение?",
-  "Что такое mood?",
-  "Как включить звук?",
-  "Как добавить друга?"
+  "Привет!",
+  "Как дела?",
+  "Расскажи шутку",
+  "Обними меня",
+  "Что ты умеешь?",
+  "Пока!",
+  "Спасибо!"
 ];
 
 function isNyashHelp() {
   return currentChat === "nyashhelp";
 }
 
-function getNyashHelpResponse(text) {
-  text = text.toLowerCase().trim();
-  if (text.includes("тема") || text.includes("тему")) return nyashHelpResponses["тема"];
-  if (text.includes("шрифт") || text.includes("шрифты")) return nyashHelpResponses["шрифт"];
-  if (text.includes("аватар") || text.includes("фото")) return nyashHelpResponses["аватар"];
-  if (text.includes("сообщ") || text.includes("отправ")) return nyashHelpResponses["сообщение"];
-  if (text.includes("mood") || text.includes("настроение")) return nyashHelpResponses["mood"];
-  if (text.includes("звук")) return nyashHelpResponses["звук"];
-  return nyashHelpResponses["default"];
-}
-
-// ==================== NYASHGPT (Groq) ====================
-const GROQ_API_KEY = "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"; // ← ВСТАВЬ СВОЙ КЛЮЧ СЮДА
-
+// ==================== NYASHGPT ====================
 async function getNyashGPTResponse(text) {
   try {
-    const proxyUrl = "https://api.allorigins.win/raw?url=";
-    const groqUrl = "https://api.groq.com/openai/v1/chat/completions";
+    // Твоя ссылка на прокси (замени на свою после деплоя)
+    const proxyUrl = "https://nyashgram-proxy.vercel.app/api/proxy";
 
-    const response = await fetch(proxyUrl + groqUrl, {
+    const response = await fetch(proxyUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": Bearer ${GROQ_API_KEY}
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "llama-3.1-70b-versatile",
@@ -77,7 +125,7 @@ async function getNyashGPTResponse(text) {
     return data.choices[0].message.content.trim();
 
   } catch (error) {
-    console.error("NyashGPT (Groq) ошибка:", error);
+    console.error("NyashGPT ошибка:", error);
     return "Упс... что-то пошло не так 😿 Попробуй позже!";
   }
 }
@@ -121,9 +169,7 @@ async function sendMessage(text) {
 
   if (isNyashHelp()) {
     setTimeout(() => {
-
-> ♡⊹₊⟡⋆няɯиᴋ⊹₊⟡⋆♡:
-const response = getNyashHelpResponse(text);
+      const response = getNyashHelpResponse(text);
       chatData[currentChat].push({ from: "nyashhelp", text: response });
       renderMessages();
     }, 800);
@@ -159,4 +205,25 @@ function renderMessages() {
     `;
     messages.appendChild(helpPanel);
 
-    const buttonsContainer
+    const buttonsContainer = helpPanel.querySelector(".nyashhelp-buttons");
+    nyashHelpQuickQuestions.forEach(q => {
+      const btn = document.createElement("button");
+      btn.textContent = q;
+      btn.onclick = () => sendMessage(q);
+      buttonsContainer.appendChild(btn);
+    });
+  } else if (chatData[currentChat].length === 0) {
+    intro.style.display = "block";
+  } else {
+    intro.style.display = "none";
+  }
+
+  chatData[currentChat].forEach(m => {
+    const el = document.createElement("div");
+    el.className = `message ${m.from}`;
+    el.textContent = m.text;
+    messages.appendChild(el);
+  });
+
+  messages.scrollTop = messages.scrollHeight;
+}

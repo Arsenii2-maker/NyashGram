@@ -37,19 +37,19 @@ function getNyashHelpResponse(text) {
   return nyashHelpResponses["default"];
 }
 
-// ==================== NYASHGPT (DeepSeek) ====================
-const DEEPSEEK_API_KEY = "sk-1daeabf12ea842909222e28cfe1d9f8f"; // ← ВСТАВЬ СВОЙ КЛЮЧ СЮДА (sk-...)
+// ==================== NYASHGPT (Groq) ====================
+
 
 async function getNyashGPTResponse(text) {
   try {
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+        "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek-chat", // самая актуальная модель на 2026 год
+        model: "llama-3.1-70b-versatile", // самая мощная бесплатная модель Groq
         messages: [
           {
             role: "system",
@@ -61,8 +61,7 @@ async function getNyashGPTResponse(text) {
           }
         ],
         temperature: 0.8,
-        max_tokens: 800,
-        stream: false
+        max_tokens: 800
       })
     });
 
@@ -75,7 +74,7 @@ async function getNyashGPTResponse(text) {
     return data.choices[0].message.content.trim();
 
   } catch (error) {
-    console.error("NyashGPT (DeepSeek) ошибка:", error);
+    console.error("NyashGPT (Groq) ошибка:", error);
     return "Упс... что-то пошло не так 😿 Попробуй позже или другой вопрос!";
   }
 }

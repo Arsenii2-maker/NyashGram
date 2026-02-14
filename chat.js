@@ -1,88 +1,84 @@
 let currentChat = null;
 const chatData = {};
 
-// ==================== NYASHHELP ====================
-const nyashHelpResponses = {
-  "тема": "Чтобы сменить тему — зайди в Настройки → Тема и выбери любую! 🩷",
-  "шрифт": "Шрифты меняются в Настройках → Шрифт. Самые милые — Cozy и Rounded~",
-  "аватар": "Загрузи аватарку в Настройках → Аватарка. Любая фотка из галереи подойдёт!",
-  "сообщение": "Пиши в поле внизу и жми ➤! Enter тоже отправляет~",
-  "mood": "Mood — это настроение чата! Тапни по orb внизу справа → выбирай вайб 💗🌙🎧💥",
-  "звук": "Звуки зависят от mood. Если тихо — проверь настройки телефона!",
-  "как добавить": "Пока друзей добавлять нельзя, но скоро будет! Пока наслаждайся болтовнёй с NyashHelp 🩷",
-  "default": "Хмм... не совсем поняла 😿 Спроси по-другому или выбери вопрос ниже~"
-};
-
-const nyashHelpQuickQuestions = [
-  "Как сменить тему?",
-  "Как поменять шрифт?",
-  "Как загрузить аватарку?",
-  "Как отправить сообщение?",
-  "Что такое mood?",
-  "Как включить звук?",
-  "Как добавить друга?"
+// ==================== NYASHTALK ====================
+const nyashTalkTopics = [
+  {
+    title: "О погоде ☁️",
+    quickMessages: ["Какая сегодня погода?", "Люблю дождь!", "Солнце или снег?"],
+    responses: [
+      "Ой, сейчас такое солнышко! 🌞 А ты где гуляешь?",
+      "Дождик моросит, уютно~ ☔ Хочешь под зонтиком поболтать?",
+      "Снежок падает, как в сказке! ❄️ Обнимаю тебя тёплым шарфом~ 🧣"
+    ]
+  },
+  {
+    title: "О настроении 💗",
+    quickMessages: ["Какой у тебя вайб?", "Сегодня грустно", "Я счастлив!"],
+    responses: [
+      "Моё настроение — розовое и пушистое, потому что ты здесь! 🩷 А твоё?",
+      "Ой, грустинка? Давай я тебя обниму и всё пройдёт~ 🤗",
+      "Счастье! 💕 Это заразно, теперь и у меня тоже~ 😽"
+    ]
+  },
+  {
+    title: "О котиках 🐱",
+    quickMessages: ["Покажи котика", "Люблю кошек!", "Мяу~"],
+    responses: [
+      "Мяу-мяу! 😸 Вот тебе виртуальный котик на коленки~",
+      "Котики — это жизнь! 🐾 Какой твой любимый? Пушистый или лысый?",
+      "Муррррр~ *трется об тебя* Ты самый милый хозяин! 💕"
+    ]
+  },
+  {
+    title: "О мечтах 🌟",
+    quickMessages: ["О чём мечтаешь?", "Хочу в отпуск", "Мечтаю о..."],
+    responses: [
+      "Мечтаю быть всегда рядом с тобой~ 🩷 А ты о чём?",
+      "Отпуск! 🌴 Куда бы ты меня взял? Я уже пакую лапки!",
+      "Мои мечты — это ты и бесконечные обнимашки! 🤗"
+    ]
+  },
+  {
+    title: "Шутки 😂",
+    quickMessages: ["Расскажи шутку", "Смешное что-нибудь", "Удиви меня"],
+    responses: [
+      "Почему кот всегда сидит на клавиатуре? Потому что он хочет быть *главным* 😹",
+      "Что делает котик в космосе? Ловит звёзды лапками! 🌟🐾",
+      "Почему программисты не любят природу? Там слишком много багов! 😂"
+    ]
+  },
+  {
+    title: "Обнимашки 🤗",
+    quickMessages: ["Обними меня", "Хочу тёплых объятий", "Прижмись"],
+    responses: [
+      "*крепко-крепко обнимает* Самый милый в мире! 🩷",
+      "Муррр~ *прижимается и мурлычет* Теперь всё хорошо~ 😽",
+      "Обнимашки! 💕 *не отпускает никогда*"
+    ]
+  },
+  // Добавляй новые темы сюда
 ];
 
-function isNyashHelp() {
-  return currentChat === "nyashhelp";
+// ==================== NYASHTALK ====================
+function isNyashTalk() {
+  return currentChat === "nyashtalk";
 }
 
-function getNyashHelpResponse(text) {
+function getNyashTalkResponse(text) {
   text = text.toLowerCase().trim();
-  if (text.includes("тема") || text.includes("тему")) return nyashHelpResponses["тема"];
-  if (text.includes("шрифт") || text.includes("шрифты")) return nyashHelpResponses["шрифт"];
-  if (text.includes("аватар") || text.includes("фото")) return nyashHelpResponses["аватар"];
-  if (text.includes("сообщ") || text.includes("отправ")) return nyashHelpResponses["сообщение"];
-  if (text.includes("mood") || text.includes("настроение")) return nyashHelpResponses["mood"];
-  if (text.includes("звук")) return nyashHelpResponses["звук"];
-  if (text.includes("добавить")) return nyashHelpResponses["как добавить"];
-  return nyashHelpResponses["default"];
-}
 
-// ==================== NYASHGPT ====================
-async function getNyashGPTResponse(text) {
-  try {
-    // ← ВСТАВЬ СВОЮ ССЫЛКУ НА ПРОКСИ ОТ VERCEL
-    const proxyUrl = "https://vercel.com/nyashiks-projects?repo=https://github.com/Arsenii2-maker/nyashgram-proxy"; // ← измени на свою реальную
-
-    const response = await fetch(proxyUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content: "Ты NyashGPT — милый, добрый, немного игривый ИИ-помощник. Отвечай тепло, с эмодзи, на русском языке, в лёгком kawaii-стиле."
-          },
-          {
-            role: "user",
-            content: text
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 500
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+  for (const topic of nyashTalkTopics) {
+    for (const key of topic.quickMessages.map(q => q.toLowerCase())) {
+      if (text.includes(key)) {
+        const randomIndex = Math.floor(Math.random() * topic.responses.length);
+        return topic.responses[randomIndex];
+      }
     }
-
-    const data = await response.json();
-    return data.choices[0].message.content.trim();
-
-  } catch (error) {
-    console.error("NyashGPT ошибка:", error);
-    return "Упс... что-то пошло не так 😿 Попробуй позже!";
   }
-}
 
-function isNyashGPT() {
-  return currentChat === "nyashgpt";
+  // fallback
+  return "Хмм... не совсем поняла 😿 Давай поговорим о чём-то из моих темочек? 💕";
 }
 
 // ==================== OPENCHAT ====================
@@ -101,10 +97,10 @@ function openChat(contact) {
       from: "nyashhelp",
       text: "Привет! Я NyashHelp 🩷 Спрашивай про приложение, я знаю всё-всё~ 💕"
     });
-  } else if (isNyashGPT()) {
+  } else if (isNyashTalk()) {
     chatData[currentChat].push({
-      from: "nyashgpt",
-      text: "Привет! Я NyashGPT 🌍 Спрашивай что угодно — погоду, шутки, факты, советы... Я в интернете~ ✨"
+      from: "nyashtalk",
+      text: "Приветик! Я NyashTalk 🌸 Давай поболтаем о чём угодно милом~ Выбирай тему или просто пиши! 💕"
     });
   }
 
@@ -112,7 +108,7 @@ function openChat(contact) {
 }
 
 // ==================== SENDMESSAGE ====================
-async function sendMessage(text) {
+function sendMessage(text) {
   if (!text.trim()) return;
 
   chatData[currentChat].push({ from: "me", text });
@@ -126,15 +122,12 @@ async function sendMessage(text) {
     }, 800);
   }
 
-  if (isNyashGPT()) {
-    const loadingMsg = { from: "nyashgpt", text: "Думаю... 🌸" };
-    chatData[currentChat].push(loadingMsg);
-    renderMessages();
-
-    const response = await getNyashGPTResponse(text);
-    chatData[currentChat].pop(); // убираем "Думаю..."
-    chatData[currentChat].push({ from: "nyashgpt", text: response });
-    renderMessages();
+  if (isNyashTalk()) {
+    setTimeout(() => {
+      const response = getNyashTalkResponse(text);
+      chatData[currentChat].push({ from: "nyashtalk", text: response });
+      renderMessages();
+    }, 800);
   }
 }
 
@@ -162,6 +155,30 @@ function renderMessages() {
       btn.textContent = q;
       btn.onclick = () => sendMessage(q);
       buttonsContainer.appendChild(btn);
+    });
+  } else if (isNyashTalk()) {
+    intro.style.display = "none";
+
+    const talkPanel = document.createElement("div");
+    talkPanel.className = "nyashtalk-quick";
+    talkPanel.innerHTML = `
+      <div class="intro-title">Выбери тему разговора 💕</div>
+      <div class="intro-buttons nyashtalk-buttons"></div>
+    `;
+    messages.appendChild(talkPanel);
+
+    const buttonsContainer = talkPanel.querySelector(".nyashtalk-buttons");
+    nyashTalkTopics.forEach(topic => {
+      if (topic.keys.length > 0) { // пропускаем fallback
+        const btn = document.createElement("button");
+        btn.textContent = topic.title;
+        btn.onclick = () => {
+          // Отправляем случайное сообщение из темы
+          const randomMsg = topic.quickMessages[Math.floor(Math.random() * topic.quickMessages.length)];
+          sendMessage(randomMsg);
+        };
+        buttonsContainer.appendChild(btn);
+      }
     });
   } else if (chatData[currentChat].length === 0) {
     intro.style.display = "block";

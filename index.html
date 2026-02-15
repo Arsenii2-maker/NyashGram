@@ -113,5 +113,11 @@
 <script src="app.js"></script>
 <script src="contacts.js"></script>
 <script src="chat.js"></script>
+<script type="module">
+  import { auth, db, storage } from './firebase.js';
+  window.auth = auth;
+  window.db = db;
+  window.storage = storage;
+</script>
 </body>
 </html>

@@ -4,7 +4,7 @@ const contacts = [
   { id: 3, name: "Учёба", status: "online" },
   { id: 4, name: "Music Pal", status: "online" },
   { id: 5, name: "Night Chat", status: "offline" }
-];
+]; 
 
 // Фиксированные чаты (всегда сверху)
 const fixedChats = [

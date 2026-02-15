@@ -35,64 +35,67 @@
 <script type="module">
   import { auth } from './firebase.js';
 
-  // Глобальная переменная для результата
+  console.log("login.js загружен, ждём Firebase...");
+
   let confirmationResult = null;
 
-  // Ждём полной готовности Firebase Auth
-  function initPhoneAuth() {
-    if (typeof auth === 'undefined' || !auth) {
+  // Функция запуска после готовности auth
+  function startPhoneAuth() {
+    if (!auth) {
       console.warn("auth ещё не готов, ждём...");
-      setTimeout(initPhoneAuth, 500); // повторяем каждые 0.5 сек
+      setTimeout(startPhoneAuth, 300);
       return;
     }
 
-    console.log("Firebase Auth готов!");
+    console.log("auth готов! Привязываем события");
 
-    // Создаём reCAPTCHA один раз
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      size: 'invisible',
-      callback: () => console.log("reCAPTCHA решён")
-    });
-
-    // Кнопка "Получить код"
     const sendBtn = document.getElementById("sendCodeBtn");
-    if (sendBtn) {
-      sendBtn.addEventListener("click", async () => {
-        const country = document.getElementById("countryCode")?.value;
-        const phone = document.getElementById("phoneNumber")?.value.trim();
-
-        if (!country || !phone) {
-          alert("Выберите страну и введите номер!");
-          return;
-        }
-
-        const fullPhone = country + phone.replace(/\D/g, "");
-
-        try {
-          sendBtn.disabled = true;
-          sendBtn.textContent = "Отправка...";
-
-          confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
-          document.getElementById("codeSection").style.display = "block";
-          alert("Код отправлен! Проверьте SMS (может прийти с задержкой до 30 сек).");
-
-          sendBtn.disabled = false;
-          sendBtn.textContent = "Получить код";
-        } catch (err) {
-          console.error("Ошибка отправки:", err);
-          alert("Не удалось отправить код:\n" + err.message + "\n\nПопробуйте перезагрузить страницу.");
-          sendBtn.disabled = false;
-          sendBtn.textContent = "Получить код";
-        }
-      });
+    if (!sendBtn) {
+      console.error("Кнопка sendCodeBtn не найдена!");
+      return;
     }
 
-    // Кнопка "Войти"
+    sendBtn.addEventListener("click", async () => {
+      console.log("Клик по кнопке 'Получить код'");
+
+      const country = document.getElementById("countryCode")?.value;
+      const phone = document.getElementById("phoneNumber")?.value.trim();
+
+      if (!country || !phone) {
+        alert("Выберите страну и введите номер!");
+        return;
+      }
+
+      const fullPhone = country + phone.replace(/\D/g, "");
+
+      try {
+        sendBtn.disabled = true;
+        sendBtn.textContent = "Отправка...";
+
+        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible'
+        });
+
+        confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
+        document.getElementById("codeSection").style.display = "block";
+        alert("Код отправлен! Проверь SMS.");
+
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Получить код";
+      } catch (err) {
+        console.error("Ошибка:", err);
+        alert("Ошибка отправки: " + err.message);
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Получить код";
+      }
+    });
+
     const verifyBtn = document.getElementById("verifyCodeBtn");
     if (verifyBtn) {
       verifyBtn.addEventListener("click", async () => {
-        const code = document.getElementById("codeInput")?.value.trim();
+        console.log("Клик по 'Войти'");
 
+        const code = document.getElementById("codeInput")?.value.trim();
         if (!code || code.length !== 6) {
           alert("Введите 6-значный код!");
           return;
@@ -115,11 +118,10 @@
           localStorage.setItem("userPhone", user.phoneNumber);
           localStorage.setItem("userUid", user.uid);
 
-          // Переходим на профиль
           window.location.href = "profile.html";
         } catch (err) {
-          console.error("Ошибка подтверждения:", err);
-          alert("Неверный код или ошибка: " + err.message);
+          console.error("Ошибка:", err);
+          alert("Неверный код: " + err.message);
           verifyBtn.disabled = false;
           verifyBtn.textContent = "Войти";
         }
@@ -127,6 +129,6 @@
     }
   }
 
-  // Запускаем инициализацию
-  initPhoneAuth();
+  // Запускаем
+  startPhoneAuth();
 </script>

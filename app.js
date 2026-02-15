@@ -50,15 +50,19 @@ loginBtn.onclick = () => {
   }
 };
 
-// Принудительно показываем логин при запуске (тест)
-console.log("Проверяем settings.name:", settings.name);
-if (!localStorage.getItem("userPhone")) {
-  // показываем экран ввода номера телефона
-  showScreen("login");
-} else {
-  // пользователь уже зарегистрирован
-  showScreen("main");
-}
+// Проверяем, авторизован ли пользователь
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // пользователь авторизован → идём на главный экран
+    localStorage.setItem("userPhone", user.phoneNumber);
+    localStorage.setItem("userUid", user.uid);
+    showScreen("main"); // или window.location.href = "index.html#main";
+    loadUserProfile(); // функция, которую сделаем позже
+  } else {
+    // не авторизован → показываем экран номера
+    showScreen("login");
+  }
+});
 
 
 // ---------- SETTINGS UI ----------

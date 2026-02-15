@@ -213,27 +213,33 @@ function renderMessages() {
   }
 
   // Стандартная панель для обычных чатов
-  if (!isNyashHelp() && !isNyashTalk() && chatData[currentChat].messages.length === 0) {
-    intro.style.display = "block";
-  }
+ // Панель для NyashTalk — всегда вверху
+if (isNyashTalk()) {
+  const talkPanel = document.createElement("div");
+  talkPanel.className = "nyashtalk-quick";
+  talkPanel.innerHTML = `
+    <div class="intro-title">Выбери тему разговора 💕</div>
+    <div class="intro-buttons nyashtalk-buttons"></div>
+  `;
+  messages.appendChild(talkPanel);
 
-  // Сообщения
-  if (chatData[currentChat] && chatData[currentChat].messages) {
-    chatData[currentChat].messages.forEach(m => {
-      const el = document.createElement("div");
-      el.className = `message ${m.from}`;
-      el.textContent = m.text;
-      messages.appendChild(el);
+  const container = talkPanel.querySelector(".nyashtalk-buttons");
+  if (container) {
+    nyashTalkTopics.forEach(topic => {
+      const btn = document.createElement("button");
+      btn.textContent = topic.title;
+      btn.dataset.topicTitle = topic.title; // для отладки
+      btn.addEventListener("click", () => {
+        if (topic.messages && topic.messages.length > 0) {
+          const randomMsg = topic.messages[Math.floor(Math.random() * topic.messages.length)];
+          sendMessage(randomMsg);
+        } else {
+          console.warn("Нет сообщений в теме:", topic.title);
+        }
+      });
+      container.appendChild(btn);
     });
+  } else {
+    console.error("Контейнер .nyashtalk-buttons не найден!");
   }
-
-  messages.scrollTop = messages.scrollHeight;
 }
-
-// ==================== СОХРАНЕНИЕ ЧЕРНОВИКА ====================
-document.getElementById("messageInput").addEventListener("input", (e) => {
-  if (currentChat) {
-    chatData[currentChat].draft = e.target.value;
-    renderContacts(); // обновляем список контактов с черновиком
-  }
-});

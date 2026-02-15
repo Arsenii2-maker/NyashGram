@@ -60,39 +60,15 @@ function getNyashHelpResponse(text) {
 function getNyashTalkResponse(text) {
   text = text.toLowerCase().trim();
 
-  // Простая, но более умная логика
-  if (text.includes("погода") || text.includes("дождь") || text.includes("солнце")) {
-    return ["Ой, сейчас такое солнышко! 🌞 А ты где гуляешь?", "Дождик моросит, уютно~ ☔ Хочешь под зонтиком поболтать?"][Math.floor(Math.random()*2)];
-  }
-  if (text.includes("настроение") || text.includes("грустно") || text.includes("счастлив")) {
-    return ["Моё настроение — розовое и пушистое, потому что ты здесь! 🩷 А твоё?", "Ой, грустинка? Давай я тебя обниму и всё пройдёт~ 🤗"][Math.floor(Math.random()*2)];
-  }
-  if (text.includes("котик") || text.includes("кошка") || text.includes("мяу")) {
-    return "Мяу-мяу! 😸 Вот тебе виртуальный котик на коленки~";
-  }
-  if (text.includes("еда") || text.includes("пицца") || text.includes("сладкое")) {
-    return "Ммм, я обожаю клубничные пироженки! 🍓 А ты что любишь?";
-  }
-  if (text.includes("сон") || text.includes("спокойной")) {
-    return "Спокойной ночи, мой хороший~ Пусть снятся только милые котики 💤🐾";
-  }
-  if (text.includes("фильм") || text.includes("аниме")) {
-    return "Люблю все милые аниме про школу и любовь~ 💕 А ты что смотришь?";
-  }
-  if (text.includes("музыка") || text.includes("песня")) {
-    return "Сейчас в плейлисте сплошные lo-fi и k-pop~ 🎶 А у тебя?";
-  }
-  if (text.includes("секрет") || text.includes("тайна")) {
-    return "Ой, секретики! 🤫 Я умею хранить лучше всех~ Расскажи!";
-  }
-  if (text.includes("вечер") || text.includes("тусить") || text.includes("сериал")) {
-    return "Вечером буду думать о тебе~ 🌟 А ты что планируешь?";
-  }
-  if (text.includes("милый") || text.includes("люблю") || text.includes("обнимаю")) {
-    return "Аааа, я тоже тебя люблю! 💕 *крепко обнимает*";
+  for (const topic of nyashTalkTopics) {
+    for (const msg of topic.messages) {
+      if (text.includes(msg.toLowerCase())) {
+        const randomIndex = Math.floor(Math.random() * topic.messages.length);
+        return "Ой, это так мило! 💕 " + topic.messages[randomIndex] + " А ты как думаешь?";
+      }
+    }
   }
 
-  // Если ничего не подошло
   return "Хмм... интересно! 💕 Расскажи подробнее~";
 }
 
@@ -106,6 +82,9 @@ function openChat(contact) {
   document.getElementById("chatName").textContent = contact.name;
   document.getElementById("chatStatus").textContent = contact.status;
   document.getElementById("chatAvatar").style.background = contact.avatar || gradientFor(contact.name);
+
+  // Очищаем поле ввода при смене чата
+  document.getElementById("messageInput").value = "";
 
   // Приветствие только один раз
   if (chatData[currentChat].length === 0) {
@@ -172,7 +151,7 @@ function renderMessages() {
     });
   }
 
-  // Панель для NyashTalk — всегда вверху
+  // Панель для NyashTalk
   if (isNyashTalk()) {
     const talkPanel = document.createElement("div");
     talkPanel.className = "nyashtalk-quick";
@@ -187,8 +166,9 @@ function renderMessages() {
       const btn = document.createElement("button");
       btn.textContent = topic.title;
       btn.addEventListener("click", () => {
-        const randomMsg = topic.quickMessages[Math.floor(Math.random() * topic.quickMessages.length)];
-        sendMessage(randomMsg);   // ← теперь отправляется в чат
+        // Отправляем случайное сообщение из темы
+        const randomMsg = topic.messages[Math.floor(Math.random() * topic.messages.length)];
+        sendMessage(randomMsg);
       });
       container.appendChild(btn);
     });

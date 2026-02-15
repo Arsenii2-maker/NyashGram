@@ -33,42 +33,84 @@
   </div>
 
   <script type="module">
-    import { auth } from './firebase.js';
+  import { auth } from './firebase.js';
 
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      'size': 'invisible'
-    });
+  // Ждём, пока Firebase полностью загрузится
+  let confirmationResult = null;
 
-    let confirmationResult;
+  // Функция показа экрана (на всякий случай)
+  function showCodeSection() {
+    document.getElementById("codeSection").style.display = "block";
+    document.getElementById("sendCodeBtn").disabled = true;
+  }
 
-    document.getElementById("sendCodeBtn").addEventListener("click", async () => {
-      const countryCode = document.getElementById("countryCode").value;
-      const phone = document.getElementById("phoneNumber").value;
-      const fullPhone = countryCode + phone;
+  // Кнопка "Получить код"
+  document.getElementById("sendCodeBtn").addEventListener("click", async () => {
+    if (typeof auth === 'undefined' || !auth) {
+      alert("Firebase Auth не загружен. Перезагрузите страницу.");
+      return;
+    }
 
-      try {
-        confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
-        document.getElementById("codeSection").style.display = "block";
-        document.getElementById("sendCodeBtn").disabled = true;
-        alert("Код отправлен!");
-      } catch (error) {
-        alert("Ошибка: " + error.message);
-      }
-    });
+    const countryCode = document.getElementById("countryCode").value;
+    const phoneNumber = document.getElementById("phoneNumber").value.trim().replace(/\D/g, '');
 
-    document.getElementById("verifyCodeBtn").addEventListener("click", async () => {
-      const code = document.getElementById("codeInput").value;
-      try {
-        const credential = await confirmationResult.confirm(code);
-        const user = credential.user;
-        alert("Вход успешен! UID: " + user.uid);
+    if (!phoneNumber) {
+      alert("Введите номер телефона!");
+      return;
+    }
 
-        // Переходим на экран профиля
-        window.location.href = "profile.html";
-      } catch (error) {
-        alert("Неверный код: " + error.message);
-      }
-    });
-  </script>
+    const fullPhone = countryCode + phoneNumber;
+
+    try {
+      // Создаём reCAPTCHA
+      const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible',
+        'callback': (response) => {
+          // reCAPTCHA решён — можно отправлять код
+        }
+      });
+
+      // Запрашиваем код
+      confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
+      showCodeSection();
+      alert("Код отправлен! Проверьте SMS (может прийти с задержкой).");
+    } catch (error) {
+      console.error("Ошибка отправки кода:", error);
+      alert("Не удалось отправить код: " + error.message + "\n\nПопробуйте перезагрузить страницу или проверить интернет.");
+    }
+  });
+
+  // Кнопка "Войти"
+  document.getElementById("verifyCodeBtn").addEventListener("click", async () => {
+    const code = document.getElementById("codeInput").value.trim();
+
+    if (!code || code.length !== 6) {
+      alert("Введите 6-значный код из SMS!");
+      return;
+    }
+
+    if (!confirmationResult) {
+      alert("Сначала запросите код!");
+      return;
+    }
+
+    try {
+      const credential = await confirmationResult.confirm(code);
+      const user = credential.user;
+
+      alert("Вход успешен! UID: " + user.uid);
+
+      // Сохраняем данные
+      localStorage.setItem("userPhone", user.phoneNumber);
+      localStorage.setItem("userUid", user.uid);
+
+      // Переходим на профиль
+      window.location.href = "profile.html";
+    } catch (error) {
+      console.error("Ошибка подтверждения кода:", error);
+      alert("Неверный код или ошибка: " + error.message);
+    }
+  });
+</script>
 </body>
 </html>

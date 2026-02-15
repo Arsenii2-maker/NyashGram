@@ -38,7 +38,7 @@
     <div id="recaptcha-container" style="margin-top:20px;"></div>
   </section>
 
-  <!-- ЭКРАН ПРОФИЛЯ (после ввода кода) -->
+  <!-- ЭКРАН ПРОФИЛЯ -->
   <section id="profileScreen" class="screen center" style="display:none;">
     <h1>Создай профиль</h1>
 
@@ -47,7 +47,7 @@
     <div class="avatar-upload" style="margin:20px 0;">
       <label for="avatarInput">
         <div id="avatarPreview" class="avatar-preview" style="width:120px; height:120px; background:#ff9acb; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; color:white;">+</div>
-        <p style="margin-top:8px;">Выбрать фото</p>
+        <p style="margin-top:8px;">Выбрать фото (не обязательно)</p>
       </label>
       <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
     </div>
@@ -56,91 +56,18 @@
   </section>
 
   <!-- SETTINGS -->
-  <section id="settingsScreen" class="screen">
-    <header class="top-bar">
-      <button id="settingsBackBtn">←</button>
-      <div class="top-title">Настройки</div>
-    </header>
-
-    <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
-      <label>
-        Никнейм
-        <input id="settingsName">
-      </label>
-
-      <label>
-        Аватарка
-        <input type="file" id="avatarInput" accept="image/*">
-        <div style="margin-top:8px;">
-          <div id="avatarPreview" class="avatar" style="width:80px; height:80px; margin:0 auto;"></div>
-        </div>
-      </label>
-
-      <label>
-        Тема
-        <select id="themeSelect">
-          <option value="pastel-pink">Pastel Pink 🩷</option>
-          <option value="milk-rose">Milk Rose 🌸</option>
-          <option value="night-blue">Night Blue 🌙</option>
-          <option value="lo-fi-beige">Lo-Fi Beige ☕</option>
-          <option value="soft-lilac">Soft Lilac 💜</option>
-        </select>
-      </label>
-
-      <label>
-        Шрифт
-        <select id="fontSelect">
-          <option value="system">System</option>
-          <option value="rounded">Rounded</option>
-          <option value="cozy">Cozy</option>
-          <option value="elegant">Elegant</option>
-          <option value="bold-soft">Bold Soft</option>
-          <option value="mono-cozy">Mono Cozy</option>
-        </select>
-      </label>
-
-      <button id="saveSettingsBtn">Сохранить</button>
-    </div>
+  <section id="settingsScreen" class="screen" style="display:none;">
+    <!-- твой старый код настроек -->
   </section>
 
   <!-- CONTACTS -->
-  <section id="contactsScreen" class="screen">
-    <header class="top-bar">
-      <button id="settingsBtn">⚙️</button>
-      <div class="top-title">Контакты</div>
-    </header>
-    <div id="contactsList"></div>
+  <section id="contactsScreen" class="screen" style="display:none;">
+    <!-- твой старый код контактов -->
   </section>
 
   <!-- CHAT -->
-  <section id="chatScreen" class="screen">
-    <header class="top-bar">
-      <button id="backBtn">←</button>
-      <div class="chat-header">
-        <div id="chatAvatar" class="avatar"></div>
-        <div>
-          <div id="chatName"></div>
-          <div id="chatStatus" class="status"></div>
-        </div>
-      </div>
-    </header>
-
-    <div id="chatIntro" class="chat-intro">
-      <div class="intro-title">✨ Начни общение ✨</div>
-      <div class="intro-buttons">
-        <button>Привет! Как дела?</button>
-        <button>Чем занимаешься?</button>
-        <button>Хочешь поболтать?</button>
-        <button>Какой вайб сегодня?</button>
-      </div>
-    </div>
-
-    <div id="messages"></div>
-
-    <div class="input-bar">
-      <input id="messageInput" placeholder="Сообщение...">
-      <button id="sendBtn">➤</button>
-    </div>
+  <section id="chatScreen" class="screen" style="display:none;">
+    <!-- твой старый код чата -->
   </section>
 
 </div>

@@ -52,19 +52,12 @@ loginBtn.onclick = () => {
 
 // Принудительно показываем логин при запуске (тест)
 console.log("Проверяем settings.name:", settings.name);
-if (settings.name) {
-  console.log("Есть имя — показываем контакты");
-  showScreen("contacts");
-  setTimeout(() => {
-    if (typeof renderContacts === 'function') {
-      renderContacts();
-    } else {
-      alert("renderContacts не загрузилась!");
-    }
-  }, 100);
-} else {
-  console.log("Имени нет — показываем логин");
+if (!localStorage.getItem("userPhone")) {
+  // показываем экран ввода номера телефона
   showScreen("login");
+} else {
+  // пользователь уже зарегистрирован
+  showScreen("main");
 }
 
 

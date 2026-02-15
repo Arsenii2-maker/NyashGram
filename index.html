@@ -13,12 +13,30 @@
 
 <div id="app">
 
-  <!-- LOGIN -->
-  <section id="loginScreen" class="screen center">
-    <h1>NyashGram 🩷</h1>
-    <input id="loginInput" placeholder="Ваш никнейм">
-    <button id="loginBtn">Войти</button>
-  </section>
+  <!-- Экран ввода номера телефона -->
+<section id="phoneLoginScreen" class="screen center" style="display: none;">
+  <h1>NyashGram 🩷</h1>
+  <p>Вход по номеру телефона</p>
+
+  <div style="display:flex; gap:8px; margin:20px 0;">
+    <select id="countryCode" style="padding:10px; font-size:16px;">
+      <option value="+7">+7 Россия</option>
+      <option value="+380">+380 Украина</option>
+      <option value="+375">+375 Беларусь</option>
+      <option value="+1">+1 США/Канада</option>
+    </select>
+    <input type="tel" id="phoneInput" placeholder="999 999 99 99" style="flex:1; padding:10px; font-size:16px;" />
+  </div>
+
+  <button id="sendCodeBtn" style="padding:12px 24px; font-size:18px;">Получить код</button>
+
+  <div id="codeSection" style="display:none; margin-top:20px;">
+    <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="padding:10px; font-size:18px; width:120px; text-align:center;" />
+    <button id="verifyCodeBtn" style="padding:12px 24px; font-size:18px;">Войти</button>
+  </div>
+
+  <div id="recaptcha-container" style="margin-top:20px;"></div>
+</section>
 
   <!-- SETTINGS -->
   <section id="settingsScreen" class="screen">

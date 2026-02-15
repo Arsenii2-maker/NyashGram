@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NyashGram — Профиль</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="profile-container">
+    <h1>Создай свой профиль</h1>
+
+    <input type="text" id="displayName" placeholder="Как тебя зовут?" />
+
+    <div class="avatar-upload">
+      <label for="avatarInput">
+        <div id="avatarPreview" class="avatar-preview"></div>
+        <span>Выбрать фото</span>
+      </label>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+    </div>
+
+    <button id="saveProfileBtn">Готово!</button>
+  </div>
+
+  <script type="module">
+    import { auth, db, storage } from './firebase.js';
+
+    const user = auth.currentUser;
+    if (!user) {
+      window.location.href = "login.html";
+    }
+
+    // Предпросмотр аватарки
+    document.getElementById("avatarInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          document.getElementById("avatarPreview").style.backgroundImage = `url(${event.target.result})`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById("saveProfileBtn").addEventListener("click", async () => {
+      const name = document.getElementById("displayName").value.trim();
+      if (!name) return alert("Введи имя!");
+
+      const file = document.getElementById("avatarInput").files[0];
+      let avatarUrl = "";
+
+      if (file) {
+        const ref = storage.ref(`avatars/${user.uid}`);
+        await ref.put(file);
+        avatarUrl = await ref.getDownloadURL();
+      }
+
+      await db.collection("users").doc(user.uid).set({
+        phone: user.phoneNumber,
+        name,
+        avatar: avatarUrl,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("Профиль сохранён!");
+      window.location.href = "index.html"; // или главный экран
+    });
+  </script>
+</body>
+</html>

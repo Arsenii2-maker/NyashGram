@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NyashGram — Вход</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h1>NyashGram</h1>
+    <p>Вход по номеру телефона</p>
+
+    <div class="phone-input">
+      <select id="countryCode">
+        <option value="+7">+7 (Россия)</option>
+        <option value="+380">+380 (Украина)</option>
+        <option value="+375">+375 (Беларусь)</option>
+        <option value="+1">+1 (США/Канада)</option>
+        <!-- добавь нужные страны -->
+      </select>
+      <input type="tel" id="phoneNumber" placeholder="Номер телефона" />
+    </div>
+
+    <button id="sendCodeBtn">Получить код</button>
+
+    <div id="codeSection" style="display:none;">
+      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" />
+      <button id="verifyCodeBtn">Войти</button>
+    </div>
+
+    <div id="recaptcha-container"></div>
+  </div>
+
+  <script type="module">
+    import { auth } from './firebase.js';
+
+    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible'
+    });
+
+    let confirmationResult;
+
+    document.getElementById("sendCodeBtn").addEventListener("click", async () => {
+      const countryCode = document.getElementById("countryCode").value;
+      const phone = document.getElementById("phoneNumber").value;
+      const fullPhone = countryCode + phone;
+
+      try {
+        confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
+        document.getElementById("codeSection").style.display = "block";
+        document.getElementById("sendCodeBtn").disabled = true;
+        alert("Код отправлен!");
+      } catch (error) {
+        alert("Ошибка: " + error.message);
+      }
+    });
+
+    document.getElementById("verifyCodeBtn").addEventListener("click", async () => {
+      const code = document.getElementById("codeInput").value;
+      try {
+        const credential = await confirmationResult.confirm(code);
+        const user = credential.user;
+        alert("Вход успешен! UID: " + user.uid);
+
+        // Переходим на экран профиля
+        window.location.href = "profile.html";
+      } catch (error) {
+        alert("Неверный код: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

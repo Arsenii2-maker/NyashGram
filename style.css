@@ -320,3 +320,16 @@ button {
 .nyashhelp-buttons button:active {
   transform: scale(0.98);
 }
+.contact .info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 12px;
+}
+
+.contact .draft {
+  color: var(--accent);
+  font-size: 12px;
+  margin-top: 2px;
+  line-height: 1.2;
+}

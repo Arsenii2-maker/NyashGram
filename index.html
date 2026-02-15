@@ -13,30 +13,47 @@
 
 <div id="app">
 
-  <!-- Экран ввода номера телефона -->
-<section id="phoneLoginScreen" class="screen center" style="display: none;">
-  <h1>NyashGram 🩷</h1>
-  <p>Вход по номеру телефона</p>
+  <!-- ЭКРАН ВВОДА НОМЕРА ТЕЛЕФОНА -->
+  <section id="phoneLoginScreen" class="screen center">
+    <h1>NyashGram 🩷</h1>
+    <p>Вход по номеру телефона</p>
 
-  <div style="display:flex; gap:8px; margin:20px 0;">
-    <select id="countryCode" style="padding:10px; font-size:16px;">
-      <option value="+7">+7 Россия</option>
-      <option value="+380">+380 Украина</option>
-      <option value="+375">+375 Беларусь</option>
-      <option value="+1">+1 США/Канада</option>
-    </select>
-    <input type="tel" id="phoneInput" placeholder="999 999 99 99" style="flex:1; padding:10px; font-size:16px;" />
-  </div>
+    <div style="display:flex; gap:8px; margin:20px 0; max-width:400px;">
+      <select id="countryCode" style="padding:12px; font-size:16px;">
+        <option value="+7">+7 Россия</option>
+        <option value="+380">+380 Украина</option>
+        <option value="+375">+375 Беларусь</option>
+        <option value="+1">+1 США/Канада</option>
+      </select>
+      <input type="tel" id="phoneInput" placeholder="999 999 99 99" style="flex:1; padding:12px; font-size:16px;" />
+    </div>
 
-  <button id="sendCodeBtn" style="padding:12px 24px; font-size:18px;">Получить код</button>
+    <button id="sendCodeBtn" style="padding:12px 32px; font-size:18px;">Получить код</button>
 
-  <div id="codeSection" style="display:none; margin-top:20px;">
-    <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="padding:10px; font-size:18px; width:120px; text-align:center;" />
-    <button id="verifyCodeBtn" style="padding:12px 24px; font-size:18px;">Войти</button>
-  </div>
+    <div id="codeSection" style="display:none; margin-top:20px;">
+      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="padding:12px; font-size:18px; width:140px; text-align:center;" />
+      <button id="verifyCodeBtn" style="padding:12px 32px; font-size:18px;">Войти</button>
+    </div>
 
-  <div id="recaptcha-container" style="margin-top:20px;"></div>
-</section>
+    <div id="recaptcha-container" style="margin-top:20px;"></div>
+  </section>
+
+  <!-- ЭКРАН ПРОФИЛЯ (после ввода кода) -->
+  <section id="profileScreen" class="screen center" style="display:none;">
+    <h1>Создай профиль</h1>
+
+    <input type="text" id="displayName" placeholder="Как тебя зовут?" style="padding:12px; width:80%; max-width:400px; margin:16px 0;" />
+
+    <div class="avatar-upload" style="margin:20px 0;">
+      <label for="avatarInput">
+        <div id="avatarPreview" class="avatar-preview" style="width:120px; height:120px; background:#ff9acb; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; color:white;">+</div>
+        <p style="margin-top:8px;">Выбрать фото</p>
+      </label>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+    </div>
+
+    <button id="saveProfileBtn" style="padding:12px 32px; font-size:18px;">Готово!</button>
+  </section>
 
   <!-- SETTINGS -->
   <section id="settingsScreen" class="screen">
@@ -109,14 +126,14 @@
     </header>
 
     <div id="chatIntro" class="chat-intro">
-  <div class="intro-title">✨ Начни общение ✨</div>
-  <div class="intro-buttons">
-    <button>Привет! Как дела?</button>
-    <button>Чем занимаешься?</button>
-    <button>Хочешь поболтать?</button>
-    <button>Какой вайб сегодня?</button>
-  </div>
-</div>
+      <div class="intro-title">✨ Начни общение ✨</div>
+      <div class="intro-buttons">
+        <button>Привет! Как дела?</button>
+        <button>Чем занимаешься?</button>
+        <button>Хочешь поболтать?</button>
+        <button>Какой вайб сегодня?</button>
+      </div>
+    </div>
 
     <div id="messages"></div>
 

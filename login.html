@@ -6,16 +6,67 @@
   <title>NyashGram — Вход</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    body { font-family: system-ui, sans-serif; background: #fff; margin: 0; padding: 0; height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .login-container { max-width: 360px; width: 90%; padding: 30px 20px; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-    h1 { margin: 0 0 8px; font-size: 2.2rem; color: #ff9acb; }
-    p { margin: 0 0 24px; color: #666; }
-    .phone-input { display: flex; gap: 8px; margin-bottom: 20px; }
-    select, input { padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 8px; flex: 1; }
-    button { padding: 14px; font-size: 17px; background: #ff9acb; color: white; border: none; border-radius: 10px; width: 100%; cursor: pointer; transition: 0.2s; }
-    button:disabled { background: #ffb3d1; cursor: not-allowed; }
-    #codeSection { margin-top: 20px; }
-    #recaptcha-container { margin-top: 20px; min-height: 78px; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(135deg, #ff9acb, #ffd6e8);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-container {
+      background: white;
+      padding: 32px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+    }
+    h1 {
+      color: #ff9acb;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #666;
+      margin-bottom: 24px;
+    }
+    .phone-input {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    select, input {
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      flex: 1;
+    }
+    button {
+      padding: 14px;
+      font-size: 17px;
+      background: #ff9acb;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:disabled {
+      background: #ffb3d1;
+      cursor: not-allowed;
+    }
+    #codeSection {
+      margin-top: 24px;
+    }
+    #recaptcha-container {
+      margin-top: 16px;
+      min-height: 78px;
+    }
   </style>
 </head>
 <body>
@@ -37,7 +88,7 @@
     <button id="sendCodeBtn">Получить код</button>
 
     <div id="codeSection" style="display:none;">
-      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="width:100%; margin:12px 0;" />
+      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="width:100%; margin:16px 0; text-align:center;" />
       <button id="verifyCodeBtn">Войти</button>
     </div>
 
@@ -47,28 +98,24 @@
   <script type="module">
     import { auth } from './firebase.js';
 
-    console.log("login.html загружен");
+    console.log("login.html: скрипт запущен");
 
     let confirmationResult = null;
 
-    // Ждём полной готовности auth
-    function tryInit() {
-      if (!auth) {
-        console.log("auth ещё не готов, ждём...");
-        setTimeout(tryInit, 300);
-        return;
-      }
-
-      console.log("Firebase Auth готов → привязываем события");
+    // Ждём загрузки DOM и Firebase
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM загружен");
 
       const sendBtn = document.getElementById("sendCodeBtn");
       if (!sendBtn) {
-        console.error("Кнопка #sendCodeBtn не найдена!");
+        console.error("Кнопка #sendCodeBtn НЕ НАЙДЕНА");
         return;
       }
 
+      console.log("Кнопка найдена, привязываем клик");
+
       sendBtn.addEventListener("click", async () => {
-        console.log("Нажата кнопка Получить код");
+        console.log("КЛИК ПО КНОПКЕ 'Получить код' — событие сработало!");
 
         const country = document.getElementById("countryCode")?.value;
         const phone = document.getElementById("phoneNumber")?.value?.trim();
@@ -80,6 +127,8 @@
 
         const fullPhone = country + phone.replace(/\D/g, "");
 
+        console.log("Пытаемся отправить код на:", fullPhone);
+
         try {
           sendBtn.disabled = true;
           sendBtn.textContent = "Отправка...";
@@ -88,28 +137,26 @@
             size: 'invisible'
           });
 
-          console.log("Запрашиваем код для номера:", fullPhone);
-
           confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
 
           document.getElementById("codeSection").style.display = "block";
-          alert("Код отправлен! Проверьте SMS (может прийти через 5–30 секунд).");
+          alert("Код отправлен! Проверьте SMS.");
 
           sendBtn.disabled = false;
           sendBtn.textContent = "Получить код";
         } catch (err) {
-          console.error("Ошибка при запросе кода:", err);
-          alert("Не удалось отправить код:\n" + err.message);
+          console.error("Ошибка при отправке кода:", err);
+          alert("Ошибка: " + err.message);
           sendBtn.disabled = false;
           sendBtn.textContent = "Получить код";
         }
       });
 
-      // Кнопка Войти
+      // Кнопка "Войти"
       const verifyBtn = document.getElementById("verifyCodeBtn");
       if (verifyBtn) {
         verifyBtn.addEventListener("click", async () => {
-          console.log("Нажата кнопка Войти");
+          console.log("КЛИК ПО 'Войти'");
 
           const code = document.getElementById("codeInput")?.value?.trim();
 
@@ -130,7 +177,7 @@
             const credential = await confirmationResult.confirm(code);
             const user = credential.user;
 
-            console.log("Успешный вход, UID:", user.uid);
+            console.log("Успешный вход:", user.uid);
 
             alert("Вход успешен!");
             localStorage.setItem("userPhone", user.phoneNumber);
@@ -138,17 +185,14 @@
 
             window.location.href = "profile.html";
           } catch (err) {
-            console.error("Ошибка подтверждения:", err);
-            alert("Неверный код или ошибка:\n" + err.message);
+            console.error("Ошибка:", err);
+            alert("Неверный код: " + err.message);
             verifyBtn.disabled = false;
             verifyBtn.textContent = "Войти";
           }
         });
       }
-    }
-
-    // Запускаем
-    tryInit();
+    });
   </script>
 </body>
 </html>

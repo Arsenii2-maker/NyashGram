@@ -5,130 +5,150 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>NyashGram — Вход</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: system-ui, sans-serif; background: #fff; margin: 0; padding: 0; height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-container { max-width: 360px; width: 90%; padding: 30px 20px; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+    h1 { margin: 0 0 8px; font-size: 2.2rem; color: #ff9acb; }
+    p { margin: 0 0 24px; color: #666; }
+    .phone-input { display: flex; gap: 8px; margin-bottom: 20px; }
+    select, input { padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 8px; flex: 1; }
+    button { padding: 14px; font-size: 17px; background: #ff9acb; color: white; border: none; border-radius: 10px; width: 100%; cursor: pointer; transition: 0.2s; }
+    button:disabled { background: #ffb3d1; cursor: not-allowed; }
+    #codeSection { margin-top: 20px; }
+    #recaptcha-container { margin-top: 20px; min-height: 78px; }
+  </style>
 </head>
 <body>
+
   <div class="login-container">
-    <h1>NyashGram</h1>
+    <h1>NyashGram 🩷</h1>
     <p>Вход по номеру телефона</p>
 
     <div class="phone-input">
       <select id="countryCode">
-        <option value="+7">+7 (Россия)</option>
-        <option value="+380">+380 (Украина)</option>
-        <option value="+375">+375 (Беларусь)</option>
-        <option value="+1">+1 (США/Канада)</option>
-        <!-- добавь нужные страны -->
+        <option value="+7">+7 Россия</option>
+        <option value="+380">+380 Украина</option>
+        <option value="+375">+375 Беларусь</option>
+        <option value="+1">+1 США/Канада</option>
       </select>
-      <input type="tel" id="phoneNumber" placeholder="Номер телефона" />
+      <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
     </div>
 
     <button id="sendCodeBtn">Получить код</button>
 
     <div id="codeSection" style="display:none;">
-      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" />
+      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="width:100%; margin:12px 0;" />
       <button id="verifyCodeBtn">Войти</button>
     </div>
 
     <div id="recaptcha-container"></div>
   </div>
 
-<script type="module">
-  import { auth } from './firebase.js';
+  <script type="module">
+    import { auth } from './firebase.js';
 
-  console.log("login.js загружен, ждём Firebase...");
+    console.log("login.html загружен");
 
-  let confirmationResult = null;
+    let confirmationResult = null;
 
-  // Функция запуска после готовности auth
-  function startPhoneAuth() {
-    if (!auth) {
-      console.warn("auth ещё не готов, ждём...");
-      setTimeout(startPhoneAuth, 300);
-      return;
-    }
-
-    console.log("auth готов! Привязываем события");
-
-    const sendBtn = document.getElementById("sendCodeBtn");
-    if (!sendBtn) {
-      console.error("Кнопка sendCodeBtn не найдена!");
-      return;
-    }
-
-    sendBtn.addEventListener("click", async () => {
-      console.log("Клик по кнопке 'Получить код'");
-
-      const country = document.getElementById("countryCode")?.value;
-      const phone = document.getElementById("phoneNumber")?.value.trim();
-
-      if (!country || !phone) {
-        alert("Выберите страну и введите номер!");
+    // Ждём полной готовности auth
+    function tryInit() {
+      if (!auth) {
+        console.log("auth ещё не готов, ждём...");
+        setTimeout(tryInit, 300);
         return;
       }
 
-      const fullPhone = country + phone.replace(/\D/g, "");
+      console.log("Firebase Auth готов → привязываем события");
 
-      try {
-        sendBtn.disabled = true;
-        sendBtn.textContent = "Отправка...";
-
-        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-          size: 'invisible'
-        });
-
-        confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
-        document.getElementById("codeSection").style.display = "block";
-        alert("Код отправлен! Проверь SMS.");
-
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Получить код";
-      } catch (err) {
-        console.error("Ошибка:", err);
-        alert("Ошибка отправки: " + err.message);
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Получить код";
+      const sendBtn = document.getElementById("sendCodeBtn");
+      if (!sendBtn) {
+        console.error("Кнопка #sendCodeBtn не найдена!");
+        return;
       }
-    });
 
-    const verifyBtn = document.getElementById("verifyCodeBtn");
-    if (verifyBtn) {
-      verifyBtn.addEventListener("click", async () => {
-        console.log("Клик по 'Войти'");
+      sendBtn.addEventListener("click", async () => {
+        console.log("Нажата кнопка Получить код");
 
-        const code = document.getElementById("codeInput")?.value.trim();
-        if (!code || code.length !== 6) {
-          alert("Введите 6-значный код!");
+        const country = document.getElementById("countryCode")?.value;
+        const phone = document.getElementById("phoneNumber")?.value?.trim();
+
+        if (!country || !phone) {
+          alert("Выберите страну и введите номер!");
           return;
         }
 
-        if (!confirmationResult) {
-          alert("Сначала запросите код!");
-          return;
-        }
+        const fullPhone = country + phone.replace(/\D/g, "");
 
         try {
-          verifyBtn.disabled = true;
-          verifyBtn.textContent = "Проверка...";
+          sendBtn.disabled = true;
+          sendBtn.textContent = "Отправка...";
 
-          const credential = await confirmationResult.confirm(code);
-          const user = credential.user;
+          const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible'
+          });
 
-          alert("Вход успешен! UID: " + user.uid);
+          console.log("Запрашиваем код для номера:", fullPhone);
 
-          localStorage.setItem("userPhone", user.phoneNumber);
-          localStorage.setItem("userUid", user.uid);
+          confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
 
-          window.location.href = "profile.html";
+          document.getElementById("codeSection").style.display = "block";
+          alert("Код отправлен! Проверьте SMS (может прийти через 5–30 секунд).");
+
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Получить код";
         } catch (err) {
-          console.error("Ошибка:", err);
-          alert("Неверный код: " + err.message);
-          verifyBtn.disabled = false;
-          verifyBtn.textContent = "Войти";
+          console.error("Ошибка при запросе кода:", err);
+          alert("Не удалось отправить код:\n" + err.message);
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Получить код";
         }
       });
-    }
-  }
 
-  // Запускаем
-  startPhoneAuth();
-</script>
+      // Кнопка Войти
+      const verifyBtn = document.getElementById("verifyCodeBtn");
+      if (verifyBtn) {
+        verifyBtn.addEventListener("click", async () => {
+          console.log("Нажата кнопка Войти");
+
+          const code = document.getElementById("codeInput")?.value?.trim();
+
+          if (!code || code.length !== 6) {
+            alert("Введите 6-значный код!");
+            return;
+          }
+
+          if (!confirmationResult) {
+            alert("Сначала запросите код!");
+            return;
+          }
+
+          try {
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = "Проверка...";
+
+            const credential = await confirmationResult.confirm(code);
+            const user = credential.user;
+
+            console.log("Успешный вход, UID:", user.uid);
+
+            alert("Вход успешен!");
+            localStorage.setItem("userPhone", user.phoneNumber);
+            localStorage.setItem("userUid", user.uid);
+
+            window.location.href = "profile.html";
+          } catch (err) {
+            console.error("Ошибка подтверждения:", err);
+            alert("Неверный код или ошибка:\n" + err.message);
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = "Войти";
+          }
+        });
+      }
+    }
+
+    // Запускаем
+    tryInit();
+  </script>
+</body>
+</html>

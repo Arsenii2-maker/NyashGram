@@ -63,8 +63,7 @@ function getNyashTalkResponse(text) {
   for (const topic of nyashTalkTopics) {
     for (const msg of topic.messages) {
       if (text.includes(msg.toLowerCase())) {
-        const randomIndex = Math.floor(Math.random() * topic.messages.length);
-        return "Ой, это так мило! 💕 " + topic.messages[randomIndex] + " А ты как думаешь?";
+        return "Ой, это так мило! 💕 " + msg + " А ты как думаешь?";
       }
     }
   }
@@ -83,8 +82,9 @@ function openChat(contact) {
   document.getElementById("chatStatus").textContent = contact.status;
   document.getElementById("chatAvatar").style.background = contact.avatar || gradientFor(contact.name);
 
-  // Очищаем поле ввода при смене чата
-  document.getElementById("messageInput").value = "";
+  // Восстанавливаем черновик
+  const input = document.getElementById("messageInput");
+  input.value = chatData[currentChat].draft || "";
 
   // Приветствие только один раз
   if (chatData[currentChat].length === 0) {
@@ -103,6 +103,8 @@ function sendMessage(text) {
   if (!text.trim()) return;
 
   chatData[currentChat].push({ from: "me", text });
+  chatData[currentChat].draft = ""; // очищаем черновик после отправки
+  document.getElementById("messageInput").value = "";
   renderMessages();
 
   if (isNyashHelp()) {
@@ -129,7 +131,6 @@ function renderMessages() {
 
   messages.innerHTML = "";
 
-  // Скрываем стандартную панель для NyashHelp и NyashTalk
   intro.style.display = "none";
 
   // Панель для NyashHelp
@@ -166,7 +167,6 @@ function renderMessages() {
       const btn = document.createElement("button");
       btn.textContent = topic.title;
       btn.addEventListener("click", () => {
-        // Отправляем случайное сообщение из темы
         const randomMsg = topic.messages[Math.floor(Math.random() * topic.messages.length)];
         sendMessage(randomMsg);
       });
@@ -191,3 +191,11 @@ function renderMessages() {
 
   messages.scrollTop = messages.scrollHeight;
 }
+
+// ==================== СОХРАНЕНИЕ ЧЕРНОВИКА ====================
+document.getElementById("messageInput").addEventListener("input", (e) => {
+  if (currentChat) {
+    chatData[currentChat].draft = e.target.value;
+    renderContacts(); // обновляем список чатов (черновик под именем)
+  }
+});

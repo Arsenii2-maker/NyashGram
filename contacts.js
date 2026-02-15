@@ -55,6 +55,14 @@ function renderContacts() {
       <div>
         <div>${c.name}</div>
         <div class="status">${c.status}</div>
+        if (chatData[c.id] && chatData[c.id].draft) {
+  const draftEl = document.createElement("div");
+  draftEl.className = "draft";
+  draftEl.textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
+  draftEl.style.color = "var(--accent)";
+  draftEl.style.fontSize = "12px";
+  el.querySelector(".status").parentNode.appendChild(draftEl);
+}
       </div>
     `;
     el.onclick = () => openChat(c);

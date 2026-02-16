@@ -1,12 +1,12 @@
 const contacts = [
-  { id: 1, name: "Bestie", status: "online" },
-  { id: 2, name: "Философ", status: "offline" },
-  { id: 3, name: "Учёба", status: "online" },
-  { id: 4, name: "Music Pal", status: "online" },
-  { id: 5, name: "Night Chat", status: "offline" }
-]; 
+  { id: 1, name: "Bestie", status: "online", avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)" },
+  { id: 2, name: "Философ", status: "offline", avatar: "linear-gradient(135deg, #6c5ce7, #a29bfe)" },
+  { id: 3, name: "Учёба", status: "online", avatar: "linear-gradient(135deg, #74b9ff, #0984e3)" },
+  { id: 4, name: "Music Pal", status: "online", avatar: "linear-gradient(135deg, #fdcb6e, #e17055)" },
+  { id: 5, name: "Night Chat", status: "offline", avatar: "linear-gradient(135deg, #2d3436, #636e72)" }
+];
 
-// Фиксированные чаты (всегда сверху)
+// Фиксированные боты сверху
 const fixedChats = [
   {
     id: "nyashhelp",
@@ -31,7 +31,7 @@ function renderContacts() {
   const list = document.getElementById("contactsList");
   list.innerHTML = "";
 
-  // Фиксированные чаты
+  // Фиксированные боты
   fixedChats.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact fixed";
@@ -59,7 +59,7 @@ function renderContacts() {
     const el = document.createElement("div");
     el.className = "contact";
     el.innerHTML = `
-      <div class="avatar" style="background:${gradientFor(c.name)}"></div>
+      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}"></div>
       <div class="info">
         <div class="name">${c.name}</div>
         <div class="status">${c.status}</div>

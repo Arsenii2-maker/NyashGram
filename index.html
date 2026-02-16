@@ -142,15 +142,13 @@
     </div>
   </section>
 
-  <!-- КОНТАКТЫ (пока заглушка, потом подключи contacts.js) -->
-  <section id="contactsScreen" class="screen">
-    <header class="top-bar">
-      <div class="top-title">Контакты</div>
-    </header>
-    <div id="contactsList" style="padding:20px; text-align:center; color:#666;">
-      <p>Тут будут NyashHelp и NyashTalk</p>
-    </div>
-  </section>
+  <!-- КОНТАКТЫ -->
+<section id="contactsScreen" class="screen active">
+  <header class="top-bar">
+    <div class="top-title">Контакты</div>
+  </header>
+  <div id="contactsList"></div>
+</section>
 
   <script>
     let generatedCode = "";
@@ -237,5 +235,8 @@
       document.getElementById("contactsScreen").classList.add("active");
     });
   </script>
+  <script src="app.js"></script>
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
 </body>
 </html>

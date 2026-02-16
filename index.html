@@ -21,6 +21,7 @@
         <select id="countryCode">
           <option value="+7">+7 Россия</option>
           <option value="+380">+380 Украина</option>
+          <option value="+375">+375 Беларусь</option>
         </select>
         <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
       </div>
@@ -53,7 +54,7 @@
       <div style="margin:20px 0;">
         <label for="avatarInput">
           <div id="avatarPreview" style="width:120px; height:120px; background:#ff9acb; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; color:white;">+</div>
-          <p style="margin-top:12px;">Выбрать фото</p>
+          <p style="margin-top:12px;">Выбрать фото (необязательно)</p>
         </label>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
       </div>
@@ -148,10 +149,6 @@
 </div>
 
 <script>
-  // Глобальные переменные
-  let currentChat = null;
-  const chatData = {}; // { chatId: { messages: [], draft: "" } }
-
   // Фейковый код
   let generatedCode = "";
 
@@ -169,7 +166,7 @@
   // Экран номера
   const phoneInput = document.getElementById("phoneNumber");
   const sendBtn = document.getElementById("sendBtn");
-  const phoneError = document.getElementById("errorMessage");
+  const phoneError = document.getElementById("phoneError");
 
   function checkPhone() {
     const phone = phoneInput.value.trim().replace(/\D/g, "");
@@ -241,7 +238,7 @@
     renderContacts();
   });
 
-  // Контакты и чаты
+  // Контакты
   const contacts = [
     { id: "bestie", name: "Bestie", status: "online", avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)" },
     { id: "filosof", name: "Философ", status: "пишет трактат", avatar: "linear-gradient(135deg, #6c5ce7, #a29bfe)" },
@@ -310,10 +307,9 @@
     if (input) input.value = chatData[currentChat].draft || "";
 
     if (chatData[currentChat].messages.length === 0) {
-      let greeting = "";
+      let greeting = "Привет! Это " + contact.name + " 😊";
       if (contact.id === "nyashhelp") greeting = "Привет! Я NyashHelp 🩷 Спрашивай про приложение~";
-      else if (contact.id === "nyashtalk") greeting = "Приветик! Я NyashTalk 🌸 Давай поболтаем о милом~";
-      else greeting = "Привет! Это " + contact.name + " 😊";
+      if (contact.id === "nyashtalk") greeting = "Приветик! Я NyashTalk 🌸 Давай поболтаем о милом~";
       chatData[currentChat].messages.push({ from: "bot", text: greeting });
     }
 
@@ -330,16 +326,15 @@
     renderMessages();
     renderContacts();
 
-    // Шаблонные ответы
     setTimeout(() => {
       let response = "Хмм... интересненько~ 💕";
       const name = document.getElementById("chatName").textContent;
 
       if (name === "Bestie") response = ["Ааа, как мило! 🥰 Обнимашки тебе!", "Ты самый милый в мире! 💕"][Math.floor(Math.random()*2)];
-      else if (name === "Философ") response = ["Сие есть вопрос бытия... 🧠", "Жизнь — это вечный поиск истины."][Math.floor(Math.random()*2)];
-      else if (name === "Учёба") response = "Не сдавайся! Ты справишься 💪 Повторяй материал 3 раза.";
-      else if (name === "Music Pal") response = "Слушаю прямо сейчас Billie Eilish ~ 🎧 А ты что качаешь?";
-      else if (name === "Night Chat") response = "Ночь такая тихая... 🌙 Расскажи, что тебя не отпускает спать?";
+      if (name === "Философ") response = ["Сие есть вопрос бытия... 🧠", "Жизнь — это вечный поиск истины."][Math.floor(Math.random()*2)];
+      if (name === "Учёба") response = "Не сдавайся! Ты справишься 💪 Повторяй материал 3 раза.";
+      if (name === "Music Pal") response = "Слушаю прямо сейчас Billie Eilish ~ 🎧 А ты что качаешь?";
+      if (name === "Night Chat") response = "Ночь такая тихая... 🌙 Расскажи, что тебя не отпускает спать?";
 
       chatData[currentChat].messages.push({ from: "bot", text: response });
       renderMessages();
@@ -367,7 +362,6 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
-  // Черновик
   document.getElementById("messageInput").addEventListener("input", (e) => {
     if (currentChat) {
       chatData[currentChat].draft = e.target.value;
@@ -375,7 +369,21 @@
     }
   });
 
-  // Настройки (простая заглушка)
+  document.getElementById("backBtn").onclick = () => showScreen("contactsScreen");
+
+  document.getElementById("sendBtn").onclick = () => {
+    const text = document.getElementById("messageInput").value.trim();
+    if (text) sendMessage(text);
+  };
+
+  document.getElementById("messageInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      const text = e.target.value.trim();
+      if (text) sendMessage(text);
+    }
+  });
+
+  // Настройки
   document.getElementById("settingsBtn").onclick = () => showScreen("settingsScreen");
   document.getElementById("settingsBackBtn").onclick = () => showScreen("contactsScreen");
   document.getElementById("saveSettingsBtn").onclick = () => {
@@ -385,6 +393,6 @@
 
   // Запуск
   showScreen("phoneScreen");
-  </script>
+</script>
 </body>
 </html>

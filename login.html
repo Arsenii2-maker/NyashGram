@@ -9,67 +9,82 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: system-ui, sans-serif;
-      background: linear-gradient(135deg, #ff9acb, #ffd6e8);
+      font-family: 'Comfortaa', 'system-ui', sans-serif;
+      background: linear-gradient(135deg, #ff9acb 0%, #ffd6e8 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .login-container {
-      background: white;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
       padding: 32px 24px;
-      border-radius: 24px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      border-radius: 28px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
       width: 90%;
       max-width: 380px;
       text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     h1 {
       color: #ff9acb;
       margin: 0 0 8px;
-      font-size: 2.2rem;
+      font-size: 2.4rem;
+      font-weight: 700;
     }
     p {
       color: #666;
       margin: 0 0 24px;
+      font-size: 1.1rem;
     }
     .phone-input {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
     select, input {
-      padding: 14px;
+      padding: 14px 16px;
       font-size: 16px;
       border: 1px solid #ddd;
       border-radius: 12px;
       flex: 1;
+      background: white;
+      transition: border 0.2s;
     }
-    button {
-      padding: 14px;
-      font-size: 17px;
-      background: #ffb3d1; /* серый по умолчанию */
-      color: white;
-      border: none;
-      border-radius: 12px;
-      width: 100%;
-      cursor: not-allowed;
-      transition: 0.2s;
-      margin: 8px 0;
-    }
-    button.active {
-      background: #ff9acb;
-      cursor: pointer;
-    }
-    #codeSection {
-      margin-top: 20px;
+    input:focus {
+      border-color: #ff9acb;
+      outline: none;
     }
     #errorMessage {
       color: #e74c3c;
       font-size: 14px;
       margin: 4px 0 12px;
       min-height: 20px;
+    }
+    button {
+      padding: 16px;
+      font-size: 17px;
+      background: #ffb3d1;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      width: 100%;
+      cursor: not-allowed;
+      transition: all 0.3s;
+      margin: 12px 0;
+      font-weight: 600;
+    }
+    button.active {
+      background: #ff9acb;
+      box-shadow: 0 6px 20px rgba(255, 156, 203, 0.4);
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.7;
+    }
+    #codeSection {
+      margin-top: 24px;
     }
     #recaptcha-container {
       margin-top: 16px;
@@ -98,7 +113,7 @@
     <button id="sendCodeBtn" disabled>Получить код</button>
 
     <div id="codeSection" style="display:none;">
-      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="width:100%; margin:12px 0; text-align:center;" />
+      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="width:100%; margin:16px 0; text-align:center; padding:14px; font-size:18px;" />
       <button id="verifyCodeBtn">Войти</button>
     </div>
 
@@ -121,7 +136,7 @@
       const phone = phoneInput.value.trim().replace(/\D/g, "");
       const country = document.getElementById("countryCode").value;
 
-      if (phone.length >= 9) { // минимум 9 цифр после кода страны
+      if (phone.length >= 9) {
         sendBtn.classList.add("active");
         sendBtn.disabled = false;
         errorMsg.textContent = "";
@@ -138,18 +153,18 @@
       checkPhone(); // начальная проверка
     }
 
-    // Ждём готовности Firebase
-    function tryInit() {
+    // Инициализация после готовности Firebase
+    function initAuth() {
       if (!auth) {
         console.log("auth ещё не готов...");
-        setTimeout(tryInit, 300);
+        setTimeout(initAuth, 300);
         return;
       }
 
-      console.log("auth готов!");
+      console.log("Firebase Auth готов!");
 
       if (!sendBtn) {
-        console.error("Кнопка не найдена!");
+        console.error("Кнопка #sendCodeBtn не найдена!");
         return;
       }
 
@@ -177,7 +192,7 @@
           confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
 
           document.getElementById("codeSection").style.display = "block";
-          alert("Код отправлен! Проверьте SMS.");
+          alert("Код отправлен! Проверьте SMS (может прийти через 5–30 секунд).");
 
           sendBtn.disabled = false;
           sendBtn.textContent = "Получить код";
@@ -189,36 +204,45 @@
         }
       });
 
-      // Войти
-      document.getElementById("verifyCodeBtn").addEventListener("click", async () => {
-        const code = document.getElementById("codeInput").value.trim();
+      // Кнопка "Войти"
+      const verifyBtn = document.getElementById("verifyCodeBtn");
+      if (verifyBtn) {
+        verifyBtn.addEventListener("click", async () => {
+          const code = document.getElementById("codeInput").value.trim();
 
-        if (!code || code.length !== 6) {
-          alert("Введите 6-значный код!");
-          return;
-        }
+          if (!code || code.length !== 6) {
+            alert("Введите 6-значный код!");
+            return;
+          }
 
-        if (!confirmationResult) {
-          alert("Сначала запросите код!");
-          return;
-        }
+          if (!confirmationResult) {
+            alert("Сначала запросите код!");
+            return;
+          }
 
-        try {
-          const credential = await confirmationResult.confirm(code);
-          const user = credential.user;
+          try {
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = "Проверка...";
 
-          alert("Вход успешен!");
-          localStorage.setItem("userPhone", user.phoneNumber);
-          localStorage.setItem("userUid", user.uid);
+            const credential = await confirmationResult.confirm(code);
+            const user = credential.user;
 
-          window.location.href = "profile.html";
-        } catch (err) {
-          alert("Неверный код: " + err.message);
-        }
-      });
+            alert("Вход успешен!");
+            localStorage.setItem("userPhone", user.phoneNumber);
+            localStorage.setItem("userUid", user.uid);
+
+            window.location.href = "profile.html";
+          } catch (err) {
+            console.error("Ошибка:", err);
+            alert("Неверный код: " + err.message);
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = "Войти";
+          }
+        });
+      }
     }
 
-    tryInit();
+    initAuth();
   </script>
 </body>
 </html>

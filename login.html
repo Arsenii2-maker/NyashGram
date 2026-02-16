@@ -3,20 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NyashGram — Вход</title>
+  <title>NyashGram</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Comfortaa', 'system-ui', sans-serif;
+      font-family: 'Comfortaa', sans-serif;
       background: linear-gradient(135deg, #ff9acb 0%, #ffd6e8 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .login-container {
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .active {
+      display: flex !important;
+    }
+    .container {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(10px);
       padding: 32px 24px;
@@ -50,17 +64,10 @@
       border-radius: 12px;
       flex: 1;
       background: white;
-      transition: border 0.2s;
     }
     input:focus {
       border-color: #ff9acb;
       outline: none;
-    }
-    #errorMessage {
-      color: #e74c3c;
-      font-size: 14px;
-      margin: 4px 0 12px;
-      min-height: 20px;
     }
     button {
       padding: 16px;
@@ -80,62 +87,112 @@
       box-shadow: 0 6px 20px rgba(255, 156, 203, 0.4);
       cursor: pointer;
     }
-    button:disabled {
-      opacity: 0.7;
+    #errorMessage {
+      color: #e74c3c;
+      font-size: 14px;
+      margin: 4px 0 12px;
+      min-height: 20px;
+    }
+    /* Экран кода */
+    #codeInput {
+      width: 100%;
+      padding: 16px;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 12px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background: white;
+      color: #333;
+    }
+    #codeInput::placeholder {
+      color: rgba(255, 156, 203, 0.5);
+      opacity: 1;
+      letter-spacing: 12px;
     }
     #codeSection {
       margin-top: 24px;
-    }
-    #recaptcha-container {
-      margin-top: 16px;
-      min-height: 78px;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <h1>NyashGram 🩷</h1>
-    <p>Вход по номеру телефона</p>
+  <!-- Экран ввода номера -->
+  <section id="phoneScreen" class="screen active">
+    <div class="container">
+      <h1>NyashGram 🩷</h1>
+      <p>Вход по номеру телефона</p>
 
-    <div class="phone-input">
-      <select id="countryCode">
-        <option value="+7">+7 Россия</option>
-        <option value="+380">+380 Украина</option>
-        <option value="+375">+375 Беларусь</option>
-        <option value="+1">+1 США/Канада</option>
-      </select>
-      <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
+      <div class="phone-input">
+        <select id="countryCode">
+          <option value="+7">+7 Россия</option>
+          <option value="+380">+380 Украина</option>
+          <option value="+375">+375 Беларусь</option>
+          <option value="+1">+1 США/Канада</option>
+        </select>
+        <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
+      </div>
+
+      <div id="errorMessage"></div>
+
+      <button id="sendCodeBtn" disabled>Получить код</button>
     </div>
+  </section>
 
-    <div id="errorMessage"></div>
+  <!-- Экран ввода кода -->
+  <section id="codeScreen" class="screen">
+    <div class="container">
+      <h1>NyashGram 🩷</h1>
+      <p>Введи код</p>
 
-    <button id="sendCodeBtn" disabled>Получить код</button>
+      <input type="text" id="codeInput" placeholder="------" maxlength="6" autocomplete="off" />
 
-    <div id="codeSection" style="display:none;">
-      <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6" style="width:100%; margin:16px 0; text-align:center; padding:14px; font-size:18px;" />
-      <button id="verifyCodeBtn">Войти</button>
+      <div id="codeError" style="color:#e74c3c; font-size:14px; margin-top:12px; min-height:20px;"></div>
+
+      <button id="verifyCodeBtn" disabled>Войти</button>
     </div>
+  </section>
 
-    <div id="recaptcha-container"></div>
-  </div>
+  <!-- Экран профиля -->
+  <section id="profileScreen" class="screen">
+    <div class="container">
+      <h1>Создай профиль</h1>
 
-  <script type="module">
-    import { auth } from './firebase.js';
+      <input type="text" id="displayName" placeholder="Как тебя зовут?" style="width:100%; margin:16px 0;" />
 
-    console.log("login.html загружен");
+      <div style="margin:20px 0;">
+        <label for="avatarInput">
+          <div id="avatarPreview" style="width:120px; height:120px; background:#ff9acb; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; color:white;">+</div>
+          <p style="margin-top:12px;">Выбрать фото</p>
+        </label>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+      </div>
 
-    let confirmationResult = null;
+      <button id="saveProfileBtn">Готово!</button>
+    </div>
+  </section>
 
-    const sendBtn = document.getElementById("sendCodeBtn");
+  <script>
+    let generatedCode = "";
+
+    // Генерация 6-значного кода
+    function generateCode() {
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById("codeInput").placeholder = generatedCode.split("").join(" ");
+      console.log("Сгенерированный код:", generatedCode);
+    }
+
+    // Экран номера
+    const phoneScreen = document.getElementById("phoneScreen");
+    const codeScreen = document.getElementById("codeScreen");
+    const profileScreen = document.getElementById("profileScreen");
+
     const phoneInput = document.getElementById("phoneNumber");
+    const sendBtn = document.getElementById("sendCodeBtn");
     const errorMsg = document.getElementById("errorMessage");
 
-    // Проверка номера в реальном времени
     function checkPhone() {
       const phone = phoneInput.value.trim().replace(/\D/g, "");
-      const country = document.getElementById("countryCode").value;
-
       if (phone.length >= 9) {
         sendBtn.classList.add("active");
         sendBtn.disabled = false;
@@ -147,102 +204,69 @@
       }
     }
 
-    if (phoneInput) {
-      phoneInput.addEventListener("input", checkPhone);
-      document.getElementById("countryCode").addEventListener("change", checkPhone);
-      checkPhone(); // начальная проверка
-    }
+    phoneInput.addEventListener("input", checkPhone);
+    checkPhone();
 
-    // Инициализация после готовности Firebase
-    function initAuth() {
-      if (!auth) {
-        console.log("auth ещё не готов...");
-        setTimeout(initAuth, 300);
+    sendBtn.addEventListener("click", () => {
+      if (sendBtn.disabled) return;
+      generateCode();
+      phoneScreen.classList.remove("active");
+      codeScreen.classList.add("active");
+    });
+
+    // Экран кода
+    const codeInput = document.getElementById("codeInput");
+    const verifyBtn = document.getElementById("verifyCodeBtn");
+    const codeError = document.getElementById("codeError");
+
+    codeInput.addEventListener("input", () => {
+      const entered = codeInput.value.trim();
+      if (entered.length === 6) {
+        if (entered === generatedCode) {
+          codeError.textContent = "";
+          verifyBtn.classList.add("active");
+          verifyBtn.disabled = false;
+        } else {
+          codeError.textContent = "Неверный код";
+          verifyBtn.classList.remove("active");
+          verifyBtn.disabled = true;
+        }
+      } else {
+        codeError.textContent = "";
+        verifyBtn.classList.remove("active");
+        verifyBtn.disabled = true;
+      }
+    });
+
+    verifyBtn.addEventListener("click", () => {
+      if (verifyBtn.disabled) return;
+      codeScreen.classList.remove("active");
+      profileScreen.classList.add("active");
+    });
+
+    // Экран профиля
+    document.getElementById("avatarInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          document.getElementById("avatarPreview").style.backgroundImage = `url(${event.target.result})`;
+          document.getElementById("avatarPreview").textContent = "";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById("saveProfileBtn").addEventListener("click", () => {
+      const name = document.getElementById("displayName").value.trim();
+      if (!name) {
+        alert("Введи имя!");
         return;
       }
-
-      console.log("Firebase Auth готов!");
-
-      if (!sendBtn) {
-        console.error("Кнопка #sendCodeBtn не найдена!");
-        return;
-      }
-
-      sendBtn.addEventListener("click", async () => {
-        console.log("Клик по 'Получить код'");
-
-        const country = document.getElementById("countryCode").value;
-        const phone = phoneInput.value.trim().replace(/\D/g, "");
-
-        if (phone.length < 9) {
-          alert("Номер слишком короткий!");
-          return;
-        }
-
-        const fullPhone = country + phone;
-
-        try {
-          sendBtn.disabled = true;
-          sendBtn.textContent = "Отправка...";
-
-          const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            size: 'invisible'
-          });
-
-          confirmationResult = await auth.signInWithPhoneNumber(fullPhone, appVerifier);
-
-          document.getElementById("codeSection").style.display = "block";
-          alert("Код отправлен! Проверьте SMS (может прийти через 5–30 секунд).");
-
-          sendBtn.disabled = false;
-          sendBtn.textContent = "Получить код";
-        } catch (err) {
-          console.error("Ошибка:", err);
-          alert("Ошибка отправки: " + err.message);
-          sendBtn.disabled = false;
-          sendBtn.textContent = "Получить код";
-        }
-      });
-
-      // Кнопка "Войти"
-      const verifyBtn = document.getElementById("verifyCodeBtn");
-      if (verifyBtn) {
-        verifyBtn.addEventListener("click", async () => {
-          const code = document.getElementById("codeInput").value.trim();
-
-          if (!code || code.length !== 6) {
-            alert("Введите 6-значный код!");
-            return;
-          }
-
-          if (!confirmationResult) {
-            alert("Сначала запросите код!");
-            return;
-          }
-
-          try {
-            verifyBtn.disabled = true;
-            verifyBtn.textContent = "Проверка...";
-
-            const credential = await confirmationResult.confirm(code);
-            const user = credential.user;
-
-            alert("Вход успешен!");
-            localStorage.setItem("userPhone", user.phoneNumber);
-            localStorage.setItem("userUid", user.uid);
-
-            window.location.href = "profile.html";
-          } catch (err) {
-            console.error("Ошибка:", err);
-            alert("Неверный код: " + err.message);
-            verifyBtn.disabled = false;
-            verifyBtn.textContent = "Войти";
-          }
-        });
-      }
-    }
-
-    initAuth();
+      alert("Профиль сохранён! Добро пожаловать в NyashGram 🩷");
+      // Здесь можно перейти на контакты
+      // window.location.href = "contacts.html" или showScreen("contacts")
+    });
   </script>
 </body>
 </html>

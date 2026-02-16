@@ -11,10 +11,10 @@
 
 <div id="app">
 
-  <!-- Экран номера -->
+  <!-- Экран ввода номера (как на скрине) -->
   <section id="phoneScreen" class="screen active">
-    <div class="container">
-      <h1>NyashGram 🩷</h1>
+    <div class="login-container">
+      <h1>NyashGram <span style="font-size:1.2em;">♥</span></h1>
       <p>Вход по номеру телефона</p>
 
       <div class="phone-input">
@@ -26,15 +26,16 @@
         <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
       </div>
 
-      <div id="phoneError"></div>
+      <div id="phoneError" style="color:#e74c3c; font-size:14px; margin:8px 0; min-height:20px;"></div>
+
       <button id="sendBtn" disabled>Получить код</button>
     </div>
   </section>
 
-  <!-- Экран фейкового кода -->
+  <!-- Экран ввода кода -->
   <section id="codeScreen" class="screen">
-    <div class="container">
-      <h1>NyashGram 🩷</h1>
+    <div class="login-container">
+      <h1>NyashGram <span style="font-size:1.2em;">♥</span></h1>
       <p>Введи код</p>
 
       <input type="text" id="codeInput" placeholder="------" maxlength="6" autocomplete="off" />
@@ -44,72 +45,9 @@
     </div>
   </section>
 
-  <!-- Экран профиля -->
-  <section id="profileScreen" class="screen">
-    <div class="container">
-      <h1>Создай профиль</h1>
-
-      <input type="text" id="displayName" placeholder="Как тебя зовут?" style="width:100%; margin:16px 0;" />
-
-      <div style="margin:20px 0;">
-        <label for="avatarInput">
-          <div id="avatarPreview" style="width:120px; height:120px; background:#ff9acb; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; color:white;">+</div>
-          <p style="margin-top:12px;">Выбрать фото (необязательно)</p>
-        </label>
-        <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
-      </div>
-
-      <button id="saveProfileBtn">Готово!</button>
-    </div>
-  </section>
-
-  <!-- НАСТРОЙКИ -->
-  <section id="settingsScreen" class="screen">
-    <header class="top-bar">
-      <button id="settingsBackBtn">←</button>
-      <div class="top-title">Настройки</div>
-    </header>
-
-    <div style="padding:16px; display:flex; flex-direction:column; gap:16px">
-      <label>
-        Никнейм
-        <input id="settingsName">
-      </label>
-
-      <label>
-        Аватарка
-        <input type="file" id="avatarInputSettings" accept="image/*">
-        <div style="margin-top:8px;">
-          <div id="avatarPreviewSettings" class="avatar" style="width:80px; height:80px; margin:0 auto;"></div>
-        </div>
-      </label>
-
-      <label>
-        Тема
-        <select id="themeSelect">
-          <option value="pastel-pink">Pastel Pink 🩷</option>
-          <option value="milk-rose">Milk Rose 🌸</option>
-          <option value="night-blue">Night Blue 🌙</option>
-        </select>
-      </label>
-
-      <label>
-        Шрифт
-        <select id="fontSelect">
-          <option value="system">System</option>
-          <option value="rounded">Rounded</option>
-          <option value="cozy">Cozy</option>
-        </select>
-      </label>
-
-      <button id="saveSettingsBtn">Сохранить</button>
-    </div>
-  </section>
-
-  <!-- КОНТАКТЫ -->
+  <!-- Контакты -->
   <section id="contactsScreen" class="screen">
     <header class="top-bar">
-      <button id="settingsBtn">⚙️</button>
       <div class="top-title">Контакты</div>
     </header>
     <div id="contactsList"></div>
@@ -149,11 +87,6 @@
 </div>
 
 <script>
-  // Глобальные переменные
-  let currentChat = null;
-  const chatData = {}; // { chatId: { messages: [], draft: "" } }
-
-  // Фейковый код
   let generatedCode = "";
 
   function generateCode() {
@@ -218,185 +151,15 @@
   });
 
   verifyBtn.addEventListener("click", () => {
-    showScreen("profileScreen");
-  });
-
-  // Экран профиля
-  document.getElementById("avatarInput").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        document.getElementById("avatarPreview").style.backgroundImage = `url(${event.target.result})`;
-        document.getElementById("avatarPreview").textContent = "";
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  document.getElementById("saveProfileBtn").addEventListener("click", () => {
-    const name = document.getElementById("displayName").value.trim();
-    if (!name) return alert("Введи имя!");
-    alert("Профиль сохранён! Добро пожаловать 🩷");
     showScreen("contactsScreen");
-    renderContacts();
+    if (typeof renderContacts === 'function') renderContacts();
   });
-
-  // Контакты
-  const contacts = [
-    { id: "bestie", name: "Bestie", status: "online", avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)" },
-    { id: "filosof", name: "Философ", status: "пишет трактат", avatar: "linear-gradient(135deg, #6c5ce7, #a29bfe)" },
-    { id: "ucheba", name: "Учёба", status: "готовлюсь к экзамену", avatar: "linear-gradient(135deg, #74b9ff, #0984e3)" },
-    { id: "music", name: "Music Pal", status: "слушаю lo-fi", avatar: "linear-gradient(135deg, #fdcb6e, #e17055)" },
-    { id: "night", name: "Night Chat", status: "не сплю", avatar: "linear-gradient(135deg, #2d3436, #636e72)" }
-  ];
-
-  const fixedChats = [
-    { id: "nyashhelp", name: "NyashHelp", status: "🩷 всегда на связи", avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)" },
-    { id: "nyashtalk", name: "NyashTalk", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #a78bfa, #7ab8ff)" }
-  ];
-
-  function renderContacts() {
-    const list = document.getElementById("contactsList");
-    list.innerHTML = "";
-
-    fixedChats.forEach(c => {
-      const el = document.createElement("div");
-      el.className = "contact fixed";
-      el.innerHTML = `
-        <div class="avatar" style="background:${c.avatar}"></div>
-        <div class="info">
-          <div class="name">${c.name}</div>
-          <div class="status">${c.status}</div>
-          <div class="draft" style="display:none; color:#ff9acb; font-size:12px;"></div>
-        </div>
-      `;
-      if (chatData[c.id] && chatData[c.id].draft) {
-        el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + "...";
-        el.querySelector(".draft").style.display = "block";
-      }
-      el.onclick = () => openChat(c);
-      list.appendChild(el);
-    });
-
-    contacts.forEach(c => {
-      const el = document.createElement("div");
-      el.className = "contact";
-      el.innerHTML = `
-        <div class="avatar" style="background:${c.avatar}"></div>
-        <div class="info">
-          <div class="name">${c.name}</div>
-          <div class="status">${c.status}</div>
-          <div class="draft" style="display:none; color:#ff9acb; font-size:12px;"></div>
-        </div>
-      `;
-      if (chatData[c.id] && chatData[c.id].draft) {
-        el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + "...";
-        el.querySelector(".draft").style.display = "block";
-      }
-      el.onclick = () => openChat(c);
-      list.appendChild(el);
-    });
-  }
-
-  function openChat(contact) {
-    currentChat = contact.id;
-    if (!chatData[currentChat]) chatData[currentChat] = { messages: [], draft: "" };
-
-    document.getElementById("chatName").textContent = contact.name;
-    document.getElementById("chatStatus").textContent = contact.status;
-    document.getElementById("chatAvatar").style.background = contact.avatar;
-
-    const input = document.getElementById("messageInput");
-    if (input) input.value = chatData[currentChat].draft || "";
-
-    if (chatData[currentChat].messages.length === 0) {
-      let greeting = "Привет! Это " + contact.name + " 😊";
-      if (contact.id === "nyashhelp") greeting = "Привет! Я NyashHelp 🩷 Спрашивай про приложение~";
-      if (contact.id === "nyashtalk") greeting = "Приветик! Я NyashTalk 🌸 Давай поболтаем о милом~";
-      chatData[currentChat].messages.push({ from: "bot", text: greeting });
-    }
-
-    showScreen("chatScreen");
-    renderMessages();
-  }
-
-  function sendMessage(text) {
-    if (!text.trim()) return;
-
-    chatData[currentChat].messages.push({ from: "me", text });
-    chatData[currentChat].draft = "";
-    document.getElementById("messageInput").value = "";
-    renderMessages();
-    renderContacts();
-
-    setTimeout(() => {
-      let response = "Хмм... интересненько~ 💕";
-      const name = document.getElementById("chatName").textContent;
-
-      if (name === "Bestie") response = ["Ааа, как мило! 🥰 Обнимашки тебе!", "Ты самый милый в мире! 💕"][Math.floor(Math.random()*2)];
-      if (name === "Философ") response = ["Сие есть вопрос бытия... 🧠", "Жизнь — это вечный поиск истины."][Math.floor(Math.random()*2)];
-      if (name === "Учёба") response = "Не сдавайся! Ты справишься 💪 Повторяй материал 3 раза.";
-      if (name === "Music Pal") response = "Слушаю прямо сейчас Billie Eilish ~ 🎧 А ты что качаешь?";
-      if (name === "Night Chat") response = "Ночь такая тихая... 🌙 Расскажи, что тебя не отпускает спать?";
-
-      chatData[currentChat].messages.push({ from: "bot", text: response });
-      renderMessages();
-    }, 800);
-  }
-
-  function renderMessages() {
-    const messages = document.getElementById("messages");
-    const intro = document.getElementById("chatIntro");
-
-    messages.innerHTML = "";
-    intro.style.display = "none";
-
-    if (chatData[currentChat]?.messages.length === 0) {
-      intro.style.display = "block";
-    }
-
-    chatData[currentChat]?.messages.forEach(m => {
-      const el = document.createElement("div");
-      el.className = `message ${m.from}`;
-      el.textContent = m.text;
-      messages.appendChild(el);
-    });
-
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  document.getElementById("messageInput").addEventListener("input", (e) => {
-    if (currentChat) {
-      chatData[currentChat].draft = e.target.value;
-      renderContacts();
-    }
-  });
-
-  document.getElementById("backBtn").onclick = () => showScreen("contactsScreen");
-
-  document.getElementById("sendBtn").onclick = () => {
-    const text = document.getElementById("messageInput").value.trim();
-    if (text) sendMessage(text);
-  };
-
-  document.getElementById("messageInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      const text = e.target.value.trim();
-      if (text) sendMessage(text);
-    }
-  });
-
-  // Настройки
-  document.getElementById("settingsBtn").onclick = () => showScreen("settingsScreen");
-  document.getElementById("settingsBackBtn").onclick = () => showScreen("contactsScreen");
-  document.getElementById("saveSettingsBtn").onclick = () => {
-    alert("Настройки сохранены!");
-    showScreen("contactsScreen");
-  };
 
   // Запуск
   showScreen("phoneScreen");
 </script>
+<script src="app.js"></script>
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
 </body>
 </html>

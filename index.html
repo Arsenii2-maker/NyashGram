@@ -86,6 +86,41 @@
       opacity: 1;
       letter-spacing: 10px;
     }
+
+    /* Контакты */
+    .contact {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: white;
+      margin: 8px 0;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 16px;
+    }
+    .info {
+      flex: 1;
+      text-align: left;
+    }
+    .name {
+      font-weight: 600;
+      color: #333;
+    }
+    .status {
+      font-size: 14px;
+      color: #666;
+    }
+    .draft {
+      font-size: 12px;
+      color: #ff9acb;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -142,13 +177,13 @@
     </div>
   </section>
 
-  <!-- КОНТАКТЫ -->
-<section id="contactsScreen" class="screen active">
-  <header class="top-bar">
-    <div class="top-title">Контакты</div>
-  </header>
-  <div id="contactsList"></div>
-</section>
+  <!-- Контакты -->
+  <section id="contactsScreen" class="screen">
+    <header class="top-bar">
+      <div class="top-title">Контакты</div>
+    </header>
+    <div id="contactsList"></div>
+  </section>
 
   <script>
     let generatedCode = "";
@@ -233,10 +268,38 @@
       alert("Профиль сохранён! Добро пожаловать 🩷");
       document.getElementById("profileScreen").classList.remove("active");
       document.getElementById("contactsScreen").classList.add("active");
+      renderContacts(); // вызываем контакты
     });
+
+    // Контакты (простая заглушка)
+    function renderContacts() {
+      const list = document.getElementById("contactsList");
+      list.innerHTML = "";
+
+      const chats = [
+        { name: "NyashHelp", status: "🩷 всегда на связи" },
+        { name: "NyashTalk", status: "💕 болтаем о милом" },
+        { name: "Bestie", status: "online" },
+        { name: "Философ", status: "пишет трактат" },
+        { name: "Учёба", status: "готовлюсь к экзамену" },
+        { name: "Music Pal", status: "слушаю lo-fi" },
+        { name: "Night Chat", status: "не сплю" }
+      ];
+
+      chats.forEach(c => {
+        const el = document.createElement("div");
+        el.className = "contact";
+        el.innerHTML = `
+          <div class="avatar" style="background: linear-gradient(135deg, #ff9acb, #ffd6e8);"></div>
+          <div class="info">
+            <div class="name">${c.name}</div>
+            <div class="status">${c.status}</div>
+          </div>
+        `;
+        el.onclick = () => alert(`Открываем чат с ${c.name}`);
+        list.appendChild(el);
+      });
+    }
   </script>
-  <script src="app.js"></script>
-<script src="contacts.js"></script>
-<script src="chat.js"></script>
 </body>
 </html>

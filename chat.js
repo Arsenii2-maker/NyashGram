@@ -1,5 +1,3 @@
-// chat.js — исправленный и чистый
-
 let currentChat = null;
 const chatData = {};
 
@@ -62,6 +60,7 @@ function getNyashHelpResponse(text) {
 function getNyashTalkResponse(text) {
   text = text.toLowerCase().trim();
 
+  // Более умные ответы по ключевым словам
   if (text.includes("привет") || text.includes("хай")) {
     return ["Приветик! 🩷 Как настроение сегодня~?", "Хай-хай! 💕 Соскучилась по тебе!"][Math.floor(Math.random()*2)];
   }
@@ -105,7 +104,12 @@ function getNyashTalkResponse(text) {
     return "Аааа, я тоже тебя люблю! 💕 *крепко обнимает*";
   }
 
-  return ["Хмм... интересно! 💕 Расскажи подробнее~", "Ой, я вся внимание! 😽 Что дальше?", "Миленько! 🩷 Продолжай, мне очень нравится слушать тебя~"][Math.floor(Math.random()*3)];
+  // Если ничего не подошло — умный fallback
+  return [
+    "Хмм... это так мило! 💕 Расскажи подробнее~",
+    "Ой, я вся внимание! 😽 Что дальше?",
+    "Миленько! 🩷 Продолжай, мне очень нравится слушать тебя~"
+  ][Math.floor(Math.random() * 3)];
 }
 
 // ==================== OPENCHAT ====================
@@ -169,7 +173,7 @@ function renderMessages() {
   const messages = document.getElementById("messages");
   const intro = document.getElementById("chatIntro");
 
-  if (!messages) return; // защита
+  if (!messages) return;
 
   messages.innerHTML = "";
 
@@ -196,7 +200,7 @@ function renderMessages() {
     }
   }
 
-  // Панель для NyashTalk — всегда показываем
+  // Панель для NyashTalk
   if (isNyashTalk()) {
     const talkPanel = document.createElement("div");
     talkPanel.className = "nyashtalk-quick";

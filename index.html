@@ -233,6 +233,36 @@
       document.getElementById("profileScreen").classList.remove("active");
       document.getElementById("contactsScreen").classList.add("active");
     });
+    // Проверяем, проходил ли пользователь вход раньше
+const hasEntered = localStorage.getItem("nyashgram_entered");
+
+if (hasEntered === "true") {
+  // Если уже входил — сразу показываем контакты
+  showScreen("contactsScreen");
+  if (typeof renderContacts === "function") renderContacts();
+} else {
+  // Первый раз — показываем экран номера
+  showScreen("phoneScreen");
+}
+
+// После успешного ввода кода (в обработчике verifyBtn)
+verifyBtn.addEventListener("click", () => {
+  const entered = codeInput.value.trim();
+  if (entered === generatedCode) {
+    codeError.textContent = "";
+    verifyBtn.classList.add("active");
+    verifyBtn.disabled = false;
+
+    // Сохраняем флаг, что вход пройден
+    localStorage.setItem("nyashgram_entered", "true");
+
+    // Переходим сразу на контакты
+    showScreen("contactsScreen");
+    if (typeof renderContacts === "function") renderContacts();
+  } else {
+    codeError.textContent = "Неверный код";
+  }
+});
   </script>
   <script src="contacts.js"></script>
 <script src="chat.js"></script>

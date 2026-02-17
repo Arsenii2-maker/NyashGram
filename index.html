@@ -150,6 +150,11 @@
 </section>
 
   <script>
+  function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(id);
+  if (screen) screen.classList.add('active');
+}
     let generatedCode = "";
 
     function generateCode() {

@@ -224,7 +224,7 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          document.getElementById("avatarPreview").style.backgroundImage = url(${event.target.result});
+          document.getElementById("avatarPreview").style.backgroundImage = `url(${event.target.result})`;
           document.getElementById("avatarPreview").textContent = "";
         };
         reader.readAsDataURL(file);

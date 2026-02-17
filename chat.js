@@ -183,7 +183,7 @@ function openChat(contact) {
 }
 
   renderMessages();
-}
+
 
 // ==================== SENDMESSAGE ====================
 function sendMessage(text) {

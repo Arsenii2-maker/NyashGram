@@ -167,21 +167,20 @@ function openChat(contact) {
   currentChat = contact.id;
   if (!chatData[currentChat]) chatData[currentChat] = { messages: [], draft: "" };
 
+  // Сначала показываем экран, потом заполняем элементы
   showScreen("chat");
 
-  document.getElementById("chatName").textContent = contact.name;
-  document.getElementById("chatStatus").textContent = contact.status;
-  document.getElementById("chatAvatar").style.background = contact.avatar || gradientFor(contact.name);
+  // Теперь элементы уже в DOM
+  const chatName = document.getElementById("chatName");
+  const chatStatus = document.getElementById("chatStatus");
+  const chatAvatar = document.getElementById("chatAvatar");
 
-  const input = document.getElementById("messageInput");
-  if (input) input.value = chatData[currentChat].draft || "";
+  if (chatName) chatName.textContent = contact.name;
+  if (chatStatus) chatStatus.textContent = contact.status;
+  if (chatAvatar) chatAvatar.style.background = contact.avatar || gradientFor(contact.name);
 
-  if (chatData[currentChat].messages.length === 0) {
-    let greeting = `Привет! Это ${contact.name} 😊`;
-    if (isNyashHelp()) greeting = "Привет! Я NyashHelp 🩷 Спрашивай про приложение, я знаю всё-всё~ 💕";
-    if (isNyashTalk()) greeting = "Приветик! Я NyashTalk 🌸 Давай поболтаем о чём угодно милом~ Выбирай тему! 💕";
-    chatData[currentChat].messages.push({ from: "bot", text: greeting });
-  }
+  // остальной код...
+}
 
   renderMessages();
 }

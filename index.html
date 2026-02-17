@@ -263,26 +263,26 @@ verifyBtn.addEventListener("click", () => {
     codeError.textContent = "Неверный код";
   }
 });
-// Проверяем, проходил ли вход раньше
+// Проверяем, проходил ли пользователь вход раньше
 if (localStorage.getItem("nyashgram_entered") === "true") {
   showScreen("contactsScreen");
-  renderContacts(); // сразу рендерим контакты
+  renderContacts(); // сразу показываем контакты
 } else {
   showScreen("phoneScreen");
 }
 
-// В обработчике успешного ввода кода (verifyBtn) добавь сохранение флага
+// Обработчик кнопки "Войти"
 verifyBtn.addEventListener("click", () => {
   const entered = codeInput.value.trim();
   if (entered === generatedCode) {
     codeError.textContent = "";
 
-    // Сохраняем, что вход пройден
+    // Сохраняем флаг входа
     localStorage.setItem("nyashgram_entered", "true");
 
     // Переходим на контакты и рендерим их
     showScreen("contactsScreen");
-    renderContacts(); // ← эта строка заставит контакты появиться
+    renderContacts(); // ← это обязательно здесь
   } else {
     codeError.textContent = "Неверный код";
   }

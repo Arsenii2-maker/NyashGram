@@ -268,7 +268,8 @@ verifyBtn.addEventListener("click", () => {
     codeError.textContent = "Неверный код";
   }
 });
-// Проверяем, проходил ли пользователь вход раньше
+
+// Проверяем, проходил ли вход раньше
 if (localStorage.getItem("nyashgram_entered") === "true") {
   showScreen("contactsScreen");
   renderContacts(); // сразу показываем контакты
@@ -285,9 +286,9 @@ verifyBtn.addEventListener("click", () => {
     // Сохраняем флаг входа
     localStorage.setItem("nyashgram_entered", "true");
 
-    // Переходим на контакты и рендерим их
+    // Переходим на контакты и рендерим
     showScreen("contactsScreen");
-    renderContacts(); // ← это обязательно здесь
+    renderContacts();
   } else {
     codeError.textContent = "Неверный код";
   }

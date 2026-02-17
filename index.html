@@ -272,7 +272,13 @@ verifyBtn.addEventListener("click", () => {
 // Проверяем, проходил ли вход раньше
 if (localStorage.getItem("nyashgram_entered") === "true") {
   showScreen("contactsScreen");
-  renderContacts(); // сразу показываем контакты
+  setTimeout(() => {
+  if (typeof renderContacts === "function") {
+    renderContacts();
+  } else {
+    console.error("renderContacts всё ещё не загружен — подожди contacts.js");
+  }
+}, 300); // 300 мс задержки
 } else {
   showScreen("phoneScreen");
 }

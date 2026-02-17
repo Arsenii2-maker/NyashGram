@@ -60,6 +60,7 @@ function getNyashHelpResponse(text) {
 function getNyashTalkResponse(text) {
   text = text.toLowerCase().trim();
 
+  // Более умные ответы
   if (text.includes("привет") || text.includes("хай")) {
     return ["Приветик! 🩷 Как настроение сегодня~?", "Хай-хай! 💕 Соскучилась по тебе!"][Math.floor(Math.random()*2)];
   }
@@ -103,63 +104,7 @@ function getNyashTalkResponse(text) {
     return "Аааа, я тоже тебя люблю! 💕 *крепко обнимает*";
   }
 
-  return [
-    "Хмм... это так мило! 💕 Расскажи подробнее~",
-    "Ой, я вся внимание! 😽 Что дальше?",
-    "Миленько! 🩷 Продолжай, мне очень нравится слушать тебя~"
-  ][Math.floor(Math.random() * 3)];
-}
-
-// ==================== ОТВЕТЫ ОТ ЗАГЛУШЕК (Bestie, Философ и т.д.) ====================
-function getStubResponse(chatName) {
-  const name = chatName.toLowerCase();
-
-  if (name.includes("bestie")) {
-    const replies = [
-      "Ааа, ты такой милый! 🥰 Давай обнимашки~ 💕",
-      "Ты моя любимая душа в этом мире! 😽 Целую в щёчку!",
-      "Ммм, мне так уютно с тобой... 🧸❤️"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  }
-
-  if (name.includes("философ")) {
-    const replies = [
-      "Сие есть вопрос бытия... Что есть любовь в мире форм? 🧠",
-      "Человек есть мера всех вещей, но ты — мера моего сердца.",
-      "Жизнь коротка, а разговор с тобой — вечность."
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  }
-
-  if (name.includes("учёба")) {
-    const replies = [
-      "Не сдавайся! Повторяй материал 3 раза и будет легче 💪📚",
-      "Знание — сила, а ты — будущий гений! Давай разберём тему вместе?",
-      "Каждый шаг вперёд — победа. Ты молодец!"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  }
-
-  if (name.includes("music")) {
-    const replies = [
-      "Сейчас качаю Billie Eilish — Ocean Eyes... А ты что слушаешь? 🎧✨",
-      "Включила lo-fi beats to chill/study to ~ Идеально для нас двоих 😌",
-      "Рекомендую K-pop плейлист — там сейчас очень милый вайб! 💗"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  }
-
-  if (name.includes("night")) {
-    const replies = [
-      "Ночь такая тихая... 🌙 Что тебя не отпускает спать сегодня?",
-      "Давай поболтаем до утра? У меня есть все звёзды для тебя ✨",
-      "Ты мой самый уютный ночной секрет... 😴💜"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  }
-
-  return "Хмм... интересненько~ 💕 Расскажи ещё!";
+  return ["Хмм... интересно! 💕 Расскажи подробнее~", "Ой, я вся внимание! 😽 Что дальше?", "Миленько! 🩷 Продолжай, мне очень нравится слушать тебя~"][Math.floor(Math.random()*3)];
 }
 
 // ==================== OPENCHAT ====================
@@ -167,51 +112,54 @@ function openChat(contact) {
   currentChat = contact.id;
   if (!chatData[currentChat]) chatData[currentChat] = { messages: [], draft: "" };
 
-  // Сначала показываем экран, потом заполняем элементы
   showScreen("chat");
 
-  // Теперь элементы уже в DOM
-  const chatName = document.getElementById("chatName");
-  const chatStatus = document.getElementById("chatStatus");
-  const chatAvatar = document.getElementById("chatAvatar");
+  document.getElementById("chatName").textContent = contact.name;
+  document.getElementById("chatStatus").textContent = contact.status;
+  document.getElementById("chatAvatar").style.background = contact.avatar || gradientFor(contact.name);
 
-  if (chatName) chatName.textContent = contact.name;
-  if (chatStatus) chatStatus.textContent = contact.status;
-  if (chatAvatar) chatAvatar.style.background = contact.avatar || gradientFor(contact.name);
+  // Восстанавливаем черновик
+  const input = document.getElementById("messageInput");
+  input.value = chatData[currentChat].draft || "";
 
-  // остальной код...
-}
+  // Приветствие только один раз
+  if (chatData[currentChat].messages.length === 0) {
+    if (isNyashHelp()) {
+      chatData[currentChat].messages.push({ from: "nyashhelp", text: "Привет! Я NyashHelp 🩷 Спрашивай про приложение, я знаю всё-всё~ 💕" });
+    } else if (isNyashTalk()) {
+      chatData[currentChat].messages.push({ from: "nyashtalk", text: "Приветик! Я NyashTalk 🌸 Давай поболтаем о чём угодно милом~ Выбирай тему! 💕" });
+    }
+  }
 
   renderMessages();
-
+}
 
 // ==================== SENDMESSAGE ====================
 function sendMessage(text) {
   if (!text.trim()) return;
 
   chatData[currentChat].messages.push({ from: "me", text });
-  chatData[currentChat].draft = "";
-  const input = document.getElementById("messageInput");
-  if (input) input.value = "";
+  chatData[currentChat].draft = ""; // очищаем черновик
+  document.getElementById("messageInput").value = "";
   renderMessages();
 
-  setTimeout(() => {
-    let response = "Хмм... интересненько~ 💕";
+  if (isNyashHelp()) {
+    setTimeout(() => {
+      const response = getNyashHelpResponse(text);
+      chatData[currentChat].messages.push({ from: "nyashhelp", text: response });
+      renderMessages();
+    }, 800);
+  }
 
-    if (isNyashHelp()) {
-      response = getNyashHelpResponse(text);
-    } else if (isNyashTalk()) {
-      response = getNyashTalkResponse(text);
-    } else {
-      // Ответы от заглушек
-      response = getStubResponse(document.getElementById("chatName").textContent);
-    }
+  if (isNyashTalk()) {
+    setTimeout(() => {
+      const response = getNyashTalkResponse(text);
+      chatData[currentChat].messages.push({ from: "nyashtalk", text: response });
+      renderMessages();
+    }, 800);
+  }
 
-    chatData[currentChat].messages.push({ from: "bot", text: response });
-    renderMessages();
-  }, 800);
-
-  renderContacts(); // обновляем черновики в списке
+  renderContacts(); // обновляем список контактов с черновиком
 }
 
 // ==================== RENDERMESSAGES ====================
@@ -219,12 +167,11 @@ function renderMessages() {
   const messages = document.getElementById("messages");
   const intro = document.getElementById("chatIntro");
 
-  if (!messages) return;
-
   messages.innerHTML = "";
 
   intro.style.display = "none";
 
+  // Панель для NyashHelp
   if (isNyashHelp()) {
     const helpPanel = document.createElement("div");
     helpPanel.className = "nyashhelp-quick";
@@ -235,16 +182,15 @@ function renderMessages() {
     messages.appendChild(helpPanel);
 
     const container = helpPanel.querySelector(".nyashhelp-buttons");
-    if (container) {
-      nyashHelpQuickQuestions.forEach(q => {
-        const btn = document.createElement("button");
-        btn.textContent = q;
-        btn.addEventListener("click", () => sendMessage(q));
-        container.appendChild(btn);
-      });
-    }
+    nyashHelpQuickQuestions.forEach(q => {
+      const btn = document.createElement("button");
+      btn.textContent = q;
+      btn.addEventListener("click", () => sendMessage(q));
+      container.appendChild(btn);
+    });
   }
 
+  // Панель для NyashTalk
   if (isNyashTalk()) {
     const talkPanel = document.createElement("div");
     talkPanel.className = "nyashtalk-quick";
@@ -255,25 +201,23 @@ function renderMessages() {
     messages.appendChild(talkPanel);
 
     const container = talkPanel.querySelector(".nyashtalk-buttons");
-    if (container) {
-      nyashTalkTopics.forEach(topic => {
-        const btn = document.createElement("button");
-        btn.textContent = topic.title;
-        btn.addEventListener("click", () => {
-          if (topic.messages && topic.messages.length > 0) {
-            const randomMsg = topic.messages[Math.floor(Math.random() * topic.messages.length)];
-            sendMessage(randomMsg);
-          }
-        });
-        container.appendChild(btn);
+    nyashTalkTopics.forEach(topic => {
+      const btn = document.createElement("button");
+      btn.textContent = topic.title;
+      btn.addEventListener("click", () => {
+        const randomMsg = topic.messages[Math.floor(Math.random() * topic.messages.length)];
+        sendMessage(randomMsg);
       });
-    }
+      container.appendChild(btn);
+    });
   }
 
-  if (!isNyashHelp() && !isNyashTalk() && chatData[currentChat]?.messages.length === 0) {
+  // Стандартная панель для обычных чатов
+  if (!isNyashHelp() && !isNyashTalk() && chatData[currentChat].messages.length === 0) {
     intro.style.display = "block";
   }
 
+  // Сообщения
   if (chatData[currentChat] && chatData[currentChat].messages) {
     chatData[currentChat].messages.forEach(m => {
       const el = document.createElement("div");
@@ -287,14 +231,9 @@ function renderMessages() {
 }
 
 // ==================== СОХРАНЕНИЕ ЧЕРНОВИКА ====================
-const messageInput = document.getElementById("messageInput");
-if (messageInput) {
-  messageInput.addEventListener("input", (e) => {
-    if (currentChat) {
-      chatData[currentChat].draft = e.target.value;
-      renderContacts();
-    }
-  });
-}
-
-console.log("chat.js загружен");
+document.getElementById("messageInput").addEventListener("input", (e) => {
+  if (currentChat) {
+    chatData[currentChat].draft = e.target.value;
+    renderContacts(); // обновляем список контактов с черновиком
+  }
+});

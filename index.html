@@ -6,15 +6,94 @@
   <title>NyashGram</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comfortaa', system-ui, sans-serif;
+      background: linear-gradient(135deg, #ff9acb 0%, #ffd6e8 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .active { display: flex !important; }
+    .container {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      padding: 32px 24px;
+      border-radius: 28px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    h1 { color: #ff9acb; margin: 0 0 8px; font-size: 2.4rem; font-weight: 700; }
+    p { color: #666; margin: 0 0 24px; font-size: 1.1rem; }
+    .phone-input { display: flex; gap: 10px; margin-bottom: 16px; }
+    select, input {
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      flex: 1;
+      background: white;
+    }
+    input:focus { border-color: #ff9acb; outline: none; }
+    button {
+      padding: 16px;
+      font-size: 17px;
+      background: #ffb3d1;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      width: 100%;
+      cursor: not-allowed;
+      transition: all 0.3s;
+      margin: 12px 0;
+      font-weight: 600;
+    }
+    button.active {
+      background: #ff9acb;
+      box-shadow: 0 6px 20px rgba(255,156,203,0.4);
+      cursor: pointer;
+    }
+    #errorMessage { color: #e74c3c; font-size: 14px; margin: 4px 0 12px; min-height: 20px; }
+    #codeInput {
+      width: 100%;
+      padding: 16px;
+      font-size: 28px;
+      text-align: center;
+      letter-spacing: 10px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background: white;
+      color: #333;
+    }
+    #codeInput::placeholder {
+      color: rgba(255,156,203,0.6);
+      opacity: 1;
+      letter-spacing: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<div id="app">
-
-  <!-- Экран ввода номера -->
+  <!-- Экран номера -->
   <section id="phoneScreen" class="screen active">
     <div class="container">
-      <h1>NyashGram <span style="font-size:1.2em;">♥</span></h1>
+      <h1>NyashGram 🩷</h1>
       <p>Вход по номеру телефона</p>
 
       <div class="phone-input">
@@ -26,7 +105,7 @@
         <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
       </div>
 
-      <div id="phoneError" style="color:#e74c3c; font-size:14px; margin:8px 0; min-height:20px;"></div>
+      <div id="errorMessage"></div>
       <button id="sendBtn" disabled>Получить код</button>
     </div>
   </section>
@@ -34,7 +113,7 @@
   <!-- Экран фейкового кода -->
   <section id="codeScreen" class="screen">
     <div class="container">
-      <h1>NyashGram <span style="font-size:1.2em;">♥</span></h1>
+      <h1>NyashGram 🩷</h1>
       <p>Введи код</p>
 
       <input type="text" id="codeInput" placeholder="------" maxlength="6" autocomplete="off" />
@@ -44,7 +123,7 @@
     </div>
   </section>
 
-  <!-- Экран профиля (короткий, сразу на контакты) -->
+  <!-- Экран профиля -->
   <section id="profileScreen" class="screen">
     <div class="container">
       <h1>Создай профиль</h1>
@@ -59,131 +138,108 @@
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
       </div>
 
-      <button id="saveProfileBtn">Готово!</button>
+      <button id="saveBtn">Готово!</button>
     </div>
   </section>
 
-  <!-- Контакты -->
+  <!-- КОНТАКТЫ (пока заглушка, потом подключи contacts.js) -->
   <section id="contactsScreen" class="screen">
     <header class="top-bar">
-      <button id="settingsBtn">⚙️</button>
       <div class="top-title">Контакты</div>
     </header>
-    <div id="contactsList"></div>
-  </section>
-
-  <!-- ЧАТ -->
-  <section id="chatScreen" class="screen">
-    <header class="top-bar">
-      <button id="backBtn">←</button>
-      <div class="chat-header">
-        <div id="chatAvatar" class="avatar"></div>
-        <div>
-          <div id="chatName"></div>
-          <div id="chatStatus" class="status"></div>
-        </div>
-      </div>
-    </header>
-
-    <div id="chatIntro" class="chat-intro">
-      <div class="intro-title">✨ Начни общение ✨</div>
-      <div class="intro-buttons">
-        <button>Привет! Как дела?</button>
-        <button>Чем занимаешься?</button>
-        <button>Хочешь поболтать?</button>
-        <button>Какой вайб сегодня?</button>
-      </div>
-    </div>
-
-    <div id="messages"></div>
-
-    <div class="input-bar">
-      <input id="messageInput" placeholder="Сообщение...">
-      <button id="sendBtn">➤</button>
+    <div id="contactsList" style="padding:20px; text-align:center; color:#666;">
+      <p>Тут будут NyashHelp и NyashTalk</p>
     </div>
   </section>
 
-</div>
+  <script>
+    let generatedCode = "";
 
-<script>
-  let currentChat = null;
-  const chatData = {}; // { chatId: { messages: [], draft: "" } }
-
-  // Фейковый код
-  let generatedCode = "";
-
-  function generateCode() {
-    generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById("codeInput").placeholder = generatedCode.split("").join(" ");
-  }
-
-  // Переключение экранов
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  // Экран номера
-  const phoneInput = document.getElementById("phoneNumber");
-  const sendBtn = document.getElementById("sendBtn");
-  const phoneError = document.getElementById("phoneError");
-
-  function checkPhone() {
-    const phone = phoneInput.value.trim().replace(/\D/g, "");
-    if (phone.length >= 9) {
-      sendBtn.classList.add("active");
-      sendBtn.disabled = false;
-      phoneError.textContent = "";
-    } else {
-      sendBtn.classList.remove("active");
-      sendBtn.disabled = true;
-      phoneError.textContent = phone.length === 0 ? "" : "Номер слишком короткий";
+    function generateCode() {
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById("codeInput").placeholder = generatedCode.split("").join(" ");
     }
-  }
 
-  phoneInput.addEventListener("input", checkPhone);
-  checkPhone();
+    // Экран номера
+    const phoneInput = document.getElementById("phoneNumber");
+    const sendBtn = document.getElementById("sendBtn");
+    const errorMsg = document.getElementById("errorMessage");
 
-  sendBtn.addEventListener("click", () => {
-    generateCode();
-    showScreen("codeScreen");
-  });
-
-  // Экран кода
-  const codeInput = document.getElementById("codeInput");
-  const verifyBtn = document.getElementById("verifyBtn");
-  const codeError = document.getElementById("codeError");
-
-  codeInput.addEventListener("input", () => {
-    const entered = codeInput.value.trim();
-    if (entered.length === 6) {
-      if (entered === generatedCode) {
-        codeError.textContent = "";
-        verifyBtn.classList.add("active");
-        verifyBtn.disabled = false;
+    function checkPhone() {
+      const phone = phoneInput.value.trim().replace(/\D/g, "");
+      if (phone.length >= 9) {
+        sendBtn.classList.add("active");
+        sendBtn.disabled = false;
+        errorMsg.textContent = "";
       } else {
-        codeError.textContent = "Неверный код";
+        sendBtn.classList.remove("active");
+        sendBtn.disabled = true;
+        errorMsg.textContent = phone.length === 0 ? "" : "Номер слишком короткий";
+      }
+    }
+
+    phoneInput.addEventListener("input", checkPhone);
+    checkPhone();
+
+    sendBtn.addEventListener("click", () => {
+      generateCode();
+      document.getElementById("phoneScreen").classList.remove("active");
+      document.getElementById("codeScreen").classList.add("active");
+    });
+
+    // Экран кода
+    const codeInput = document.getElementById("codeInput");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const codeError = document.getElementById("codeError");
+
+    codeInput.addEventListener("input", () => {
+      const entered = codeInput.value.trim();
+      if (entered.length === 6) {
+        if (entered === generatedCode) {
+          codeError.textContent = "";
+          verifyBtn.classList.add("active");
+          verifyBtn.disabled = false;
+        } else {
+          codeError.textContent = "Неверный код";
+          verifyBtn.classList.remove("active");
+          verifyBtn.disabled = true;
+        }
+      } else {
+        codeError.textContent = "";
         verifyBtn.classList.remove("active");
         verifyBtn.disabled = true;
       }
-    } else {
-      codeError.textContent = "";
-      verifyBtn.classList.remove("active");
-      verifyBtn.disabled = true;
-    }
-  });
+    });
 
-  verifyBtn.addEventListener("click", () => {
-    showScreen("contactsScreen");
-    if (typeof renderContacts === 'function') renderContacts();
-  });
+    verifyBtn.addEventListener("click", () => {
+      document.getElementById("codeScreen").classList.remove("active");
+      document.getElementById("profileScreen").classList.add("active");
+    });
 
-  // Контакты и чаты — подключай свои файлы
-  // renderContacts() из contacts.js
-  // openChat(), renderMessages() из chat.js
-</script>
+    // Экран профиля
+    document.getElementById("avatarInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          document.getElementById("avatarPreview").style.backgroundImage = `url(${event.target.result})`;
+          document.getElementById("avatarPreview").textContent = "";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-<script src="contacts.js"></script>
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const name = document.getElementById("displayName").value.trim();
+      if (!name) return alert("Введи имя!");
+      alert("Профиль сохранён! Добро пожаловать 🩷");
+      document.getElementById("profileScreen").classList.remove("active");
+      document.getElementById("contactsScreen").classList.add("active");
+    });
+    <script src="contacts.js"></script>
 <script src="chat.js"></script>
+<script src="app.js"></script>
+<script src="style.css"></script>
+  </script>
 </body>
 </html>

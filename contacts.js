@@ -1,24 +1,14 @@
 const contacts = [
-  { id: 1, name: "Bestie", status: "online", avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)" },
-  { id: 2, name: "Философ", status: "offline", avatar: "linear-gradient(135deg, #6c5ce7, #a29bfe)" },
-  { id: 3, name: "Учёба", status: "online", avatar: "linear-gradient(135deg, #74b9ff, #0984e3)" },
-  { id: 4, name: "Music Pal", status: "online", avatar: "linear-gradient(135deg, #fdcb6e, #e17055)" },
-  { id: 5, name: "Night Chat", status: "offline", avatar: "linear-gradient(135deg, #2d3436, #636e72)" }
+  { id: 1, name: "Bestie", status: "online" },
+  { id: 2, name: "Философ", status: "пишет трактат" },
+  { id: 3, name: "Учёба", status: "готовлюсь к экзамену" },
+  { id: 4, name: "Music Pal", status: "слушаю lo-fi" },
+  { id: 5, name: "Night Chat", status: "не сплю" }
 ];
 
 const fixedChats = [
-  {
-    id: "nyashhelp",
-    name: "NyashHelp",
-    status: "🩷 всегда на связи",
-    avatar: "linear-gradient(135deg, #ff9acb, #ffd6e8)"
-  },
-  {
-    id: "nyashtalk",
-    name: "NyashTalk",
-    status: "💕 болтаем о милом",
-    avatar: "linear-gradient(135deg, #a78bfa, #7ab8ff)"
-  }
+  { id: "nyashhelp", name: "NyashHelp", status: "🩷 всегда на связи" },
+  { id: "nyashtalk", name: "NyashTalk", status: "💕 болтаем о милом" }
 ];
 
 function gradientFor(name) {
@@ -30,21 +20,21 @@ function renderContacts() {
   const list = document.getElementById("contactsList");
   list.innerHTML = "";
 
-  // Фиксированные боты сверху
+  // Фиксированные боты
   fixedChats.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact fixed";
     el.innerHTML = `
-      <div class="avatar" style="background:${c.avatar}; width:48px; height:48px; border-radius:50%; margin-right:16px;"></div>
+      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}"></div>
       <div class="info">
-        <div class="name" style="font-weight:600; color:#333; font-size:16px;">${c.name}</div>
-        <div class="status" style="font-size:13px; color:#666; margin-top:2px;">${c.status}</div>
-        <div class="draft" style="display:none; color:#ff9acb; font-size:12px; margin-top:2px;"></div>
+        <div class="name">${c.name}</div>
+        <div class="status">${c.status}</div>
+        <div class="draft" style="display:none; color:#ff9acb; font-size:12px; margin-top:4px;"></div>
       </div>
     `;
 
     if (chatData[c.id] && chatData[c.id].draft) {
-      el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
+      el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + "...";
       el.querySelector(".draft").style.display = "block";
     }
 
@@ -57,16 +47,16 @@ function renderContacts() {
     const el = document.createElement("div");
     el.className = "contact";
     el.innerHTML = `
-      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}; width:48px; height:48px; border-radius:50%; margin-right:16px;"></div>
+      <div class="avatar" style="background:${gradientFor(c.name)}"></div>
       <div class="info">
-        <div class="name" style="font-weight:600; color:#333; font-size:16px;">${c.name}</div>
-        <div class="status" style="font-size:13px; color:#666; margin-top:2px;">${c.status}</div>
-        <div class="draft" style="display:none; color:#ff9acb; font-size:12px; margin-top:2px;"></div>
+        <div class="name">${c.name}</div>
+        <div class="status">${c.status}</div>
+        <div class="draft" style="display:none; color:#ff9acb; font-size:12px; margin-top:4px;"></div>
       </div>
     `;
 
     if (chatData[c.id] && chatData[c.id].draft) {
-      el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
+      el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + "...";
       el.querySelector(".draft").style.display = "block";
     }
 

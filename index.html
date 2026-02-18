@@ -705,6 +705,127 @@
       window.verifyBtn = newVerifyBtn;
     });
   </script>
+  <script>
+  // ЭКСТРЕННОЕ ИСПРАВЛЕНИЕ для кнопки "Войти"
+  (function() {
+    console.log("🔧 Устанавливаю экстренное исправление для кнопки 'Войти'");
+    
+    // Функция для получения кода из placeholder
+    function getCodeFromPlaceholder() {
+      const codeInput = document.getElementById('codeInput');
+      if (!codeInput) return '';
+      return codeInput.placeholder.replace(/\s/g, '');
+    }
+    
+    // Функция проверки кода
+    function checkCodeInput() {
+      const codeInput = document.getElementById('codeInput');
+      const verifyBtn = document.getElementById('verifyBtn');
+      const codeError = document.getElementById('codeError');
+      
+      if (!codeInput || !verifyBtn) return;
+      
+      const entered = codeInput.value.trim();
+      const expected = codeInput.placeholder.replace(/\s/g, '');
+      
+      if (entered.length === 6) {
+        if (entered === expected) {
+          if (codeError) codeError.textContent = '';
+          verifyBtn.classList.add('active');
+          verifyBtn.disabled = false;
+        } else {
+          if (codeError) codeError.textContent = 'Неверный код';
+          verifyBtn.classList.remove('active');
+          verifyBtn.disabled = true;
+        }
+      } else {
+        if (codeError) codeError.textContent = '';
+        verifyBtn.classList.remove('active');
+        verifyBtn.disabled = true;
+      }
+    }
+    
+    // Ждём загрузки страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("🔧 DOM загружен, ищем элементы...");
+      
+      const codeInput = document.getElementById('codeInput');
+      const verifyBtn = document.getElementById('verifyBtn');
+      
+      if (!codeInput || !verifyBtn) {
+        console.error("🔧 Не найдены элементы ввода кода или кнопка!");
+        return;
+      }
+      
+      console.log("🔧 Элементы найдены, устанавливаем обработчики");
+      
+      // Удаляем старые обработчики с input
+      const newCodeInput = codeInput.cloneNode(true);
+      codeInput.parentNode.replaceChild(newCodeInput, codeInput);
+      
+      // Удаляем старые обработчики с кнопки
+      const newVerifyBtn = verifyBtn.cloneNode(true);
+      verifyBtn.parentNode.replaceChild(newVerifyBtn, verifyBtn);
+      
+      // Добавляем обработчик на input
+      newCodeInput.addEventListener('input', checkCodeInput);
+      
+      // Добавляем обработчик на кнопку
+      newVerifyBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log("🔧 Кнопка 'Войти' нажата");
+        console.log("🔧 Классы кнопки:", this.className);
+        console.log("🔧 Disabled:", this.disabled);
+        
+        if (!this.disabled && this.classList.contains('active')) {
+          const entered = newCodeInput.value.trim();
+          const expected = newCodeInput.placeholder.replace(/\s/g, '');
+          
+          console.log("🔧 Введён код:", entered);
+          console.log("🔧 Ожидаемый код:", expected);
+          
+          if (entered === expected) {
+            console.log("🔧 Код верный, выполняем вход");
+            
+            // Сохраняем флаг входа
+            localStorage.setItem("nyashgram_entered", "true");
+            
+            // Сохраняем имя по умолчанию
+            if (!localStorage.getItem("nyashgram_name")) {
+              localStorage.setItem("nyashgram_name", "Няша");
+            }
+            
+            // Переключаем экран
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const contactsScreen = document.getElementById('contactsScreen');
+            if (contactsScreen) {
+              contactsScreen.classList.add('active');
+              
+              // Рендерим контакты
+              setTimeout(() => {
+                if (typeof renderContacts === 'function') {
+                  renderContacts();
+                }
+              }, 100);
+            }
+          } else {
+            const codeError = document.getElementById('codeError');
+            if (codeError) {
+              codeError.textContent = 'Неверный код';
+            }
+          }
+        }
+      });
+      
+      // Первоначальная проверка
+      setTimeout(checkCodeInput, 100);
+      
+      console.log("🔧 Исправление установлено!");
+    });
+  })();
+</script>
 
   <!-- Подключаем внешние скрипты -->
   <script src="contacts.js"></script>

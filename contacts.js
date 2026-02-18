@@ -6,7 +6,6 @@ const contacts = [
   { id: 5, name: "Night Chat", status: "offline", avatar: "linear-gradient(135deg, #2d3436, #636e72)" }
 ];
 
-// Фиксированные боты сверху
 const fixedChats = [
   {
     id: "nyashhelp",
@@ -29,30 +28,24 @@ function gradientFor(name) {
 
 function renderContacts() {
   const list = document.getElementById("contactsList");
-  if (!list) {
-    console.error("Элемент #contactsList не найден в DOM");
-    return;
-  }
-
   list.innerHTML = "";
 
-  // Фиксированные боты
+  // Фиксированные боты сверху
   fixedChats.forEach(c => {
     const el = document.createElement("div");
     el.className = "contact fixed";
     el.innerHTML = `
-      <div class="avatar" style="background:${c.avatar}"></div>
+      <div class="avatar" style="background:${c.avatar}; width:48px; height:48px; border-radius:50%; margin-right:16px;"></div>
       <div class="info">
-        <div class="name">${c.name}</div>
-        <div class="status">${c.status}</div>
-        <div class="draft" style="display:none; color:var(--accent); font-size:12px; margin-top:2px;"></div>
+        <div class="name" style="font-weight:600; color:#333; font-size:16px;">${c.name}</div>
+        <div class="status" style="font-size:13px; color:#666; margin-top:2px;">${c.status}</div>
+        <div class="draft" style="display:none; color:#ff9acb; font-size:12px; margin-top:2px;"></div>
       </div>
     `;
 
     if (chatData[c.id] && chatData[c.id].draft) {
-      const draftEl = el.querySelector(".draft");
-      draftEl.textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
-      draftEl.style.display = "block";
+      el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
+      el.querySelector(".draft").style.display = "block";
     }
 
     el.onclick = () => openChat(c);
@@ -64,23 +57,20 @@ function renderContacts() {
     const el = document.createElement("div");
     el.className = "contact";
     el.innerHTML = `
-      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}"></div>
+      <div class="avatar" style="background:${c.avatar || gradientFor(c.name)}; width:48px; height:48px; border-radius:50%; margin-right:16px;"></div>
       <div class="info">
-        <div class="name">${c.name}</div>
-        <div class="status">${c.status}</div>
-        <div class="draft" style="display:none; color:var(--accent); font-size:12px; margin-top:2px;"></div>
+        <div class="name" style="font-weight:600; color:#333; font-size:16px;">${c.name}</div>
+        <div class="status" style="font-size:13px; color:#666; margin-top:2px;">${c.status}</div>
+        <div class="draft" style="display:none; color:#ff9acb; font-size:12px; margin-top:2px;"></div>
       </div>
     `;
 
     if (chatData[c.id] && chatData[c.id].draft) {
-      const draftEl = el.querySelector(".draft");
-      draftEl.textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
-      draftEl.style.display = "block";
+      el.querySelector(".draft").textContent = "Черновик: " + chatData[c.id].draft.slice(0, 30) + (chatData[c.id].draft.length > 30 ? "..." : "");
+      el.querySelector(".draft").style.display = "block";
     }
 
     el.onclick = () => openChat(c);
     list.appendChild(el);
   });
 }
-
-console.log("contacts.js загружен успешно");

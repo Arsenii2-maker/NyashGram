@@ -256,83 +256,96 @@ function checkCodeInput() {
   }
 }
 
-// ========== НАСТРОЙКА ОБРАБОТЧИКОВ ==========
-function setupEventListeners() {
+// ===== ЭКРАН КОДА =====
+const codeInput = document.getElementById("codeInput");
+if (codeInput) {
+  // Удаляем старые обработчики
+  const newCodeInput = codeInput.cloneNode(true);
+  codeInput.parentNode.replaceChild(newCodeInput, codeInput);
   
-  // ===== ЭКРАН НОМЕРА =====
-  const phoneInput = document.getElementById("phoneNumber");
-  if (phoneInput) {
-    phoneInput.addEventListener("input", checkPhoneInput);
-    // Первоначальная проверка
-    setTimeout(checkPhoneInput, 100);
-  }
-  
-  const sendBtn = document.getElementById("sendBtn");
-  if (sendBtn) {
-    // Удаляем все старые обработчики
-    const newSendBtn = sendBtn.cloneNode(true);
-    sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+  newCodeInput.addEventListener("input", function() {
+    const entered = this.value.trim();
+    const verifyBtn = document.getElementById("verifyBtn");
+    const codeError = document.getElementById("codeError");
     
-    newSendBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("Кнопка 'Получить код' нажата");
+    if (!verifyBtn) return;
+    
+    if (entered.length === 6) {
+      // Проверяем код (сравниваем с тем, что в placeholder)
+      const placeholderCode = this.placeholder.replace(/\s/g, "");
       
-      // Проверяем, активна ли кнопка
-      if (!newSendBtn.disabled && newSendBtn.classList.contains('active')) {
-        generateCode();
-        showScreen("codeScreen");
+      if (entered === placeholderCode) {
+        if (codeError) codeError.textContent = "";
+        verifyBtn.classList.add("active");
+        verifyBtn.disabled = false;
       } else {
-        console.log("Кнопка не активна");
+        if (codeError) codeError.textContent = "Неверный код";
+        verifyBtn.classList.remove("active");
+        verifyBtn.disabled = true;
       }
-    });
-  }
+    } else {
+      if (codeError) codeError.textContent = "";
+      verifyBtn.classList.remove("active");
+      verifyBtn.disabled = true;
+    }
+  });
+}
+
+const verifyBtn = document.getElementById("verifyBtn");
+if (verifyBtn) {
+  // Удаляем старые обработчики
+  const newVerifyBtn = verifyBtn.cloneNode(true);
+  verifyBtn.parentNode.replaceChild(newVerifyBtn, verifyBtn);
   
-  // ===== ЭКРАН КОДА =====
-  const codeInput = document.getElementById("codeInput");
-  if (codeInput) {
-    codeInput.addEventListener("input", checkCodeInput);
-  }
-  
-  const verifyBtn = document.getElementById("verifyBtn");
-  if (verifyBtn) {
-    const newVerifyBtn = verifyBtn.cloneNode(true);
-    verifyBtn.parentNode.replaceChild(newVerifyBtn, verifyBtn);
+  newVerifyBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Кнопка 'Войти' нажата");
     
-    newVerifyBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("Кнопка 'Войти' нажата");
+    if (!this.disabled && this.classList.contains('active')) {
+      const codeInput = document.getElementById("codeInput");
+      const codeError = document.getElementById("codeError");
       
-      if (!newVerifyBtn.disabled && newVerifyBtn.classList.contains('active')) {
-        const codeInput = document.getElementById("codeInput");
-        const codeError = document.getElementById("codeError");
+      if (!codeInput) return;
+      
+      const enteredCode = codeInput.value.trim();
+      const placeholderCode = codeInput.placeholder.replace(/\s/g, "");
+      
+      console.log("Введён код:", enteredCode);
+      console.log("Ожидаемый код:", placeholderCode);
+      
+      if (enteredCode === placeholderCode) {
+        if (codeError) codeError.textContent = "";
         
-        if (codeInput.value.trim() === generatedCode) {
-          if (codeError) codeError.textContent = "";
-          
-          // Сохраняем флаг входа
-          localStorage.setItem("nyashgram_entered", "true");
-          
-          // Сохраняем имя по умолчанию, если ещё нет
-          if (!localStorage.getItem("nyashgram_name")) {
-            localStorage.setItem("nyashgram_name", "Няша");
-          }
-          
-          // Загружаем настройки
+        // Сохраняем флаг входа
+        localStorage.setItem("nyashgram_entered", "true");
+        
+        // Сохраняем имя по умолчанию, если ещё нет
+        if (!localStorage.getItem("nyashgram_name")) {
+          localStorage.setItem("nyashgram_name", "Няша");
+        }
+        
+        // Загружаем настройки
+        if (typeof loadSavedSettings === 'function') {
           loadSavedSettings();
-          
-          // Переходим на контакты
-          showScreen("contactsScreen");
+        }
+        
+        // Переходим на контакты
+        showScreen("contactsScreen");
+        
+        // Рендерим контакты
+        setTimeout(() => {
           if (typeof renderContacts === "function") {
             renderContacts();
           }
-        } else {
-          if (codeError) codeError.textContent = "Неверный код";
-        }
+        }, 100);
+        
+      } else {
+        if (codeError) codeError.textContent = "Неверный код";
       }
-    });
-  }
+    }
+  });
+}
   
   // ===== ЭКРАН ПРОФИЛЯ =====
   const avatarInput = document.getElementById("avatarInput");

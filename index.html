@@ -3,20 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>NyashGram</title>
+  <title>NyashGram — говори по-няшному 💗</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Основной шрифт Comfortaa + запасные -->
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body {
+    /* Базовые сбросы и минимальные стили — основное в style.css */
+    * {
       margin: 0;
       padding: 0;
-      font-family: 'Comfortaa', system-ui, sans-serif;
-      background: linear-gradient(135deg, #ff9acb 0%, #ffd6e8 100%);
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comfortaa', cursive;
+      background: linear-gradient(145deg, #ffd1dc 0%, #ffe4e1 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
+
+    /* Экраны */
     .screen {
       position: absolute;
       inset: 0;
@@ -26,143 +35,525 @@
       justify-content: center;
       padding: 20px;
       box-sizing: border-box;
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
     }
-    .active { display: flex !important; }
-    .container {
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(10px);
+
+    .screen.active {
+      display: flex !important;
+    }
+
+    /* Glass-контейнер для форм */
+    .glass-container {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 8px 20px rgba(255, 192, 203, 0.3);
       padding: 32px 24px;
-      border-radius: 28px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
       width: 90%;
       max-width: 380px;
       text-align: center;
-      border: 1px solid rgba(255,255,255,0.3);
     }
-    h1 { color: #ff9acb; margin: 0 0 8px; font-size: 2.4rem; font-weight: 700; }
-    p { color: #666; margin: 0 0 24px; font-size: 1.1rem; }
-    .phone-input { display: flex; gap: 10px; margin-bottom: 16px; }
+
+    /* Заголовки */
+    h1 {
+      color: #9f6b8a;
+      margin: 0 0 8px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .subtitle {
+      color: #8b6f8b;
+      margin: 0 0 24px;
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    /* Поля ввода */
+    .phone-input {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
     select, input {
       padding: 14px 16px;
       font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      flex: 1;
-      background: white;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      font-family: 'Comfortaa', cursive;
+      transition: all 0.2s;
     }
-    input:focus { border-color: #ff9acb; outline: none; }
+
+    select {
+      flex: 0 0 auto;
+      width: auto;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    input {
+      flex: 1;
+    }
+
+    input:focus, select:focus {
+      border-color: #ffa5b9;
+      background: rgba(255, 255, 255, 0.9);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 165, 185, 0.2);
+    }
+
+    /* Специальный стиль для поля кода */
+    #codeInput {
+      width: 100%;
+      padding: 18px 16px;
+      font-size: 28px;
+      text-align: center;
+      letter-spacing: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.6);
+      color: #4a3f4a;
+      font-weight: 600;
+    }
+
+    #codeInput::placeholder {
+      color: rgba(159, 107, 138, 0.4);
+      letter-spacing: 10px;
+      font-size: 24px;
+    }
+
+    /* Кнопки */
     button {
       padding: 16px;
       font-size: 17px;
-      background: #ffb3d1;
-      color: white;
-      border: none;
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.4);
+      color: #8b6f8b;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 40px;
       width: 100%;
       cursor: not-allowed;
       transition: all 0.3s;
       margin: 12px 0;
       font-weight: 600;
+      font-family: 'Comfortaa', cursive;
+      backdrop-filter: blur(5px);
     }
+
     button.active {
-      background: #ff9acb;
-      box-shadow: 0 6px 20px rgba(255,156,203,0.4);
+      background: white;
+      box-shadow: 0 6px 20px rgba(255, 120, 160, 0.4);
+      border: 1px solid #ffa5b9;
+      color: #d46b8d;
       cursor: pointer;
     }
-    #errorMessage { color: #e74c3c; font-size: 14px; margin: 4px 0 12px; min-height: 20px; }
-    #codeInput {
+
+    button.active:hover {
+      transform: scale(1.02);
+      background: #fff0f5;
+    }
+
+    /* Сообщения об ошибках */
+    .error-message {
+      color: #e67e8f;
+      font-size: 14px;
+      margin: 4px 0 12px;
+      min-height: 20px;
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(255,255,255,0.5);
+    }
+
+    /* Аватар预览 */
+    #avatarPreview {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #fbc2c2, #c2b9f0);
+      border-radius: 50%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      border: 3px solid white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+      background-size: cover;
+      background-position: center;
+    }
+
+    #avatarPreview:hover {
+      transform: scale(1.05);
+    }
+
+    /* Хедер для экрана контактов */
+    .top-bar {
+      width: 100%;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .top-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #9f6b8a;
+      text-shadow: 0 2px 10px white;
+    }
+
+    #contactsList {
+      width: 100%;
+      max-width: 600px;
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Для экрана чата */
+    #chatHeader {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
+    #backBtn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9f6b8a;
+      margin: 0;
+      padding: 0;
+    }
+
+    #chatContactName {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #4a3f4a;
+    }
+
+    #chatArea {
+      flex: 1;
       width: 100%;
       padding: 16px;
-      font-size: 28px;
-      text-align: center;
-      letter-spacing: 10px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background: white;
-      color: #333;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
-    #codeInput::placeholder {
-      color: rgba(255,156,203,0.6);
-      opacity: 1;
-      letter-spacing: 10px;
+
+    #messageInputArea {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid rgba(255,255,255,0.3);
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.6);
+      font-family: 'Comfortaa', cursive;
+    }
+
+    #sendMessageBtn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #ffa5b9;
+      color: #d46b8d;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Панель быстрых ответов */
+    .quick-reply-panel {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(5px);
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .quick-chip {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 40px;
+      padding: 8px 18px;
+      font-size: 14px;
+      color: #4a3f4a;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: 0.2s;
+      font-family: 'Comfortaa', cursive;
+    }
+
+    .quick-chip:hover {
+      background: white;
+      box-shadow: 0 4px 10px rgba(255, 150, 180, 0.4);
     }
   </style>
 </head>
 <body>
 
-  <!-- Экран номера -->
+  <!-- Экран ввода номера -->
   <section id="phoneScreen" class="screen active">
-    <div class="container">
-      <h1>NyashGram 🩷</h1>
-      <p>Вход по номеру телефона</p>
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Вход по номеру телефона</p>
 
       <div class="phone-input">
         <select id="countryCode">
-          <option value="+7">+7 Россия</option>
-          <option value="+380">+380 Украина</option>
-          <option value="+375">+375 Беларусь</option>
+          <option value="+7">🇷🇺 +7</option>
+          <option value="+380">🇺🇦 +380</option>
+          <option value="+375">🇧🇾 +375</option>
         </select>
         <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
       </div>
 
-      <div id="errorMessage"></div>
-      <button id="sendBtn" disabled>Получить код</button>
+      <div id="errorMessage" class="error-message"></div>
+      <button id="sendBtn" disabled>✨ Получить код ✨</button>
+      <p style="font-size:12px; color:#9f8b9f; margin-top:16px;">Введи любой номер — это тест</p>
     </div>
   </section>
 
-  <!-- Экран фейкового кода -->
+  <!-- Экран ввода кода -->
   <section id="codeScreen" class="screen">
-    <div class="container">
-      <h1>NyashGram 🩷</h1>
-      <p>Введи код</p>
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Введи код из смс</p>
 
       <input type="text" id="codeInput" placeholder="------" maxlength="6" autocomplete="off" />
 
-      <div id="codeError" style="color:#e74c3c; font-size:14px; margin-top:12px; min-height:20px;"></div>
-      <button id="verifyBtn" disabled>Войти</button>
+      <div id="codeError" class="error-message"></div>
+      <button id="verifyBtn" disabled>💕 Войти 💕</button>
+      <p style="font-size:12px; color:#9f8b9f; margin-top:16px;">Код: <span id="generatedCodeHint">******</span></p>
     </div>
   </section>
 
-  <!-- Экран профиля -->
+  <!-- Экран создания профиля -->
   <section id="profileScreen" class="screen">
-    <div class="container">
-      <h1>Создай профиль</h1>
+    <div class="glass-container">
+      <h1>Создай профиль 💫</h1>
 
       <input type="text" id="displayName" placeholder="Как тебя зовут?" style="width:100%; margin:16px 0;" />
 
       <div style="margin:20px 0;">
         <label for="avatarInput">
-        <div id="avatarPreview" style="width:120px; height:120px; background:#ff9acb; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px; color:white;">+</div>
-          <p style="margin-top:12px;">Выбрать фото (необязательно)</p>
+          <div id="avatarPreview">+</div>
+          <p style="margin-top:12px; color:#8b6f8b;">Выбрать фото (необязательно)</p>
         </label>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
       </div>
 
-      <button id="saveBtn">Готово!</button>
+      <button id="saveBtn">✨ Готово ✨</button>
     </div>
   </section>
 
+  <!-- Экран контактов -->
   <section id="contactsScreen" class="screen">
-  <header class="top-bar">
-    <div class="top-title">Контакты</div>
-  </header>
-  <div id="contactsList"></div>
-</section>
+    <header class="top-bar">
+      <div class="top-title">Мой мирок 💗</div>
+      <div style="display:flex; gap:10px;">
+        <button id="settingsBtn" style="width:auto; padding:8px 16px; margin:0;">⚙️</button>
+      </div>
+    </header>
+    <div id="contactsList"></div>
+  </section>
+
+  <!-- Экран чата -->
+  <section id="chatScreen" class="screen">
+    <header id="chatHeader">
+      <button id="backBtn">←</button>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div id="chatAvatar" class="avatar" style="width:40px; height:40px;"></div>
+        <span id="chatContactName">Загрузка...</span>
+      </div>
+    </header>
+    
+    <!-- Панель быстрых ответов (будет заполняться динамически) -->
+    <div id="quickReplyPanel" class="quick-reply-panel"></div>
+    
+    <div id="chatArea"></div>
+    
+    <div id="messageInputArea">
+      <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." />
+      <button id="sendMessageBtn">➤</button>
+    </div>
+  </section>
+
+  <!-- Экран настроек -->
+  <section id="settingsScreen" class="screen">
+    <header class="top-bar">
+      <button id="backFromSettingsBtn" style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.4); border:none;">←</button>
+      <div class="top-title">Настройки</div>
+      <div style="width:40px;"></div>
+    </header>
+    
+    <div style="width:100%; max-width:500px; padding:20px; overflow-y:auto;">
+      <div class="glass-container" style="margin-bottom:20px;">
+        <h3 style="color:#9f6b8a; margin-bottom:16px;">Твой ник</h3>
+        <input type="text" id="settingsName" placeholder="Имя" style="width:100%; margin-bottom:16px;" />
+        <button id="saveSettingsBtn" class="active" style="margin-top:0;">Сохранить</button>
+      </div>
+      
+      <div class="glass-container" style="margin-bottom:20px;">
+        <h3 style="color:#9f6b8a; margin-bottom:16px;">Тема оформления</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+          <button class="theme-btn active" data-theme="pastel">Pastel Pink</button>
+          <button class="theme-btn" data-theme="milk">Milk Rose</button>
+          <button class="theme-btn" data-theme="night">Night Blue</button>
+        </div>
+      </div>
+      
+      <div class="glass-container">
+        <h3 style="color:#9f6b8a; margin-bottom:16px;">Шрифт</h3>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+          <button class="font-btn active" data-font="comfortaa">System</button>
+          <button class="font-btn" data-font="quicksand">Rounded</button>
+          <button class="font-btn" data-font="nunito">Cozy</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script>
-  function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const screen = document.getElementById(id);
-  if (screen) screen.classList.add('active');
-}
+    // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
     let generatedCode = "";
+    let currentUser = {
+      name: "Няша",
+      avatar: null,
+      theme: "pastel",
+      font: "comfortaa"
+    };
 
+    // ========== УПРАВЛЕНИЕ ЭКРАНАМИ ==========
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const screen = document.getElementById(id);
+      if (screen) screen.classList.add('active');
+      
+      // Специальные действия при показе экранов
+      if (id === 'contactsScreen' && typeof renderContacts === 'function') {
+        renderContacts();
+      }
+    }
+
+    // ========== ГЕНЕРАЦИЯ ФЕЙКОВОГО КОДА ==========
     function generateCode() {
       generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
       document.getElementById("codeInput").placeholder = generatedCode.split("").join(" ");
+      document.getElementById("generatedCodeHint").textContent = generatedCode;
     }
 
-    // Экран номера
+    // ========== ПРОВЕРКА ВХОДА ==========
+    function checkAuth() {
+      const hasEntered = localStorage.getItem("nyashgram_entered");
+      if (hasEntered === "true") {
+        // Загружаем сохраненные настройки
+        loadSettings();
+        showScreen("contactsScreen");
+        setTimeout(() => {
+          if (typeof renderContacts === "function") renderContacts();
+        }, 100);
+      } else {
+        showScreen("phoneScreen");
+      }
+    }
+
+    // ========== ЗАГРУЗКА НАСТРОЕК ==========
+    function loadSettings() {
+      const savedName = localStorage.getItem("nyashgram_name");
+      const savedTheme = localStorage.getItem("nyashgram_theme");
+      const savedFont = localStorage.getItem("nyashgram_font");
+      
+      if (savedName) currentUser.name = savedName;
+      if (savedTheme) {
+        currentUser.theme = savedTheme;
+        applyTheme(savedTheme);
+      }
+      if (savedFont) {
+        currentUser.font = savedFont;
+        applyFont(savedFont);
+      }
+      
+      // Обновляем поле имени в настройках
+      const settingsName = document.getElementById("settingsName");
+      if (settingsName) settingsName.value = currentUser.name;
+    }
+
+    // ========== ПРИМЕНЕНИЕ ТЕМЫ ==========
+    function applyTheme(theme) {
+      document.body.className = ''; // Сбрасываем классы
+      if (theme === 'pastel') {
+        document.body.style.background = 'linear-gradient(145deg, #ffd1dc, #ffe4e1)';
+      } else if (theme === 'milk') {
+        document.body.style.background = 'linear-gradient(145deg, #f9e6e6, #f5d9d9)';
+      } else if (theme === 'night') {
+        document.body.style.background = 'linear-gradient(145deg, #d4e0f0, #c0d0e8)';
+      }
+      
+      // Обновляем активную кнопку темы
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.theme === theme) btn.classList.add('active');
+      });
+    }
+
+    // ========== ПРИМЕНЕНИЕ ШРИФТА ==========
+    function applyFont(font) {
+      const fontMap = {
+        'comfortaa': "'Comfortaa', cursive",
+        'quicksand': "'Quicksand', sans-serif",
+        'nunito': "'Nunito', sans-serif"
+      };
+      document.body.style.fontFamily = fontMap[font] || "'Comfortaa', cursive";
+      
+      document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.font === font) btn.classList.add('active');
+      });
+    }
+
+    // ========== ЭКРАН НОМЕРА ==========
     const phoneInput = document.getElementById("phoneNumber");
     const sendBtn = document.getElementById("sendBtn");
     const errorMsg = document.getElementById("errorMessage");
@@ -185,11 +576,10 @@
 
     sendBtn.addEventListener("click", () => {
       generateCode();
-      document.getElementById("phoneScreen").classList.remove("active");
-      document.getElementById("codeScreen").classList.add("active");
+      showScreen("codeScreen");
     });
 
-    // Экран кода
+    // ========== ЭКРАН КОДА ==========
     const codeInput = document.getElementById("codeInput");
     const verifyBtn = document.getElementById("verifyBtn");
     const codeError = document.getElementById("codeError");
@@ -213,19 +603,17 @@
       }
     });
 
-    verifyBtn.addEventListener("click", () => {
-      document.getElementById("codeScreen").classList.remove("active");
-      document.getElementById("profileScreen").classList.add("active");
-    });
-
-    // Экран профиля
+    // ========== ПРОФИЛЬ ==========
     document.getElementById("avatarInput").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          document.getElementById("avatarPreview").style.backgroundImage = `url(${event.target.result})`;
-          document.getElementById("avatarPreview").textContent = "";
+          const preview = document.getElementById("avatarPreview");
+          preview.style.backgroundImage = `url(${event.target.result})`;
+          preview.style.backgroundSize = "cover";
+          preview.textContent = "";
+          currentUser.avatar = event.target.result;
         };
         reader.readAsDataURL(file);
       }
@@ -233,75 +621,94 @@
 
     document.getElementById("saveBtn").addEventListener("click", () => {
       const name = document.getElementById("displayName").value.trim();
-      if (!name) return alert("Введи имя!");
-      alert("Профиль сохранён! Добро пожаловать 🩷");
-      document.getElementById("profileScreen").classList.remove("active");
-      document.getElementById("contactsScreen").classList.add("active");
+      if (!name) {
+        alert("Введи имя!");
+        return;
+      }
+      
+      currentUser.name = name;
+      localStorage.setItem("nyashgram_name", name);
+      localStorage.setItem("nyashgram_entered", "true");
+      
+      alert("Профиль сохранён! Добро пожаловать 💗");
+      showScreen("contactsScreen");
+      if (typeof renderContacts === "function") renderContacts();
     });
-    // Проверяем, проходил ли пользователь вход раньше
-const hasEntered = localStorage.getItem("nyashgram_entered");
 
-if (hasEntered === "true") {
-  // Если уже входил — сразу показываем контакты
-  showScreen("contactsScreen");
-  if (typeof renderContacts === "function") renderContacts();
-} else {
-  // Первый раз — показываем экран номера
-  showScreen("phoneScreen");
-}
+    // ========== НАСТРОЙКИ ==========
+    document.getElementById("settingsBtn")?.addEventListener("click", () => {
+      document.getElementById("settingsName").value = currentUser.name;
+      showScreen("settingsScreen");
+    });
 
-// После успешного ввода кода (в обработчике verifyBtn)
-verifyBtn.addEventListener("click", () => {
-  const entered = codeInput.value.trim();
-  if (entered === generatedCode) {
-    codeError.textContent = "";
-    verifyBtn.classList.add("active");
-    verifyBtn.disabled = false;
+    document.getElementById("backFromSettingsBtn")?.addEventListener("click", () => {
+      showScreen("contactsScreen");
+    });
 
-    // Сохраняем флаг, что вход пройден
-    localStorage.setItem("nyashgram_entered", "true");
+    document.getElementById("saveSettingsBtn")?.addEventListener("click", () => {
+      const newName = document.getElementById("settingsName").value.trim();
+      if (newName) {
+        currentUser.name = newName;
+        localStorage.setItem("nyashgram_name", newName);
+      }
+      showScreen("contactsScreen");
+      if (typeof renderContacts === "function") renderContacts();
+    });
 
-    // Переходим сразу на контакты
-    showScreen("contactsScreen");
-    if (typeof renderContacts === "function") renderContacts();
-  } else {
-    codeError.textContent = "Неверный код";
-  }
-});
+    // Кнопки тем
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme;
+        currentUser.theme = theme;
+        localStorage.setItem("nyashgram_theme", theme);
+        applyTheme(theme);
+      });
+    });
 
-// Проверяем, проходил ли вход раньше
-if (localStorage.getItem("nyashgram_entered") === "true") {
-  showScreen("contactsScreen");
-  setTimeout(() => {
-  if (typeof renderContacts === "function") {
-    renderContacts();
-  } else {
-    console.error("renderContacts всё ещё не загружен — подожди contacts.js");
-  }
-}, 300); // 300 мс задержки
-} else {
-  showScreen("phoneScreen");
-}
+    // Кнопки шрифтов
+    document.querySelectorAll('.font-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const font = btn.dataset.font;
+        currentUser.font = font;
+        localStorage.setItem("nyashgram_font", font);
+        applyFont(font);
+      });
+    });
 
-// Обработчик кнопки "Войти"
-verifyBtn.addEventListener("click", () => {
-  const entered = codeInput.value.trim();
-  if (entered === generatedCode) {
-    codeError.textContent = "";
+    // ========== НАВИГАЦИЯ ЧАТА ==========
+    document.getElementById("backBtn")?.addEventListener("click", () => {
+      showScreen("contactsScreen");
+    });
 
-    // Сохраняем флаг входа
-    localStorage.setItem("nyashgram_entered", "true");
-
-    // Переходим на контакты и рендерим
-    showScreen("contactsScreen");
-    renderContacts();
-  } else {
-    codeError.textContent = "Неверный код";
-  }
-});
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      
+      // Устанавливаем обработчики для verifyBtn (если их несколько, убираем дубли)
+      const oldVerifyBtn = verifyBtn;
+      const newVerifyBtn = oldVerifyBtn.cloneNode(true);
+      oldVerifyBtn.parentNode.replaceChild(newVerifyBtn, oldVerifyBtn);
+      
+      newVerifyBtn.addEventListener("click", () => {
+        const entered = codeInput.value.trim();
+        if (entered === generatedCode) {
+          codeError.textContent = "";
+          localStorage.setItem("nyashgram_entered", "true");
+          showScreen("contactsScreen");
+          if (typeof renderContacts === "function") renderContacts();
+        } else {
+          codeError.textContent = "Неверный код";
+        }
+      });
+      
+      // Обновляем ссылку на verifyBtn
+      window.verifyBtn = newVerifyBtn;
+    });
   </script>
+
+  <!-- Подключаем внешние скрипты -->
   <script src="contacts.js"></script>
-<script src="chat.js"></script>
-<script src="app.js"></script>
+  <script src="chat.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

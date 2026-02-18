@@ -1,6 +1,6 @@
-// app.js — NyashGram v2.0 (ребрендинг)
+// app.js — NyashGram v2.0 (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 // Без Firebase, только локальное хранение, темы и шрифты
- 
+
 // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 const AppState = {
   currentUser: {
@@ -191,26 +191,109 @@ function checkAuth() {
   }
 }
 
-// ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
+// ========== ФУНКЦИИ ДЛЯ ЭКРАНА ВХОДА ==========
+let generatedCode = "";
+
+function generateCode() {
+  generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const codeInput = document.getElementById("codeInput");
+  if (codeInput) {
+    codeInput.placeholder = generatedCode.split("").join(" ");
+  }
+  const codeHint = document.getElementById("generatedCodeHint");
+  if (codeHint) {
+    codeHint.textContent = generatedCode;
+  }
+  console.log("Сгенерирован код:", generatedCode);
+  return generatedCode;
+}
+
+function checkPhoneInput() {
+  const phoneInput = document.getElementById("phoneNumber");
+  const sendBtn = document.getElementById("sendBtn");
+  const errorMsg = document.getElementById("errorMessage");
+  
+  if (!phoneInput || !sendBtn) return;
+  
+  const phone = phoneInput.value.trim().replace(/\D/g, "");
+  if (phone.length >= 9) {
+    sendBtn.classList.add("active");
+    sendBtn.disabled = false;
+    if (errorMsg) errorMsg.textContent = "";
+  } else {
+    sendBtn.classList.remove("active");
+    sendBtn.disabled = true;
+    if (errorMsg && phone.length > 0) {
+      errorMsg.textContent = "Номер слишком короткий";
+    } else if (errorMsg) {
+      errorMsg.textContent = "";
+    }
+  }
+}
+
+function checkCodeInput() {
+  const codeInput = document.getElementById("codeInput");
+  const verifyBtn = document.getElementById("verifyBtn");
+  const codeError = document.getElementById("codeError");
+  
+  if (!codeInput || !verifyBtn) return;
+  
+  const entered = codeInput.value.trim();
+  if (entered.length === 6) {
+    if (entered === generatedCode) {
+      if (codeError) codeError.textContent = "";
+      verifyBtn.classList.add("active");
+      verifyBtn.disabled = false;
+    } else {
+      if (codeError) codeError.textContent = "Неверный код";
+      verifyBtn.classList.remove("active");
+      verifyBtn.disabled = true;
+    }
+  } else {
+    if (codeError) codeError.textContent = "";
+    verifyBtn.classList.remove("active");
+    verifyBtn.disabled = true;
+  }
+}
+
+// ========== НАСТРОЙКА ОБРАБОТЧИКОВ ==========
 function setupEventListeners() {
   
   // ===== ЭКРАН НОМЕРА =====
+  const phoneInput = document.getElementById("phoneNumber");
+  if (phoneInput) {
+    phoneInput.addEventListener("input", checkPhoneInput);
+    // Первоначальная проверка
+    setTimeout(checkPhoneInput, 100);
+  }
+  
   const sendBtn = document.getElementById("sendBtn");
   if (sendBtn) {
-    // Убираем старые обработчики
+    // Удаляем все старые обработчики
     const newSendBtn = sendBtn.cloneNode(true);
     sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
     
     newSendBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      // Проверяем, активна ли кнопка (не disabled)
+      e.stopPropagation();
+      console.log("Кнопка 'Получить код' нажата");
+      
+      // Проверяем, активна ли кнопка
       if (!newSendBtn.disabled && newSendBtn.classList.contains('active')) {
+        generateCode();
         showScreen("codeScreen");
+      } else {
+        console.log("Кнопка не активна");
       }
     });
   }
   
   // ===== ЭКРАН КОДА =====
+  const codeInput = document.getElementById("codeInput");
+  if (codeInput) {
+    codeInput.addEventListener("input", checkCodeInput);
+  }
+  
   const verifyBtn = document.getElementById("verifyBtn");
   if (verifyBtn) {
     const newVerifyBtn = verifyBtn.cloneNode(true);
@@ -218,15 +301,15 @@ function setupEventListeners() {
     
     newVerifyBtn.addEventListener("click", (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      console.log("Кнопка 'Войти' нажата");
+      
       if (!newVerifyBtn.disabled && newVerifyBtn.classList.contains('active')) {
         const codeInput = document.getElementById("codeInput");
         const codeError = document.getElementById("codeError");
         
-        // Получаем сгенерированный код из placeholder (убираем пробелы)
-        const generatedCode = codeInput?.placeholder?.replace(/\s/g, "") || "";
-        
         if (codeInput.value.trim() === generatedCode) {
-          codeError.textContent = "";
+          if (codeError) codeError.textContent = "";
           
           // Сохраняем флаг входа
           localStorage.setItem("nyashgram_entered", "true");
@@ -245,13 +328,32 @@ function setupEventListeners() {
             renderContacts();
           }
         } else {
-          codeError.textContent = "Неверный код";
+          if (codeError) codeError.textContent = "Неверный код";
         }
       }
     });
   }
   
   // ===== ЭКРАН ПРОФИЛЯ =====
+  const avatarInput = document.getElementById("avatarInput");
+  if (avatarInput) {
+    avatarInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const preview = document.getElementById("avatarPreview");
+          if (preview) {
+            preview.style.backgroundImage = `url(${event.target.result})`;
+            preview.style.backgroundSize = "cover";
+            preview.textContent = "";
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  
   const saveBtn = document.getElementById("saveBtn");
   if (saveBtn) {
     const newSaveBtn = saveBtn.cloneNode(true);
@@ -291,7 +393,6 @@ function setupEventListeners() {
   }
   
   // ===== НАСТРОЙКИ =====
-  // Кнопка открытия настроек
   const settingsBtn = document.getElementById("settingsBtn");
   if (settingsBtn) {
     settingsBtn.addEventListener("click", () => {
@@ -299,7 +400,6 @@ function setupEventListeners() {
     });
   }
   
-  // Кнопка назад из настроек
   const backFromSettingsBtn = document.getElementById("backFromSettingsBtn");
   if (backFromSettingsBtn) {
     backFromSettingsBtn.addEventListener("click", () => {
@@ -307,7 +407,6 @@ function setupEventListeners() {
     });
   }
   
-  // Сохранение настроек
   const saveSettingsBtn = document.getElementById("saveSettingsBtn");
   if (saveSettingsBtn) {
     saveSettingsBtn.addEventListener("click", saveSettings);
@@ -334,7 +433,6 @@ function setupEventListeners() {
   });
   
   // ===== ЧАТ =====
-  // Кнопка назад из чата
   const backBtn = document.getElementById("backBtn");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
@@ -342,20 +440,20 @@ function setupEventListeners() {
     });
   }
   
-  // Отправка сообщения (обработчик в chat.js, но дублируем для надёжности)
   const sendMessageBtn = document.getElementById("sendMessageBtn");
   const messageInput = document.getElementById("messageInput");
   
   if (sendMessageBtn && messageInput) {
     sendMessageBtn.addEventListener("click", () => {
       if (typeof window.sendMessage === 'function') {
-        window.sendMessage();
+        window.sendMessage(messageInput.value);
       }
     });
     
     messageInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter" && typeof window.sendMessage === 'function') {
-        window.sendMessage();
+      if (e.key === "Enter" && !e.shiftKey && typeof window.sendMessage === 'function') {
+        e.preventDefault();
+        window.sendMessage(messageInput.value);
       }
     });
   }
@@ -376,6 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.applyTheme = applyTheme;
   window.applyFont = applyFont;
   window.AppState = AppState;
+  window.generateCode = generateCode;
 });
 
-console.log("✅ app.js загружен — Firebase удалён, темы и шрифты работают");
+console.log("✅ app.js загружен — Firebase удалён, кнопка 'Получить код' ИСПРАВЛЕНА");

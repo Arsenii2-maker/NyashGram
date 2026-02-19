@@ -1,21 +1,22 @@
 // contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
 const contacts = [
-  { id: "bestie", name: "Bestie", status: "онлайн 💕" },
-  { id: "philosopher", name: "Философ", status: "пишет трактат 📜" },
-  { id: "study", name: "Учёба", status: "готовлюсь к экзамену 📚" },
-  { id: "musicpal", name: "Music Pal", status: "слушаю lo-fi 🎧" },
-  { id: "nightchat", name: "Night Chat", status: "не сплю 🌙" }
+  { id: "bestie", name: "Bestie", username: "bestie_nyash", status: "онлайн 💕" },
+  { id: "philosopher", name: "Философ", username: "thinker_deep", status: "пишет трактат 📜" },
+  { id: "study", name: "Учёба", username: "study_buddy", status: "готовлюсь к экзамену 📚" },
+  { id: "musicpal", name: "Music Pal", username: "melody_lover", status: "слушаю lo-fi 🎧" },
+  { id: "nightchat", name: "Night Chat", username: "midnight_vibes", status: "не сплю 🌙" }
 ];
 
 const fixedChats = [
-  { id: "nyashhelp", name: "NyashHelp", status: "🩷 всегда на связи", avatar: "linear-gradient(135deg, #c38ef0, #e0b0ff)" },
-  { id: "nyashtalk", name: "NyashTalk", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #85d1c5, #b0e0d5)" }
+  { id: "nyashhelp", name: "NyashHelp", username: "nyashhelp_official", status: "🩷 всегда на связи", avatar: "linear-gradient(135deg, #c38ef0, #e0b0ff)" },
+  { id: "nyashtalk", name: "NyashTalk", username: "nyashtalk_bot", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #85d1c5, #b0e0d5)" }
 ];
 
 const allContacts = [...fixedChats, ...contacts];
 const chatData = {};
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned') || '[]');
+let currentSearchTerm = '';
 
 function savePinnedToStorage() {
   localStorage.setItem('nyashgram_pinned', JSON.stringify(pinnedChats));
@@ -50,14 +51,26 @@ function getGradientForName(name) {
   return gradients[hash % gradients.length];
 }
 
+function filterContactsByUsername(searchTerm) {
+  currentSearchTerm = searchTerm.toLowerCase().trim();
+  renderContacts();
+}
+
+function contactMatchesSearch(contact) {
+  if (!currentSearchTerm) return true;
+  const username = (contact.username || '').toLowerCase();
+  return username.includes(currentSearchTerm);
+}
+
 function renderContacts() {
   const list = document.getElementById('contactsList');
   if (!list) return;
   
   list.innerHTML = '';
   
-  // Сортируем: закреплённые первыми
-  const sortedFixed = [...fixedChats].sort((a, b) => {
+  // Фильтруем ботов
+  const filteredFixed = fixedChats.filter(contact => contactMatchesSearch(contact));
+  const sortedFixed = [...filteredFixed].sort((a, b) => {
     const aPinned = isPinned(a.id) ? 1 : 0;
     const bPinned = isPinned(b.id) ? 1 : 0;
     return bPinned - aPinned;
@@ -69,8 +82,9 @@ function renderContacts() {
     list.appendChild(el);
   });
   
-  // Друзья (без заголовка)
-  const sortedContacts = [...contacts].sort((a, b) => {
+  // Фильтруем друзей
+  const filteredContacts = contacts.filter(contact => contactMatchesSearch(contact));
+  const sortedContacts = [...filteredContacts].sort((a, b) => {
     const aPinned = isPinned(a.id) ? 1 : 0;
     const bPinned = isPinned(b.id) ? 1 : 0;
     return bPinned - aPinned;
@@ -80,6 +94,16 @@ function renderContacts() {
     const el = createContactElement(contact);
     list.appendChild(el);
   });
+  
+  // Если ничего не найдено
+  if (sortedFixed.length === 0 && sortedContacts.length === 0) {
+    const emptyEl = document.createElement('div');
+    emptyEl.style.padding = '20px';
+    emptyEl.style.textAlign = 'center';
+    emptyEl.style.color = 'var(--text-soft)';
+    emptyEl.textContent = '😿 Ничего не найдено';
+    list.appendChild(emptyEl);
+  }
   
   // Обновляем отображение username
   updateUsernameDisplay();
@@ -98,17 +122,17 @@ function createContactElement(contact) {
     <div class="avatar" style="background: ${avatarStyle}; background-size: cover;"></div>
     <div class="info">
       <div class="name">${contact.name} ${pinIcon}</div>
+      <div class="username">@${contact.username || 'unknown'}</div>
       <div class="status">${contact.status}</div>
       ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
     </div>
   `;
   
   el.onclick = (e) => {
-    // Если клик не по кнопке, открываем чат
-    if (!e.target.closest('.pin-btn')) {
-      if (typeof window.openChat === 'function') {
-        window.openChat(contact);
-      }
+    // Предотвращаем выделение
+    e.preventDefault();
+    if (typeof window.openChat === 'function') {
+      window.openChat(contact);
     }
   };
   
@@ -118,8 +142,8 @@ function createContactElement(contact) {
 function updateUsernameDisplay() {
   const display = document.getElementById('usernameDisplay');
   if (display) {
-    const name = localStorage.getItem('nyashgram_name') || 'Няша';
-    display.textContent = `@${name}`;
+    const username = localStorage.getItem('nyashgram_username') || 'nyasha';
+    display.textContent = `@${username}`;
   }
 }
 
@@ -140,5 +164,6 @@ window.getGradientForName = getGradientForName;
 window.togglePin = togglePin;
 window.isPinned = isPinned;
 window.pinnedChats = pinnedChats;
+window.filterContactsByUsername = filterContactsByUsername;
 
 console.log('✅ contacts.js загружен');

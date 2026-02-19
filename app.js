@@ -386,6 +386,22 @@ document.addEventListener('DOMContentLoaded', function() {
       window.filterContactsByUsername(this.value);
     }
   });
+  // В chat.js, функция toggleChatActions
+function toggleChatActions() {
+  const panel = document.getElementById('chatActionsPanel');
+  if (!panel) return;
+  
+  if (panel.style.display === 'none' || panel.style.display === '') {
+    panel.style.display = 'flex';
+    panel.style.animation = 'slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+  } else {
+    panel.style.animation = 'slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+    setTimeout(() => {
+      panel.style.display = 'none';
+      panel.style.animation = ''; // Сбрасываем анимацию
+    }, 200);
+  }
+}
   
   // Проверка авторизации
   checkAuth();

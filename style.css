@@ -9,6 +9,7 @@
   user-select: none;
 }
 
+/* Разрешаем выделение только в полях ввода */
 input, textarea, [contenteditable="true"] {
   -webkit-user-select: text;
   -moz-user-select: text;
@@ -23,6 +24,24 @@ html, body {
   min-height: 100vh;
 }
 
+/* ===== БАЗОВЫЕ ПЕРЕМЕННЫЕ (значения по умолчанию) ===== */
+body {
+  --bg-start: #ffd1dc;
+  --bg-end: #ffe4e1;
+  --text: #5c3a4a;
+  --text-soft: #8b6f8b;
+  --accent: #ffadd6;
+  --accent-soft: #ffc1e0;
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(240, 225, 255, 0.7);
+  --border-light: rgba(255, 255, 255, 0.4);
+  
+  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
 /* ===== ТЕМЫ - СВЕТЛЫЕ ===== */
 body.theme-pastel-pink-light {
   --bg-start: #ffd1dc;
@@ -35,8 +54,6 @@ body.theme-pastel-pink-light {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(240, 225, 255, 0.7);
   --border-light: rgba(255, 255, 255, 0.4);
-  background: linear-gradient(145deg, #ffd1dc, #ffe4e1);
-  color: #5c3a4a;
 }
 
 body.theme-milk-rose-light {
@@ -50,8 +67,6 @@ body.theme-milk-rose-light {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(255, 200, 200, 0.7);
   --border-light: rgba(255, 235, 220, 0.5);
-  background: linear-gradient(145deg, #ffb6c1, #ff9eb5);
-  color: #4a2c1f;
 }
 
 body.theme-night-blue-light {
@@ -65,8 +80,6 @@ body.theme-night-blue-light {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(210, 230, 255, 0.7);
   --border-light: rgba(255, 255, 255, 0.3);
-  background: linear-gradient(145deg, #d4e0f0, #c0d0e8);
-  color: #1a2a4a;
 }
 
 body.theme-lo-fi-beige-light {
@@ -80,8 +93,6 @@ body.theme-lo-fi-beige-light {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(235, 220, 210, 0.7);
   --border-light: rgba(230, 210, 190, 0.4);
-  background: linear-gradient(145deg, #f9f5ee, #f0e6d9);
-  color: #4a3c2e;
 }
 
 body.theme-soft-lilac-light {
@@ -95,8 +106,6 @@ body.theme-soft-lilac-light {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(220, 200, 255, 0.7);
   --border-light: rgba(220, 200, 255, 0.4);
-  background: linear-gradient(145deg, #f5f0ff, #e6d9ff);
-  color: #3c1f5c;
 }
 
 /* ===== ТЕМЫ - ТЁМНЫЕ ===== */
@@ -111,8 +120,6 @@ body.theme-pastel-pink-dark {
   --bubble-user: rgba(255, 105, 180, 0.7);
   --bubble-bot: rgba(199, 21, 133, 0.6);
   --border-light: rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #8b1a4d, #4a1a2a);
-  color: #ffe4f0;
 }
 
 body.theme-milk-rose-dark {
@@ -126,8 +133,6 @@ body.theme-milk-rose-dark {
   --bubble-user: rgba(255, 127, 80, 0.7);
   --bubble-bot: rgba(255, 71, 87, 0.6);
   --border-light: rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #8b3a3a, #4a1f1f);
-  color: #fff0f0;
 }
 
 body.theme-night-blue-dark {
@@ -141,8 +146,6 @@ body.theme-night-blue-dark {
   --bubble-user: rgba(65, 105, 225, 0.7);
   --bubble-bot: rgba(0, 0, 139, 0.6);
   --border-light: rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #0a2351, #03002b);
-  color: #f0f8ff;
 }
 
 body.theme-lo-fi-beige-dark {
@@ -156,8 +159,6 @@ body.theme-lo-fi-beige-dark {
   --bubble-user: rgba(205, 133, 63, 0.7);
   --bubble-bot: rgba(139, 69, 19, 0.6);
   --border-light: rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #5d3a1a, #2d1e0a);
-  color: #fdf5e6;
 }
 
 body.theme-soft-lilac-dark {
@@ -171,8 +172,21 @@ body.theme-soft-lilac-dark {
   --bubble-user: rgba(147, 112, 219, 0.7);
   --bubble-bot: rgba(138, 43, 226, 0.6);
   --border-light: rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #4b0082, #240041);
-  color: #f0e6ff;
+}
+
+/* ===== ПРИМЕНЕНИЕ ФОНА И ЦВЕТОВ ===== */
+body.theme-pastel-pink-light,
+body.theme-pastel-pink-dark,
+body.theme-milk-rose-light,
+body.theme-milk-rose-dark,
+body.theme-night-blue-light,
+body.theme-night-blue-dark,
+body.theme-lo-fi-beige-light,
+body.theme-lo-fi-beige-dark,
+body.theme-soft-lilac-light,
+body.theme-soft-lilac-dark {
+  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+  color: var(--text);
 }
 
 /* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */

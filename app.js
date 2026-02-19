@@ -11,7 +11,7 @@ const AppState = {
 };
 
 // База данных занятых юзернеймов
-let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "admin", "user"]');
+let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
 
 function isUsernameTaken(username, currentUsername = null) {
   if (!username) return false;

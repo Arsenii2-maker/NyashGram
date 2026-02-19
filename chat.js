@@ -553,6 +553,7 @@ function renderMessages() {
   
   chatArea.innerHTML = '';
   
+  // Добавляем сообщения (они получат анимацию через CSS класс .message)
   if (window.chatData[currentChat].messages) {
     window.chatData[currentChat].messages.forEach((msg) => {
       const el = document.createElement('div');
@@ -562,30 +563,23 @@ function renderMessages() {
     });
   }
   
-  if (isBotTyping) {
+  // Добавляем индикатор печати если нужно
+  if (isTyping) {
     const typingEl = document.createElement('div');
     typingEl.className = 'typing-indicator bot-typing';
-    typingEl.id = 'botTypingIndicator';
+    typingEl.id = 'typingIndicator';
     typingEl.innerHTML = '<span></span><span></span><span></span>';
     chatArea.appendChild(typingEl);
   }
   
-  if (isUserTyping) {
-    const typingEl = document.createElement('div');
-    typingEl.className = 'typing-indicator user-typing';
-    typingEl.id = 'userTypingIndicator';
-    typingEl.innerHTML = '<span></span><span></span><span></span>';
-    typingEl.style.alignSelf = 'flex-end';
-    chatArea.appendChild(typingEl);
-  }
-  
+  // Прокрутка
   if (isNearBottom) {
     chatArea.scrollTop = chatArea.scrollHeight;
   } else {
     chatArea.scrollTop = scrollPos;
   }
   
-  // УНИКАЛЬНЫЕ ПАНЕЛИ ДЛЯ КАЖДОГО БОТА
+  // Обновляем панель быстрых ответов (с анимацией)
   if (quickPanel) {
     quickPanel.innerHTML = '';
     
@@ -623,10 +617,11 @@ function renderMessages() {
         questions = universalQuickQuestions.map(q => q.text);
     }
     
-    questions.forEach((q) => {
+    questions.forEach((q, index) => {
       const btn = document.createElement('button');
       btn.className = 'quick-chip';
       btn.textContent = q;
+      btn.style.animationDelay = `${index * 0.05}s`; // Каскадная анимация
       btn.onclick = (e) => {
         e.preventDefault();
         sendMessage(q);
@@ -635,7 +630,6 @@ function renderMessages() {
     });
   }
 }
-
 // Обработчик печати пользователя
 function setupTypingListener() {
   const msgInput = document.getElementById('messageInput');

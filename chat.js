@@ -269,7 +269,9 @@ function renderMessages() {
         btn.textContent = q;
         btn.onclick = (e) => {
           e.preventDefault();
+          e.stopPropagation();
           sendMessage(q);
+          return false;
         };
         quickPanel.appendChild(btn);
       });
@@ -280,8 +282,10 @@ function renderMessages() {
         btn.textContent = t.title;
         btn.onclick = (e) => {
           e.preventDefault();
+          e.stopPropagation();
           const randomMsg = t.msgs[Math.floor(Math.random() * t.msgs.length)];
           sendMessage(randomMsg);
+          return false;
         };
         quickPanel.appendChild(btn);
       });
@@ -296,7 +300,8 @@ function renderMessages() {
       el.textContent = msg.text;
       
       // Предотвращаем выделение при клике
-      el.onmousedown = (e) => e.preventDefault();
+      el.addEventListener('mousedown', (e) => e.preventDefault());
+      el.addEventListener('selectstart', (e) => e.preventDefault());
       
       chatArea.appendChild(el);
     });
@@ -323,7 +328,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (sendBtn && msgInput) {
     sendBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (msgInput.value.trim()) sendMessage(msgInput.value);
+      return false;
     });
     
     msgInput.addEventListener('keypress', (e) => {
@@ -344,9 +351,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (backBtn) {
     backBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (typeof window.showScreen === 'function') {
         window.showScreen('contactsScreen');
       }
+      return false;
     });
   }
   
@@ -354,7 +363,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (pinChatBtn) {
     pinChatBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       toggleChatActions();
+      return false;
     });
   }
   
@@ -362,11 +373,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (pinActionBtn) {
     pinActionBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (currentChat && typeof window.togglePin === 'function') {
         window.togglePin(currentChat);
         updatePinIcon();
         document.getElementById('chatActionsPanel').style.display = 'none';
       }
+      return false;
     });
   }
   
@@ -374,7 +387,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (renameBtn) {
     renameBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       showRenameModal();
+      return false;
     });
   }
   
@@ -382,8 +397,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (muteBtn) {
     muteBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       alert('🔇 Звук выключен для этого чата (демо-режим)');
       document.getElementById('chatActionsPanel').style.display = 'none';
+      return false;
     });
   }
   
@@ -391,11 +408,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (deleteBtn) {
     deleteBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       if (currentChat && confirm('Удалить историю чата?')) {
         chatData[currentChat] = { messages: [], draft: '' };
         renderMessages();
         document.getElementById('chatActionsPanel').style.display = 'none';
       }
+      return false;
     });
   }
   
@@ -403,20 +422,33 @@ document.addEventListener('DOMContentLoaded', function() {
   if (renameCancelBtn) {
     renameCancelBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       hideRenameModal();
+      return false;
     });
   }
   
   if (renameConfirmBtn) {
     renameConfirmBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       renameCurrentChat();
+      return false;
     });
   }
   
-  // Предотвращаем выделение на всех кнопках
-  document.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('mousedown', (e) => e.preventDefault());
+  // Предотвращаем выделение на всех элементах
+  document.querySelectorAll('*').forEach(el => {
+    el.addEventListener('mousedown', (e) => {
+      if (!el.matches('input, textarea, [contenteditable="true"]')) {
+        e.preventDefault();
+      }
+    });
+    el.addEventListener('selectstart', (e) => {
+      if (!el.matches('input, textarea, [contenteditable="true"]')) {
+        e.preventDefault();
+      }
+    });
   });
 });
 

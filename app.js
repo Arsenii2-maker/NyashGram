@@ -1,4 +1,4 @@
-// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
+// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ПЛАВНЫМИ АНИМАЦИЯМИ
 
 const AppState = {
   currentUser: {
@@ -15,7 +15,6 @@ let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames'
 
 function isUsernameTaken(username, currentUsername = null) {
   if (!username) return false;
-  // Если это текущий юзернейм пользователя, то не считаем занятым
   if (currentUsername && username.toLowerCase() === currentUsername.toLowerCase()) return false;
   return takenUsernames.some(u => u.toLowerCase() === username.toLowerCase());
 }
@@ -35,48 +34,77 @@ function removeUsername(username) {
   }
 }
 
-// Функция переключения экранов
+// Функция переключения экранов с анимацией
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const screen = document.getElementById(id);
-  if (screen) {
-    screen.classList.add('active');
-    if (id === 'contactsScreen' && typeof renderContacts === 'function') {
-      setTimeout(renderContacts, 50);
+  const currentActive = document.querySelector('.screen.active');
+  const newScreen = document.getElementById(id);
+  
+  if (currentActive) {
+    currentActive.style.opacity = '0';
+    setTimeout(() => {
+      currentActive.classList.remove('active');
+      if (newScreen) {
+        newScreen.classList.add('active');
+        setTimeout(() => {
+          newScreen.style.opacity = '1';
+        }, 50);
+      }
+    }, 300);
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    if (newScreen) {
+      newScreen.classList.add('active');
+      newScreen.style.opacity = '1';
     }
+  }
+  
+  if (id === 'contactsScreen' && typeof renderContacts === 'function') {
+    setTimeout(renderContacts, 350);
   }
 }
 
-// Применение темы
+// Применение темы с анимацией
 function applyTheme(themeId) {
-  document.body.classList.remove(
-    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
-    'theme-lo-fi-beige', 'theme-soft-lilac'
-  );
-  document.body.classList.add(`theme-${themeId}`);
-  AppState.currentUser.theme = themeId;
-  localStorage.setItem('nyashgram_theme', themeId);
+  document.body.style.opacity = '0.5';
   
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.theme === themeId) btn.classList.add('active');
-  });
+  setTimeout(() => {
+    document.body.classList.remove(
+      'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
+      'theme-lo-fi-beige', 'theme-soft-lilac'
+    );
+    document.body.classList.add(`theme-${themeId}`);
+    AppState.currentUser.theme = themeId;
+    localStorage.setItem('nyashgram_theme', themeId);
+    
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.theme === themeId) btn.classList.add('active');
+    });
+    
+    document.body.style.opacity = '1';
+  }, 150);
 }
 
-// Применение шрифта
+// Применение шрифта с анимацией
 function applyFont(fontClass) {
-  document.body.classList.remove(
-    'font-system', 'font-rounded', 'font-cozy', 
-    'font-elegant', 'font-bold-soft', 'font-mono-cozy'
-  );
-  document.body.classList.add(fontClass);
-  AppState.currentUser.font = fontClass;
-  localStorage.setItem('nyashgram_font', fontClass);
+  document.body.style.opacity = '0.5';
   
-  document.querySelectorAll('.font-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.font === fontClass) btn.classList.add('active');
-  });
+  setTimeout(() => {
+    document.body.classList.remove(
+      'font-system', 'font-rounded', 'font-cozy', 
+      'font-elegant', 'font-bold-soft', 'font-mono-cozy'
+    );
+    document.body.classList.add(fontClass);
+    AppState.currentUser.font = fontClass;
+    localStorage.setItem('nyashgram_font', fontClass);
+    
+    document.querySelectorAll('.font-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.font === fontClass) btn.classList.add('active');
+    });
+    
+    document.body.style.opacity = '1';
+  }, 150);
 }
 
 // Загрузка настроек в UI
@@ -113,7 +141,6 @@ function saveSettings() {
     return;
   }
   
-  // Проверка на уникальность
   if (isUsernameTaken(newUsername, AppState.currentUser.username)) {
     if (errorEl) errorEl.textContent = 'Этот юзернейм уже занят!';
     return;
@@ -121,17 +148,14 @@ function saveSettings() {
   
   if (errorEl) errorEl.textContent = '';
   
-  // Удаляем старый юзернейм из занятых
   removeUsername(AppState.currentUser.username);
   
-  // Обновляем данные
   AppState.currentUser.name = newName;
   AppState.currentUser.username = newUsername;
   
   localStorage.setItem('nyashgram_name', newName);
   localStorage.setItem('nyashgram_username', newUsername);
   
-  // Добавляем новый юзернейм в занятые
   addUsername(newUsername);
   
   const display = document.getElementById('usernameDisplay');
@@ -143,9 +167,7 @@ function saveSettings() {
 // Проверка авторизации
 function checkAuth() {
   if (localStorage.getItem('nyashgram_entered') === 'true') {
-    // Добавляем текущего пользователя в список занятых, если его там нет
     addUsername(AppState.currentUser.username);
-    
     applyTheme(AppState.currentUser.theme);
     applyFont(AppState.currentUser.font);
     showScreen('contactsScreen');
@@ -237,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         showScreen('contactsScreen');
         if (typeof renderContacts === 'function') {
-          setTimeout(renderContacts, 100);
+          setTimeout(renderContacts, 350);
         }
       }
     });
@@ -284,16 +306,27 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // ===== НАСТРОЙКИ =====
-  document.getElementById('settingsBtn')?.addEventListener('click', () => {
-    loadSettingsIntoUI();
-    showScreen('settingsScreen');
-  });
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      loadSettingsIntoUI();
+      showScreen('settingsScreen');
+    });
+  }
   
-  document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => {
-    showScreen('contactsScreen');
-  });
+  const backFromSettingsBtn = document.getElementById('backFromSettingsBtn');
+  if (backFromSettingsBtn) {
+    backFromSettingsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showScreen('contactsScreen');
+    });
+  }
   
-  document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  if (saveSettingsBtn) {
+    saveSettingsBtn.addEventListener('click', saveSettings);
+  }
   
   // Кнопки тем
   document.querySelectorAll('.theme-btn').forEach(btn => {

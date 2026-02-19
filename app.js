@@ -1,6 +1,6 @@
-// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
+// app.js — НОВАЯ ПРОСТАЯ ВЕРСИЯ
 
-// Инициализируем глобальный chatData если его нет
+// Инициализация
 if (!window.chatData) {
   window.chatData = {};
 }
@@ -11,78 +11,57 @@ const AppState = {
     username: localStorage.getItem('nyashgram_username') || "nyasha",
     avatar: localStorage.getItem('nyashgram_avatar') || null,
     theme: localStorage.getItem('nyashgram_theme') || "pastel-pink",
+    mode: localStorage.getItem('nyashgram_mode') || "light",
     font: localStorage.getItem('nyashgram_font') || "font-cozy"
   }
 };
 
-// ===== НОВАЯ СИСТЕМА ТЕМ =====
-let currentThemeBase = localStorage.getItem('nyashgram_theme_base') || 'pastel-pink';
-let currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
+// База занятых юзернеймов
+let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "nyashgame_bot", "nyashhoroscope_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
 
-// Функция применения темы (НОВАЯ)
-function applyNewTheme(themeBase, mode) {
-  const themeClass = `theme-${themeBase}-${mode}`;
+// Милые слова
+const cuteWords = ["nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango", "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream"];
+const cuteSuffixes = ["chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi"];
+
+// ===== ПРОСТАЯ СИСТЕМА ТЕМ =====
+function setTheme(theme, mode) {
+  // Сохраняем текущий шрифт
+  const currentFont = AppState.currentUser.font;
   
-  // Удаляем все старые классы тем
-  document.body.classList.remove(
-    'theme-pastel-pink-light', 'theme-pastel-pink-dark',
-    'theme-milk-rose-light', 'theme-milk-rose-dark',
-    'theme-night-blue-light', 'theme-night-blue-dark',
-    'theme-lo-fi-beige-light', 'theme-lo-fi-beige-dark',
-    'theme-soft-lilac-light', 'theme-soft-lilac-dark',
-    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
-    'theme-lo-fi-beige', 'theme-soft-lilac',
-    'light-mode', 'dark-mode'
-  );
+  // Полностью очищаем классы на body
+  document.body.className = '';
   
-  // Добавляем новую тему
-  document.body.classList.add(themeClass);
+  // Добавляем класс темы и режима
+  document.body.classList.add(`${theme}-${mode}`);
   
-  // Сохраняем
-  currentThemeBase = themeBase;
-  currentThemeMode = mode;
-  localStorage.setItem('nyashgram_theme_base', themeBase);
-  localStorage.setItem('nyashgram_theme_mode', mode);
-  AppState.currentUser.theme = themeBase;
-  localStorage.setItem('nyashgram_theme', themeBase);
+  // Добавляем класс шрифта
+  document.body.classList.add(currentFont);
   
-  console.log('✅ Применена тема:', themeClass);
+  // Сохраняем в состояние
+  AppState.currentUser.theme = theme;
+  AppState.currentUser.mode = mode;
+  localStorage.setItem('nyashgram_theme', theme);
+  localStorage.setItem('nyashgram_mode', mode);
+  
+  console.log('✅ Тема установлена:', `${theme}-${mode}`);
   console.log('📌 Классы body:', document.body.className);
 }
 
-// Функция переключения режима (луна/солнце)
-function toggleThemeMode() {
-  console.log('🔴 КНОПКА ЛУНЫ НАЖАТА! Текущий режим:', currentThemeMode);
+// Переключение режима (луна/солнце)
+function toggleMode() {
+  const newMode = AppState.currentUser.mode === 'light' ? 'dark' : 'light';
+  setTheme(AppState.currentUser.theme, newMode);
   
-  const newMode = currentThemeMode === 'light' ? 'dark' : 'light';
-  applyNewTheme(currentThemeBase, newMode);
-  
-  // Обновляем иконку
   const modeToggle = document.getElementById('themeModeToggle');
   if (modeToggle) {
     modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';
   }
 }
 
-// База данных занятых юзернеймов
-let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "nyashgame_bot", "nyashhoroscope_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
-
-// Милые слова для генерации юзернеймов
-const cuteWords = [
-  "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
-  "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
-  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream"
-];
-
-const cuteSuffixes = [
-  "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi"
-];
-
-// Проверка валидности юзернейма
+// ===== ПРОВЕРКА ЮЗЕРНЕЙМА =====
 function isValidUsername(username) {
   if (!username) return false;
-  const regex = /^[a-z0-9_]{3,50}$/;
-  return regex.test(username);
+  return /^[a-z0-9_]{3,50}$/.test(username);
 }
 
 function getUsernameError(username) {
@@ -93,47 +72,17 @@ function getUsernameError(username) {
   return '';
 }
 
-// Генерация случайного милого юзернейма
 function generateCuteUsername() {
   let attempts = 0;
-  const maxAttempts = 50;
-  
-  while (attempts < maxAttempts) {
+  while (attempts < 50) {
     attempts++;
-    
-    const format = Math.floor(Math.random() * 6);
-    let username = '';
-    
-    switch(format) {
-      case 0:
-        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
-                  Math.floor(Math.random() * 999);
-        break;
-      case 1:
-        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
-                  cuteWords[Math.floor(Math.random() * cuteWords.length)].slice(0, 5);
-        break;
-      case 2:
-        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
-                  cuteSuffixes[Math.floor(Math.random() * cuteSuffixes.length)];
-        break;
-      case 3:
-        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + '_' + 
-                  cuteWords[Math.floor(Math.random() * cuteWords.length)];
-        break;
-      default:
-        const shortWords = ["nyu", "mya", "puu", "nyaa"];
-        username = shortWords[Math.floor(Math.random() * shortWords.length)] + 
-                  Math.floor(Math.random() * 999);
-    }
-    
-    if (username.length > 50) username = username.slice(0, 50);
-    
+    const word = cuteWords[Math.floor(Math.random() * cuteWords.length)];
+    const num = Math.floor(Math.random() * 999);
+    const username = word + num;
     if (isValidUsername(username) && !isUsernameTaken(username)) {
       return username;
     }
   }
-  
   return "nyasha_" + Date.now().toString().slice(-6);
 }
 
@@ -158,67 +107,45 @@ function removeUsername(username) {
   }
 }
 
-// Функция переключения экранов с анимацией
+// ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
 function showScreen(id) {
-  const currentActive = document.querySelector('.screen.active');
-  const newScreen = document.getElementById(id);
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.opacity = '0';
+  });
   
-  if (currentActive) {
-    currentActive.style.opacity = '0';
+  const screen = document.getElementById(id);
+  if (screen) {
+    screen.classList.add('active');
     setTimeout(() => {
-      currentActive.classList.remove('active');
-      if (newScreen) {
-        newScreen.classList.add('active');
-        setTimeout(() => {
-          newScreen.style.opacity = '1';
-        }, 50);
-      }
-    }, 300);
-  } else {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    if (newScreen) {
-      newScreen.classList.add('active');
-      newScreen.style.opacity = '1';
-    }
+      screen.style.opacity = '1';
+    }, 50);
   }
   
   if (id === 'contactsScreen' && typeof renderContacts === 'function') {
-    setTimeout(renderContacts, 350);
+    setTimeout(renderContacts, 100);
   }
 }
 
-// Применение шрифта
+// ===== ШРИФТЫ =====
 function applyFont(fontClass) {
-  document.body.style.opacity = '0.5';
-  
-  setTimeout(() => {
-    document.body.classList.remove(
-      'font-system', 'font-rounded', 'font-cozy', 
-      'font-elegant', 'font-bold-soft', 'font-mono-cozy'
-    );
-    document.body.classList.add(fontClass);
-    AppState.currentUser.font = fontClass;
-    localStorage.setItem('nyashgram_font', fontClass);
-    
-    document.querySelectorAll('.font-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.dataset.font === fontClass) btn.classList.add('active');
-    });
-    
-    document.body.style.opacity = '1';
-  }, 150);
+  document.body.classList.remove(
+    'font-system', 'font-rounded', 'font-cozy', 
+    'font-elegant', 'font-bold-soft', 'font-mono-cozy'
+  );
+  document.body.classList.add(fontClass);
+  AppState.currentUser.font = fontClass;
+  localStorage.setItem('nyashgram_font', fontClass);
 }
 
-// Загрузка настроек в UI
+// ===== НАСТРОЙКИ =====
 function loadSettingsIntoUI() {
-  const nameInput = document.getElementById('settingsName');
-  const usernameInput = document.getElementById('settingsUsername');
-  if (nameInput) nameInput.value = AppState.currentUser.name;
-  if (usernameInput) usernameInput.value = AppState.currentUser.username;
+  document.getElementById('settingsName').value = AppState.currentUser.name;
+  document.getElementById('settingsUsername').value = AppState.currentUser.username;
   
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
-    if (btn.dataset.theme === currentThemeBase) btn.classList.add('active');
+    if (btn.dataset.theme === AppState.currentUser.theme) btn.classList.add('active');
   });
   
   document.querySelectorAll('.font-btn').forEach(btn => {
@@ -227,16 +154,12 @@ function loadSettingsIntoUI() {
   });
 }
 
-// Сохранение настроек
 function saveSettings() {
-  const newName = document.getElementById('settingsName')?.value.trim();
-  const newUsername = document.getElementById('settingsUsername')?.value.trim().toLowerCase();
+  const newName = document.getElementById('settingsName').value.trim();
+  const newUsername = document.getElementById('settingsUsername').value.trim().toLowerCase();
   const errorEl = document.getElementById('settingsUsernameError');
   
-  if (!newName) {
-    alert('Введи имя!');
-    return;
-  }
+  if (!newName) return alert('Введи имя!');
   
   const usernameError = getUsernameError(newUsername);
   if (usernameError) {
@@ -258,45 +181,15 @@ function saveSettings() {
   
   localStorage.setItem('nyashgram_name', newName);
   localStorage.setItem('nyashgram_username', newUsername);
-  
   addUsername(newUsername);
   
-  const display = document.getElementById('usernameDisplay');
-  if (display) display.textContent = `@${newUsername}`;
-  
+  document.getElementById('usernameDisplay').textContent = `@${newUsername}`;
   showScreen('contactsScreen');
 }
 
-// Проверка авторизации
-function checkAuth() {
-  if (localStorage.getItem('nyashgram_entered') === 'true') {
-    addUsername(AppState.currentUser.username);
-    
-    // Загружаем сохранённые тему и режим
-    currentThemeBase = localStorage.getItem('nyashgram_theme_base') || 'pastel-pink';
-    currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
-    
-    // Применяем тему
-    applyNewTheme(currentThemeBase, currentThemeMode);
-    applyFont(AppState.currentUser.font);
-    
-    // Обновляем кнопку луны
-    const modeToggle = document.getElementById('themeModeToggle');
-    if (modeToggle) {
-      modeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
-    }
-    
-    showScreen('contactsScreen');
-  } else {
-    showScreen('phoneScreen');
-    // По умолчанию светлая тема
-    applyNewTheme('pastel-pink', 'light');
-    applyFont('font-cozy');
-  }
-}
-
-// Генерация кода
+// ===== АВТОРИЗАЦИЯ =====
 let generatedCode = '';
+
 function generateCode() {
   generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
   const codeInput = document.getElementById('codeInput');
@@ -304,16 +197,35 @@ function generateCode() {
     codeInput.placeholder = generatedCode.split('').join(' ');
     codeInput.value = '';
   }
-  const hint = document.getElementById('generatedCodeHint');
-  if (hint) hint.textContent = generatedCode;
-  return generatedCode;
+  document.getElementById('generatedCodeHint').textContent = generatedCode;
 }
 
-// Инициализация
+function checkAuth() {
+  if (localStorage.getItem('nyashgram_entered') === 'true') {
+    addUsername(AppState.currentUser.username);
+    
+    // Устанавливаем тему из сохранённых данных
+    setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+    applyFont(AppState.currentUser.font);
+    
+    const modeToggle = document.getElementById('themeModeToggle');
+    if (modeToggle) {
+      modeToggle.textContent = AppState.currentUser.mode === 'light' ? '☀️' : '🌙';
+    }
+    
+    showScreen('contactsScreen');
+  } else {
+    showScreen('phoneScreen');
+    setTheme('pastel-pink', 'light');
+    applyFont('font-cozy');
+  }
+}
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 NyashGram загружается...');
   
-  // ===== ЭКРАН НОМЕРА =====
+  // Экран номера
   const phoneInput = document.getElementById('phoneNumber');
   const sendBtn = document.getElementById('sendBtn');
   
@@ -338,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // ===== ЭКРАН КОДА =====
+  // Экран кода
   const codeInput = document.getElementById('codeInput');
   const verifyBtn = document.getElementById('verifyBtn');
   
@@ -378,13 +290,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         showScreen('contactsScreen');
         if (typeof renderContacts === 'function') {
-          setTimeout(renderContacts, 350);
+          setTimeout(renderContacts, 100);
         }
       }
     });
   }
   
-  // ===== ЭКРАН ПРОФИЛЯ =====
+  // Экран профиля
   const saveProfileBtn = document.getElementById('saveBtn');
   const profileUsernameInput = document.getElementById('displayUsername');
   const usernameErrorEl = document.getElementById('usernameError');
@@ -393,21 +305,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (generateUsernameBtn && profileUsernameInput) {
     generateUsernameBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      const newUsername = generateCuteUsername();
-      profileUsernameInput.value = newUsername;
+      profileUsernameInput.value = generateCuteUsername();
       if (usernameErrorEl) usernameErrorEl.textContent = '';
     });
   }
   
   if (saveProfileBtn) {
     saveProfileBtn.addEventListener('click', function() {
-      const name = document.getElementById('displayName')?.value.trim();
-      const username = profileUsernameInput?.value.trim().toLowerCase();
+      const name = document.getElementById('displayName').value.trim();
+      const username = profileUsernameInput.value.trim().toLowerCase();
       
-      if (!name) {
-        alert('Введи имя!');
-        return;
-      }
+      if (!name) return alert('Введи имя!');
       
       const usernameError = getUsernameError(username);
       if (usernameError) {
@@ -419,8 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (usernameErrorEl) usernameErrorEl.textContent = 'Этот юзернейм уже занят!';
         return;
       }
-      
-      if (usernameErrorEl) usernameErrorEl.textContent = '';
       
       localStorage.setItem('nyashgram_name', name);
       localStorage.setItem('nyashgram_username', username);
@@ -435,53 +341,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // ===== НАСТРОЙКИ =====
-  const settingsBtn = document.getElementById('settingsBtn');
-  if (settingsBtn) {
-    settingsBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      loadSettingsIntoUI();
-      showScreen('settingsScreen');
-    });
-  }
+  // Настройки
+  document.getElementById('settingsBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadSettingsIntoUI();
+    showScreen('settingsScreen');
+  });
   
-  const backFromSettingsBtn = document.getElementById('backFromSettingsBtn');
-  if (backFromSettingsBtn) {
-    backFromSettingsBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      showScreen('contactsScreen');
-    });
-  }
+  document.getElementById('backFromSettingsBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showScreen('contactsScreen');
+  });
   
-  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-  if (saveSettingsBtn) {
-    saveSettingsBtn.addEventListener('click', saveSettings);
-  }
+  document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
   
-  // Кнопка генерации юзернейма в настройках
-  const settingsGenerateBtn = document.getElementById('settingsGenerateBtn');
-  const settingsUsernameInput = document.getElementById('settingsUsername');
-  if (settingsGenerateBtn && settingsUsernameInput) {
-    settingsGenerateBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const newUsername = generateCuteUsername();
-      settingsUsernameInput.value = newUsername;
-      document.getElementById('settingsUsernameError').textContent = '';
-    });
-  }
+  // Кнопка генерации в настройках
+  document.getElementById('settingsGenerateBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('settingsUsername').value = generateCuteUsername();
+    document.getElementById('settingsUsernameError').textContent = '';
+  });
   
-  // Кнопка переключения режима темы (ЛУНА/СОЛНЦЕ)
+  // Кнопка луны
   const themeModeToggle = document.getElementById('themeModeToggle');
   if (themeModeToggle) {
-    themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
-    themeModeToggle.addEventListener('click', toggleThemeMode);
+    themeModeToggle.addEventListener('click', toggleMode);
   }
   
-  // Кнопки тем (в настройках)
+  // Кнопки тем
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const themeBase = btn.dataset.theme;
-      applyNewTheme(themeBase, currentThemeMode);
+      setTheme(btn.dataset.theme, AppState.currentUser.mode);
     });
   });
   
@@ -490,32 +380,23 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', () => applyFont(btn.dataset.font));
   });
   
-  // ===== ПОИСК =====
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      if (typeof window.filterContactsByUsername === 'function') {
-        window.filterContactsByUsername(this.value);
-      }
-    });
-  }
+  // Поиск
+  document.getElementById('searchInput')?.addEventListener('input', function() {
+    if (typeof window.filterContactsByUsername === 'function') {
+      window.filterContactsByUsername(this.value);
+    }
+  });
   
   // Проверка авторизации
   checkAuth();
   
-  // Экспорт в глобальную область
+  // Экспорт
   window.showScreen = showScreen;
   window.applyFont = applyFont;
   window.AppState = AppState;
   window.generateCode = generateCode;
-  window.isUsernameTaken = isUsernameTaken;
-  window.addUsername = addUsername;
-  window.removeUsername = removeUsername;
-  window.generateCuteUsername = generateCuteUsername;
-  window.isValidUsername = isValidUsername;
-  window.getUsernameError = getUsernameError;
-  window.toggleThemeMode = toggleThemeMode;
-  window.applyNewTheme = applyNewTheme;
+  window.toggleMode = toggleMode;
+  window.setTheme = setTheme;
   
   console.log('✅ app.js готов');
 });

@@ -1,4 +1,4 @@
-// contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ПЛАВНЫМИ АНИМАЦИЯМИ
+// contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
 const contacts = [
   { id: "bestie", name: "Bestie", username: "bestie_nyash", status: "онлайн 💕" },
@@ -14,9 +14,12 @@ const fixedChats = [
 ];
 
 const allContacts = [...fixedChats, ...contacts];
-const chatData = {};
+// Убираем объявление chatData отсюда - оно будет только в chat.js
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned') || '[]');
 let currentSearchTerm = '';
+
+// Ссылка на chatData из глобальной области (если уже есть)
+const chatData = window.chatData || {};
 
 function savePinnedToStorage() {
   localStorage.setItem('nyashgram_pinned', JSON.stringify(pinnedChats));
@@ -121,7 +124,8 @@ function createContactElement(contact, isBot = false) {
   el.setAttribute('data-id', contact.id);
   
   const avatarStyle = contact.avatar || getGradientForName(contact.name);
-  const draftText = chatData[contact.id]?.draft || '';
+  // Используем глобальный chatData
+  const draftText = window.chatData?.[contact.id]?.draft || '';
   const pinIcon = isPinned(contact.id) && !isBot ? '<span class="pin-icon">📌</span>' : '';
   
   el.innerHTML = `
@@ -158,15 +162,16 @@ function updateUsernameDisplay() {
 }
 
 function saveDraft(contactId, text) {
-  if (!chatData[contactId]) chatData[contactId] = {};
-  chatData[contactId].draft = text;
+  if (!window.chatData) window.chatData = {};
+  if (!window.chatData[contactId]) window.chatData[contactId] = {};
+  window.chatData[contactId].draft = text;
   renderContacts();
 }
 
+// Экспорт
 window.contacts = contacts;
 window.fixedChats = fixedChats;
 window.allContacts = allContacts;
-window.chatData = chatData;
 window.renderContacts = renderContacts;
 window.saveDraft = saveDraft;
 window.getGradientForName = getGradientForName;

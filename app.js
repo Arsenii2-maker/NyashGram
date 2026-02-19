@@ -19,7 +19,7 @@ const AppState = {
 };
 
 // База данных занятых юзернеймов
-let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
+let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "nyashgame_bot", "nyashhoroscope_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
 
 // Милые слова для генерации юзернеймов
 const cuteWords = [
@@ -51,16 +51,73 @@ function toggleThemeMode() {
   
   localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
   
-  // Переприменяем текущую тему
+  // Переприменяем текущую тему с новым режимом
   const currentTheme = AppState.currentUser.theme;
+  
+  // Сначала удаляем все классы тем
   document.body.classList.remove(
     'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
     'theme-lo-fi-beige', 'theme-soft-lilac'
   );
+  
+  // Добавляем текущую тему (она автоматически применится с новым режимом)
   document.body.classList.add(`theme-${currentTheme}`);
   
   console.log('Режим темы:', currentThemeMode);
 }
+
+// Применение темы
+function applyTheme(themeId) {
+  document.body.style.opacity = '0.5';
+  
+  setTimeout(() => {
+    // Удаляем старую тему
+    document.body.classList.remove(
+      'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
+      'theme-lo-fi-beige', 'theme-soft-lilac'
+    );
+    
+    // Добавляем новую тему
+    document.body.classList.add(`theme-${themeId}`);
+    
+    // Сохраняем
+    AppState.currentUser.theme = themeId;
+    localStorage.setItem('nyashgram_theme', themeId);
+    
+    // Обновляем активные кнопки
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.theme === themeId) btn.classList.add('active');
+    });
+    
+    document.body.style.opacity = '1';
+  }, 150);
+}
+
+// Применение шрифта
+function applyFont(fontClass) {
+  document.body.style.opacity = '0.5';
+  
+  setTimeout(() => {
+    document.body.classList.remove(
+      'font-system', 'font-rounded', 'font-cozy', 
+      'font-elegant', 'font-bold-soft', 'font-mono-cozy'
+    );
+    document.body.classList.add(fontClass);
+    AppState.currentUser.font = fontClass;
+    localStorage.setItem('nyashgram_font', fontClass);
+    
+    document.querySelectorAll('.font-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.font === fontClass) btn.classList.add('active');
+    });
+    
+    document.body.style.opacity = '1';
+  }, 150);
+}
+
+// Остальные функции app.js остаются без изменений...
+// (сохраните все остальные функции из предыдущей версии app.js)
 
 // Проверка валидности юзернейма
 function isValidUsername(username) {

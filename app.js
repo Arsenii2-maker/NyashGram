@@ -1,6 +1,37 @@
-// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ГЕНЕРАТОРОМ ЮЗЕРНЕЙМОВ
-// В начале app.js добавьте
+// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
+
+// Инициализируем глобальный chatData если его нет
+if (!window.chatData) {
+  window.chatData = {};
+}
+
+// Режим темы (светлый/тёмный)
 let currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
+
+const AppState = {
+  currentUser: {
+    name: localStorage.getItem('nyashgram_name') || "Няша",
+    username: localStorage.getItem('nyashgram_username') || "nyasha",
+    avatar: localStorage.getItem('nyashgram_avatar') || null,
+    theme: localStorage.getItem('nyashgram_theme') || "pastel-pink",
+    font: localStorage.getItem('nyashgram_font') || "font-cozy"
+  }
+};
+
+// База данных занятых юзернеймов
+let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
+
+// Милые слова для генерации юзернеймов
+const cuteWords = [
+  "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
+  "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
+  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream",
+  "blossom", "flower", "petal", "rose", "lily", "daisy", "bubble", "fairy"
+];
+
+const cuteSuffixes = [
+  "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi", "pomu"
+];
 
 // Функция переключения режима темы
 function toggleThemeMode() {
@@ -27,65 +58,22 @@ function toggleThemeMode() {
     'theme-lo-fi-beige', 'theme-soft-lilac'
   );
   document.body.classList.add(`theme-${currentTheme}`);
+  
+  console.log('Режим темы:', currentThemeMode);
 }
 
-// В DOMContentLoaded добавьте:
-const themeModeToggle = document.getElementById('themeModeToggle');
-if (themeModeToggle) {
-  themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
-  document.body.classList.add(currentThemeMode === 'light' ? 'light-mode' : 'dark-mode');
-  themeModeToggle.addEventListener('click', toggleThemeMode);
-}
-const AppState = {
-  currentUser: {
-    name: localStorage.getItem('nyashgram_name') || "Няша",
-    username: localStorage.getItem('nyashgram_username') || "nyasha",
-    avatar: localStorage.getItem('nyashgram_avatar') || null,
-    theme: localStorage.getItem('nyashgram_theme') || "pastel-pink",
-    font: localStorage.getItem('nyashgram_font') || "font-cozy"
-  }
-};
-
-// База данных занятых юзернеймов
-let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
-
-// Милые слова для генерации юзернеймов
-const cuteWords = [
-  "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
-  "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
-  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream",
-  "blossom", "flower", "petal", "rose", "lily", "daisy", "bubble", "fairy",
-  "magic", "wonder", "charm", "grace", "joy", "happy", "smile", "laugh",
-  "pinky", "rose", "lova", "mimi", "nini", "lulu", "kiki", "coco", "gigi",
-  "peach", "berry", "plum", "pudding", "creme", "honey", "maple", "sugar"
-];
-
-const cuteSuffixes = [
-  "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi", "pomu",
-  "ppi", "kko", "tta", "nna", "mmi", "ppy", "xxi", "zzu", "ppa", "tto"
-];
-
-// Проверка валидности юзернейма (только латиница, цифры, нижнее подчеркивание)
+// Проверка валидности юзернейма
 function isValidUsername(username) {
   if (!username) return false;
-  // Только буквы a-z, цифры 0-9, нижнее подчеркивание, минимум 3 символа, максимум 50
   const regex = /^[a-z0-9_]{3,50}$/;
   return regex.test(username);
 }
 
 function getUsernameError(username) {
-  if (!username || username.length === 0) {
-    return 'Введи юзернейм!';
-  }
-  if (username.length < 3) {
-    return 'Юзернейм должен быть минимум 3 символа';
-  }
-  if (username.length > 50) {
-    return 'Юзернейм должен быть максимум 50 символов';
-  }
-  if (!/^[a-z0-9_]+$/.test(username)) {
-    return 'Только латинские буквы, цифры и нижнее подчеркивание';
-  }
+  if (!username || username.length === 0) return 'Введи юзернейм!';
+  if (username.length < 3) return 'Юзернейм должен быть минимум 3 символа';
+  if (username.length > 50) return 'Юзернейм должен быть максимум 50 символов';
+  if (!/^[a-z0-9_]+$/.test(username)) return 'Только латинские буквы, цифры и нижнее подчеркивание';
   return '';
 }
 
@@ -97,59 +85,37 @@ function generateCuteUsername() {
   while (attempts < maxAttempts) {
     attempts++;
     
-    // Выбираем случайный формат
     const format = Math.floor(Math.random() * 6);
     let username = '';
     
     switch(format) {
-      case 0: // слово + число
+      case 0:
         username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
                   Math.floor(Math.random() * 999);
         break;
-      case 1: // слово + слово
+      case 1:
         username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
                   cuteWords[Math.floor(Math.random() * cuteWords.length)].slice(0, 5);
         break;
-      case 2: // слово + суффикс
+      case 2:
         username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
                   cuteSuffixes[Math.floor(Math.random() * cuteSuffixes.length)];
         break;
-      case 3: // два слова через нижнее подчеркивание
+      case 3:
         username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + '_' + 
                   cuteWords[Math.floor(Math.random() * cuteWords.length)];
         break;
-      case 4: // слово + число + суффикс
-        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
-                  Math.floor(Math.random() * 99) + 
-                  cuteSuffixes[Math.floor(Math.random() * cuteSuffixes.length)];
-        break;
-      case 5: // короткое милое слово
-        const shortWords = ["nyu", "mya", "puu", "nyaa", "myaa", "kya", "pya", "chuu"];
+      default:
+        const shortWords = ["nyu", "mya", "puu", "nyaa"];
         username = shortWords[Math.floor(Math.random() * shortWords.length)] + 
                   Math.floor(Math.random() * 999);
-        break;
     }
     
-    // Обрезаем до 50 символов если нужно
-    if (username.length > 50) {
-      username = username.slice(0, 50);
-    }
+    if (username.length > 50) username = username.slice(0, 50);
     
-    // Проверяем, что юзернейм валидный и не занят
     if (isValidUsername(username) && !isUsernameTaken(username)) {
       return username;
     }
-  }
-  
-  // Если не получилось сгенерировать уникальный, добавляем случайное число
-  let base = "nyasha";
-  let counter = 1;
-  while (counter < 1000) {
-    const username = `${base}${counter}`;
-    if (!isUsernameTaken(username)) {
-      return username;
-    }
-    counter++;
   }
   
   return "nyasha_" + Date.now().toString().slice(-6);
@@ -311,6 +277,10 @@ function saveSettings() {
 function checkAuth() {
   if (localStorage.getItem('nyashgram_entered') === 'true') {
     addUsername(AppState.currentUser.username);
+    
+    // Применяем режим темы
+    document.body.classList.add(currentThemeMode === 'light' ? 'light-mode' : 'dark-mode');
+    
     applyTheme(AppState.currentUser.theme);
     applyFont(AppState.currentUser.font);
     showScreen('contactsScreen');
@@ -492,6 +462,13 @@ document.addEventListener('DOMContentLoaded', function() {
       settingsUsernameInput.value = newUsername;
       document.getElementById('settingsUsernameError').textContent = '';
     });
+  }
+  
+  // Кнопка переключения режима темы
+  const themeModeToggle = document.getElementById('themeModeToggle');
+  if (themeModeToggle) {
+    themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
+    themeModeToggle.addEventListener('click', toggleThemeMode);
   }
   
   // Кнопки тем

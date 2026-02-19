@@ -1,4 +1,4 @@
-// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ПЛАВНЫМИ АНИМАЦИЯМИ
+// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ГЕНЕРАТОРОМ ЮЗЕРНЕЙМОВ
 
 const AppState = {
   currentUser: {
@@ -12,6 +12,112 @@ const AppState = {
 
 // База данных занятых юзернеймов
 let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
+
+// Милые слова для генерации юзернеймов
+const cuteWords = [
+  "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
+  "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
+  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream",
+  "blossom", "flower", "petal", "rose", "lily", "daisy", "bubble", "fairy",
+  "magic", "wonder", "charm", "grace", "joy", "happy", "smile", "laugh",
+  "pinky", "rose", "lova", "mimi", "nini", "lulu", "kiki", "coco", "gigi",
+  "peach", "berry", "plum", "pudding", "creme", "honey", "maple", "sugar"
+];
+
+const cuteSuffixes = [
+  "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi", "pomu",
+  "ppi", "kko", "tta", "nna", "mmi", "ppy", "xxi", "zzu", "ppa", "tto"
+];
+
+// Проверка валидности юзернейма (только латиница, цифры, нижнее подчеркивание)
+function isValidUsername(username) {
+  if (!username) return false;
+  // Только буквы a-z, цифры 0-9, нижнее подчеркивание, минимум 3 символа, максимум 50
+  const regex = /^[a-z0-9_]{3,50}$/;
+  return regex.test(username);
+}
+
+function getUsernameError(username) {
+  if (!username || username.length === 0) {
+    return 'Введи юзернейм!';
+  }
+  if (username.length < 3) {
+    return 'Юзернейм должен быть минимум 3 символа';
+  }
+  if (username.length > 50) {
+    return 'Юзернейм должен быть максимум 50 символов';
+  }
+  if (!/^[a-z0-9_]+$/.test(username)) {
+    return 'Только латинские буквы, цифры и нижнее подчеркивание';
+  }
+  return '';
+}
+
+// Генерация случайного милого юзернейма
+function generateCuteUsername() {
+  let attempts = 0;
+  const maxAttempts = 50;
+  
+  while (attempts < maxAttempts) {
+    attempts++;
+    
+    // Выбираем случайный формат
+    const format = Math.floor(Math.random() * 6);
+    let username = '';
+    
+    switch(format) {
+      case 0: // слово + число
+        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
+                  Math.floor(Math.random() * 999);
+        break;
+      case 1: // слово + слово
+        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
+                  cuteWords[Math.floor(Math.random() * cuteWords.length)].slice(0, 5);
+        break;
+      case 2: // слово + суффикс
+        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
+                  cuteSuffixes[Math.floor(Math.random() * cuteSuffixes.length)];
+        break;
+      case 3: // два слова через нижнее подчеркивание
+        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + '_' + 
+                  cuteWords[Math.floor(Math.random() * cuteWords.length)];
+        break;
+      case 4: // слово + число + суффикс
+        username = cuteWords[Math.floor(Math.random() * cuteWords.length)] + 
+                  Math.floor(Math.random() * 99) + 
+                  cuteSuffixes[Math.floor(Math.random() * cuteSuffixes.length)];
+        break;
+      case 5: // короткое милое слово
+        const shortWords = ["nyu", "mya", "puu", "nyaa", "myaa", "kya", "pya", "chuu"];
+        username = shortWords[Math.floor(Math.random() * shortWords.length)] + 
+                  Math.floor(Math.random() * 999);
+        break;
+    }
+    
+    // Обрезаем до 50 символов если нужно
+    if (username.length > 50) {
+      username = username.slice(0, 50);
+    }
+    
+    // Проверяем, что юзернейм валидный и не занят
+    if (isValidUsername(username) && !isUsernameTaken(username)) {
+      return username;
+    }
+  }
+  
+  // Если не получилось сгенерировать уникальный, добавляем случайное число
+  let base = "nyasha";
+  let counter = 1;
+  while (counter < 1000) {
+    const username = `${base}${counter}`;
+    if (!isUsernameTaken(username)) {
+      return username;
+    }
+    counter++;
+  }
+  
+  return "nyasha_" + Date.now().toString().slice(-6);
+}
 
 function isUsernameTaken(username, currentUsername = null) {
   if (!username) return false;
@@ -136,8 +242,9 @@ function saveSettings() {
     return;
   }
   
-  if (!newUsername) {
-    if (errorEl) errorEl.textContent = 'Введи юзернейм!';
+  const usernameError = getUsernameError(newUsername);
+  if (usernameError) {
+    if (errorEl) errorEl.textContent = usernameError;
     return;
   }
   
@@ -253,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
           localStorage.setItem('nyashgram_name', 'Няша');
         }
         if (!localStorage.getItem('nyashgram_username')) {
-          const defaultUsername = 'nyasha' + Math.floor(Math.random() * 1000);
+          const defaultUsername = generateCuteUsername();
           localStorage.setItem('nyashgram_username', defaultUsername);
           AppState.currentUser.username = defaultUsername;
         }
@@ -269,6 +376,16 @@ document.addEventListener('DOMContentLoaded', function() {
   const saveProfileBtn = document.getElementById('saveBtn');
   const profileUsernameInput = document.getElementById('displayUsername');
   const usernameErrorEl = document.getElementById('usernameError');
+  const generateUsernameBtn = document.getElementById('generateUsernameBtn');
+  
+  if (generateUsernameBtn && profileUsernameInput) {
+    generateUsernameBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const newUsername = generateCuteUsername();
+      profileUsernameInput.value = newUsername;
+      if (usernameErrorEl) usernameErrorEl.textContent = '';
+    });
+  }
   
   if (saveProfileBtn) {
     saveProfileBtn.addEventListener('click', function() {
@@ -280,8 +397,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      if (!username) {
-        if (usernameErrorEl) usernameErrorEl.textContent = 'Введи юзернейм!';
+      const usernameError = getUsernameError(username);
+      if (usernameError) {
+        if (usernameErrorEl) usernameErrorEl.textContent = usernameError;
         return;
       }
       
@@ -328,6 +446,18 @@ document.addEventListener('DOMContentLoaded', function() {
     saveSettingsBtn.addEventListener('click', saveSettings);
   }
   
+  // Кнопка генерации юзернейма в настройках
+  const settingsGenerateBtn = document.getElementById('settingsGenerateBtn');
+  const settingsUsernameInput = document.getElementById('settingsUsername');
+  if (settingsGenerateBtn && settingsUsernameInput) {
+    settingsGenerateBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const newUsername = generateCuteUsername();
+      settingsUsernameInput.value = newUsername;
+      document.getElementById('settingsUsernameError').textContent = '';
+    });
+  }
+  
   // Кнопки тем
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
@@ -360,6 +490,9 @@ document.addEventListener('DOMContentLoaded', function() {
   window.isUsernameTaken = isUsernameTaken;
   window.addUsername = addUsername;
   window.removeUsername = removeUsername;
+  window.generateCuteUsername = generateCuteUsername;
+  window.isValidUsername = isValidUsername;
+  window.getUsernameError = getUsernameError;
   
   console.log('✅ app.js готов');
 });

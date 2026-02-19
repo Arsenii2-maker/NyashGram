@@ -10,7 +10,9 @@ const contacts = [
 
 const fixedChats = [
   { id: "nyashhelp", name: "NyashHelp", username: "nyashhelp_official", status: "🩷 всегда на связи", avatar: "linear-gradient(135deg, #c38ef0, #e0b0ff)" },
-  { id: "nyashtalk", name: "NyashTalk", username: "nyashtalk_bot", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #85d1c5, #b0e0d5)" }
+  { id: "nyashtalk", name: "NyashTalk", username: "nyashtalk_bot", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #85d1c5, #b0e0d5)" },
+  { id: "nyashgame", name: "NyashGame", username: "nyashgame_bot", status: "🎮 поиграем?", avatar: "linear-gradient(135deg, #ffb347, #ff8c42)" },
+  { id: "nyashhoroscope", name: "NyashHoroscope", username: "nyashhoroscope_bot", status: "🔮 звёзды говорят", avatar: "linear-gradient(135deg, #9b59b6, #8e44ad)" }
 ];
 
 const allContacts = [...fixedChats, ...contacts];

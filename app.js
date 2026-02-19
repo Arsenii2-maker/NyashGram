@@ -25,12 +25,11 @@ let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames'
 const cuteWords = [
   "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
   "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
-  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream",
-  "blossom", "flower", "petal", "rose", "lily", "daisy", "bubble", "fairy"
+  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream"
 ];
 
 const cuteSuffixes = [
-  "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi", "pomu"
+  "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi"
 ];
 
 // Функция переключения режима темы
@@ -51,74 +50,19 @@ function toggleThemeMode() {
   
   localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
   
-  // Переприменяем текущую тему (чтобы обновились цвета)
+  // Переприменяем текущую тему
   const currentTheme = AppState.currentUser.theme;
   
-  // Сначала удаляем все классы тем
   document.body.classList.remove(
     'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
     'theme-lo-fi-beige', 'theme-soft-lilac'
   );
   
-  // Добавляем текущую тему
   document.body.classList.add(`theme-${currentTheme}`);
   
   console.log('Режим темы:', currentThemeMode);
   console.log('Классы body:', document.body.className);
 }
-
-// Применение темы
-function applyTheme(themeId) {
-  document.body.style.opacity = '0.5';
-  
-  setTimeout(() => {
-    // Удаляем старую тему
-    document.body.classList.remove(
-      'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
-      'theme-lo-fi-beige', 'theme-soft-lilac'
-    );
-    
-    // Добавляем новую тему
-    document.body.classList.add(`theme-${themeId}`);
-    
-    // Сохраняем
-    AppState.currentUser.theme = themeId;
-    localStorage.setItem('nyashgram_theme', themeId);
-    
-    // Обновляем активные кнопки
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.dataset.theme === themeId) btn.classList.add('active');
-    });
-    
-    document.body.style.opacity = '1';
-  }, 150);
-}
-
-// Применение шрифта
-function applyFont(fontClass) {
-  document.body.style.opacity = '0.5';
-  
-  setTimeout(() => {
-    document.body.classList.remove(
-      'font-system', 'font-rounded', 'font-cozy', 
-      'font-elegant', 'font-bold-soft', 'font-mono-cozy'
-    );
-    document.body.classList.add(fontClass);
-    AppState.currentUser.font = fontClass;
-    localStorage.setItem('nyashgram_font', fontClass);
-    
-    document.querySelectorAll('.font-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.dataset.font === fontClass) btn.classList.add('active');
-    });
-    
-    document.body.style.opacity = '1';
-  }, 150);
-}
-
-// Остальные функции app.js остаются без изменений...
-// (сохраните все остальные функции из предыдущей версии app.js)
 
 // Проверка валидности юзернейма
 function isValidUsername(username) {
@@ -229,7 +173,7 @@ function showScreen(id) {
   }
 }
 
-// Применение темы с анимацией
+// Применение темы
 function applyTheme(themeId) {
   document.body.style.opacity = '0.5';
   
@@ -238,7 +182,9 @@ function applyTheme(themeId) {
       'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
       'theme-lo-fi-beige', 'theme-soft-lilac'
     );
+    
     document.body.classList.add(`theme-${themeId}`);
+    
     AppState.currentUser.theme = themeId;
     localStorage.setItem('nyashgram_theme', themeId);
     
@@ -248,10 +194,12 @@ function applyTheme(themeId) {
     });
     
     document.body.style.opacity = '1';
+    
+    console.log('Тема применена:', themeId);
   }, 150);
 }
 
-// Применение шрифта с анимацией
+// Применение шрифта
 function applyFont(fontClass) {
   document.body.style.opacity = '0.5';
   
@@ -340,7 +288,7 @@ function checkAuth() {
     const savedMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
     currentThemeMode = savedMode;
     
-    // ВАЖНО: добавляем класс режима на body
+    // Добавляем класс режима на body
     document.body.classList.add(savedMode + '-mode');
     
     // Применяем сохранённую тему
@@ -362,6 +310,7 @@ function checkAuth() {
     applyFont('font-cozy');
   }
 }
+
 // Генерация кода
 let generatedCode = '';
 function generateCode() {
@@ -579,6 +528,8 @@ document.addEventListener('DOMContentLoaded', function() {
   window.generateCuteUsername = generateCuteUsername;
   window.isValidUsername = isValidUsername;
   window.getUsernameError = getUsernameError;
+  window.toggleThemeMode = toggleThemeMode;
+  window.currentThemeMode = currentThemeMode;
   
   console.log('✅ app.js готов');
 });

@@ -1,6 +1,7 @@
 // chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
 let currentChat = null;
+let currentContact = null;
 const chatData = window.chatData || {};
 
 // ===== NYASHHELP =====
@@ -9,8 +10,7 @@ const nyashHelpQuickQuestions = [
   "Как поменять шрифт?",
   "Как загрузить аватарку?",
   "Что такое черновик?",
-  "Кто такие боты?",
-  "Расскажи про Bestie"
+  "Кто такие боты?"
 ];
 
 function getNyashHelpResponse(text) {
@@ -20,7 +20,6 @@ function getNyashHelpResponse(text) {
   if (text.includes('аватар')) return 'Загрузи фото в настройках или оставь милый градиент! 💫';
   if (text.includes('черновик')) return 'Черновики сохраняются автоматически! 📝 Видишь подпись под контактом?';
   if (text.includes('бот')) return 'У нас NyashHelp, NyashTalk и 5 друзей: Bestie, Философ, Учёба, Music Pal, Night Chat! 🎭';
-  if (text.includes('bestie')) return 'Bestie — лучшая подруга! Всегда поддержит и порадуется 💖';
   return 'Спроси про темы, шрифты, аватарки или ботов! 🩷';
 }
 
@@ -96,17 +95,27 @@ function getBotResponse(contactId, text) {
 }
 
 function openChat(contact) {
-  if (!contact || !contact.id) return;
+  console.log('Открываем чат с:', contact);
+  
+  if (!contact || !contact.id) {
+    console.error('Некорректный контакт');
+    return;
+  }
   
   currentChat = contact.id;
-  if (!chatData[currentChat]) chatData[currentChat] = { messages: [], draft: '' };
+  currentContact = contact;
+  
+  if (!chatData[currentChat]) {
+    chatData[currentChat] = { messages: [], draft: '' };
+  }
   
   // Показываем экран чата
-  if (typeof showScreen === 'function') {
-    showScreen('chatScreen');
+  if (typeof window.showScreen === 'function') {
+    window.showScreen('chatScreen');
   } else {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('chatScreen')?.classList.add('active');
+    const chatScreen = document.getElementById('chatScreen');
+    if (chatScreen) chatScreen.classList.add('active');
   }
   
   // Заполняем заголовок
@@ -115,15 +124,18 @@ function openChat(contact) {
   
   const avatarEl = document.getElementById('chatAvatar');
   if (avatarEl) {
-    avatarEl.style.background = contact.avatar || (typeof getGradientForName === 'function' ? getGradientForName(contact.name) : 'linear-gradient(135deg, #fbc2c2, #c2b9f0)');
+    avatarEl.style.background = contact.avatar || (typeof window.getGradientForName === 'function' ? window.getGradientForName(contact.name) : 'linear-gradient(135deg, #fbc2c2, #c2b9f0)');
     avatarEl.style.backgroundSize = 'cover';
   }
+  
+  // Обновляем иконку пина
+  updatePinIcon();
   
   // Восстанавливаем черновик
   const input = document.getElementById('messageInput');
   if (input) input.value = chatData[currentChat].draft || '';
   
-  // Приветствие
+  // Приветствие, если сообщений нет
   if (!chatData[currentChat].messages || chatData[currentChat].messages.length === 0) {
     chatData[currentChat].messages = [];
     let welcome = 'Привет! 💕';
@@ -142,6 +154,26 @@ function openChat(contact) {
   renderMessages();
 }
 
+function updatePinIcon() {
+  const pinBtn = document.getElementById('pinChatBtn');
+  if (pinBtn && currentChat) {
+    const isPinned = window.isPinned ? window.isPinned(currentChat) : false;
+    pinBtn.style.opacity = isPinned ? '1' : '0.5';
+    pinBtn.title = isPinned ? 'Открепить' : 'Закрепить';
+  }
+}
+
+function toggleChatActions() {
+  const panel = document.getElementById('chatActionsPanel');
+  if (panel) {
+    if (panel.style.display === 'none' || panel.style.display === '') {
+      panel.style.display = 'flex';
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+}
+
 function sendMessage(text) {
   if (!text || !text.trim() || !currentChat) return;
   
@@ -153,7 +185,7 @@ function sendMessage(text) {
   if (input) input.value = '';
   
   renderMessages();
-  if (typeof saveDraft === 'function') saveDraft(currentChat, '');
+  if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, '');
   
   // Ответ бота
   setTimeout(() => {
@@ -199,20 +231,29 @@ function renderMessages() {
   }
   
   // Сообщения
-  chatData[currentChat].messages.forEach(msg => {
-    const el = document.createElement('div');
-    el.className = `message ${msg.from}`;
-    el.textContent = msg.text;
-    chatArea.appendChild(el);
-  });
+  if (chatData[currentChat].messages) {
+    chatData[currentChat].messages.forEach(msg => {
+      const el = document.createElement('div');
+      el.className = `message ${msg.from}`;
+      el.textContent = msg.text;
+      chatArea.appendChild(el);
+    });
+  }
   
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔧 Настройка chat.js...');
+  
   const sendBtn = document.getElementById('sendMessageBtn');
   const msgInput = document.getElementById('messageInput');
+  const backBtn = document.getElementById('backBtn');
+  const pinChatBtn = document.getElementById('pinChatBtn');
+  const pinActionBtn = document.getElementById('pinChatActionBtn');
+  const muteBtn = document.getElementById('muteChatBtn');
+  const deleteBtn = document.getElementById('deleteChatBtn');
   
   if (sendBtn && msgInput) {
     sendBtn.addEventListener('click', () => {
@@ -229,7 +270,50 @@ document.addEventListener('DOMContentLoaded', function() {
     msgInput.addEventListener('input', (e) => {
       if (currentChat) {
         chatData[currentChat].draft = e.target.value;
-        if (typeof saveDraft === 'function') saveDraft(currentChat, e.target.value);
+        if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, e.target.value);
+      }
+    });
+  }
+  
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      if (typeof window.showScreen === 'function') {
+        window.showScreen('contactsScreen');
+      }
+    });
+  }
+  
+  // Кнопка пина в шапке — показывает/скрывает панель
+  if (pinChatBtn) {
+    pinChatBtn.addEventListener('click', toggleChatActions);
+  }
+  
+  // Кнопка пина в панели действий
+  if (pinActionBtn) {
+    pinActionBtn.addEventListener('click', () => {
+      if (currentChat && typeof window.togglePin === 'function') {
+        window.togglePin(currentChat);
+        updatePinIcon();
+        document.getElementById('chatActionsPanel').style.display = 'none';
+      }
+    });
+  }
+  
+  // Кнопка "Выключить звук"
+  if (muteBtn) {
+    muteBtn.addEventListener('click', () => {
+      alert('🔇 Звук выключен для этого чата (демо-режим)');
+      document.getElementById('chatActionsPanel').style.display = 'none';
+    });
+  }
+  
+  // Кнопка "Удалить чат"
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      if (currentChat && confirm('Удалить историю чата?')) {
+        chatData[currentChat] = { messages: [], draft: '' };
+        renderMessages();
+        document.getElementById('chatActionsPanel').style.display = 'none';
       }
     });
   }
@@ -238,5 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // Экспорт
 window.openChat = openChat;
 window.sendMessage = sendMessage;
+window.toggleChatActions = toggleChatActions;
 
 console.log('✅ chat.js загружен');

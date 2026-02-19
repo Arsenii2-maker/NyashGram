@@ -1,13 +1,15 @@
-// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
+// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ (ИСПРАВЛЕНО)
 
-// chatData объявляется только здесь!
+// Убираем объявление chatData - будем использовать глобальное
 let currentChat = null;
 let currentContact = null;
-const chatData = {}; // chatData только в chat.js
-let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 
-// Делаем chatData глобально доступным
-window.chatData = chatData;
+// Проверяем, есть ли уже глобальный chatData, если нет - создаём
+if (!window.chatData) {
+  window.chatData = {};
+}
+
+let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 
 function saveCustomName(contactId, newName) {
   if (!newName || newName.trim() === '') {
@@ -124,8 +126,9 @@ function openChat(contact) {
   currentChat = contact.id;
   currentContact = contact;
   
-  if (!chatData[currentChat]) {
-    chatData[currentChat] = { messages: [], draft: '' };
+  // Используем глобальный window.chatData
+  if (!window.chatData[currentChat]) {
+    window.chatData[currentChat] = { messages: [], draft: '' };
   }
   
   if (typeof window.showScreen === 'function') {
@@ -151,10 +154,10 @@ function openChat(contact) {
   updatePinIcon();
   
   const input = document.getElementById('messageInput');
-  if (input) input.value = chatData[currentChat].draft || '';
+  if (input) input.value = window.chatData[currentChat].draft || '';
   
-  if (!chatData[currentChat].messages || chatData[currentChat].messages.length === 0) {
-    chatData[currentChat].messages = [];
+  if (!window.chatData[currentChat].messages || window.chatData[currentChat].messages.length === 0) {
+    window.chatData[currentChat].messages = [];
     let welcome = 'Привет! 💕';
     switch(contact.id) {
       case 'nyashhelp': welcome = 'Привет! Я NyashHelp 🩷 Спрашивай!'; break;
@@ -165,7 +168,7 @@ function openChat(contact) {
       case 'musicpal': welcome = 'Йо! Что в плейлисте? 🎧'; break;
       case 'nightchat': welcome = 'Тсс... Полночь... 🌙'; break;
     }
-    chatData[currentChat].messages.push({ from: 'bot', text: welcome });
+    window.chatData[currentChat].messages.push({ from: 'bot', text: welcome });
   }
   
   renderMessages();
@@ -230,8 +233,8 @@ function sendMessage(text) {
   if (!text || !text.trim() || !currentChat) return;
   
   const msgText = text.trim();
-  chatData[currentChat].messages.push({ from: 'user', text: msgText });
-  chatData[currentChat].draft = '';
+  window.chatData[currentChat].messages.push({ from: 'user', text: msgText });
+  window.chatData[currentChat].draft = '';
   
   const input = document.getElementById('messageInput');
   if (input) input.value = '';
@@ -242,7 +245,7 @@ function sendMessage(text) {
   setTimeout(() => {
     if (currentChat) {
       const response = getBotResponse(currentChat, msgText);
-      chatData[currentChat].messages.push({ from: 'bot', text: response });
+      window.chatData[currentChat].messages.push({ from: 'bot', text: response });
       renderMessages();
     }
   }, 600);
@@ -252,7 +255,7 @@ function renderMessages() {
   const chatArea = document.getElementById('chatArea');
   const quickPanel = document.getElementById('quickReplyPanel');
   
-  if (!chatArea || !currentChat || !chatData[currentChat]) return;
+  if (!chatArea || !currentChat || !window.chatData[currentChat]) return;
   
   chatArea.innerHTML = '';
   if (quickPanel) quickPanel.innerHTML = '';
@@ -290,8 +293,8 @@ function renderMessages() {
     }
   }
   
-  if (chatData[currentChat].messages) {
-    chatData[currentChat].messages.forEach((msg, index) => {
+  if (window.chatData[currentChat].messages) {
+    window.chatData[currentChat].messages.forEach((msg, index) => {
       const el = document.createElement('div');
       el.className = `message ${msg.from}`;
       el.textContent = msg.text;
@@ -339,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     msgInput.addEventListener('input', (e) => {
       if (currentChat) {
-        chatData[currentChat].draft = e.target.value;
+        window.chatData[currentChat].draft = e.target.value;
         if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, e.target.value);
       }
     });
@@ -402,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       e.stopPropagation();
       if (currentChat && confirm('Удалить историю чата?')) {
-        chatData[currentChat] = { messages: [], draft: '' };
+        window.chatData[currentChat] = { messages: [], draft: '' };
         renderMessages();
         document.getElementById('chatActionsPanel').style.display = 'none';
       }

@@ -1,16 +1,16 @@
-// contacts.js — NyashGram v2.0
+// contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
 const contacts = [
-  { id: "bestie", name: "Bestie", status: "онлайн 💕", type: "friend" },
-  { id: "philosopher", name: "Философ", status: "пишет трактат 📜", type: "friend" },
-  { id: "study", name: "Учёба", status: "готовлюсь к экзамену 📚", type: "friend" },
-  { id: "musicpal", name: "Music Pal", status: "слушаю lo-fi 🎧", type: "friend" },
-  { id: "nightchat", name: "Night Chat", status: "не сплю 🌙", type: "friend" }
+  { id: "bestie", name: "Bestie", status: "онлайн 💕" },
+  { id: "philosopher", name: "Философ", status: "пишет трактат 📜" },
+  { id: "study", name: "Учёба", status: "готовлюсь к экзамену 📚" },
+  { id: "musicpal", name: "Music Pal", status: "слушаю lo-fi 🎧" },
+  { id: "nightchat", name: "Night Chat", status: "не сплю 🌙" }
 ];
 
 const fixedChats = [
-  { id: "nyashhelp", name: "NyashHelp", status: "🩷 всегда на связи", avatar: "linear-gradient(135deg, #c38ef0, #e0b0ff)", type: "bot" },
-  { id: "nyashtalk", name: "NyashTalk", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #85d1c5, #b0e0d5)", type: "bot" }
+  { id: "nyashhelp", name: "NyashHelp", status: "🩷 всегда на связи", avatar: "linear-gradient(135deg, #c38ef0, #e0b0ff)" },
+  { id: "nyashtalk", name: "NyashTalk", status: "💕 болтаем о милом", avatar: "linear-gradient(135deg, #85d1c5, #b0e0d5)" }
 ];
 
 const allContacts = [...fixedChats, ...contacts];
@@ -32,52 +32,70 @@ function getGradientForName(name) {
 }
 
 function renderContacts() {
-  const list = document.getElementById("contactsList");
+  const list = document.getElementById('contactsList');
   if (!list) return;
   
-  list.innerHTML = "";
-
+  list.innerHTML = '';
+  
   // Боты
-  fixedChats.forEach(c => {
-    const el = document.createElement("div");
-    el.className = "contact bot";
-    el.setAttribute("data-id", c.id);
+  fixedChats.forEach(contact => {
+    const el = document.createElement('div');
+    el.className = 'contact';
+    el.setAttribute('data-id', contact.id);
+    
+    const avatarStyle = contact.avatar || getGradientForName(contact.name);
+    const draftText = chatData[contact.id]?.draft || '';
+    
     el.innerHTML = `
-      <div class="avatar" style="background: ${c.avatar || getGradientForName(c.name)}; background-size: cover;"></div>
+      <div class="avatar" style="background: ${avatarStyle}; background-size: cover;"></div>
       <div class="info">
-        <div class="name">${c.name}</div>
-        <div class="status">${c.status}</div>
-        <div class="draft" style="display:${chatData[c.id]?.draft ? 'block' : 'none'}; color:var(--accent); font-size:12px;">
-          ${chatData[c.id]?.draft ? '📝 ' + chatData[c.id].draft.slice(0, 20) + '...' : ''}
-        </div>
+        <div class="name">${contact.name}</div>
+        <div class="status">${contact.status}</div>
+        ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
       </div>
     `;
-    el.onclick = () => openChat(c);
+    
+    el.onclick = () => {
+      if (typeof openChat === 'function') {
+        openChat(contact);
+      }
+    };
+    
     list.appendChild(el);
   });
-
-  // Заголовок для друзей
-  const header = document.createElement("div");
-  header.className = "contacts-section-header";
-  header.innerHTML = '<span class="section-title">👥 Друзья</span>';
-  list.appendChild(header);
-
+  
+  // Разделитель
+  const separator = document.createElement('div');
+  separator.style.padding = '16px 0 4px 4px';
+  separator.style.fontSize = '13px';
+  separator.style.color = 'var(--text-soft)';
+  separator.style.opacity = '0.7';
+  separator.textContent = '👥 Друзья';
+  list.appendChild(separator);
+  
   // Друзья
-  contacts.forEach(c => {
-    const el = document.createElement("div");
-    el.className = "contact";
-    el.setAttribute("data-id", c.id);
+  contacts.forEach(contact => {
+    const el = document.createElement('div');
+    el.className = 'contact';
+    el.setAttribute('data-id', contact.id);
+    
+    const draftText = chatData[contact.id]?.draft || '';
+    
     el.innerHTML = `
-      <div class="avatar" style="background: ${getGradientForName(c.name)}; background-size: cover;"></div>
+      <div class="avatar" style="background: ${getGradientForName(contact.name)}; background-size: cover;"></div>
       <div class="info">
-        <div class="name">${c.name}</div>
-        <div class="status">${c.status}</div>
-        <div class="draft" style="display:${chatData[c.id]?.draft ? 'block' : 'none'}; color:var(--accent); font-size:12px;">
-          ${chatData[c.id]?.draft ? '📝 ' + chatData[c.id].draft.slice(0, 20) + '...' : ''}
-        </div>
+        <div class="name">${contact.name}</div>
+        <div class="status">${contact.status}</div>
+        ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
       </div>
     `;
-    el.onclick = () => openChat(c);
+    
+    el.onclick = () => {
+      if (typeof openChat === 'function') {
+        openChat(contact);
+      }
+    };
+    
     list.appendChild(el);
   });
 }
@@ -88,12 +106,13 @@ function saveDraft(contactId, text) {
   renderContacts();
 }
 
+// Экспорт
+window.contacts = contacts;
+window.fixedChats = fixedChats;
+window.allContacts = allContacts;
+window.chatData = chatData;
 window.renderContacts = renderContacts;
 window.saveDraft = saveDraft;
 window.getGradientForName = getGradientForName;
-window.allContacts = allContacts;
-window.fixedChats = fixedChats;
-window.contacts = contacts;
-window.chatData = chatData;
 
-console.log("✅ contacts.js загружен");
+console.log('✅ contacts.js загружен');

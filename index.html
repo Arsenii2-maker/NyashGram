@@ -11,20 +11,20 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-user-select: none !important;
-      -moz-user-select: none !important;
-      -ms-user-select: none !important;
-      user-select: none !important;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
     }
 
     /* Разрешаем выделение только в полях ввода */
     input, textarea, [contenteditable="true"] {
-      -webkit-user-select: text !important;
-      -moz-user-select: text !important;
-      -ms-user-select: text !important;
-      user-select: text !important;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
     }
 
     body {
@@ -100,6 +100,7 @@
     body {
       background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
       color: var(--text);
+      transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ===== ЭКРАНЫ ===== */
@@ -110,8 +111,13 @@
       flex-direction: column;
       width: 100%;
       height: 100vh;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .screen.active { display: flex; }
+    .screen.active { 
+      display: flex; 
+      opacity: 1;
+    }
 
     /* ===== КОНТЕЙНЕРЫ ===== */
     #contactsList, #chatArea, #quickReplyPanel, #messageInputArea, .top-bar, #chatHeader, .search-bar {
@@ -125,6 +131,7 @@
       padding-bottom: 8px;
       overflow-y: auto;
       flex: 1;
+      scroll-behavior: smooth;
     }
 
     #chatArea {
@@ -135,6 +142,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      scroll-behavior: smooth;
     }
 
     #quickReplyPanel {
@@ -145,6 +153,7 @@
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #messageInputArea {
@@ -154,6 +163,7 @@
       backdrop-filter: blur(10px);
       display: flex;
       gap: 6px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .top-bar, #chatHeader {
@@ -163,6 +173,7 @@
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .top-bar {
@@ -179,6 +190,7 @@
       padding-bottom: 8px;
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(5px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .search-input {
@@ -188,11 +200,14 @@
       border: 1px solid rgba(255, 255, 255, 0.6);
       background: rgba(255, 255, 255, 0.6);
       font-size: 14px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .search-input:focus {
       outline: none;
       border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1.02);
     }
 
     /* ===== ЭЛЕМЕНТЫ ===== */
@@ -206,6 +221,13 @@
       max-width: 360px;
       margin: 0 auto;
       text-align: center;
+      transform: translateY(0);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     }
 
     h1 { 
@@ -222,20 +244,24 @@
       padding: 12px 16px;
       font-size: 16px;
       color: var(--text);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     button {
       background: rgba(255, 255, 255, 0.4);
-      cursor: not-allowed;
-      transition: all 0.3s;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-weight: 600;
+    }
+
+    button:active {
+      transform: scale(0.95);
     }
 
     button.active {
       background: white;
       border-color: var(--accent);
       color: var(--text);
-      cursor: pointer;
       box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
     }
 
@@ -251,11 +277,18 @@
       margin-bottom: 8px;
       border: 1px solid rgba(255, 255, 255, 0.4);
       cursor: pointer;
-      transition: transform 0.1s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      transform: translateX(0);
     }
 
-    .contact:active { transform: scale(0.99); }
+    .contact:hover {
+      transform: translateX(4px);
+      background: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.2);
+    }
+
+    .contact:active { transform: scale(0.98); }
     .contact.pinned { border-left: 4px solid var(--accent); }
     .contact.bot-section { 
       background: rgba(195, 142, 240, 0.2);
@@ -270,6 +303,12 @@
       background-size: cover;
       background-position: center;
       flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .contact:hover .avatar {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
     }
 
     .info { 
@@ -299,6 +338,7 @@
       font-size: 14px;
       color: var(--accent);
       margin-left: 4px;
+      animation: bounceIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .section-header {
@@ -308,6 +348,8 @@
       color: var(--text-soft);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      opacity: 0.8;
+      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ===== СООБЩЕНИЯ ===== */
@@ -315,18 +357,21 @@
       max-width: 80%;
       padding: 10px 14px;
       border-radius: 20px;
-      animation: fadeIn 0.3s;
+      animation: messageSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       word-wrap: break-word;
+      transform-origin: left;
     }
     .message.user {
       align-self: flex-end;
       background: var(--bubble-user);
       border: 1px solid white;
+      animation: messageSlideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .message.bot {
       align-self: flex-start;
       background: var(--bubble-bot);
       border: 1px solid rgba(255,255,255,0.4);
+      animation: messageSlideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .quick-chip {
@@ -337,6 +382,18 @@
       font-size: 13px;
       cursor: pointer;
       white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: chipPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .quick-chip:hover {
+      background: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
+    }
+
+    .quick-chip:active {
+      transform: scale(0.95);
     }
 
     /* ===== КНОПКИ ===== */
@@ -352,6 +409,12 @@
       justify-content: center;
       cursor: pointer;
       padding: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #backBtn:hover, #settingsBtn:hover, #backFromSettingsBtn:hover, #pinChatBtn:hover {
+      transform: scale(1.1);
+      background: rgba(255,255,255,0.6);
     }
 
     #sendMessageBtn {
@@ -363,6 +426,16 @@
       color: var(--text);
       font-size: 20px;
       padding: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #sendMessageBtn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
+    }
+
+    #sendMessageBtn:active {
+      transform: scale(0.95);
     }
 
     /* ===== ПАНЕЛЬ ДЕЙСТВИЙ ===== */
@@ -374,6 +447,7 @@
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255,255,255,0.3);
       justify-content: flex-end;
+      animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ===== USERNAME DISPLAY ===== */
@@ -381,6 +455,7 @@
       font-size: 13px;
       color: var(--text-soft);
       margin-left: 8px;
+      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ===== МОДАЛКА ДЛЯ ПЕРЕИМЕНОВАНИЯ ===== */
@@ -396,6 +471,7 @@
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .modal-content {
@@ -406,6 +482,7 @@
       width: 80%;
       max-width: 300px;
       border: 1px solid rgba(255,255,255,0.4);
+      animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .modal-content h3 {
@@ -416,6 +493,12 @@
     .modal-content input {
       width: 100%;
       margin-bottom: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-content input:focus {
+      transform: scale(1.02);
+      border-color: var(--accent);
     }
 
     .modal-buttons {
@@ -428,9 +511,149 @@
       margin: 0;
     }
 
+    /* ===== АНИМАЦИИ ===== */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideLeft {
+      from { 
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideRight {
+      from { 
+        opacity: 0;
+        transform: translateX(10px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes messageSlide {
+      from { 
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes messageSlideRight {
+      from { 
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes messageSlideLeft {
+      from { 
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes chipPop {
+      0% { 
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      80% { 
+        transform: scale(1.05);
+      }
+      100% { 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes scaleIn {
+      from { 
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to { 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes bounceIn {
+      0% { 
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% { 
+        transform: scale(1.1);
+      }
+      70% { 
+        transform: scale(0.9);
+      }
+      100% { 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ===== СКРОЛЛБАР ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
     }
   </style>
 </head>
@@ -476,7 +699,7 @@
       <div id="usernameError" style="color: #e67e8f; font-size: 13px; margin-bottom: 10px; min-height: 20px;"></div>
       <div style="margin: 20px 0;">
         <label for="avatarInput">
-          <div id="avatarPreview" style="width: 100px; height: 100px; background: linear-gradient(135deg, #fbc2c2, #c2b9f0); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; border: 3px solid white; cursor: pointer;">+</div>
+          <div id="avatarPreview" style="width: 100px; height: 100px; background: linear-gradient(135deg, #fbc2c2, #c2b9f0); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; border: 3px solid white; cursor: pointer; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">+</div>
           <p style="margin-top: 12px; color: var(--text-soft);">Выбрать фото</p>
         </label>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
@@ -585,33 +808,5 @@
   <script src="app.js"></script>
   <script src="contacts.js"></script>
   <script src="chat.js"></script>
-  
-  <!-- Финальное подавление выделения -->
-  <script>
-    (function() {
-      // Запрещаем выделение на всём документе
-      document.addEventListener('selectstart', function(e) {
-        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
-          e.preventDefault();
-          return false;
-        }
-      });
-      
-      document.addEventListener('mousedown', function(e) {
-        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
-          e.preventDefault();
-        }
-      });
-      
-      // Для мобильных устройств
-      document.addEventListener('touchstart', function(e) {
-        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
-          e.preventDefault();
-        }
-      }, { passive: false });
-      
-      console.log('✅ Выделение текста запрещено');
-    })();
-  </script>
 </body>
 </html>

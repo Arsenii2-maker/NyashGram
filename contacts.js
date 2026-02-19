@@ -15,6 +15,25 @@ const fixedChats = [
 
 const allContacts = [...fixedChats, ...contacts];
 const chatData = {};
+let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned') || '[]');
+
+function savePinnedToStorage() {
+  localStorage.setItem('nyashgram_pinned', JSON.stringify(pinnedChats));
+}
+
+function togglePin(contactId) {
+  if (pinnedChats.includes(contactId)) {
+    pinnedChats = pinnedChats.filter(id => id !== contactId);
+  } else {
+    pinnedChats.push(contactId);
+  }
+  savePinnedToStorage();
+  renderContacts();
+}
+
+function isPinned(contactId) {
+  return pinnedChats.includes(contactId);
+}
 
 function getGradientForName(name) {
   const gradients = [
@@ -37,67 +56,71 @@ function renderContacts() {
   
   list.innerHTML = '';
   
+  // Сортируем: закреплённые первыми
+  const sortedFixed = [...fixedChats].sort((a, b) => {
+    const aPinned = isPinned(a.id) ? 1 : 0;
+    const bPinned = isPinned(b.id) ? 1 : 0;
+    return bPinned - aPinned;
+  });
+  
   // Боты
-  fixedChats.forEach(contact => {
-    const el = document.createElement('div');
-    el.className = 'contact';
-    el.setAttribute('data-id', contact.id);
-    
-    const avatarStyle = contact.avatar || getGradientForName(contact.name);
-    const draftText = chatData[contact.id]?.draft || '';
-    
-    el.innerHTML = `
-      <div class="avatar" style="background: ${avatarStyle}; background-size: cover;"></div>
-      <div class="info">
-        <div class="name">${contact.name}</div>
-        <div class="status">${contact.status}</div>
-        ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
-      </div>
-    `;
-    
-    el.onclick = () => {
-      if (typeof openChat === 'function') {
-        openChat(contact);
-      }
-    };
-    
+  sortedFixed.forEach(contact => {
+    const el = createContactElement(contact);
     list.appendChild(el);
   });
   
-  // Разделитель
-  const separator = document.createElement('div');
-  separator.style.padding = '16px 0 4px 4px';
-  separator.style.fontSize = '13px';
-  separator.style.color = 'var(--text-soft)';
-  separator.style.opacity = '0.7';
-  separator.textContent = '👥 Друзья';
-  list.appendChild(separator);
+  // Друзья (без заголовка)
+  const sortedContacts = [...contacts].sort((a, b) => {
+    const aPinned = isPinned(a.id) ? 1 : 0;
+    const bPinned = isPinned(b.id) ? 1 : 0;
+    return bPinned - aPinned;
+  });
   
-  // Друзья
-  contacts.forEach(contact => {
-    const el = document.createElement('div');
-    el.className = 'contact';
-    el.setAttribute('data-id', contact.id);
-    
-    const draftText = chatData[contact.id]?.draft || '';
-    
-    el.innerHTML = `
-      <div class="avatar" style="background: ${getGradientForName(contact.name)}; background-size: cover;"></div>
-      <div class="info">
-        <div class="name">${contact.name}</div>
-        <div class="status">${contact.status}</div>
-        ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
-      </div>
-    `;
-    
-    el.onclick = () => {
-      if (typeof openChat === 'function') {
-        openChat(contact);
-      }
-    };
-    
+  sortedContacts.forEach(contact => {
+    const el = createContactElement(contact);
     list.appendChild(el);
   });
+  
+  // Обновляем отображение username
+  updateUsernameDisplay();
+}
+
+function createContactElement(contact) {
+  const el = document.createElement('div');
+  el.className = `contact ${isPinned(contact.id) ? 'pinned' : ''}`;
+  el.setAttribute('data-id', contact.id);
+  
+  const avatarStyle = contact.avatar || getGradientForName(contact.name);
+  const draftText = chatData[contact.id]?.draft || '';
+  const pinIcon = isPinned(contact.id) ? '<span class="pin-icon">📌</span>' : '';
+  
+  el.innerHTML = `
+    <div class="avatar" style="background: ${avatarStyle}; background-size: cover;"></div>
+    <div class="info">
+      <div class="name">${contact.name} ${pinIcon}</div>
+      <div class="status">${contact.status}</div>
+      ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
+    </div>
+  `;
+  
+  el.onclick = (e) => {
+    // Если клик не по кнопке, открываем чат
+    if (!e.target.closest('.pin-btn')) {
+      if (typeof window.openChat === 'function') {
+        window.openChat(contact);
+      }
+    }
+  };
+  
+  return el;
+}
+
+function updateUsernameDisplay() {
+  const display = document.getElementById('usernameDisplay');
+  if (display) {
+    const name = localStorage.getItem('nyashgram_name') || 'Няша';
+    display.textContent = `@${name}`;
+  }
 }
 
 function saveDraft(contactId, text) {
@@ -114,5 +137,8 @@ window.chatData = chatData;
 window.renderContacts = renderContacts;
 window.saveDraft = saveDraft;
 window.getGradientForName = getGradientForName;
+window.togglePin = togglePin;
+window.isPinned = isPinned;
+window.pinnedChats = pinnedChats;
 
 console.log('✅ contacts.js загружен');

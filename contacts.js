@@ -86,8 +86,9 @@ function renderContacts() {
   
   const botsToShow = fixedChats.filter(contact => contactMatchesSearch(contact));
   
-  botsToShow.forEach(contact => {
+  botsToShow.forEach((contact, index) => {
     const el = createContactElement(contact, true);
+    el.style.animationDelay = `${index * 0.05}s`; // Каскадная анимация
     list.appendChild(el);
   });
   
@@ -106,19 +107,11 @@ function renderContacts() {
       return bPinned - aPinned;
     });
     
-    sortedFriends.forEach(contact => {
+    sortedFriends.forEach((contact, index) => {
       const el = createContactElement(contact);
+      el.style.animationDelay = `${(botsToShow.length + index) * 0.05}s`; // Продолжаем нумерацию
       list.appendChild(el);
     });
-  }
-  
-  if (botsToShow.length === 0 && friendsToShow.length === 0) {
-    const emptyEl = document.createElement('div');
-    emptyEl.style.padding = '20px';
-    emptyEl.style.textAlign = 'center';
-    emptyEl.style.color = 'var(--text-soft)';
-    emptyEl.textContent = '😿 Ничего не найдено';
-    list.appendChild(emptyEl);
   }
   
   updateUsernameDisplay();

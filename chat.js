@@ -1,4 +1,4 @@
-// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
+// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ПЛАВНЫМИ АНИМАЦИЯМИ
 
 let currentChat = null;
 let currentContact = null;
@@ -124,7 +124,6 @@ function openChat(contact) {
     chatData[currentChat] = { messages: [], draft: '' };
   }
   
-  // Показываем экран чата
   if (typeof window.showScreen === 'function') {
     window.showScreen('chatScreen');
   } else {
@@ -133,7 +132,6 @@ function openChat(contact) {
     if (chatScreen) chatScreen.classList.add('active');
   }
   
-  // Заполняем заголовок с учётом кастомного имени
   const nameEl = document.getElementById('chatContactName');
   if (nameEl) nameEl.textContent = getDisplayName(contact);
   
@@ -146,14 +144,11 @@ function openChat(contact) {
     avatarEl.style.backgroundSize = 'cover';
   }
   
-  // Обновляем иконку пина
   updatePinIcon();
   
-  // Восстанавливаем черновик
   const input = document.getElementById('messageInput');
   if (input) input.value = chatData[currentChat].draft || '';
   
-  // Приветствие, если сообщений нет
   if (!chatData[currentChat].messages || chatData[currentChat].messages.length === 0) {
     chatData[currentChat].messages = [];
     let welcome = 'Привет! 💕';
@@ -186,6 +181,7 @@ function toggleChatActions() {
   if (panel) {
     if (panel.style.display === 'none' || panel.style.display === '') {
       panel.style.display = 'flex';
+      panel.style.animation = 'slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
     } else {
       panel.style.display = 'none';
     }
@@ -216,13 +212,11 @@ function renameCurrentChat() {
   const newName = input.value.trim();
   saveCustomName(currentContact.id, newName);
   
-  // Обновляем отображение
   const nameEl = document.getElementById('chatContactName');
   if (nameEl) nameEl.textContent = getDisplayName(currentContact);
   
   hideRenameModal();
   
-  // Обновляем список контактов
   if (typeof window.renderContacts === 'function') {
     window.renderContacts();
   }
@@ -241,7 +235,6 @@ function sendMessage(text) {
   renderMessages();
   if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, '');
   
-  // Ответ бота
   setTimeout(() => {
     if (currentChat) {
       const response = getBotResponse(currentChat, msgText);
@@ -260,13 +253,13 @@ function renderMessages() {
   chatArea.innerHTML = '';
   if (quickPanel) quickPanel.innerHTML = '';
   
-  // Быстрые ответы
   if (quickPanel) {
     if (currentChat === 'nyashhelp') {
-      nyashHelpQuickQuestions.forEach(q => {
+      nyashHelpQuickQuestions.forEach((q, index) => {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
         btn.textContent = q;
+        btn.style.animationDelay = `${index * 0.05}s`;
         btn.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -276,10 +269,11 @@ function renderMessages() {
         quickPanel.appendChild(btn);
       });
     } else if (currentChat === 'nyashtalk') {
-      nyashTalkTopics.forEach(t => {
+      nyashTalkTopics.forEach((t, index) => {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
         btn.textContent = t.title;
+        btn.style.animationDelay = `${index * 0.05}s`;
         btn.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -292,14 +286,13 @@ function renderMessages() {
     }
   }
   
-  // Сообщения
   if (chatData[currentChat].messages) {
-    chatData[currentChat].messages.forEach(msg => {
+    chatData[currentChat].messages.forEach((msg, index) => {
       const el = document.createElement('div');
       el.className = `message ${msg.from}`;
       el.textContent = msg.text;
+      el.style.animationDelay = `${index * 0.05}s`;
       
-      // Предотвращаем выделение при клике
       el.addEventListener('mousedown', (e) => e.preventDefault());
       el.addEventListener('selectstart', (e) => e.preventDefault());
       
@@ -359,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Кнопка пина в шапке — показывает/скрывает панель
   if (pinChatBtn) {
     pinChatBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -369,7 +361,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Кнопка пина в панели действий
   if (pinActionBtn) {
     pinActionBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -383,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Кнопка переименования
   if (renameBtn) {
     renameBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -393,7 +383,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Кнопка "Выключить звук"
   if (muteBtn) {
     muteBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -404,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Кнопка "Удалить чат"
   if (deleteBtn) {
     deleteBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -418,7 +406,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Модалка переименования
   if (renameCancelBtn) {
     renameCancelBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -437,7 +424,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Предотвращаем выделение на всех элементах
   document.querySelectorAll('*').forEach(el => {
     el.addEventListener('mousedown', (e) => {
       if (!el.matches('input, textarea, [contenteditable="true"]')) {
@@ -452,7 +438,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Экспорт
 window.openChat = openChat;
 window.sendMessage = sendMessage;
 window.toggleChatActions = toggleChatActions;

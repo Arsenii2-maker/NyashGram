@@ -1,4 +1,4 @@
-// contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
+// contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ПЛАВНЫМИ АНИМАЦИЯМИ
 
 const contacts = [
   { id: "bestie", name: "Bestie", username: "bestie_nyash", status: "онлайн 💕" },
@@ -68,13 +68,12 @@ function renderContacts() {
   
   list.innerHTML = '';
   
-  // Секция ботов (NyashHelp и NyashTalk) - всегда вверху
+  // Секция ботов
   const botsSection = document.createElement('div');
   botsSection.className = 'section-header';
   botsSection.textContent = '🤖 Няш-боты';
   list.appendChild(botsSection);
   
-  // Боты - всегда показываем, даже при поиске
   const botsToShow = fixedChats.filter(contact => contactMatchesSearch(contact));
   
   botsToShow.forEach(contact => {
@@ -82,7 +81,7 @@ function renderContacts() {
     list.appendChild(el);
   });
   
-  // Друзья - показываем если есть
+  // Секция друзей
   const friendsToShow = contacts.filter(contact => contactMatchesSearch(contact));
   
   if (friendsToShow.length > 0) {
@@ -91,7 +90,6 @@ function renderContacts() {
     friendsSection.textContent = '👥 Друзья';
     list.appendChild(friendsSection);
     
-    // Сортируем друзей: закреплённые сверху
     const sortedFriends = [...friendsToShow].sort((a, b) => {
       const aPinned = isPinned(a.id) ? 1 : 0;
       const bPinned = isPinned(b.id) ? 1 : 0;
@@ -104,17 +102,16 @@ function renderContacts() {
     });
   }
   
-  // Если ничего не найдено
   if (botsToShow.length === 0 && friendsToShow.length === 0) {
     const emptyEl = document.createElement('div');
     emptyEl.style.padding = '20px';
     emptyEl.style.textAlign = 'center';
     emptyEl.style.color = 'var(--text-soft)';
+    emptyEl.style.animation = 'fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
     emptyEl.textContent = '😿 Ничего не найдено';
     list.appendChild(emptyEl);
   }
   
-  // Обновляем отображение username
   updateUsernameDisplay();
 }
 
@@ -133,7 +130,7 @@ function createContactElement(contact, isBot = false) {
       <div class="name">${contact.name} ${pinIcon}</div>
       <div class="username">@${contact.username || 'unknown'}</div>
       <div class="status">${contact.status}</div>
-      ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px;">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
+      ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
     </div>
   `;
   
@@ -146,7 +143,6 @@ function createContactElement(contact, isBot = false) {
     return false;
   };
   
-  // Запрещаем выделение
   el.addEventListener('mousedown', (e) => e.preventDefault());
   el.addEventListener('selectstart', (e) => e.preventDefault());
   
@@ -167,7 +163,6 @@ function saveDraft(contactId, text) {
   renderContacts();
 }
 
-// Экспорт
 window.contacts = contacts;
 window.fixedChats = fixedChats;
 window.allContacts = allContacts;

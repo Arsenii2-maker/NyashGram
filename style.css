@@ -25,19 +25,8 @@ html, body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-body {
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-  color: var(--text);
-}
-/* ТЕСТОВЫЕ СТИЛИ - ВРЕМЕННО */
-body.theme-pastel-pink.light-mode { background: pink !important; }
-body.theme-pastel-pink.dark-mode { background: darkred !important; }
-body.theme-milk-rose.light-mode { background: peachpuff !important; }
-body.theme-milk-rose.dark-mode { background: darkorange !important; }
-
-/* ===== ТЕМЫ - ИСПРАВЛЕНО ===== */
-
-/* Пастельные тона (светлый режим) */
+/* ===== ТЕМЫ ===== */
+/* Pastel Pink - Светлая */
 body.light-mode.theme-pastel-pink {
   --bg-start: #ffd1dc;
   --bg-end: #ffe4e1;
@@ -51,6 +40,21 @@ body.light-mode.theme-pastel-pink {
   --border-light: rgba(255, 255, 255, 0.4);
 }
 
+/* Pastel Pink - Тёмная */
+body.dark-mode.theme-pastel-pink {
+  --bg-start: #8b1a4d;
+  --bg-end: #4a1a2a;
+  --text: #ffe4f0;
+  --text-soft: #ffb6c1;
+  --accent: #ff69b4;
+  --accent-soft: #ff82b9;
+  --card-bg: rgba(139, 26, 77, 0.4);
+  --bubble-user: rgba(255, 105, 180, 0.7);
+  --bubble-bot: rgba(199, 21, 133, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+}
+
+/* Milk Rose - Светлая */
 body.light-mode.theme-milk-rose {
   --bg-start: #ffb6c1;
   --bg-end: #ff9eb5;
@@ -64,6 +68,21 @@ body.light-mode.theme-milk-rose {
   --border-light: rgba(255, 235, 220, 0.5);
 }
 
+/* Milk Rose - Тёмная */
+body.dark-mode.theme-milk-rose {
+  --bg-start: #8b3a3a;
+  --bg-end: #4a1f1f;
+  --text: #fff0f0;
+  --text-soft: #ffcccc;
+  --accent: #ff7f50;
+  --accent-soft: #ff9966;
+  --card-bg: rgba(139, 58, 58, 0.4);
+  --bubble-user: rgba(255, 127, 80, 0.7);
+  --bubble-bot: rgba(255, 71, 87, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+}
+
+/* Night Blue - Светлая */
 body.light-mode.theme-night-blue {
   --bg-start: #d4e0f0;
   --bg-end: #c0d0e8;
@@ -77,6 +96,21 @@ body.light-mode.theme-night-blue {
   --border-light: rgba(255, 255, 255, 0.3);
 }
 
+/* Night Blue - Тёмная */
+body.dark-mode.theme-night-blue {
+  --bg-start: #0a2351;
+  --bg-end: #03002b;
+  --text: #f0f8ff;
+  --text-soft: #b0c4de;
+  --accent: #4169e1;
+  --accent-soft: #1e90ff;
+  --card-bg: rgba(10, 35, 81, 0.4);
+  --bubble-user: rgba(65, 105, 225, 0.7);
+  --bubble-bot: rgba(0, 0, 139, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+}
+
+/* Lo-Fi Beige - Светлая */
 body.light-mode.theme-lo-fi-beige {
   --bg-start: #f9f5ee;
   --bg-end: #f0e6d9;
@@ -90,6 +124,21 @@ body.light-mode.theme-lo-fi-beige {
   --border-light: rgba(230, 210, 190, 0.4);
 }
 
+/* Lo-Fi Beige - Тёмная */
+body.dark-mode.theme-lo-fi-beige {
+  --bg-start: #5d3a1a;
+  --bg-end: #2d1e0a;
+  --text: #fdf5e6;
+  --text-soft: #deb887;
+  --accent: #cd853f;
+  --accent-soft: #d2691e;
+  --card-bg: rgba(93, 58, 26, 0.4);
+  --bubble-user: rgba(205, 133, 63, 0.7);
+  --bubble-bot: rgba(139, 69, 19, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+}
+
+/* Soft Lilac - Светлая */
 body.light-mode.theme-soft-lilac {
   --bg-start: #f5f0ff;
   --bg-end: #e6d9ff;
@@ -103,70 +152,18 @@ body.light-mode.theme-soft-lilac {
   --border-light: rgba(220, 200, 255, 0.4);
 }
 
-/* Неоновые/тёмные тона (тёмный режим) */
-body.dark-mode.theme-pastel-pink {
-  --bg-start: #ff1493;
-  --bg-end: #c71585;
-  --text: #ffe4f0;
-  --text-soft: #ffb6c1;
-  --accent: #ff69b4;
-  --accent-soft: #ff82b9;
-  --card-bg: rgba(255, 20, 147, 0.3);
-  --bubble-user: rgba(255, 105, 180, 0.7);
-  --bubble-bot: rgba(199, 21, 133, 0.6);
-  --border-light: rgba(255, 255, 255, 0.2);
-}
-
-body.dark-mode.theme-milk-rose {
-  --bg-start: #ff6b6b;
-  --bg-end: #ff4757;
-  --text: #fff0f0;
-  --text-soft: #ffcccc;
-  --accent: #ff7f50;
-  --accent-soft: #ff9966;
-  --card-bg: rgba(255, 107, 107, 0.4);
-  --bubble-user: rgba(255, 127, 80, 0.7);
-  --bubble-bot: rgba(255, 71, 87, 0.6);
-  --border-light: rgba(255, 255, 255, 0.2);
-}
-
-body.dark-mode.theme-night-blue {
-  --bg-start: #4169e1;
-  --bg-end: #1e90ff;
-  --text: #f0f8ff;
-  --text-soft: #b0c4de;
-  --accent: #00bfff;
-  --accent-soft: #1e90ff;
-  --card-bg: rgba(65, 105, 225, 0.4);
-  --bubble-user: rgba(30, 144, 255, 0.7);
-  --bubble-bot: rgba(0, 191, 255, 0.6);
-  --border-light: rgba(255, 255, 255, 0.2);
-}
-
-body.dark-mode.theme-lo-fi-beige {
-  --bg-start: #8b4513;
-  --bg-end: #cd853f;
-  --text: #fdf5e6;
-  --text-soft: #deb887;
-  --accent: #d2691e;
-  --accent-soft: #cd853f;
-  --card-bg: rgba(139, 69, 19, 0.4);
-  --bubble-user: rgba(205, 133, 63, 0.7);
-  --bubble-bot: rgba(210, 105, 30, 0.6);
-  --border-light: rgba(255, 255, 255, 0.2);
-}
-
+/* Soft Lilac - Тёмная */
 body.dark-mode.theme-soft-lilac {
-  --bg-start: #800080;
-  --bg-end: #9370db;
+  --bg-start: #4b0082;
+  --bg-end: #240041;
   --text: #f0e6ff;
   --text-soft: #d8bfd8;
-  --accent: #da70d6;
+  --accent: #9370db;
   --accent-soft: #ba55d3;
-  --card-bg: rgba(128, 0, 128, 0.4);
+  --card-bg: rgba(75, 0, 130, 0.4);
   --bubble-user: rgba(147, 112, 219, 0.7);
-  --bubble-bot: rgba(218, 112, 214, 0.6);
-  --border-light: rgba(255, 255, 255, 0.2);
+  --bubble-bot: rgba(138, 43, 226, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
 }
 
 /* Применяем переменные */
@@ -176,7 +173,7 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* ===== GLOBAL STYLES ===== */
+/* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
 #app {
   height: 100%;
 }
@@ -361,7 +358,7 @@ button:active {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: var(--panel);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   position: sticky;
@@ -492,7 +489,7 @@ button:active {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: var(--panel);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   width: 100%;
@@ -535,7 +532,7 @@ button:active {
   gap: 6px;
   flex-wrap: wrap;
   padding: 8px 12px;
-  background: var(--panel);
+  background: var(--card-bg);
   backdrop-filter: blur(5px);
   border-bottom: 1px solid var(--border-light);
   width: 100%;
@@ -550,7 +547,7 @@ button:active {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: var(--chat-bg);
+  background: var(--card-bg);
   scroll-behavior: smooth;
 }
 
@@ -584,7 +581,7 @@ button:active {
 #messageInputArea {
   width: 100%;
   padding: 8px 12px;
-  background: var(--panel);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   display: flex;
   gap: 6px;
@@ -639,7 +636,7 @@ button:active {
   display: flex;
   gap: 8px;
   padding: 8px 12px;
-  background: var(--panel);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   justify-content: flex-end;

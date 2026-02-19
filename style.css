@@ -29,6 +29,11 @@ body {
   background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
   color: var(--text);
 }
+/* ТЕСТОВЫЕ СТИЛИ - ВРЕМЕННО */
+body.theme-pastel-pink.light-mode { background: pink !important; }
+body.theme-pastel-pink.dark-mode { background: darkred !important; }
+body.theme-milk-rose.light-mode { background: peachpuff !important; }
+body.theme-milk-rose.dark-mode { background: darkorange !important; }
 
 /* ===== ТЕМЫ (ИСПРАВЛЕНО) ===== */
 /* Pastel Pink */

@@ -11,18 +11,20 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-user-select: none;  /* Запрет выделения */
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
     }
 
     /* Разрешаем выделение только в полях ввода */
-    input, textarea {
-      -webkit-user-select: text;
-      -moz-user-select: text;
-      -ms-user-select: text;
-      user-select: text;
+    input, textarea, [contenteditable="true"] {
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      -ms-user-select: text !important;
+      user-select: text !important;
     }
 
     body {
@@ -255,6 +257,10 @@
 
     .contact:active { transform: scale(0.99); }
     .contact.pinned { border-left: 4px solid var(--accent); }
+    .contact.bot-section { 
+      background: rgba(195, 142, 240, 0.2);
+      border-left: 4px solid #c38ef0;
+    }
 
     .avatar {
       width: 44px;
@@ -293,6 +299,15 @@
       font-size: 14px;
       color: var(--accent);
       margin-left: 4px;
+    }
+
+    .section-header {
+      padding: 16px 0 4px 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* ===== СООБЩЕНИЯ ===== */
@@ -525,9 +540,9 @@
     </header>
     <div style="padding: 16px; overflow-y: auto; width: 100%;">
       <div class="glass-container" style="margin-bottom: 16px;">
-        <h3 style="color: var(--text); margin-bottom: 16px;">Твой ник</h3>
+        <h3 style="color: var(--text); margin-bottom: 16px;">Твой профиль</h3>
         <input type="text" id="settingsName" placeholder="Имя" style="width:100%; margin-bottom: 8px;" />
-        <input type="text" id="settingsUsername" placeholder="Юзернейм (уникальный)" style="width:100%; margin-bottom: 12px;" />
+        <input type="text" id="settingsUsername" placeholder="Юзернейм (уникальный)" style="width:100%; margin-bottom: 8px;" />
         <div id="settingsUsernameError" style="color: #e67e8f; font-size: 13px; margin-bottom: 10px; min-height: 20px;"></div>
         <button id="saveSettingsBtn" class="active" style="margin-top: 0;">Сохранить</button>
       </div>
@@ -570,5 +585,33 @@
   <script src="app.js"></script>
   <script src="contacts.js"></script>
   <script src="chat.js"></script>
+  
+  <!-- Финальное подавление выделения -->
+  <script>
+    (function() {
+      // Запрещаем выделение на всём документе
+      document.addEventListener('selectstart', function(e) {
+        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      
+      document.addEventListener('mousedown', function(e) {
+        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
+          e.preventDefault();
+        }
+      });
+      
+      // Для мобильных устройств
+      document.addEventListener('touchstart', function(e) {
+        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+      
+      console.log('✅ Выделение текста запрещено');
+    })();
+  </script>
 </body>
 </html>

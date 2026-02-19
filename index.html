@@ -736,6 +736,7 @@
   </section>
 
   <!-- Экран чата -->
+<!-- Экран чата -->
   <section id="chatScreen" class="screen">
     <header id="chatHeader">
       <button id="backBtn">←</button>
@@ -755,9 +756,14 @@
       <button id="deleteChatBtn" title="Удалить чат">🗑️</button>
     </div>
     
-    <div id="quickReplyPanel"></div>
-    <div id="chatArea"></div>
-    <div id="messageInputArea">
+    <!-- Панель быстрых ответов -->
+    <div id="quickReplyPanel" class="quick-reply-panel"></div>
+    
+    <!-- Область сообщений -->
+    <div id="chatArea" class="chat-area"></div>
+    
+    <!-- Поле ввода сообщения -->
+    <div id="messageInputArea" class="message-input-area">
       <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." />
       <button id="sendMessageBtn">➤</button>
     </div>

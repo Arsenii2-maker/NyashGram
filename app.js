@@ -5,9 +5,6 @@ if (!window.chatData) {
   window.chatData = {};
 }
 
-// Режим темы (светлый/тёмный)
-let currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
-
 const AppState = {
   currentUser: {
     name: localStorage.getItem('nyashgram_name') || "Няша",
@@ -17,23 +14,25 @@ const AppState = {
     font: localStorage.getItem('nyashgram_font') || "font-cozy"
   }
 };
-// В начале файла, после AppState, добавьте:
 
-// Текущая тема и режим
+// ===== НОВАЯ СИСТЕМА ТЕМ =====
 let currentThemeBase = localStorage.getItem('nyashgram_theme_base') || 'pastel-pink';
 let currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
 
-// Функция применения темы
-function applyTheme(themeBase, mode) {
+// Функция применения темы (НОВАЯ)
+function applyNewTheme(themeBase, mode) {
   const themeClass = `theme-${themeBase}-${mode}`;
   
-  // Удаляем все классы тем
+  // Удаляем все старые классы тем
   document.body.classList.remove(
     'theme-pastel-pink-light', 'theme-pastel-pink-dark',
     'theme-milk-rose-light', 'theme-milk-rose-dark',
     'theme-night-blue-light', 'theme-night-blue-dark',
     'theme-lo-fi-beige-light', 'theme-lo-fi-beige-dark',
-    'theme-soft-lilac-light', 'theme-soft-lilac-dark'
+    'theme-soft-lilac-light', 'theme-soft-lilac-dark',
+    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
+    'theme-lo-fi-beige', 'theme-soft-lilac',
+    'light-mode', 'dark-mode'
   );
   
   // Добавляем новую тему
@@ -44,39 +43,25 @@ function applyTheme(themeBase, mode) {
   currentThemeMode = mode;
   localStorage.setItem('nyashgram_theme_base', themeBase);
   localStorage.setItem('nyashgram_theme_mode', mode);
+  AppState.currentUser.theme = themeBase;
+  localStorage.setItem('nyashgram_theme', themeBase);
   
-  console.log('Применена тема:', themeClass);
+  console.log('✅ Применена тема:', themeClass);
+  console.log('📌 Классы body:', document.body.className);
 }
 
 // Функция переключения режима (луна/солнце)
 function toggleThemeMode() {
+  console.log('🔴 КНОПКА ЛУНЫ НАЖАТА! Текущий режим:', currentThemeMode);
+  
   const newMode = currentThemeMode === 'light' ? 'dark' : 'light';
-  applyTheme(currentThemeBase, newMode);
+  applyNewTheme(currentThemeBase, newMode);
   
   // Обновляем иконку
   const modeToggle = document.getElementById('themeModeToggle');
   if (modeToggle) {
     modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';
   }
-}
-
-// В функции checkAuth() замените применение темы на:
-// После загрузки пользователя
-applyTheme(currentThemeBase, currentThemeMode);
-
-// В обработчиках кнопок тем замените на:
-document.querySelectorAll('.theme-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const themeBase = btn.dataset.theme; // теперь data-theme="pastel-pink" и т.д.
-    applyTheme(themeBase, currentThemeMode);
-  });
-});
-
-// Для кнопки луны:
-const themeModeToggle = document.getElementById('themeModeToggle');
-if (themeModeToggle) {
-  themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
-  themeModeToggle.addEventListener('click', toggleThemeMode);
 }
 
 // База данных занятых юзернеймов
@@ -86,50 +71,12 @@ let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames'
 const cuteWords = [
   "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
   "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
-  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream", "Parallelogram"
+  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream"
 ];
 
 const cuteSuffixes = [
   "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi"
 ];
-
-// Функция переключения режима темы (ОТЛАДОЧНАЯ ВЕРСИЯ)
-function toggleThemeMode() {
-    console.log('🔴 КНОПКА НАЖАТА! Текущий режим:', currentThemeMode);
-    
-    const modeToggle = document.getElementById('themeModeToggle');
-    
-    if (currentThemeMode === 'light') {
-        currentThemeMode = 'dark';
-        if (modeToggle) modeToggle.textContent = '🌙';
-        document.body.classList.remove('light-mode');
-        document.body.classList.add('dark-mode');
-        console.log('🟢 Переключили на dark-mode');
-    } else {
-        currentThemeMode = 'light';
-        if (modeToggle) modeToggle.textContent = '☀️';
-        document.body.classList.remove('dark-mode');
-        document.body.classList.add('light-mode');
-        console.log('🟢 Переключили на light-mode');
-    }
-    
-    localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
-    
-    // Проверяем, какие классы теперь на body
-    console.log('📌 Классы body после переключения:', document.body.className);
-    console.log('📌 Содержит dark-mode?', document.body.classList.contains('dark-mode'));
-    console.log('📌 Содержит light-mode?', document.body.classList.contains('light-mode'));
-    
-    // Переприменяем текущую тему
-    const currentTheme = AppState.currentUser.theme;
-    document.body.classList.remove(
-        'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
-        'theme-lo-fi-beige', 'theme-soft-lilac'
-    );
-    document.body.classList.add(`theme-${currentTheme}`);
-    
-    console.log('🎨 Фон после применения:', getComputedStyle(document.body).background);
-}
 
 // Проверка валидности юзернейма
 function isValidUsername(username) {
@@ -240,32 +187,6 @@ function showScreen(id) {
   }
 }
 
-// Применение темы
-function applyTheme(themeId) {
-  document.body.style.opacity = '0.5';
-  
-  setTimeout(() => {
-    document.body.classList.remove(
-      'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
-      'theme-lo-fi-beige', 'theme-soft-lilac'
-    );
-    
-    document.body.classList.add(`theme-${themeId}`);
-    
-    AppState.currentUser.theme = themeId;
-    localStorage.setItem('nyashgram_theme', themeId);
-    
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-      btn.classList.remove('active');
-      if (btn.dataset.theme === themeId) btn.classList.add('active');
-    });
-    
-    document.body.style.opacity = '1';
-    
-    console.log('Тема применена:', themeId);
-  }, 150);
-}
-
 // Применение шрифта
 function applyFont(fontClass) {
   document.body.style.opacity = '0.5';
@@ -297,7 +218,7 @@ function loadSettingsIntoUI() {
   
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
-    if (btn.dataset.theme === AppState.currentUser.theme) btn.classList.add('active');
+    if (btn.dataset.theme === currentThemeBase) btn.classList.add('active');
   });
   
   document.querySelectorAll('.font-btn').forEach(btn => {
@@ -351,29 +272,25 @@ function checkAuth() {
   if (localStorage.getItem('nyashgram_entered') === 'true') {
     addUsername(AppState.currentUser.username);
     
-    // Загружаем сохранённый режим
-    const savedMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
-    currentThemeMode = savedMode;
+    // Загружаем сохранённые тему и режим
+    currentThemeBase = localStorage.getItem('nyashgram_theme_base') || 'pastel-pink';
+    currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
     
-    // Добавляем класс режима на body
-    document.body.classList.add(savedMode + '-mode');
-    
-    // Применяем сохранённую тему
-    applyTheme(AppState.currentUser.theme);
+    // Применяем тему
+    applyNewTheme(currentThemeBase, currentThemeMode);
     applyFont(AppState.currentUser.font);
     
     // Обновляем кнопку луны
     const modeToggle = document.getElementById('themeModeToggle');
     if (modeToggle) {
-      modeToggle.textContent = savedMode === 'light' ? '☀️' : '🌙';
+      modeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
     }
     
     showScreen('contactsScreen');
   } else {
     showScreen('phoneScreen');
-    // По умолчанию светлый режим
-    document.body.classList.add('light-mode');
-    applyTheme('pastel-pink');
+    // По умолчанию светлая тема
+    applyNewTheme('pastel-pink', 'light');
     applyFont('font-cozy');
   }
 }
@@ -553,16 +470,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Кнопка переключения режима темы
+  // Кнопка переключения режима темы (ЛУНА/СОЛНЦЕ)
   const themeModeToggle = document.getElementById('themeModeToggle');
   if (themeModeToggle) {
     themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
     themeModeToggle.addEventListener('click', toggleThemeMode);
   }
   
-  // Кнопки тем
+  // Кнопки тем (в настройках)
   document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    btn.addEventListener('click', () => {
+      const themeBase = btn.dataset.theme;
+      applyNewTheme(themeBase, currentThemeMode);
+    });
   });
   
   // Кнопки шрифтов
@@ -585,7 +505,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Экспорт в глобальную область
   window.showScreen = showScreen;
-  window.applyTheme = applyTheme;
   window.applyFont = applyFont;
   window.AppState = AppState;
   window.generateCode = generateCode;
@@ -596,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.isValidUsername = isValidUsername;
   window.getUsernameError = getUsernameError;
   window.toggleThemeMode = toggleThemeMode;
-  window.currentThemeMode = currentThemeMode;
+  window.applyNewTheme = applyNewTheme;
   
   console.log('✅ app.js готов');
 });

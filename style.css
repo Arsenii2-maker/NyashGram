@@ -8,6 +8,17 @@
   -ms-user-select: none;
   user-select: none;
 }
+/* === ПРОСТЫЕ ТЕСТОВЫЕ ТЕМЫ === */
+body.light-mode.theme-pastel-pink { background: pink !important; }
+body.dark-mode.theme-pastel-pink { background: darkred !important; }
+body.light-mode.theme-milk-rose { background: peachpuff !important; }
+body.dark-mode.theme-milk-rose { background: darkorange !important; }
+body.light-mode.theme-night-blue { background: lightblue !important; }
+body.dark-mode.theme-night-blue { background: darkblue !important; }
+body.light-mode.theme-lo-fi-beige { background: beige !important; }
+body.dark-mode.theme-lo-fi-beige { background: saddlebrown !important; }
+body.light-mode.theme-soft-lilac { background: lavender !important; }
+body.dark-mode.theme-soft-lilac { background: purple !important; }
 
 /* Разрешаем выделение только в полях ввода */
 input, textarea, [contenteditable="true"] {

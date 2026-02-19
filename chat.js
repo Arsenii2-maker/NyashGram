@@ -29,6 +29,20 @@ function getDisplayName(contact) {
   return customNames[contact.id] || contact.name;
 }
 
+// ===== УНИВЕРСАЛЬНЫЕ БЫСТРЫЕ ВОПРОСЫ ДЛЯ ВСЕХ ЧАТОВ =====
+const universalQuickQuestions = [
+  { text: "Как дела? 💕", keywords: ["дела", "как ты"] },
+  { text: "Чем занят? 🌸", keywords: ["чем", "занят", "делаешь"] },
+  { text: "Расскажи о себе ✨", keywords: ["себе", "расскажи"] },
+  { text: "Что нового? 🌟", keywords: ["нового", "новости"] },
+  { text: "Как настроение? 💗", keywords: ["настроение"] },
+  { text: "Планы на вечер? 🌙", keywords: ["вечер", "планы"] },
+  { text: "Любимая еда? 🍰", keywords: ["еда", "кушать"] },
+  { text: "Посоветуй фильм 🎬", keywords: ["фильм", "кино"] },
+  { text: "Что послушать? 🎧", keywords: ["музыка", "песня"] },
+  { text: "Спроси меня о чём-нибудь 💭", keywords: ["спроси", "вопрос"] }
+];
+
 // ===== NYASHHELP =====
 const nyashHelpQuickQuestions = [
   "Как сменить тему?",
@@ -159,6 +173,7 @@ function getBestieResponse(text) {
   if (text.includes('привет')) return ['Привееет, моя няша! 💕', 'Солнышко! 🥰', 'Соскучилась! 💗'][Math.floor(Math.random()*3)];
   if (text.includes('люблю')) return ['Я тебя больше! 💖', 'Ты лучший! 💘', 'Обнимаю! 🤗'][Math.floor(Math.random()*3)];
   if (text.includes('грустн')) return ['Всё будет хорошо, я рядом! 💪', 'Держись! 🌸', 'Обнимаю! 🫂'][Math.floor(Math.random()*3)];
+  if (text.includes('дела') || text.includes('как ты')) return ['У меня всё супер, а у тебя? 💕', 'Отлично! Рассказывай о себе!', 'Счастлива, что ты спросил! ✨'][Math.floor(Math.random()*3)];
   return ['Няш-няш! 🩷', 'Рассказывай! 👂', 'Как день? 💕'][Math.floor(Math.random()*3)];
 }
 
@@ -167,6 +182,7 @@ function getPhilosopherResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Приветствую... 🧠', 'Здравствуй...', 'И снова ты...'][Math.floor(Math.random()*3)];
   if (text.includes('жизнь')) return ['Жизнь — это байты...', 'А что есть жизнь?', 'Бытие...'][Math.floor(Math.random()*3)];
+  if (text.includes('дела')) return ['Бытие определяет сознание... А как твои дела?', 'Вопрос бытия... У меня всё философски 🤔'][Math.floor(Math.random()*3)];
   return ['Интересная мысль...', 'Познай себя...', 'Всё относительно...'][Math.floor(Math.random()*3)];
 }
 
@@ -175,6 +191,7 @@ function getStudyResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Привет! Уроки сделал? 📚', 'А параграф прочитал?', 'Проверим домашку?'][Math.floor(Math.random()*3)];
   if (text.includes('домашк')) return ['Покажи, я проверю! ✍️', 'Опять не сделал?', 'Давай вместе!'][Math.floor(Math.random()*3)];
+  if (text.includes('дела')) return ['Учёба — это свет! А у тебя как успехи? 📖', 'Всё отлично, готовлюсь к экзаменам! А ты?'][Math.floor(Math.random()*3)];
   return ['Учись, учись! ⭐', 'Повторение — мать учения!', 'Грызи гранит науки! 🪨'][Math.floor(Math.random()*3)];
 }
 
@@ -183,6 +200,7 @@ function getMusicPalResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Йо, музыкант! 🎵', 'Что в плейлисте?', 'Здарова! 🎧'][Math.floor(Math.random()*3)];
   if (text.includes('посовет')) return ['Послушай lo-fi!', 'Новый трек Taylor Swift!', 'Классный инди-микс!'][Math.floor(Math.random()*3)];
+  if (text.includes('дела')) return ['В ритме музыки! 🎶 А у тебя как настроение?', 'Играет новый альбом, кайф! А ты что слушаешь?'][Math.floor(Math.random()*3)];
   return ['Музыка — жизнь! 🎶', 'Вруби на полную!', 'Отличный вкус!'][Math.floor(Math.random()*3)];
 }
 
@@ -191,6 +209,7 @@ function getNightChatResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Тсс... Звёзды шепчут... 🌙', 'Полночь...', 'Ночной гость... ✨'][Math.floor(Math.random()*3)];
   if (text.includes('сон')) return ['Что снилось? 🌠', 'Сны — порталы...', 'Цветные сны?'][Math.floor(Math.random()*3)];
+  if (text.includes('дела')) return ['В ночной тишине всё иначе... А у тебя как? 🌙', 'Звёзды шепчут, что у тебя всё хорошо... Это правда?'][Math.floor(Math.random()*3)];
   return ['Ночь длинная...', 'Шёпотом...', 'Расскажи мне...'][Math.floor(Math.random()*3)];
 }
 
@@ -219,7 +238,6 @@ function showTypingIndicator() {
   typingEl.className = 'typing-indicator';
   typingEl.id = 'typingIndicator';
   typingEl.innerHTML = '<span></span><span></span><span></span>';
-  typingEl.style.animation = 'none';
   chatArea.appendChild(typingEl);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
@@ -272,13 +290,13 @@ function openChat(contact) {
     window.chatData[currentChat].messages = [];
     let welcome = 'Привет! 💕';
     switch(contact.id) {
-      case 'nyashhelp': welcome = 'Привет! Я NyashHelp 🩷 Спрашивай!'; break;
+      case 'nyashhelp': welcome = 'Привет! Я NyashHelp 🩷 Спрашивай про приложение!'; break;
       case 'nyashtalk': welcome = 'Приветик! Давай болтать! 🌸 О чём поговорим?'; break;
-      case 'bestie': welcome = 'Привееет, моя няша! 💖 Как делишки?'; break;
-      case 'philosopher': welcome = 'Здравствуй... 🧠 О чём хочешь пофилософствовать?'; break;
-      case 'study': welcome = 'Привет! Уроки сделал? 📚'; break;
-      case 'musicpal': welcome = 'Йо! Что в плейлисте? 🎧'; break;
-      case 'nightchat': welcome = 'Тсс... Полночь... Добро пожаловать в ночной чат 🌙'; break;
+      case 'bestie': welcome = 'Привееет, моя няша! 💖 Как делишки? Рассказывай!'; break;
+      case 'philosopher': welcome = 'Здравствуй... 🧠 О чём хочешь пофилософствовать сегодня?'; break;
+      case 'study': welcome = 'Привет! Уроки сделал? 📚 Что проходили?'; break;
+      case 'musicpal': welcome = 'Йо! Что в плейлисте сегодня? 🎧 Делись!'; break;
+      case 'nightchat': welcome = 'Тсс... Полночь... Добро пожаловать в ночной чат 🌙 Звёзды сегодня особенно яркие...'; break;
     }
     window.chatData[currentChat].messages.push({ from: 'bot', text: welcome });
   }
@@ -353,7 +371,7 @@ function sendMessage(text) {
   // Показываем индикатор печати
   showTypingIndicator();
   
-  // Ответ бота
+  // Ответ бота с задержкой
   setTimeout(() => {
     if (currentChat) {
       hideTypingIndicator();
@@ -385,7 +403,6 @@ function renderMessages() {
       const el = document.createElement('div');
       el.className = `message ${msg.from}`;
       el.textContent = msg.text;
-      el.style.animation = 'none';
       chatArea.appendChild(el);
     });
   }
@@ -395,7 +412,6 @@ function renderMessages() {
     typingEl.className = 'typing-indicator';
     typingEl.id = 'typingIndicator';
     typingEl.innerHTML = '<span></span><span></span><span></span>';
-    typingEl.style.animation = 'none';
     chatArea.appendChild(typingEl);
   }
   
@@ -405,42 +421,33 @@ function renderMessages() {
     chatArea.scrollTop = scrollPos;
   }
   
+  // УНИВЕРСАЛЬНАЯ ПАНЕЛЬ БЫСТРЫХ ОТВЕТОВ ДЛЯ ВСЕХ ЧАТОВ
   if (quickPanel) {
     quickPanel.innerHTML = '';
     
+    // Для NyashHelp - специальные вопросы
     if (currentChat === 'nyashhelp') {
       nyashHelpQuickQuestions.forEach((q) => {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
         btn.textContent = q;
-        btn.style.animation = 'none';
         btn.onclick = (e) => {
           e.preventDefault();
           sendMessage(q);
         };
         quickPanel.appendChild(btn);
       });
-    } else if (currentChat === 'nyashtalk') {
-      const topics = [
-        "Расскажи о погоде ☁️",
-        "Поговорим о настроении 💗",
-        "Люблю котиков! 🐱",
-        "Что насчёт еды? 🍰",
-        "Сны — это интересно ✨",
-        "Посоветуй фильм 🎬",
-        "Что слушаешь? 🎧",
-        "Твоё хобби? 🎨",
-        "Куда поехать? ✈️"
-      ];
-      
-      topics.forEach((topic) => {
+    } 
+    // Для всех остальных чатов - универсальные вопросы
+    else {
+      // Показываем первые 6 универсальных вопросов
+      universalQuickQuestions.slice(0, 6).forEach((item) => {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
-        btn.textContent = topic;
-        btn.style.animation = 'none';
+        btn.textContent = item.text;
         btn.onclick = (e) => {
           e.preventDefault();
-          sendMessage(topic);
+          sendMessage(item.text);
         };
         quickPanel.appendChild(btn);
       });

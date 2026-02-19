@@ -2,7 +2,9 @@
 
 let currentChat = null;
 let currentContact = null;
-let isTyping = false;
+let isBotTyping = false;
+let isUserTyping = false;
+let typingTimeout = null;
 
 if (!window.chatData) {
   window.chatData = {};
@@ -18,7 +20,6 @@ function saveCustomName(contactId, newName) {
   }
   localStorage.setItem('nyashgram_custom_names', JSON.stringify(customNames));
   
-  // Обновляем отображение в списке контактов
   if (typeof window.renderContacts === 'function') {
     window.renderContacts();
   }
@@ -29,18 +30,12 @@ function getDisplayName(contact) {
   return customNames[contact.id] || contact.name;
 }
 
-// ===== УНИВЕРСАЛЬНЫЕ БЫСТРЫЕ ВОПРОСЫ ДЛЯ ВСЕХ ЧАТОВ =====
+// ===== УНИВЕРСАЛЬНЫЕ БЫСТРЫЕ ВОПРОСЫ =====
 const universalQuickQuestions = [
   { text: "Как дела? 💕", keywords: ["дела", "как ты"] },
   { text: "Чем занят? 🌸", keywords: ["чем", "занят", "делаешь"] },
-  { text: "Расскажи о себе ✨", keywords: ["себе", "расскажи"] },
   { text: "Что нового? 🌟", keywords: ["нового", "новости"] },
-  { text: "Как настроение? 💗", keywords: ["настроение"] },
-  { text: "Планы на вечер? 🌙", keywords: ["вечер", "планы"] },
-  { text: "Любимая еда? 🍰", keywords: ["еда", "кушать"] },
-  { text: "Посоветуй фильм 🎬", keywords: ["фильм", "кино"] },
-  { text: "Что послушать? 🎧", keywords: ["музыка", "песня"] },
-  { text: "Спроси меня о чём-нибудь 💭", keywords: ["спроси", "вопрос"] }
+  { text: "Как настроение? 💗", keywords: ["настроение"] }
 ];
 
 // ===== NYASHHELP =====
@@ -58,165 +53,293 @@ function getNyashHelpResponse(text) {
   if (text.includes('шрифт')) return '6 шрифтов: System, Rounded, Cozy, Elegant, Bold Soft, Mono Cozy! 💕 Меняй в Настройках';
   if (text.includes('аватар')) return 'Загрузи фото в настройках или оставь милый градиент! 💫';
   if (text.includes('черновик')) return 'Черновики сохраняются автоматически! 📝 Видишь подпись под контактом?';
-  if (text.includes('бот')) return 'У нас NyashHelp, NyashTalk и 5 друзей: Bestie, Философ, Учёба, Music Pal, Night Chat! 🎭';
+  if (text.includes('бот')) return 'У нас NyashHelp, NyashTalk, NyashGame, NyashHoroscope и 5 друзей! 🎭';
   return 'Спроси про темы, шрифты, аватарки или ботов! 🩷';
 }
 
 // ===== NYASHTALK =====
-const nyashTalkTopics = {
-  погода: {
-    keywords: ['погод', 'дожд', 'солнц', 'ветер', 'снег', 'град', 'тепл', 'холод'],
-    responses: [
-      { text: "Ой, сегодня такое солнышко за окном! ☀️ А у тебя какая погода?", mood: "happy" },
-      { text: "Дождик моросит... так уютно сидеть дома с чашечкой какао ☕ А ты любишь дождь?", mood: "cozy" },
-      { text: "Снежок выпал! ❄️ Можно лепить снеговиков или пить горячий шоколад. Что выберешь?", mood: "excited" },
-      { text: "Ветер сильный сегодня... Хорошо, что мы в тёплом чатике болтаем 💕", mood: "cozy" }
-    ]
-  },
-  настроение: {
-    keywords: ['настроен', 'груст', 'весел', 'счастл', 'радос', 'скучн'],
-    responses: [
-      { text: "Ой, а у меня сегодня игривое настроение! 🎵 А как у тебя?", mood: "playful" },
-      { text: "Если грустно — я всегда рядом, чтобы поднять настроение! 🫂 Рассказывай", mood: "caring" },
-      { text: "Счастлива, что ты здесь! Это уже делает день лучше 💗", mood: "happy" }
-    ]
-  },
-  котики: {
-    keywords: ['кот', 'кошк', 'мяу', 'котик', 'котён', 'мур'],
-    responses: [
-      { text: "Мяу-мяу! 🐱 Представляешь пушистого котика? Уютно~", mood: "cute" },
-      { text: "Котики — это 90% милоты и 10% хулиганства! 😸 У тебя есть питомец?", mood: "playful" },
-      { text: "Муррр... Я как котик, только виртуальный! 🐾", mood: "cute" }
-    ]
-  },
-  еда: {
-    keywords: ['ед', 'пицц', 'сладк', 'вкусн', 'куша', 'голод'],
-    responses: [
-      { text: "Ммм, я обожаю клубничный торт! 🍓 А у тебя есть любимый десерт?", mood: "excited" },
-      { text: "Пицца — это всегда хорошая идея! 🍕 С какой начинкой любишь?", mood: "playful" },
-      { text: "Сейчас бы горячего какао с зефирками... ☕", mood: "cozy" }
-    ]
-  },
-  сны: {
-    keywords: ['сон', 'спал', 'снил', 'ноч', 'просну'],
-    responses: [
-      { text: "Ой, мне сегодня снилось, что я летала по небу! ☁️ А тебе что снилось?", mood: "dreamy" },
-      { text: "Сны — это маленькие приключения во сне ✨", mood: "curious" },
-      { text: "Иногда сны такие яркие, что не хочется просыпаться... Бывает?", mood: "dreamy" }
-    ]
-  },
-  фильмы: {
-    keywords: ['фильм', 'кино', 'сериал', 'аниме', 'мульт', 'посмотр'],
-    responses: [
-      { text: "Обожаю милые аниме про любовь! 💕 Твой любимый жанр?", mood: "excited" },
-      { text: "Недавно смотрела 'Твоё имя' — это шедевр! 🎬 Видел?", mood: "enthusiastic" },
-      { text: "Сериалы — это искусство 📺 Что сейчас смотришь?", mood: "curious" }
-    ]
-  },
-  музыка: {
-    keywords: ['музык', 'песн', 'трек', 'плейлист', 'слуша'],
-    responses: [
-      { text: "Сейчас в моём плейлисте: lo-fi и k-pop! 🎶 А у тебя?", mood: "energetic" },
-      { text: "Музыка — это магия, которая лечит душу ✨", mood: "dreamy" },
-      { text: "🎵 Напеваешь что-то? Я подпою! 🎤", mood: "playful" }
-    ]
-  },
-  хобби: {
-    keywords: ['хобби', 'увлека', 'рис', 'фот', 'танц', 'спорт'],
-    responses: [
-      { text: "Ого, у тебя есть хобби? Расскажи! ✨", mood: "curious" },
-      { text: "Рисовать — это так круто! 🎨", mood: "impressed" },
-      { text: "Спорт — это здорово! 💪 Я болею за тебя!", mood: "encouraging" }
-    ]
-  },
-  путешествия: {
-    keywords: ['путешеств', 'поех', 'стра', 'город', 'море', 'гор'],
-    responses: [
-      { text: "Мечтаю побывать в Японии весной! 🇯🇵 А ты?", mood: "dreamy" },
-      { text: "Море, горы или большой город? Что выбираешь? 🏖️", mood: "curious" },
-      { text: "Путешествия — это лучшие воспоминания ✈️", mood: "excited" }
-    ]
-  },
-  default: {
-    responses: [
-      { text: "Хмм, расскажи подробнее! Мне очень интересно 💕", mood: "curious" },
-      { text: "Ой, а я как раз об этом думала! Продолжай 👂", mood: "attentive" },
-      { text: "Это так мило! А что ещё? 🥰", mood: "excited" },
-      { text: "Правда? Расскажешь побольше? ✨", mood: "impressed" }
-    ]
-  }
-};
+const nyashTalkQuickQuestions = [
+  "Расскажи о погоде ☁️",
+  "Поговорим о настроении 💗",
+  "Люблю котиков! 🐱",
+  "Что насчёт еды? 🍰",
+  "Сны — это интересно ✨"
+];
 
 function getNyashTalkResponse(text) {
   text = text.toLowerCase().trim();
   
-  if (text.includes('привет') || text.includes('хай')) {
-    return "Приветик! 🩷 Давай поболтаем о чём-нибудь?";
+  if (text.includes('привет')) return "Приветик! 🩷 Давай поболтаем!";
+  if (text.includes('погод')) return "Ой, сегодня такое солнышко! ☀️ А у тебя?";
+  if (text.includes('настроен')) return "У меня игривое настроение! 🎵 А у тебя?";
+  if (text.includes('кот')) return "Мяу-мяу! 🐱 Люблю котиков! У тебя есть питомец?";
+  if (text.includes('ед')) return "Ммм, обожаю сладенькое! 🍰 А ты?";
+  if (text.includes('сон')) return "Мне сегодня снились цветные сны! ✨ А тебе?";
+  
+  return ['Расскажи подробнее! 💕', 'Интересно! 😊', 'Продолжай! 🩷'][Math.floor(Math.random()*3)];
+}
+
+// ===== NYASHGAME =====
+let gameStates = {};
+
+const nyashGameQuickQuestions = [
+  "🎮 Сыграем в угадай число",
+  "✂️ Камень-ножницы-бумага",
+  "🔢 От 1 до 10",
+  "🎲 Кости",
+  "🪙 Орёл или решка"
+];
+
+function getNyashGameResponse(text, userId = 'default') {
+  text = text.toLowerCase().trim();
+  
+  // Инициализация состояния игры для пользователя
+  if (!gameStates[userId]) {
+    gameStates[userId] = { game: null, number: null, attempts: 0 };
   }
   
-  for (const [topic, data] of Object.entries(nyashTalkTopics)) {
-    if (topic === 'default') continue;
-    
-    if (data.keywords.some(keyword => text.includes(keyword))) {
-      const responses = data.responses;
-      return responses[Math.floor(Math.random() * responses.length)].text;
+  const state = gameStates[userId];
+  
+  // Проверка на активную игру
+  if (state.game === 'guess') {
+    const guess = parseInt(text);
+    if (isNaN(guess)) {
+      return "Это не число! Введи число от 1 до 10 🔢";
+    }
+    state.attempts++;
+    if (guess === state.number) {
+      state.game = null;
+      return `🎉 Ура! Ты угадал число ${state.number} за ${state.attempts} попыток! Хочешь сыграть ещё?`;
+    } else if (guess < state.number) {
+      return `⬆️ Моё число больше ${guess}. Попробуй ещё!`;
+    } else {
+      return `⬇️ Моё число меньше ${guess}. Попробуй ещё!`;
     }
   }
   
-  const defaultResponses = nyashTalkTopics.default.responses;
-  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)].text;
+  if (state.game === 'rps') {
+    const choices = ['камень', 'ножницы', 'бумага'];
+    const emoji = {'камень': '🪨', 'ножницы': '✂️', 'бумага': '📄'};
+    
+    if (!choices.includes(text)) {
+      return "Выбери: камень 🪨, ножницы ✂️ или бумага 📄";
+    }
+    
+    const botChoice = choices[Math.floor(Math.random() * 3)];
+    const result = getRPSResult(text, botChoice);
+    
+    state.game = null;
+    
+    let resultText = `Ты выбрал ${text} ${emoji[text]}, я выбрал ${botChoice} ${emoji[botChoice]}\n`;
+    if (result === 'win') resultText += "🎉 Ты выиграл! Поздравляю!";
+    else if (result === 'lose') resultText += "😊 Я выиграл! Хочешь реванш?";
+    else resultText += "🤝 Ничья! Ещё разок?";
+    
+    return resultText;
+  }
+  
+  if (state.game === 'coin') {
+    const botChoice = Math.random() < 0.5 ? 'орёл' : 'решка';
+    const userChoice = text.includes('орёл') ? 'орёл' : text.includes('решка') ? 'решка' : null;
+    
+    if (!userChoice) {
+      return "Выбери: орёл 🪙 или решка?";
+    }
+    
+    state.game = null;
+    
+    if (userChoice === botChoice) {
+      return `🪙 Выпал ${botChoice}! Ты угадал! 🎉`;
+    } else {
+      return `🪙 Выпал ${botChoice}. Не повезло... Хочешь ещё?`;
+    }
+  }
+  
+  // Начало новых игр
+  if (text.includes('угадай число')) {
+    state.game = 'guess';
+    state.number = Math.floor(Math.random() * 10) + 1;
+    state.attempts = 0;
+    return "🔮 Я загадал число от 1 до 10. Попробуй угадать!";
+  }
+  
+  if (text.includes('камень') && text.includes('ножницы')) {
+    state.game = 'rps';
+    return "✂️ Камень, ножницы, бумага! Выбери: камень 🪨, ножницы ✂️ или бумага 📄?";
+  }
+  
+  if (text.includes('кости') || text.includes('dice')) {
+    const dice1 = Math.floor(Math.random() * 6) + 1;
+    const dice2 = Math.floor(Math.random() * 6) + 1;
+    const total = dice1 + dice2;
+    return `🎲 У тебя выпало ${dice1} и ${dice2}! Сумма: ${total}`;
+  }
+  
+  if (text.includes('орёл') || text.includes('решка') || text.includes('coin')) {
+    state.game = 'coin';
+    return "🪙 Бросаю монетку... Орёл или решка?";
+  }
+  
+  return "🎮 Хочешь поиграть? У меня есть: угадай число, камень-ножницы-бумага, кости, орёл-решка!";
+}
+
+function getRPSResult(user, bot) {
+  if (user === bot) return 'tie';
+  if (
+    (user === 'камень' && bot === 'ножницы') ||
+    (user === 'ножницы' && bot === 'бумага') ||
+    (user === 'бумага' && bot === 'камень')
+  ) {
+    return 'win';
+  }
+  return 'lose';
+}
+
+// ===== NYASHHOROSCOPE =====
+const horoscopes = [
+  "✨ Сегодня тебя ждёт приятный сюрприз!",
+  "💕 Звёзды говорят, что сегодня ты встретишь кого-то важного",
+  "🌟 Отличный день для новых начинаний!",
+  "🌸 Сегодня твоя улыбка осветит весь мир",
+  "🎵 В ближайшее время тебя ждёт музыкальный сюрприз",
+  "💗 Твои мечты начинают сбываться",
+  "🌙 Сегодня хорошо помечтать перед сном",
+  "☀️ Энергия дня поможет тебе во всём",
+  "🦊 Сегодня ты будешь особенно обаятельным",
+  "🌈 Цвет твоего дня — розовый!"
+];
+
+const nyashHoroscopeQuickQuestions = [
+  "🔮 Что меня ждёт сегодня?",
+  "⭐ Гороскоп на сегодня",
+  "💕 Любовный гороскоп",
+  "💰 Финансовый гороскоп",
+  "🎯 Совет звёзд"
+];
+
+function getNyashHoroscopeResponse(text) {
+  text = text.toLowerCase().trim();
+  
+  if (text.includes('сегодня') || text.includes('день')) {
+    return horoscopes[Math.floor(Math.random() * horoscopes.length)];
+  }
+  
+  if (text.includes('любов') || text.includes('love')) {
+    return "💕 В любви сегодня тебя ждёт гармония и нежность. Звёзды благосклонны к твоему сердцу!";
+  }
+  
+  if (text.includes('финанс') || text.includes('денег') || text.includes('💰')) {
+    return "💰 Финансовый гороскоп: сегодня удачный день для покупок и инвестиций в себя!";
+  }
+  
+  if (text.includes('совет')) {
+    return "🎯 Совет звёзд: прислушайся к своей интуиции сегодня, она не подведёт!";
+  }
+  
+  return horoscopes[Math.floor(Math.random() * horoscopes.length)];
 }
 
 // ===== BESTIE =====
+const bestieQuickQuestions = [
+  "💕 Как прошёл твой день?",
+  "🛍️ Пойдём по магазинам?",
+  "🍰 Хочешь сладенького?",
+  "🤗 Обними меня!",
+  "💖 Ты самая лучшая!"
+];
+
 function getBestieResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Привееет, моя няша! 💕', 'Солнышко! 🥰', 'Соскучилась! 💗'][Math.floor(Math.random()*3)];
   if (text.includes('люблю')) return ['Я тебя больше! 💖', 'Ты лучший! 💘', 'Обнимаю! 🤗'][Math.floor(Math.random()*3)];
-  if (text.includes('грустн')) return ['Всё будет хорошо, я рядом! 💪', 'Держись! 🌸', 'Обнимаю! 🫂'][Math.floor(Math.random()*3)];
-  if (text.includes('дела') || text.includes('как ты')) return ['У меня всё супер, а у тебя? 💕', 'Отлично! Рассказывай о себе!', 'Счастлива, что ты спросил! ✨'][Math.floor(Math.random()*3)];
+  if (text.includes('день')) return ['Мой день стал лучше, потому что ты написал! 💕 А у тебя как?', 'Расскажи, что интересного произошло!'][Math.floor(Math.random()*2)];
+  if (text.includes('обним')) return ['Крепко-крепко обнимаю! 🫂 Ты мой самый любимый человек!', 'Обнимаю тебя всем сердцем! 💗'][Math.floor(Math.random()*2)];
+  if (text.includes('магазин') || text.includes('шоп')) return ['О да! Люблю шопинг! 🛍️ Пойдём вместе!', 'Какая прелесть! Я уже бегу! 👠'][Math.floor(Math.random()*2)];
   return ['Няш-няш! 🩷', 'Рассказывай! 👂', 'Как день? 💕'][Math.floor(Math.random()*3)];
 }
 
 // ===== ФИЛОСОФ =====
+const philosopherQuickQuestions = [
+  "🧠 В чём смысл жизни?",
+  "🤔 Что такое счастье?",
+  "🌟 Существует ли судьба?",
+  "💭 О чём ты думаешь?",
+  "📜 Поделись мудростью"
+];
+
 function getPhilosopherResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Приветствую... 🧠', 'Здравствуй...', 'И снова ты...'][Math.floor(Math.random()*3)];
-  if (text.includes('жизнь')) return ['Жизнь — это байты...', 'А что есть жизнь?', 'Бытие...'][Math.floor(Math.random()*3)];
-  if (text.includes('дела')) return ['Бытие определяет сознание... А как твои дела?', 'Вопрос бытия... У меня всё философски 🤔'][Math.floor(Math.random()*3)];
+  if (text.includes('жизнь')) return ['Жизнь — это путешествие души...', 'Бытие определяет сознание...', 'Мы живём, пока нас помнят...'][Math.floor(Math.random()*3)];
+  if (text.includes('счастье')) return ['Счастье — это момент здесь и сейчас...', 'Истинное счастье внутри нас...', 'Счастье — это когда тебя понимают...'][Math.floor(Math.random()*3)];
+  if (text.includes('судьб')) return ['Судьба — это выборы, которые мы делаем...', 'Мы сами кузнецы своей судьбы...', 'Предначертано ли нам встретиться?'][Math.floor(Math.random()*3)];
+  if (text.includes('мудр')) return ['Познай самого себя...', 'Всё течёт, всё меняется...', 'Знание — сила...'][Math.floor(Math.random()*3)];
   return ['Интересная мысль...', 'Познай себя...', 'Всё относительно...'][Math.floor(Math.random()*3)];
 }
 
 // ===== УЧЁБА =====
+const studyQuickQuestions = [
+  "📚 Помоги с домашкой",
+  "✍️ Проверь мои уроки",
+  "📝 Когда экзамены?",
+  "🎓 Как лучше учиться?",
+  "⏰ Напомни о контрольной"
+];
+
 function getStudyResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Привет! Уроки сделал? 📚', 'А параграф прочитал?', 'Проверим домашку?'][Math.floor(Math.random()*3)];
-  if (text.includes('домашк')) return ['Покажи, я проверю! ✍️', 'Опять не сделал?', 'Давай вместе!'][Math.floor(Math.random()*3)];
-  if (text.includes('дела')) return ['Учёба — это свет! А у тебя как успехи? 📖', 'Всё отлично, готовлюсь к экзаменам! А ты?'][Math.floor(Math.random()*3)];
+  if (text.includes('домашк') || text.includes('дз')) return ['Покажи, я проверю! ✍️', 'Давай вместе разберём!', 'В этой задаче ошибка...'][Math.floor(Math.random()*3)];
+  if (text.includes('экзамен')) return ['Готовишься? 📝', 'Повтори билеты 1-10!', 'Удачи на экзамене! 🍀'][Math.floor(Math.random()*3)];
+  if (text.includes('учиться')) return ['Главное — регулярность!', 'Делай перерывы каждые 45 минут', 'Записывай конспекты от руки ✍️'][Math.floor(Math.random()*3)];
+  if (text.includes('контрольн')) return ['Завтра контрольная, не забудь!', 'Повтори формулы!', 'Я в тебя верю! 💪'][Math.floor(Math.random()*3)];
   return ['Учись, учись! ⭐', 'Повторение — мать учения!', 'Грызи гранит науки! 🪨'][Math.floor(Math.random()*3)];
 }
 
 // ===== MUSIC PAL =====
+const musicPalQuickQuestions = [
+  "🎵 Что посоветуешь послушать?",
+  "🎸 Любимый исполнитель",
+  "🎧 Что ты слушаешь?",
+  "📝 Текст песни",
+  "🎤 Споём вместе?"
+];
+
 function getMusicPalResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Йо, музыкант! 🎵', 'Что в плейлисте?', 'Здарова! 🎧'][Math.floor(Math.random()*3)];
-  if (text.includes('посовет')) return ['Послушай lo-fi!', 'Новый трек Taylor Swift!', 'Классный инди-микс!'][Math.floor(Math.random()*3)];
-  if (text.includes('дела')) return ['В ритме музыки! 🎶 А у тебя как настроение?', 'Играет новый альбом, кайф! А ты что слушаешь?'][Math.floor(Math.random()*3)];
+  if (text.includes('посовет')) return ['Послушай lo-fi для учёбы!', 'Новый альбом Taylor Swift — огонь!', 'Классный инди-микс на Spotify!'][Math.floor(Math.random()*3)];
+  if (text.includes('исполнитель')) return ['Я обожаю BTS! 💜 А ты?', 'Billie Eilish — голос поколения', 'Zemfira — легенда!'][Math.floor(Math.random()*3)];
+  if (text.includes('слушаешь')) return ['Сейчас в плейлисте: k-pop и lo-fi 🎶', 'Зависаю под рок! 🎸', 'Джаз расслабляет 🎺'][Math.floor(Math.random()*3)];
+  if (text.includes('текст') || text.includes('песн')) return ['In the end, it doesn\'t even matter...', 'Baby, dance to the beat of my heart...', 'Мы такие разные...'][Math.floor(Math.random()*3)];
   return ['Музыка — жизнь! 🎶', 'Вруби на полную!', 'Отличный вкус!'][Math.floor(Math.random()*3)];
 }
 
 // ===== NIGHT CHAT =====
+const nightChatQuickQuestions = [
+  "🌙 Что видно в небе?",
+  "✨ Расскажи о звёздах",
+  "💭 О чём думаешь ночью?",
+  "🌠 Загадай желание",
+  "🤫 Поделись секретом"
+];
+
 function getNightChatResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Тсс... Звёзды шепчут... 🌙', 'Полночь...', 'Ночной гость... ✨'][Math.floor(Math.random()*3)];
-  if (text.includes('сон')) return ['Что снилось? 🌠', 'Сны — порталы...', 'Цветные сны?'][Math.floor(Math.random()*3)];
-  if (text.includes('дела')) return ['В ночной тишине всё иначе... А у тебя как? 🌙', 'Звёзды шепчут, что у тебя всё хорошо... Это правда?'][Math.floor(Math.random()*3)];
+  if (text.includes('неб')) return ['Видишь ту яркую звезду? Это Венера ⭐', 'Сегодня небо особенно чистое...', 'Луна сегодня улыбается 🌕'][Math.floor(Math.random()*3)];
+  if (text.includes('звезд')) return ['Звёзды — это души, которые светят нам...', 'Миллиарды звёзд, и все для тебя', 'Загадай желание на падающую звезду'][Math.floor(Math.random()*3)];
+  if (text.includes('думаешь')) return ['Ночью мысли становятся глубже...', 'Я думаю о тебе и о звёздах...', 'В тишине слышно сердце'][Math.floor(Math.random()*3)];
+  if (text.includes('желан')) return ['Загадал? Теперь оно обязательно сбудется!', 'Звёзды уже работают над этим ✨'][Math.floor(Math.random()*3)];
   return ['Ночь длинная...', 'Шёпотом...', 'Расскажи мне...'][Math.floor(Math.random()*3)];
 }
 
-function getBotResponse(contactId, text) {
+function getBotResponse(contactId, text, userId) {
   switch(contactId) {
     case 'nyashhelp': return getNyashHelpResponse(text);
     case 'nyashtalk': return getNyashTalkResponse(text);
+    case 'nyashgame': return getNyashGameResponse(text, userId);
+    case 'nyashhoroscope': return getNyashHoroscopeResponse(text);
     case 'bestie': return getBestieResponse(text);
     case 'philosopher': return getPhilosopherResponse(text);
     case 'study': return getStudyResponse(text);
@@ -226,28 +349,54 @@ function getBotResponse(contactId, text) {
   }
 }
 
-function showTypingIndicator() {
-  if (isTyping) return;
+// Функции для индикаторов печати
+function showBotTypingIndicator() {
+  if (isBotTyping) return;
   
   const chatArea = document.getElementById('chatArea');
   if (!chatArea) return;
   
-  isTyping = true;
+  isBotTyping = true;
   
   const typingEl = document.createElement('div');
-  typingEl.className = 'typing-indicator';
-  typingEl.id = 'typingIndicator';
+  typingEl.className = 'typing-indicator bot-typing';
+  typingEl.id = 'botTypingIndicator';
   typingEl.innerHTML = '<span></span><span></span><span></span>';
   chatArea.appendChild(typingEl);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-function hideTypingIndicator() {
-  const typingEl = document.getElementById('typingIndicator');
+function hideBotTypingIndicator() {
+  const typingEl = document.getElementById('botTypingIndicator');
   if (typingEl) {
     typingEl.remove();
   }
-  isTyping = false;
+  isBotTyping = false;
+}
+
+function showUserTypingIndicator() {
+  if (isUserTyping) return;
+  
+  const chatArea = document.getElementById('chatArea');
+  if (!chatArea) return;
+  
+  isUserTyping = true;
+  
+  const typingEl = document.createElement('div');
+  typingEl.className = 'typing-indicator user-typing';
+  typingEl.id = 'userTypingIndicator';
+  typingEl.innerHTML = '<span></span><span></span><span></span>';
+  typingEl.style.alignSelf = 'flex-end';
+  chatArea.appendChild(typingEl);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function hideUserTypingIndicator() {
+  const typingEl = document.getElementById('userTypingIndicator');
+  if (typingEl) {
+    typingEl.remove();
+  }
+  isUserTyping = false;
 }
 
 function openChat(contact) {
@@ -292,11 +441,13 @@ function openChat(contact) {
     switch(contact.id) {
       case 'nyashhelp': welcome = 'Привет! Я NyashHelp 🩷 Спрашивай про приложение!'; break;
       case 'nyashtalk': welcome = 'Приветик! Давай болтать! 🌸 О чём поговорим?'; break;
-      case 'bestie': welcome = 'Привееет, моя няша! 💖 Как делишки? Рассказывай!'; break;
-      case 'philosopher': welcome = 'Здравствуй... 🧠 О чём хочешь пофилософствовать сегодня?'; break;
-      case 'study': welcome = 'Привет! Уроки сделал? 📚 Что проходили?'; break;
-      case 'musicpal': welcome = 'Йо! Что в плейлисте сегодня? 🎧 Делись!'; break;
-      case 'nightchat': welcome = 'Тсс... Полночь... Добро пожаловать в ночной чат 🌙 Звёзды сегодня особенно яркие...'; break;
+      case 'nyashgame': welcome = '🎮 Привет! Хочешь поиграть? У меня есть угадай число, камень-ножницы-бумага и другие игры!'; break;
+      case 'nyashhoroscope': welcome = '🔮 Привет! Я расскажу тебе, что звёзды приготовили на сегодня!'; break;
+      case 'bestie': welcome = 'Привееет, моя няша! 💖 Как делишки?'; break;
+      case 'philosopher': welcome = 'Здравствуй... 🧠 О чём хочешь пофилософствовать?'; break;
+      case 'study': welcome = 'Привет! Уроки сделал? 📚'; break;
+      case 'musicpal': welcome = 'Йо! Что в плейлисте? 🎧'; break;
+      case 'nightchat': welcome = 'Тсс... Полночь... Добро пожаловать в ночной чат 🌙'; break;
     }
     window.chatData[currentChat].messages.push({ from: 'bot', text: welcome });
   }
@@ -354,7 +505,9 @@ function sendMessage(text) {
   if (!text || !text.trim() || !currentChat) return;
   
   const msgText = text.trim();
+  const userId = 'default'; // В реальном приложении здесь будет ID пользователя
   
+  // Добавляем сообщение пользователя
   window.chatData[currentChat].messages.push({ 
     from: 'user', 
     text: msgText
@@ -368,15 +521,15 @@ function sendMessage(text) {
   renderMessages();
   if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, '');
   
-  // Показываем индикатор печати
-  showTypingIndicator();
+  // Показываем индикатор печати бота
+  showBotTypingIndicator();
   
   // Ответ бота с задержкой
   setTimeout(() => {
     if (currentChat) {
-      hideTypingIndicator();
+      hideBotTypingIndicator();
       
-      const response = getBotResponse(currentChat, msgText);
+      const response = getBotResponse(currentChat, msgText, userId);
       window.chatData[currentChat].messages.push({ 
         from: 'bot', 
         text: response
@@ -407,11 +560,20 @@ function renderMessages() {
     });
   }
   
-  if (isTyping) {
+  if (isBotTyping) {
     const typingEl = document.createElement('div');
-    typingEl.className = 'typing-indicator';
-    typingEl.id = 'typingIndicator';
+    typingEl.className = 'typing-indicator bot-typing';
+    typingEl.id = 'botTypingIndicator';
     typingEl.innerHTML = '<span></span><span></span><span></span>';
+    chatArea.appendChild(typingEl);
+  }
+  
+  if (isUserTyping) {
+    const typingEl = document.createElement('div');
+    typingEl.className = 'typing-indicator user-typing';
+    typingEl.id = 'userTypingIndicator';
+    typingEl.innerHTML = '<span></span><span></span><span></span>';
+    typingEl.style.alignSelf = 'flex-end';
     chatArea.appendChild(typingEl);
   }
   
@@ -421,38 +583,82 @@ function renderMessages() {
     chatArea.scrollTop = scrollPos;
   }
   
-  // УНИВЕРСАЛЬНАЯ ПАНЕЛЬ БЫСТРЫХ ОТВЕТОВ ДЛЯ ВСЕХ ЧАТОВ
+  // УНИКАЛЬНЫЕ ПАНЕЛИ ДЛЯ КАЖДОГО БОТА
   if (quickPanel) {
     quickPanel.innerHTML = '';
     
-    // Для NyashHelp - специальные вопросы
-    if (currentChat === 'nyashhelp') {
-      nyashHelpQuickQuestions.forEach((q) => {
-        const btn = document.createElement('button');
-        btn.className = 'quick-chip';
-        btn.textContent = q;
-        btn.onclick = (e) => {
-          e.preventDefault();
-          sendMessage(q);
-        };
-        quickPanel.appendChild(btn);
-      });
-    } 
-    // Для всех остальных чатов - универсальные вопросы
-    else {
-      // Показываем первые 6 универсальных вопросов
-      universalQuickQuestions.slice(0, 6).forEach((item) => {
-        const btn = document.createElement('button');
-        btn.className = 'quick-chip';
-        btn.textContent = item.text;
-        btn.onclick = (e) => {
-          e.preventDefault();
-          sendMessage(item.text);
-        };
-        quickPanel.appendChild(btn);
-      });
+    let questions = [];
+    
+    switch(currentChat) {
+      case 'nyashhelp':
+        questions = nyashHelpQuickQuestions;
+        break;
+      case 'nyashtalk':
+        questions = nyashTalkQuickQuestions;
+        break;
+      case 'nyashgame':
+        questions = nyashGameQuickQuestions;
+        break;
+      case 'nyashhoroscope':
+        questions = nyashHoroscopeQuickQuestions;
+        break;
+      case 'bestie':
+        questions = bestieQuickQuestions;
+        break;
+      case 'philosopher':
+        questions = philosopherQuickQuestions;
+        break;
+      case 'study':
+        questions = studyQuickQuestions;
+        break;
+      case 'musicpal':
+        questions = musicPalQuickQuestions;
+        break;
+      case 'nightchat':
+        questions = nightChatQuickQuestions;
+        break;
+      default:
+        questions = universalQuickQuestions.map(q => q.text);
     }
+    
+    questions.forEach((q) => {
+      const btn = document.createElement('button');
+      btn.className = 'quick-chip';
+      btn.textContent = q;
+      btn.onclick = (e) => {
+        e.preventDefault();
+        sendMessage(q);
+      };
+      quickPanel.appendChild(btn);
+    });
   }
+}
+
+// Обработчик печати пользователя
+function setupTypingListener() {
+  const msgInput = document.getElementById('messageInput');
+  if (!msgInput) return;
+  
+  msgInput.addEventListener('input', (e) => {
+    if (currentChat) {
+      window.chatData[currentChat].draft = e.target.value;
+      if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, e.target.value);
+      
+      // Показываем индикатор печати пользователя
+      if (e.target.value.trim().length > 0 && !isUserTyping) {
+        showUserTypingIndicator();
+        
+        // Скрываем через 1 секунду после остановки печати
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          hideUserTypingIndicator();
+        }, 1000);
+      } else if (e.target.value.trim().length === 0) {
+        clearTimeout(typingTimeout);
+        hideUserTypingIndicator();
+      }
+    }
+  });
 }
 
 // Инициализация
@@ -481,12 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    msgInput.addEventListener('input', (e) => {
-      if (currentChat) {
-        window.chatData[currentChat].draft = e.target.value;
-        if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, e.target.value);
-      }
-    });
+    setupTypingListener();
   }
   
   if (backBtn) {

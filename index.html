@@ -830,6 +830,20 @@
       </div>
     </div>
   </div>
+  <script>
+  // Отладка для проверки работы чата
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 Проверка элементов чата:');
+    console.log('- chatArea:', document.getElementById('chatArea'));
+    console.log('- messageInput:', document.getElementById('messageInput'));
+    console.log('- sendMessageBtn:', document.getElementById('sendMessageBtn'));
+    console.log('- quickReplyPanel:', document.getElementById('quickReplyPanel'));
+    
+    // Проверяем, что функции доступны
+    console.log('- openChat:', typeof window.openChat);
+    console.log('- sendMessage:', typeof window.sendMessage);
+  });
+</script>
 
   <script src="app.js"></script>
   <script src="contacts.js"></script>

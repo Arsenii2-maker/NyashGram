@@ -1,9 +1,13 @@
-// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ПЛАВНЫМИ АНИМАЦИЯМИ
+// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
+// chatData объявляется только здесь!
 let currentChat = null;
 let currentContact = null;
-const chatData = window.chatData || {};
+const chatData = {}; // chatData только в chat.js
 let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+
+// Делаем chatData глобально доступным
+window.chatData = chatData;
 
 function saveCustomName(contactId, newName) {
   if (!newName || newName.trim() === '') {
@@ -438,6 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Экспорт
 window.openChat = openChat;
 window.sendMessage = sendMessage;
 window.toggleChatActions = toggleChatActions;

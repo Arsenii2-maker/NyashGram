@@ -51,7 +51,25 @@ function setTheme(theme, mode) {
 function toggleMode() {
   const newMode = AppState.currentUser.mode === 'light' ? 'dark' : 'light';
   setTheme(AppState.currentUser.theme, newMode);
+  // В функции toggleMode добавьте небольшую анимацию
+function toggleMode() {
+  const newMode = AppState.currentUser.mode === 'light' ? 'dark' : 'light';
   
+  // Анимация для кнопки
+  const modeToggle = document.getElementById('themeModeToggle');
+  if (modeToggle) {
+    modeToggle.style.transform = 'rotate(180deg) scale(1.2)';
+    setTimeout(() => {
+      modeToggle.style.transform = '';
+    }, 200);
+  }
+  
+  setTheme(AppState.currentUser.theme, newMode);
+  
+  if (modeToggle) {
+    modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';
+  }
+}
   const modeToggle = document.getElementById('themeModeToggle');
   if (modeToggle) {
     modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';

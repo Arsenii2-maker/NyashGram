@@ -51,7 +51,7 @@ function toggleThemeMode() {
   
   localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
   
-  // Переприменяем текущую тему с новым режимом
+  // Переприменяем текущую тему (чтобы обновились цвета)
   const currentTheme = AppState.currentUser.theme;
   
   // Сначала удаляем все классы тем
@@ -60,10 +60,11 @@ function toggleThemeMode() {
     'theme-lo-fi-beige', 'theme-soft-lilac'
   );
   
-  // Добавляем текущую тему (она автоматически применится с новым режимом)
+  // Добавляем текущую тему
   document.body.classList.add(`theme-${currentTheme}`);
   
   console.log('Режим темы:', currentThemeMode);
+  console.log('Классы body:', document.body.className);
 }
 
 // Применение темы

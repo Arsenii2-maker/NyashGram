@@ -849,6 +849,20 @@
     console.log('- sendMessage:', typeof window.sendMessage);
   });
 </script>
+<script>
+  // ЭКСТРЕННЫЙ ТЕСТ
+  setTimeout(() => {
+    console.log('ТЕСТ: Принудительно применяем тёмную тему');
+    document.body.classList.remove('light-mode');
+    document.body.classList.add('dark-mode');
+    document.body.classList.remove('theme-pastel-pink');
+    document.body.classList.add('theme-night-blue');
+    
+    // Проверяем computed style
+    const bg = getComputedStyle(document.body).background;
+    console.log('Фон после принудительного применения:', bg);
+  }, 2000);
+</script>
 
   <script src="app.js"></script>
   <script src="contacts.js"></script>

@@ -741,3 +741,42 @@ button.active:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 20px rgba(255, 150, 180, 0.4);
 }
+/* Индикатор печати */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--bubble-bot);
+  border-radius: 20px;
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  width: fit-content;
+  margin: 4px 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: var(--text-soft);
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-8px); }
+}
+
+/* Убираем анимацию с кнопок при получении сообщений */
+.quick-chip {
+  animation: none !important;
+}
+
+.message {
+  animation: none !important;
+}

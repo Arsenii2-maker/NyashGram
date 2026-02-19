@@ -32,36 +32,42 @@ const cuteSuffixes = [
   "chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi"
 ];
 
-// Функция переключения режима темы
+// Функция переключения режима темы (ОТЛАДОЧНАЯ ВЕРСИЯ)
 function toggleThemeMode() {
-  const modeToggle = document.getElementById('themeModeToggle');
-  
-  if (currentThemeMode === 'light') {
-    currentThemeMode = 'dark';
-    if (modeToggle) modeToggle.textContent = '🌙';
-    document.body.classList.remove('light-mode');
-    document.body.classList.add('dark-mode');
-  } else {
-    currentThemeMode = 'light';
-    if (modeToggle) modeToggle.textContent = '☀️';
-    document.body.classList.remove('dark-mode');
-    document.body.classList.add('light-mode');
-  }
-  
-  localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
-  
-  // Переприменяем текущую тему
-  const currentTheme = AppState.currentUser.theme;
-  
-  document.body.classList.remove(
-    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
-    'theme-lo-fi-beige', 'theme-soft-lilac'
-  );
-  
-  document.body.classList.add(`theme-${currentTheme}`);
-  
-  console.log('Режим темы:', currentThemeMode);
-  console.log('Классы body:', document.body.className);
+    console.log('🔴 КНОПКА НАЖАТА! Текущий режим:', currentThemeMode);
+    
+    const modeToggle = document.getElementById('themeModeToggle');
+    
+    if (currentThemeMode === 'light') {
+        currentThemeMode = 'dark';
+        if (modeToggle) modeToggle.textContent = '🌙';
+        document.body.classList.remove('light-mode');
+        document.body.classList.add('dark-mode');
+        console.log('🟢 Переключили на dark-mode');
+    } else {
+        currentThemeMode = 'light';
+        if (modeToggle) modeToggle.textContent = '☀️';
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        console.log('🟢 Переключили на light-mode');
+    }
+    
+    localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
+    
+    // Проверяем, какие классы теперь на body
+    console.log('📌 Классы body после переключения:', document.body.className);
+    console.log('📌 Содержит dark-mode?', document.body.classList.contains('dark-mode'));
+    console.log('📌 Содержит light-mode?', document.body.classList.contains('light-mode'));
+    
+    // Переприменяем текущую тему
+    const currentTheme = AppState.currentUser.theme;
+    document.body.classList.remove(
+        'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
+        'theme-lo-fi-beige', 'theme-soft-lilac'
+    );
+    document.body.classList.add(`theme-${currentTheme}`);
+    
+    console.log('🎨 Фон после применения:', getComputedStyle(document.body).background);
 }
 
 // Проверка валидности юзернейма

@@ -14,12 +14,13 @@ const fixedChats = [
 ];
 
 const allContacts = [...fixedChats, ...contacts];
-// Убираем объявление chatData отсюда - оно будет только в chat.js
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned') || '[]');
 let currentSearchTerm = '';
 
-// Ссылка на chatData из глобальной области (если уже есть)
-const chatData = window.chatData || {};
+// Убеждаемся что chatData существует
+if (!window.chatData) {
+  window.chatData = {};
+}
 
 function savePinnedToStorage() {
   localStorage.setItem('nyashgram_pinned', JSON.stringify(pinnedChats));
@@ -124,8 +125,7 @@ function createContactElement(contact, isBot = false) {
   el.setAttribute('data-id', contact.id);
   
   const avatarStyle = contact.avatar || getGradientForName(contact.name);
-  // Используем глобальный chatData
-  const draftText = window.chatData?.[contact.id]?.draft || '';
+  const draftText = window.chatData[contact.id]?.draft || '';
   const pinIcon = isPinned(contact.id) && !isBot ? '<span class="pin-icon">📌</span>' : '';
   
   el.innerHTML = `
@@ -162,7 +162,6 @@ function updateUsernameDisplay() {
 }
 
 function saveDraft(contactId, text) {
-  if (!window.chatData) window.chatData = {};
   if (!window.chatData[contactId]) window.chatData[contactId] = {};
   window.chatData[contactId].draft = text;
   renderContacts();

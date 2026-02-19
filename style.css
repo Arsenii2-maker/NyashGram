@@ -851,12 +851,22 @@ button.active:hover {
   display: flex;
   gap: 4px;
   padding: 12px 16px;
-  background: var(--bubble-bot);
   border-radius: 20px;
-  border-bottom-left-radius: 4px;
-  align-self: flex-start;
   width: fit-content;
   margin: 4px 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.typing-indicator.bot-typing {
+  background: var(--bubble-bot);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+
+.typing-indicator.user-typing {
+  background: var(--bubble-user);
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
 }
 
 .typing-indicator span {
@@ -886,5 +896,16 @@ button.active:hover {
   }
   30% {
     transform: translateY(-8px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

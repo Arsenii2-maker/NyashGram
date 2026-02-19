@@ -484,3 +484,201 @@ button.active {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-8px); }
 }
+/* ===== АНИМАЦИИ ===== */
+
+/* Анимация появления панели действий */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.chat-actions-panel {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+}
+
+/* Анимация сообщений */
+@keyframes messageSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  animation: messageSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Анимация кнопок */
+@keyframes buttonPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#themeModeToggle, #pinChatBtn, #backBtn, #settingsBtn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#themeModeToggle:hover, #pinChatBtn:hover, #backBtn:hover, #settingsBtn:hover {
+  transform: scale(1.1) rotate(5deg);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+#themeModeToggle:active, #pinChatBtn:active, #backBtn:active, #settingsBtn:active {
+  transform: scale(0.95);
+  animation: buttonPop 0.2s ease;
+}
+
+/* Анимация для луны/солнца */
+#themeModeToggle {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#themeModeToggle:hover {
+  transform: scale(1.1) rotate(180deg);
+}
+
+/* Анимация появления контактов */
+.contact {
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Задержки для контактов */
+.contact:nth-child(1) { animation-delay: 0.05s; }
+.contact:nth-child(2) { animation-delay: 0.1s; }
+.contact:nth-child(3) { animation-delay: 0.15s; }
+.contact:nth-child(4) { animation-delay: 0.2s; }
+.contact:nth-child(5) { animation-delay: 0.25s; }
+.contact:nth-child(6) { animation-delay: 0.3s; }
+.contact:nth-child(7) { animation-delay: 0.35s; }
+.contact:nth-child(8) { animation-delay: 0.4s; }
+
+/* Анимация для чипсов */
+.quick-chip {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: chipAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes chipAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.quick-chip:nth-child(1) { animation-delay: 0.05s; }
+.quick-chip:nth-child(2) { animation-delay: 0.1s; }
+.quick-chip:nth-child(3) { animation-delay: 0.15s; }
+.quick-chip:nth-child(4) { animation-delay: 0.2s; }
+.quick-chip:nth-child(5) { animation-delay: 0.25s; }
+.quick-chip:nth-child(6) { animation-delay: 0.3s; }
+
+/* Индикатор печати */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 20px;
+  width: fit-content;
+  margin: 4px 0;
+  animation: fadeIn 0.2s ease;
+}
+
+.typing-indicator.bot-typing {
+  background: var(--bubble-bot);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: var(--text-soft);
+  border-radius: 50%;
+  display: inline-block;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-8px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Анимация переключения экранов */
+.screen {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Анимация для модалки */
+.modal {
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

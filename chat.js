@@ -3,6 +3,21 @@
 let currentChat = null;
 let currentContact = null;
 const chatData = window.chatData || {};
+let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+
+function saveCustomName(contactId, newName) {
+  if (!newName || newName.trim() === '') {
+    delete customNames[contactId];
+  } else {
+    customNames[contactId] = newName.trim();
+  }
+  localStorage.setItem('nyashgram_custom_names', JSON.stringify(customNames));
+}
+
+function getDisplayName(contact) {
+  if (!contact) return '';
+  return customNames[contact.id] || contact.name;
+}
 
 // ===== NYASHHELP =====
 const nyashHelpQuickQuestions = [
@@ -118,9 +133,12 @@ function openChat(contact) {
     if (chatScreen) chatScreen.classList.add('active');
   }
   
-  // Заполняем заголовок
+  // Заполняем заголовок с учётом кастомного имени
   const nameEl = document.getElementById('chatContactName');
-  if (nameEl) nameEl.textContent = contact.name;
+  if (nameEl) nameEl.textContent = getDisplayName(contact);
+  
+  const usernameEl = document.getElementById('chatContactUsername');
+  if (usernameEl) usernameEl.textContent = `@${contact.username || 'unknown'}`;
   
   const avatarEl = document.getElementById('chatAvatar');
   if (avatarEl) {
@@ -174,6 +192,42 @@ function toggleChatActions() {
   }
 }
 
+function showRenameModal() {
+  if (!currentContact) return;
+  
+  const modal = document.getElementById('renameModal');
+  const input = document.getElementById('renameInput');
+  
+  if (modal && input) {
+    input.value = customNames[currentContact.id] || currentContact.name;
+    modal.style.display = 'flex';
+  }
+}
+
+function hideRenameModal() {
+  const modal = document.getElementById('renameModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renameCurrentChat() {
+  const input = document.getElementById('renameInput');
+  if (!input || !currentContact) return;
+  
+  const newName = input.value.trim();
+  saveCustomName(currentContact.id, newName);
+  
+  // Обновляем отображение
+  const nameEl = document.getElementById('chatContactName');
+  if (nameEl) nameEl.textContent = getDisplayName(currentContact);
+  
+  hideRenameModal();
+  
+  // Обновляем список контактов
+  if (typeof window.renderContacts === 'function') {
+    window.renderContacts();
+  }
+}
+
 function sendMessage(text) {
   if (!text || !text.trim() || !currentChat) return;
   
@@ -213,7 +267,10 @@ function renderMessages() {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
         btn.textContent = q;
-        btn.onclick = () => sendMessage(q);
+        btn.onclick = (e) => {
+          e.preventDefault();
+          sendMessage(q);
+        };
         quickPanel.appendChild(btn);
       });
     } else if (currentChat === 'nyashtalk') {
@@ -221,7 +278,8 @@ function renderMessages() {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
         btn.textContent = t.title;
-        btn.onclick = () => {
+        btn.onclick = (e) => {
+          e.preventDefault();
           const randomMsg = t.msgs[Math.floor(Math.random() * t.msgs.length)];
           sendMessage(randomMsg);
         };
@@ -236,6 +294,10 @@ function renderMessages() {
       const el = document.createElement('div');
       el.className = `message ${msg.from}`;
       el.textContent = msg.text;
+      
+      // Предотвращаем выделение при клике
+      el.onmousedown = (e) => e.preventDefault();
+      
       chatArea.appendChild(el);
     });
   }
@@ -252,11 +314,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const backBtn = document.getElementById('backBtn');
   const pinChatBtn = document.getElementById('pinChatBtn');
   const pinActionBtn = document.getElementById('pinChatActionBtn');
+  const renameBtn = document.getElementById('renameChatBtn');
   const muteBtn = document.getElementById('muteChatBtn');
   const deleteBtn = document.getElementById('deleteChatBtn');
+  const renameCancelBtn = document.getElementById('renameCancelBtn');
+  const renameConfirmBtn = document.getElementById('renameConfirmBtn');
   
   if (sendBtn && msgInput) {
-    sendBtn.addEventListener('click', () => {
+    sendBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       if (msgInput.value.trim()) sendMessage(msgInput.value);
     });
     
@@ -276,7 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   if (backBtn) {
-    backBtn.addEventListener('click', () => {
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       if (typeof window.showScreen === 'function') {
         window.showScreen('contactsScreen');
       }
@@ -285,12 +352,16 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Кнопка пина в шапке — показывает/скрывает панель
   if (pinChatBtn) {
-    pinChatBtn.addEventListener('click', toggleChatActions);
+    pinChatBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleChatActions();
+    });
   }
   
   // Кнопка пина в панели действий
   if (pinActionBtn) {
-    pinActionBtn.addEventListener('click', () => {
+    pinActionBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       if (currentChat && typeof window.togglePin === 'function') {
         window.togglePin(currentChat);
         updatePinIcon();
@@ -299,9 +370,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Кнопка переименования
+  if (renameBtn) {
+    renameBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showRenameModal();
+    });
+  }
+  
   // Кнопка "Выключить звук"
   if (muteBtn) {
-    muteBtn.addEventListener('click', () => {
+    muteBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       alert('🔇 Звук выключен для этого чата (демо-режим)');
       document.getElementById('chatActionsPanel').style.display = 'none';
     });
@@ -309,7 +389,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Кнопка "Удалить чат"
   if (deleteBtn) {
-    deleteBtn.addEventListener('click', () => {
+    deleteBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       if (currentChat && confirm('Удалить историю чата?')) {
         chatData[currentChat] = { messages: [], draft: '' };
         renderMessages();
@@ -317,11 +398,32 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  
+  // Модалка переименования
+  if (renameCancelBtn) {
+    renameCancelBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideRenameModal();
+    });
+  }
+  
+  if (renameConfirmBtn) {
+    renameConfirmBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      renameCurrentChat();
+    });
+  }
+  
+  // Предотвращаем выделение на всех кнопках
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => e.preventDefault());
+  });
 });
 
 // Экспорт
 window.openChat = openChat;
 window.sendMessage = sendMessage;
 window.toggleChatActions = toggleChatActions;
+window.customNames = customNames;
 
 console.log('✅ chat.js загружен');

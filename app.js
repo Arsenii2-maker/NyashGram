@@ -1,4 +1,4 @@
-// app.js — NyashGram v2.0 (ФИНАЛЬНАЯ ВЕРСИЯ)
+// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
 const AppState = {
   currentUser: {
@@ -6,143 +6,186 @@ const AppState = {
     avatar: localStorage.getItem('nyashgram_avatar') || null,
     theme: localStorage.getItem('nyashgram_theme') || "pastel-pink",
     font: localStorage.getItem('nyashgram_font') || "font-cozy"
-  },
-  themes: [
-    { id: "pastel-pink", name: "Pastel Pink" },
-    { id: "milk-rose", name: "Milk Rose" },
-    { id: "night-blue", name: "Night Blue" },
-    { id: "lo-fi-beige", name: "Lo-Fi Beige" },
-    { id: "soft-lilac", name: "Soft Lilac" }
-  ],
-  fonts: [
-    { id: "font-system", name: "System" },
-    { id: "font-rounded", name: "Rounded" },
-    { id: "font-cozy", name: "Cozy" },
-    { id: "font-elegant", name: "Elegant" },
-    { id: "font-bold-soft", name: "Bold Soft" },
-    { id: "font-mono-cozy", name: "Mono Cozy" }
-  ]
+  }
 };
 
+// Функция переключения экранов
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const screen = document.getElementById(id);
   if (screen) {
     screen.classList.add('active');
     if (id === 'contactsScreen' && typeof renderContacts === 'function') {
-      renderContacts();
-    }
-    if (id === 'settingsScreen') {
-      loadSettingsIntoUI();
+      setTimeout(renderContacts, 50);
     }
   }
 }
 
+// Применение темы
 function applyTheme(themeId) {
-  AppState.themes.forEach(theme => {
-    document.body.classList.remove(`theme-${theme.id}`);
-  });
+  // Удаляем все темы
+  document.body.classList.remove(
+    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
+    'theme-lo-fi-beige', 'theme-soft-lilac'
+  );
+  // Добавляем новую
   document.body.classList.add(`theme-${themeId}`);
   AppState.currentUser.theme = themeId;
-  localStorage.setItem("nyashgram_theme", themeId);
+  localStorage.setItem('nyashgram_theme', themeId);
   
+  // Обновляем кнопки
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.theme === themeId) btn.classList.add('active');
   });
 }
 
+// Применение шрифта
 function applyFont(fontClass) {
-  AppState.fonts.forEach(font => {
-    document.body.classList.remove(font.id);
-  });
+  // Удаляем все шрифты
+  document.body.classList.remove(
+    'font-system', 'font-rounded', 'font-cozy', 
+    'font-elegant', 'font-bold-soft', 'font-mono-cozy'
+  );
+  // Добавляем новый
   document.body.classList.add(fontClass);
   AppState.currentUser.font = fontClass;
-  localStorage.setItem("nyashgram_font", fontClass);
+  localStorage.setItem('nyashgram_font', fontClass);
   
+  // Обновляем кнопки
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.font === fontClass) btn.classList.add('active');
   });
 }
 
+// Загрузка настроек в UI
 function loadSettingsIntoUI() {
-  const settingsName = document.getElementById("settingsName");
-  if (settingsName) settingsName.value = AppState.currentUser.name;
+  const nameInput = document.getElementById('settingsName');
+  if (nameInput) nameInput.value = AppState.currentUser.name;
   
+  // Подсветка активной темы
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.theme === AppState.currentUser.theme) btn.classList.add('active');
   });
   
+  // Подсветка активного шрифта
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.font === AppState.currentUser.font) btn.classList.add('active');
   });
 }
 
+// Сохранение настроек
 function saveSettings() {
-  const settingsName = document.getElementById("settingsName")?.value.trim();
-  if (settingsName) {
-    AppState.currentUser.name = settingsName;
-    localStorage.setItem("nyashgram_name", settingsName);
+  const newName = document.getElementById('settingsName')?.value.trim();
+  if (newName) {
+    AppState.currentUser.name = newName;
+    localStorage.setItem('nyashgram_name', newName);
   }
-  showScreen("contactsScreen");
+  showScreen('contactsScreen');
 }
 
+// Проверка авторизации
 function checkAuth() {
-  if (localStorage.getItem("nyashgram_entered") === "true") {
+  if (localStorage.getItem('nyashgram_entered') === 'true') {
     applyTheme(AppState.currentUser.theme);
     applyFont(AppState.currentUser.font);
-    showScreen("contactsScreen");
+    showScreen('contactsScreen');
   } else {
-    showScreen("phoneScreen");
-    applyTheme("pastel-pink");
-    applyFont("font-cozy");
+    showScreen('phoneScreen');
   }
 }
 
-// Сохраняем настройки
-document.addEventListener('DOMContentLoaded', function() {
-  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-  if (saveSettingsBtn) {
-    saveSettingsBtn.addEventListener('click', saveSettings);
+// Генерация кода
+let generatedCode = '';
+function generateCode() {
+  generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const codeInput = document.getElementById('codeInput');
+  if (codeInput) {
+    codeInput.placeholder = generatedCode.split('').join(' ');
+    codeInput.value = '';
   }
+  const hint = document.getElementById('generatedCodeHint');
+  if (hint) hint.textContent = generatedCode;
+  return generatedCode;
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 NyashGram загружается...');
   
-  // Кнопки тем
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
-  });
+  // ===== ЭКРАН НОМЕРА =====
+  const phoneInput = document.getElementById('phoneNumber');
+  const sendBtn = document.getElementById('sendBtn');
   
-  // Кнопки шрифтов
-  document.querySelectorAll('.font-btn').forEach(btn => {
-    btn.addEventListener('click', () => applyFont(btn.dataset.font));
-  });
-  
-  // Аватар
-  const avatarInput = document.getElementById('avatarInput');
-  if (avatarInput) {
-    avatarInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const preview = document.getElementById('avatarPreview');
-          preview.style.backgroundImage = `url(${event.target.result})`;
-          preview.style.backgroundSize = 'cover';
-          preview.textContent = '';
-          localStorage.setItem('nyashgram_avatar', event.target.result);
-          AppState.currentUser.avatar = event.target.result;
-        };
-        reader.readAsDataURL(file);
+  if (phoneInput && sendBtn) {
+    phoneInput.addEventListener('input', function() {
+      const phone = this.value.replace(/\D/g, '');
+      if (phone.length >= 9) {
+        sendBtn.classList.add('active');
+        sendBtn.disabled = false;
+      } else {
+        sendBtn.classList.remove('active');
+        sendBtn.disabled = true;
+      }
+    });
+    
+    sendBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (!this.disabled && this.classList.contains('active')) {
+        generateCode();
+        showScreen('codeScreen');
       }
     });
   }
   
-  // Сохранение профиля
-  const saveBtn = document.getElementById('saveBtn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', function() {
+  // ===== ЭКРАН КОДА =====
+  const codeInput = document.getElementById('codeInput');
+  const verifyBtn = document.getElementById('verifyBtn');
+  
+  if (codeInput && verifyBtn) {
+    codeInput.addEventListener('input', function() {
+      const entered = this.value.trim();
+      const expected = this.placeholder.replace(/\s/g, '');
+      
+      if (entered.length === 6) {
+        if (entered === expected) {
+          verifyBtn.classList.add('active');
+          verifyBtn.disabled = false;
+          document.getElementById('codeError').textContent = '';
+        } else {
+          verifyBtn.classList.remove('active');
+          verifyBtn.disabled = true;
+          document.getElementById('codeError').textContent = 'Неверный код';
+        }
+      } else {
+        verifyBtn.classList.remove('active');
+        verifyBtn.disabled = true;
+        document.getElementById('codeError').textContent = '';
+      }
+    });
+    
+    verifyBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (!this.disabled && this.classList.contains('active')) {
+        localStorage.setItem('nyashgram_entered', 'true');
+        if (!localStorage.getItem('nyashgram_name')) {
+          localStorage.setItem('nyashgram_name', 'Няша');
+        }
+        showScreen('contactsScreen');
+        if (typeof renderContacts === 'function') {
+          setTimeout(renderContacts, 100);
+        }
+      }
+    });
+  }
+  
+  // ===== ЭКРАН ПРОФИЛЯ =====
+  const saveProfileBtn = document.getElementById('saveBtn');
+  if (saveProfileBtn) {
+    saveProfileBtn.addEventListener('click', function() {
       const name = document.getElementById('displayName')?.value.trim();
       if (!name) {
         alert('Введи имя!');
@@ -155,12 +198,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // ===== НАСТРОЙКИ =====
+  document.getElementById('settingsBtn')?.addEventListener('click', () => {
+    loadSettingsIntoUI();
+    showScreen('settingsScreen');
+  });
+  
+  document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => {
+    showScreen('contactsScreen');
+  });
+  
+  document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
+  
+  // Кнопки тем
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+  });
+  
+  // Кнопки шрифтов
+  document.querySelectorAll('.font-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyFont(btn.dataset.font));
+  });
+  
+  // ===== ЧАТ =====
+  document.getElementById('backBtn')?.addEventListener('click', () => {
+    showScreen('contactsScreen');
+  });
+  
+  // Проверка авторизации
   checkAuth();
+  
+  // Экспорт в глобальную область
+  window.showScreen = showScreen;
+  window.applyTheme = applyTheme;
+  window.applyFont = applyFont;
+  window.AppState = AppState;
+  window.generateCode = generateCode;
+  
+  console.log('✅ app.js готов');
 });
-
-window.showScreen = showScreen;
-window.applyTheme = applyTheme;
-window.applyFont = applyFont;
-window.AppState = AppState;
-
-console.log("✅ app.js загружен");

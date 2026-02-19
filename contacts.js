@@ -1,5 +1,5 @@
 // contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
- 
+
 const contacts = [
   { id: "bestie", name: "Bestie", username: "bestie_nyash", status: "онлайн 💕" },
   { id: "philosopher", name: "Философ", username: "thinker_deep", status: "пишет трактат 📜" },
@@ -68,35 +68,44 @@ function renderContacts() {
   
   list.innerHTML = '';
   
-  // Фильтруем ботов
-  const filteredFixed = fixedChats.filter(contact => contactMatchesSearch(contact));
-  const sortedFixed = [...filteredFixed].sort((a, b) => {
-    const aPinned = isPinned(a.id) ? 1 : 0;
-    const bPinned = isPinned(b.id) ? 1 : 0;
-    return bPinned - aPinned;
-  });
+  // Секция ботов (NyashHelp и NyashTalk) - всегда вверху
+  const botsSection = document.createElement('div');
+  botsSection.className = 'section-header';
+  botsSection.textContent = '🤖 Няш-боты';
+  list.appendChild(botsSection);
   
-  // Боты
-  sortedFixed.forEach(contact => {
-    const el = createContactElement(contact);
+  // Боты - всегда показываем, даже при поиске
+  const botsToShow = fixedChats.filter(contact => contactMatchesSearch(contact));
+  
+  botsToShow.forEach(contact => {
+    const el = createContactElement(contact, true);
     list.appendChild(el);
   });
   
-  // Фильтруем друзей
-  const filteredContacts = contacts.filter(contact => contactMatchesSearch(contact));
-  const sortedContacts = [...filteredContacts].sort((a, b) => {
-    const aPinned = isPinned(a.id) ? 1 : 0;
-    const bPinned = isPinned(b.id) ? 1 : 0;
-    return bPinned - aPinned;
-  });
+  // Друзья - показываем если есть
+  const friendsToShow = contacts.filter(contact => contactMatchesSearch(contact));
   
-  sortedContacts.forEach(contact => {
-    const el = createContactElement(contact);
-    list.appendChild(el);
-  });
+  if (friendsToShow.length > 0) {
+    const friendsSection = document.createElement('div');
+    friendsSection.className = 'section-header';
+    friendsSection.textContent = '👥 Друзья';
+    list.appendChild(friendsSection);
+    
+    // Сортируем друзей: закреплённые сверху
+    const sortedFriends = [...friendsToShow].sort((a, b) => {
+      const aPinned = isPinned(a.id) ? 1 : 0;
+      const bPinned = isPinned(b.id) ? 1 : 0;
+      return bPinned - aPinned;
+    });
+    
+    sortedFriends.forEach(contact => {
+      const el = createContactElement(contact);
+      list.appendChild(el);
+    });
+  }
   
   // Если ничего не найдено
-  if (sortedFixed.length === 0 && sortedContacts.length === 0) {
+  if (botsToShow.length === 0 && friendsToShow.length === 0) {
     const emptyEl = document.createElement('div');
     emptyEl.style.padding = '20px';
     emptyEl.style.textAlign = 'center';
@@ -109,14 +118,14 @@ function renderContacts() {
   updateUsernameDisplay();
 }
 
-function createContactElement(contact) {
+function createContactElement(contact, isBot = false) {
   const el = document.createElement('div');
-  el.className = `contact ${isPinned(contact.id) ? 'pinned' : ''}`;
+  el.className = `contact ${isBot ? 'bot-section' : ''} ${isPinned(contact.id) && !isBot ? 'pinned' : ''}`;
   el.setAttribute('data-id', contact.id);
   
   const avatarStyle = contact.avatar || getGradientForName(contact.name);
   const draftText = chatData[contact.id]?.draft || '';
-  const pinIcon = isPinned(contact.id) ? '<span class="pin-icon">📌</span>' : '';
+  const pinIcon = isPinned(contact.id) && !isBot ? '<span class="pin-icon">📌</span>' : '';
   
   el.innerHTML = `
     <div class="avatar" style="background: ${avatarStyle}; background-size: cover;"></div>
@@ -129,12 +138,17 @@ function createContactElement(contact) {
   `;
   
   el.onclick = (e) => {
-    // Предотвращаем выделение
     e.preventDefault();
+    e.stopPropagation();
     if (typeof window.openChat === 'function') {
       window.openChat(contact);
     }
+    return false;
   };
+  
+  // Запрещаем выделение
+  el.addEventListener('mousedown', (e) => e.preventDefault());
+  el.addEventListener('selectstart', (e) => e.preventDefault());
   
   return el;
 }

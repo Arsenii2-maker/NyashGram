@@ -501,41 +501,43 @@ function renameCurrentChat() {
   hideRenameModal();
 }
 
+// В функции sendMessage, после добавления сообщения:
 function sendMessage(text) {
   if (!text || !text.trim() || !currentChat) return;
   
   const msgText = text.trim();
-  const userId = 'default'; // В реальном приложении здесь будет ID пользователя
   
-  // Добавляем сообщение пользователя
-  window.chatData[currentChat].messages.push({ 
+  // Добавляем сообщение пользователя с анимацией
+  const messageObj = { 
     from: 'user', 
     text: msgText
-  });
+  };
   
+  window.chatData[currentChat].messages.push(messageObj);
   window.chatData[currentChat].draft = '';
   
   const input = document.getElementById('messageInput');
   if (input) input.value = '';
   
-  renderMessages();
+  renderMessages(); // Здесь сообщения получат анимацию через CSS
+  
   if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, '');
   
-  // Показываем индикатор печати бота
-  showBotTypingIndicator();
+  // Показываем индикатор печати
+  showTypingIndicator();
   
-  // Ответ бота с задержкой
+  // Ответ бота
   setTimeout(() => {
     if (currentChat) {
-      hideBotTypingIndicator();
+      hideTypingIndicator();
       
-      const response = getBotResponse(currentChat, msgText, userId);
+      const response = getBotResponse(currentChat, msgText);
       window.chatData[currentChat].messages.push({ 
         from: 'bot', 
         text: response
       });
       
-      renderMessages();
+      renderMessages(); // Сообщение бота тоже получит анимацию
     }
   }, 1500);
 }

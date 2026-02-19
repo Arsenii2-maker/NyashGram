@@ -24,8 +24,10 @@ html, body {
   min-height: 100vh;
 }
 
-/* ===== БАЗОВЫЕ ПЕРЕМЕННЫЕ (на случай если ничего не применится) ===== */
-body {
+/* ===== ТЕМЫ - ТОЛЬКО ОДИН СЕЛЕКТОР ДЛЯ КАЖДОЙ ТЕМЫ ===== */
+
+/* Pastel Pink - Светлая */
+body.light-mode.theme-pastel-pink {
   --bg-start: #ffd1dc;
   --bg-end: #ffe4e1;
   --text: #5c3a4a;
@@ -36,186 +38,155 @@ body {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(240, 225, 255, 0.7);
   --border-light: rgba(255, 255, 255, 0.4);
-  
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-  color: var(--text);
-  transition: all 0.3s ease;
+  background: linear-gradient(145deg, #ffd1dc, #ffe4e1);
+  color: #5c3a4a;
 }
 
-/* ===== ТЕМЫ ===== */
-
-/* PASTEL PINK */
-body.light-mode.theme-pastel-pink {
-  --bg-start: #ffd1dc !important;
-  --bg-end: #ffe4e1 !important;
-  --text: #5c3a4a !important;
-  --text-soft: #8b6f8b !important;
-  --accent: #ffadd6 !important;
-  --accent-soft: #ffc1e0 !important;
-  --card-bg: rgba(255, 255, 255, 0.25) !important;
-  --bubble-user: rgba(255, 255, 255, 0.8) !important;
-  --bubble-bot: rgba(240, 225, 255, 0.7) !important;
-  --border-light: rgba(255, 255, 255, 0.4) !important;
-}
-
+/* Pastel Pink - Тёмная */
 body.dark-mode.theme-pastel-pink {
-  --bg-start: #8b1a4d !important;
-  --bg-end: #4a1a2a !important;
-  --text: #ffe4f0 !important;
-  --text-soft: #ffb6c1 !important;
-  --accent: #ff69b4 !important;
-  --accent-soft: #ff82b9 !important;
-  --card-bg: rgba(139, 26, 77, 0.4) !important;
-  --bubble-user: rgba(255, 105, 180, 0.7) !important;
-  --bubble-bot: rgba(199, 21, 133, 0.6) !important;
-  --border-light: rgba(255, 255, 255, 0.15) !important;
+  --bg-start: #8b1a4d;
+  --bg-end: #4a1a2a;
+  --text: #ffe4f0;
+  --text-soft: #ffb6c1;
+  --accent: #ff69b4;
+  --accent-soft: #ff82b9;
+  --card-bg: rgba(139, 26, 77, 0.4);
+  --bubble-user: rgba(255, 105, 180, 0.7);
+  --bubble-bot: rgba(199, 21, 133, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, #8b1a4d, #4a1a2a);
+  color: #ffe4f0;
 }
 
-/* MILK ROSE */
+/* Milk Rose - Светлая */
 body.light-mode.theme-milk-rose {
-  --bg-start: #ffb6c1 !important;
-  --bg-end: #ff9eb5 !important;
-  --text: #4a2c1f !important;
-  --text-soft: #8b6f6f !important;
-  --accent: #ffb199 !important;
-  --accent-soft: #ffc8b3 !important;
-  --card-bg: rgba(255, 200, 200, 0.3) !important;
-  --bubble-user: rgba(255, 255, 255, 0.8) !important;
-  --bubble-bot: rgba(255, 200, 200, 0.7) !important;
-  --border-light: rgba(255, 235, 220, 0.5) !important;
+  --bg-start: #ffb6c1;
+  --bg-end: #ff9eb5;
+  --text: #4a2c1f;
+  --text-soft: #8b6f6f;
+  --accent: #ffb199;
+  --accent-soft: #ffc8b3;
+  --card-bg: rgba(255, 200, 200, 0.3);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(255, 200, 200, 0.7);
+  --border-light: rgba(255, 235, 220, 0.5);
+  background: linear-gradient(145deg, #ffb6c1, #ff9eb5);
+  color: #4a2c1f;
 }
 
+/* Milk Rose - Тёмная */
 body.dark-mode.theme-milk-rose {
-  --bg-start: #8b3a3a !important;
-  --bg-end: #4a1f1f !important;
-  --text: #fff0f0 !important;
-  --text-soft: #ffcccc !important;
-  --accent: #ff7f50 !important;
-  --accent-soft: #ff9966 !important;
-  --card-bg: rgba(139, 58, 58, 0.4) !important;
-  --bubble-user: rgba(255, 127, 80, 0.7) !important;
-  --bubble-bot: rgba(255, 71, 87, 0.6) !important;
-  --border-light: rgba(255, 255, 255, 0.15) !important;
+  --bg-start: #8b3a3a;
+  --bg-end: #4a1f1f;
+  --text: #fff0f0;
+  --text-soft: #ffcccc;
+  --accent: #ff7f50;
+  --accent-soft: #ff9966;
+  --card-bg: rgba(139, 58, 58, 0.4);
+  --bubble-user: rgba(255, 127, 80, 0.7);
+  --bubble-bot: rgba(255, 71, 87, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, #8b3a3a, #4a1f1f);
+  color: #fff0f0;
 }
 
-/* NIGHT BLUE */
+/* Night Blue - Светлая */
 body.light-mode.theme-night-blue {
-  --bg-start: #d4e0f0 !important;
-  --bg-end: #c0d0e8 !important;
-  --text: #1a2a4a !important;
-  --text-soft: #4a5a7a !important;
-  --accent: #7ab8ff !important;
-  --accent-soft: #9ac9ff !important;
-  --card-bg: rgba(255, 255, 255, 0.2) !important;
-  --bubble-user: rgba(255, 255, 255, 0.8) !important;
-  --bubble-bot: rgba(210, 230, 255, 0.7) !important;
-  --border-light: rgba(255, 255, 255, 0.3) !important;
+  --bg-start: #d4e0f0;
+  --bg-end: #c0d0e8;
+  --text: #1a2a4a;
+  --text-soft: #4a5a7a;
+  --accent: #7ab8ff;
+  --accent-soft: #9ac9ff;
+  --card-bg: rgba(255, 255, 255, 0.2);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(210, 230, 255, 0.7);
+  --border-light: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(145deg, #d4e0f0, #c0d0e8);
+  color: #1a2a4a;
 }
 
+/* Night Blue - Тёмная */
 body.dark-mode.theme-night-blue {
-  --bg-start: #0a2351 !important;
-  --bg-end: #03002b !important;
-  --text: #f0f8ff !important;
-  --text-soft: #b0c4de !important;
-  --accent: #4169e1 !important;
-  --accent-soft: #1e90ff !important;
-  --card-bg: rgba(10, 35, 81, 0.4) !important;
-  --bubble-user: rgba(65, 105, 225, 0.7) !important;
-  --bubble-bot: rgba(0, 0, 139, 0.6) !important;
-  --border-light: rgba(255, 255, 255, 0.15) !important;
+  --bg-start: #0a2351;
+  --bg-end: #03002b;
+  --text: #f0f8ff;
+  --text-soft: #b0c4de;
+  --accent: #4169e1;
+  --accent-soft: #1e90ff;
+  --card-bg: rgba(10, 35, 81, 0.4);
+  --bubble-user: rgba(65, 105, 225, 0.7);
+  --bubble-bot: rgba(0, 0, 139, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, #0a2351, #03002b);
+  color: #f0f8ff;
 }
 
-/* LO-FI BEIGE */
+/* Lo-Fi Beige - Светлая */
 body.light-mode.theme-lo-fi-beige {
-  --bg-start: #f9f5ee !important;
-  --bg-end: #f0e6d9 !important;
-  --text: #4a3c2e !important;
-  --text-soft: #8b7a6f !important;
-  --accent: #d9b99b !important;
-  --accent-soft: #e4c9b0 !important;
-  --card-bg: rgba(255, 250, 240, 0.3) !important;
-  --bubble-user: rgba(255, 255, 255, 0.8) !important;
-  --bubble-bot: rgba(235, 220, 210, 0.7) !important;
-  --border-light: rgba(230, 210, 190, 0.4) !important;
+  --bg-start: #f9f5ee;
+  --bg-end: #f0e6d9;
+  --text: #4a3c2e;
+  --text-soft: #8b7a6f;
+  --accent: #d9b99b;
+  --accent-soft: #e4c9b0;
+  --card-bg: rgba(255, 250, 240, 0.3);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(235, 220, 210, 0.7);
+  --border-light: rgba(230, 210, 190, 0.4);
+  background: linear-gradient(145deg, #f9f5ee, #f0e6d9);
+  color: #4a3c2e;
 }
 
+/* Lo-Fi Beige - Тёмная */
 body.dark-mode.theme-lo-fi-beige {
-  --bg-start: #5d3a1a !important;
-  --bg-end: #2d1e0a !important;
-  --text: #fdf5e6 !important;
-  --text-soft: #deb887 !important;
-  --accent: #cd853f !important;
-  --accent-soft: #d2691e !important;
-  --card-bg: rgba(93, 58, 26, 0.4) !important;
-  --bubble-user: rgba(205, 133, 63, 0.7) !important;
-  --bubble-bot: rgba(139, 69, 19, 0.6) !important;
-  --border-light: rgba(255, 255, 255, 0.15) !important;
+  --bg-start: #5d3a1a;
+  --bg-end: #2d1e0a;
+  --text: #fdf5e6;
+  --text-soft: #deb887;
+  --accent: #cd853f;
+  --accent-soft: #d2691e;
+  --card-bg: rgba(93, 58, 26, 0.4);
+  --bubble-user: rgba(205, 133, 63, 0.7);
+  --bubble-bot: rgba(139, 69, 19, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, #5d3a1a, #2d1e0a);
+  color: #fdf5e6;
 }
 
-/* SOFT LILAC */
+/* Soft Lilac - Светлая */
 body.light-mode.theme-soft-lilac {
-  --bg-start: #f5f0ff !important;
-  --bg-end: #e6d9ff !important;
-  --text: #3c1f5c !important;
-  --text-soft: #6f4f8f !important;
-  --accent: #c4a0ff !important;
-  --accent-soft: #d4b8ff !important;
-  --card-bg: rgba(255, 255, 255, 0.25) !important;
-  --bubble-user: rgba(255, 255, 255, 0.8) !important;
-  --bubble-bot: rgba(220, 200, 255, 0.7) !important;
-  --border-light: rgba(220, 200, 255, 0.4) !important;
+  --bg-start: #f5f0ff;
+  --bg-end: #e6d9ff;
+  --text: #3c1f5c;
+  --text-soft: #6f4f8f;
+  --accent: #c4a0ff;
+  --accent-soft: #d4b8ff;
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(220, 200, 255, 0.7);
+  --border-light: rgba(220, 200, 255, 0.4);
+  background: linear-gradient(145deg, #f5f0ff, #e6d9ff);
+  color: #3c1f5c;
 }
 
+/* Soft Lilac - Тёмная */
 body.dark-mode.theme-soft-lilac {
-  --bg-start: #4b0082 !important;
-  --bg-end: #240041 !important;
-  --text: #f0e6ff !important;
-  --text-soft: #d8bfd8 !important;
-  --accent: #9370db !important;
-  --accent-soft: #ba55d3 !important;
-  --card-bg: rgba(75, 0, 130, 0.4) !important;
-  --bubble-user: rgba(147, 112, 219, 0.7) !important;
-  --bubble-bot: rgba(138, 43, 226, 0.6) !important;
-  --border-light: rgba(255, 255, 255, 0.15) !important;
+  --bg-start: #4b0082;
+  --bg-end: #240041;
+  --text: #f0e6ff;
+  --text-soft: #d8bfd8;
+  --accent: #9370db;
+  --accent-soft: #ba55d3;
+  --card-bg: rgba(75, 0, 130, 0.4);
+  --bubble-user: rgba(147, 112, 219, 0.7);
+  --bubble-bot: rgba(138, 43, 226, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, #4b0082, #240041);
+  color: #f0e6ff;
 }
 
-/* ===== ПРИМЕНЕНИЕ ФОНА ===== */
-body.light-mode.theme-pastel-pink {
-  background: linear-gradient(145deg, #ffd1dc, #ffe4e1) !important;
-}
-body.dark-mode.theme-pastel-pink {
-  background: linear-gradient(145deg, #8b1a4d, #4a1a2a) !important;
-}
-
-body.light-mode.theme-milk-rose {
-  background: linear-gradient(145deg, #ffb6c1, #ff9eb5) !important;
-}
-body.dark-mode.theme-milk-rose {
-  background: linear-gradient(145deg, #8b3a3a, #4a1f1f) !important;
-}
-
-body.light-mode.theme-night-blue {
-  background: linear-gradient(145deg, #d4e0f0, #c0d0e8) !important;
-}
-body.dark-mode.theme-night-blue {
-  background: linear-gradient(145deg, #0a2351, #03002b) !important;
-}
-
-body.light-mode.theme-lo-fi-beige {
-  background: linear-gradient(145deg, #f9f5ee, #f0e6d9) !important;
-}
-body.dark-mode.theme-lo-fi-beige {
-  background: linear-gradient(145deg, #5d3a1a, #2d1e0a) !important;
-}
-
-body.light-mode.theme-soft-lilac {
-  background: linear-gradient(145deg, #f5f0ff, #e6d9ff) !important;
-}
-body.dark-mode.theme-soft-lilac {
-  background: linear-gradient(145deg, #4b0082, #240041) !important;
-}
-
-/* ===== ВСЕ ОСТАЛЬНЫЕ СТИЛИ (без изменений) ===== */
+/* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
 #app {
   height: 100%;
 }

@@ -23,17 +23,14 @@ function showScreen(id) {
 
 // Применение темы
 function applyTheme(themeId) {
-  // Удаляем все темы
   document.body.classList.remove(
     'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
     'theme-lo-fi-beige', 'theme-soft-lilac'
   );
-  // Добавляем новую
   document.body.classList.add(`theme-${themeId}`);
   AppState.currentUser.theme = themeId;
   localStorage.setItem('nyashgram_theme', themeId);
   
-  // Обновляем кнопки
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.theme === themeId) btn.classList.add('active');
@@ -42,17 +39,14 @@ function applyTheme(themeId) {
 
 // Применение шрифта
 function applyFont(fontClass) {
-  // Удаляем все шрифты
   document.body.classList.remove(
     'font-system', 'font-rounded', 'font-cozy', 
     'font-elegant', 'font-bold-soft', 'font-mono-cozy'
   );
-  // Добавляем новый
   document.body.classList.add(fontClass);
   AppState.currentUser.font = fontClass;
   localStorage.setItem('nyashgram_font', fontClass);
   
-  // Обновляем кнопки
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.font === fontClass) btn.classList.add('active');
@@ -64,13 +58,11 @@ function loadSettingsIntoUI() {
   const nameInput = document.getElementById('settingsName');
   if (nameInput) nameInput.value = AppState.currentUser.name;
   
-  // Подсветка активной темы
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.theme === AppState.currentUser.theme) btn.classList.add('active');
   });
   
-  // Подсветка активного шрифта
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.font === AppState.currentUser.font) btn.classList.add('active');
@@ -83,6 +75,8 @@ function saveSettings() {
   if (newName) {
     AppState.currentUser.name = newName;
     localStorage.setItem('nyashgram_name', newName);
+    const display = document.getElementById('usernameDisplay');
+    if (display) display.textContent = `@${newName}`;
   }
   showScreen('contactsScreen');
 }
@@ -218,11 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Кнопки шрифтов
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.addEventListener('click', () => applyFont(btn.dataset.font));
-  });
-  
-  // ===== ЧАТ =====
-  document.getElementById('backBtn')?.addEventListener('click', () => {
-    showScreen('contactsScreen');
   });
   
   // Проверка авторизации

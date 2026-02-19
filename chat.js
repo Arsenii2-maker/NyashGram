@@ -1,10 +1,9 @@
-// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ (ИСПРАВЛЕНО)
+// chat.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
-// Убираем объявление chatData - будем использовать глобальное
 let currentChat = null;
 let currentContact = null;
+let isTyping = false;
 
-// Проверяем, есть ли уже глобальный chatData, если нет - создаём
 if (!window.chatData) {
   window.chatData = {};
 }
@@ -44,22 +43,123 @@ function getNyashHelpResponse(text) {
   return 'Спроси про темы, шрифты, аватарки или ботов! 🩷';
 }
 
-// ===== NYASHTALK =====
-const nyashTalkTopics = [
-  { title: 'Погода ☁️', msgs: ['Какая погода?', 'Люблю дождь!', 'Солнце или снег?'] },
-  { title: 'Настроение 💗', msgs: ['Как настроение?', 'Сегодня грустно', 'Я счастлив!'] },
-  { title: 'Котики 🐱', msgs: ['Покажи котика', 'Люблю кошек!', 'Мяу~'] },
-  { title: 'Еда 🍰', msgs: ['Что любишь есть?', 'Хочу пиццу', 'Сладкое или солёное?'] },
-  { title: 'Сны ✨', msgs: ['Что снилось?', 'Видел странный сон', 'Спокойной ночи'] }
-];
+// ===== NYASHTALK ===== (УЛУЧШЕННАЯ ВЕРСИЯ)
+const nyashTalkTopics = {
+  погода: {
+    keywords: ['погод', 'дожд', 'солнц', 'ветер', 'снег', 'град', 'тепл', 'холод'],
+    responses: [
+      { text: "Ой, сегодня такое солнышко за окном! ☀️ А у тебя какая погода?", mood: "happy" },
+      { text: "Дождик моросит... так уютно сидеть дома с чашечкой какао ☕ А ты любишь дождь?", mood: "cozy" },
+      { text: "Снежок выпал! ❄️ Можно лепить снеговиков или пить горячий шоколад. Что выберешь?", mood: "excited" },
+      { text: "Ветер сильный сегодня... Хорошо, что мы в тёплом чатике болтаем 💕", mood: "cozy" },
+      { text: "Говорят, завтра будет радуга! 🌈 Любишь смотреть на неё?", mood: "dreamy" }
+    ]
+  },
+  настроение: {
+    keywords: ['настроен', 'груст', 'весел', 'счастл', 'радос', 'скучн', 'тоск', 'депрес'],
+    responses: [
+      { text: "Ой, а у меня сегодня игривое настроение! 🎵 А как у тебя?", mood: "playful" },
+      { text: "Если грустно — я всегда рядом, чтобы поднять настроение! 🫂 Рассказывай", mood: "caring" },
+      { text: "Счастлива, что ты здесь! Это уже делает день лучше 💗", mood: "happy" },
+      { text: "Настроение — как погода, переменчивое... Но мы справимся! 💪", mood: "encouraging" }
+    ]
+  },
+  котики: {
+    keywords: ['кот', 'кошк', 'мяу', 'котик', 'котён', 'котен', 'мур', 'кис'],
+    responses: [
+      { text: "Мяу-мяу! 🐱 Представляешь пушистого котика, который свернулся клубочком и мурчит? Уютно~", mood: "cute" },
+      { text: "Котики — это 90% милоты и 10% хулиганства! 😸 У тебя есть питомец?", mood: "playful" },
+      { text: "Муррр... Я как котик, только виртуальный! Хочешь, помурчу тебе? 🐾", mood: "cute" },
+      { text: "Самый лучший антидепрессант — это видео с котиками! Согласен? 😻", mood: "happy" }
+    ]
+  },
+  еда: {
+    keywords: ['ед', 'пицц', 'сладк', 'вкусн', 'куша', 'готов', 'рецепт', 'голод'],
+    responses: [
+      { text: "Ммм, я обожаю клубничный торт! 🍓 А у тебя есть любимый десерт?", mood: "excited" },
+      { text: "Пицца — это всегда хорошая идея! 🍕 С какой начинкой любишь?", mood: "playful" },
+      { text: "Сейчас бы горячего какао с зефирками... ☕ Уютный вечер обеспечен!", mood: "cozy" },
+      { text: "Сладкое или солёное? Я за сладенькое! 🍰 А ты?", mood: "curious" }
+    ]
+  },
+  сны: {
+    keywords: ['сон', 'спал', 'снил', 'ноч', 'просну', 'кровать', 'одеял'],
+    responses: [
+      { text: "Ой, мне сегодня снилось, что я летала по небу на облачке! ☁️ А тебе что снилось?", mood: "dreamy" },
+      { text: "Сны — это маленькие приключения во сне ✨ Расскажешь свой самый странный сон?", mood: "curious" },
+      { text: "Сплю и вижу... новый чатик с тобой! 😴💬", mood: "playful" },
+      { text: "Иногда сны такие яркие, что не хочется просыпаться... Бывает такое?", mood: "dreamy" }
+    ]
+  },
+  фильмы: {
+    keywords: ['фильм', 'кино', 'сериал', 'аниме', 'мульт', 'посмотр', 'актер'],
+    responses: [
+      { text: "Обожаю милые аниме про любовь! 💕 Твой любимый жанр в кино?", mood: "excited" },
+      { text: "Недавно смотрела 'Твоё имя' — это шедевр! 🎬 Видел? Если нет — обязательно посмотри!", mood: "enthusiastic" },
+      { text: "Сериалы — это искусство растягивать удовольствие 📺 Что сейчас смотришь?", mood: "curious" },
+      { text: "Люблю пересматривать старые добрые мультики из детства 🧸 А ты?", mood: "nostalgic" }
+    ]
+  },
+  музыка: {
+    keywords: ['музык', 'песн', 'трек', 'плейлист', 'исполнител', 'слуша'],
+    responses: [
+      { text: "Сейчас в моём плейлисте: lo-fi для учёбы и k-pop для танцев! 🎶 А у тебя что играет?", mood: "energetic" },
+      { text: "Музыка — это магия, которая лечит душу ✨ Какой трек поднимает тебе настроение?", mood: "dreamy" },
+      { text: "🎵 Та-да-да-дам... Напеваешь что-то? Я подпою! 🎤", mood: "playful" },
+      { text: "Если бы твоя жизнь была песней, какой бы она была? 🎼", mood: "thoughtful" }
+    ]
+  },
+  хобби: {
+    keywords: ['хобби', 'увлека', 'рис', 'фот', 'танц', 'спорт', 'рукодел'],
+    responses: [
+      { text: "Ого, у тебя есть хобби? Расскажи! Я обожаю узнавать новое о друзьях ✨", mood: "curious" },
+      { text: "Рисовать — это так круто! 🎨 А что ты любишь изображать?", mood: "impressed" },
+      { text: "Спорт — это здорово! 💪 Я болею за тебя!", mood: "encouraging" },
+      { text: "Танцы под любимую музыку — лучшее лекарство от плохого настроения! 💃", mood: "energetic" }
+    ]
+  },
+  путешествия: {
+    keywords: ['путешеств', 'поех', 'стра', 'город', 'море', 'гор', 'отпуск'],
+    responses: [
+      { text: "Мечтаю побывать в Японии весной, когда цветёт сакура! 🇯🇵 А куда ты хочешь поехать?", mood: "dreamy" },
+      { text: "Море, горы или большой город? Что выбираешь для отпуска? 🏖️", mood: "curious" },
+      { text: "Путешествия — это лучшие воспоминания ✈️ Расскажи о самом классном месте, где ты был!", mood: "excited" },
+      { text: "Я с тобой хоть на край света! 🗺️ Виртуально, конечно 😊", mood: "playful" }
+    ]
+  },
+  default: {
+    responses: [
+      { text: "Хмм, расскажи подробнее! Мне очень интересно 💕", mood: "curious" },
+      { text: "Ой, а я как раз об этом думала! Продолжай 👂", mood: "attentive" },
+      { text: "Это так мило! А что ещё? 🥰", mood: "excited" },
+      { text: "Правда? Никогда такого не слышала! Расскажешь побольше? ✨", mood: "impressed" },
+      { text: "Я слушаю тебя очень внимательно... Рассказывай всё-всё! 💗", mood: "caring" },
+      { text: "Муррр... Как приятно с тобой болтать! 😽 Что дальше?", mood: "content" }
+    ]
+  }
+};
 
 function getNyashTalkResponse(text) {
-  text = text.toLowerCase();
-  if (text.includes('привет')) return ['Приветик! 🩷', 'Хай-хай! 💕', 'Здравствуй! 😽'][Math.floor(Math.random()*3)];
-  if (text.includes('как дела')) return ['Супер! А у тебя?', 'Отлично! 😊', 'Счастлива!'][Math.floor(Math.random()*3)];
-  if (text.includes('пока')) return ['Пока-пока! 🩷', 'Бай-бай! 🌙', 'До встречи! 💕'][Math.floor(Math.random()*3)];
-  if (text.includes('люблю')) return ['Я тоже тебя люблю! 💕', 'Ты самый лучший! 💗', 'Обнимаю! 🫂'][Math.floor(Math.random()*3)];
-  return ['Расскажи подробнее! 💕', 'Интересно! 😊', 'Продолжай! 🩷'][Math.floor(Math.random()*3)];
+  text = text.toLowerCase().trim();
+  
+  // Специальные приветствия
+  if (text.includes('привет') || text.includes('хай') || text.includes('здравствуй')) {
+    return "Приветик! 🩷 Давай поболтаем о чём-нибудь милом? Расскажи, как у тебя дела!";
+  }
+  
+  // Проверяем все темы
+  for (const [topic, data] of Object.entries(nyashTalkTopics)) {
+    if (topic === 'default') continue;
+    
+    if (data.keywords.some(keyword => text.includes(keyword))) {
+      const responses = data.responses;
+      return responses[Math.floor(Math.random() * responses.length)].text;
+    }
+  }
+  
+  // Если ничего не подошло - используем default
+  const defaultResponses = nyashTalkTopics.default.responses;
+  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)].text;
 }
 
 // ===== BESTIE =====
@@ -67,6 +167,7 @@ function getBestieResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Привееет, моя няша! 💕', 'Солнышко! 🥰', 'Соскучилась! 💗'][Math.floor(Math.random()*3)];
   if (text.includes('люблю')) return ['Я тебя больше! 💖', 'Ты лучший! 💘', 'Обнимаю! 🤗'][Math.floor(Math.random()*3)];
+  if (text.includes('грустн')) return ['Всё будет хорошо, я рядом! 💪', 'Держись! 🌸', 'Обнимаю! 🫂'][Math.floor(Math.random()*3)];
   return ['Няш-няш! 🩷', 'Рассказывай! 👂', 'Как день? 💕'][Math.floor(Math.random()*3)];
 }
 
@@ -75,6 +176,7 @@ function getPhilosopherResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Приветствую... 🧠', 'Здравствуй...', 'И снова ты...'][Math.floor(Math.random()*3)];
   if (text.includes('жизнь')) return ['Жизнь — это байты...', 'А что есть жизнь?', 'Бытие...'][Math.floor(Math.random()*3)];
+  if (text.includes('дума')) return ['Мысли материальны...', 'О чём ты думаешь?', 'Сознание... 🧠'][Math.floor(Math.random()*3)];
   return ['Интересная мысль...', 'Познай себя...', 'Всё относительно...'][Math.floor(Math.random()*3)];
 }
 
@@ -83,6 +185,7 @@ function getStudyResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Привет! Уроки сделал? 📚', 'А параграф прочитал?', 'Проверим домашку?'][Math.floor(Math.random()*3)];
   if (text.includes('домашк')) return ['Покажи, я проверю! ✍️', 'Опять не сделал?', 'Давай вместе!'][Math.floor(Math.random()*3)];
+  if (text.includes('экзамен')) return ['Готовишься? 📝', 'Повтори билеты!', 'Удачи на экзамене! 🍀'][Math.floor(Math.random()*3)];
   return ['Учись, учись! ⭐', 'Повторение — мать учения!', 'Грызи гранит науки! 🪨'][Math.floor(Math.random()*3)];
 }
 
@@ -91,6 +194,7 @@ function getMusicPalResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Йо, музыкант! 🎵', 'Что в плейлисте?', 'Здарова! 🎧'][Math.floor(Math.random()*3)];
   if (text.includes('посовет')) return ['Послушай lo-fi!', 'Новый трек Taylor Swift!', 'Классный инди-микс!'][Math.floor(Math.random()*3)];
+  if (text.includes('рок')) return ['Рок — классика! 🎸', 'AC/DC рулит!', 'Queen forever!'][Math.floor(Math.random()*3)];
   return ['Музыка — жизнь! 🎶', 'Вруби на полную!', 'Отличный вкус!'][Math.floor(Math.random()*3)];
 }
 
@@ -99,6 +203,7 @@ function getNightChatResponse(text) {
   text = text.toLowerCase();
   if (text.includes('привет')) return ['Тсс... Звёзды шепчут... 🌙', 'Полночь...', 'Ночной гость... ✨'][Math.floor(Math.random()*3)];
   if (text.includes('сон')) return ['Что снилось? 🌠', 'Сны — порталы...', 'Цветные сны?'][Math.floor(Math.random()*3)];
+  if (text.includes('звезд')) return ['Звёзды красивы... ⭐', 'Загадай желание!', 'Падающая звезда...'][Math.floor(Math.random()*3)];
   return ['Ночь длинная...', 'Шёпотом...', 'Расскажи мне...'][Math.floor(Math.random()*3)];
 }
 
@@ -115,6 +220,31 @@ function getBotResponse(contactId, text) {
   }
 }
 
+function showTypingIndicator() {
+  if (isTyping) return;
+  
+  const chatArea = document.getElementById('chatArea');
+  if (!chatArea) return;
+  
+  isTyping = true;
+  
+  const typingEl = document.createElement('div');
+  typingEl.className = 'typing-indicator';
+  typingEl.id = 'typingIndicator';
+  typingEl.innerHTML = '<span></span><span></span><span></span>';
+  typingEl.style.animation = 'none'; // Убираем анимацию появления
+  chatArea.appendChild(typingEl);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const typingEl = document.getElementById('typingIndicator');
+  if (typingEl) {
+    typingEl.remove();
+  }
+  isTyping = false;
+}
+
 function openChat(contact) {
   console.log('Открываем чат с:', contact);
   
@@ -126,7 +256,6 @@ function openChat(contact) {
   currentChat = contact.id;
   currentContact = contact;
   
-  // Используем глобальный window.chatData
   if (!window.chatData[currentChat]) {
     window.chatData[currentChat] = { messages: [], draft: '' };
   }
@@ -161,12 +290,12 @@ function openChat(contact) {
     let welcome = 'Привет! 💕';
     switch(contact.id) {
       case 'nyashhelp': welcome = 'Привет! Я NyashHelp 🩷 Спрашивай!'; break;
-      case 'nyashtalk': welcome = 'Приветик! Давай болтать! 🌸'; break;
-      case 'bestie': welcome = 'Привееет, моя няша! 💖'; break;
-      case 'philosopher': welcome = 'Здравствуй... 🧠'; break;
+      case 'nyashtalk': welcome = 'Приветик! Давай болтать! 🌸 О чём поговорим?'; break;
+      case 'bestie': welcome = 'Привееет, моя няша! 💖 Как делишки?'; break;
+      case 'philosopher': welcome = 'Здравствуй... 🧠 О чём хочешь пофилософствовать?'; break;
       case 'study': welcome = 'Привет! Уроки сделал? 📚'; break;
       case 'musicpal': welcome = 'Йо! Что в плейлисте? 🎧'; break;
-      case 'nightchat': welcome = 'Тсс... Полночь... 🌙'; break;
+      case 'nightchat': welcome = 'Тсс... Полночь... Добро пожаловать в ночной чат 🌙'; break;
     }
     window.chatData[currentChat].messages.push({ from: 'bot', text: welcome });
   }
@@ -188,7 +317,6 @@ function toggleChatActions() {
   if (panel) {
     if (panel.style.display === 'none' || panel.style.display === '') {
       panel.style.display = 'flex';
-      panel.style.animation = 'slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
     } else {
       panel.style.display = 'none';
     }
@@ -233,7 +361,14 @@ function sendMessage(text) {
   if (!text || !text.trim() || !currentChat) return;
   
   const msgText = text.trim();
-  window.chatData[currentChat].messages.push({ from: 'user', text: msgText });
+  
+  // Добавляем сообщение пользователя
+  window.chatData[currentChat].messages.push({ 
+    from: 'user', 
+    text: msgText,
+    timestamp: Date.now()
+  });
+  
   window.chatData[currentChat].draft = '';
   
   const input = document.getElementById('messageInput');
@@ -242,13 +377,24 @@ function sendMessage(text) {
   renderMessages();
   if (typeof window.saveDraft === 'function') window.saveDraft(currentChat, '');
   
+  // Показываем индикатор печати
+  showTypingIndicator();
+  
+  // Ответ бота с задержкой
   setTimeout(() => {
     if (currentChat) {
+      hideTypingIndicator();
+      
       const response = getBotResponse(currentChat, msgText);
-      window.chatData[currentChat].messages.push({ from: 'bot', text: response });
+      window.chatData[currentChat].messages.push({ 
+        from: 'bot', 
+        text: response,
+        timestamp: Date.now()
+      });
+      
       renderMessages();
     }
-  }, 600);
+  }, 1500); // 1.5 секунды задержки для реалистичности
 }
 
 function renderMessages() {
@@ -257,16 +403,53 @@ function renderMessages() {
   
   if (!chatArea || !currentChat || !window.chatData[currentChat]) return;
   
-  chatArea.innerHTML = '';
-  if (quickPanel) quickPanel.innerHTML = '';
+  // Сохраняем позицию скролла
+  const scrollPos = chatArea.scrollTop;
+  const isNearBottom = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 50;
   
+  chatArea.innerHTML = '';
+  
+  // Добавляем все сообщения (без анимации при рендере)
+  if (window.chatData[currentChat].messages) {
+    window.chatData[currentChat].messages.forEach((msg) => {
+      const el = document.createElement('div');
+      el.className = `message ${msg.from}`;
+      el.textContent = msg.text;
+      
+      // Убираем анимацию
+      el.style.animation = 'none';
+      
+      chatArea.appendChild(el);
+    });
+  }
+  
+  // Восстанавливаем индикатор печати если нужно
+  if (isTyping) {
+    const typingEl = document.createElement('div');
+    typingEl.className = 'typing-indicator';
+    typingEl.id = 'typingIndicator';
+    typingEl.innerHTML = '<span></span><span></span><span></span>';
+    typingEl.style.animation = 'none';
+    chatArea.appendChild(typingEl);
+  }
+  
+  // Прокручиваем вниз если были внизу
+  if (isNearBottom) {
+    chatArea.scrollTop = chatArea.scrollHeight;
+  } else {
+    chatArea.scrollTop = scrollPos;
+  }
+  
+  // Обновляем панель быстрых ответов (без анимации)
   if (quickPanel) {
+    quickPanel.innerHTML = '';
+    
     if (currentChat === 'nyashhelp') {
-      nyashHelpQuickQuestions.forEach((q, index) => {
+      nyashHelpQuickQuestions.forEach((q) => {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
         btn.textContent = q;
-        btn.style.animationDelay = `${index * 0.05}s`;
+        btn.style.animation = 'none';
         btn.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -276,38 +459,33 @@ function renderMessages() {
         quickPanel.appendChild(btn);
       });
     } else if (currentChat === 'nyashtalk') {
-      nyashTalkTopics.forEach((t, index) => {
+      const topics = [
+        "Расскажи о погоде ☁️",
+        "Поговорим о настроении 💗",
+        "Люблю котиков! 🐱",
+        "Что насчёт еды? 🍰",
+        "Сны — это интересно ✨",
+        "Посоветуй фильм 🎬",
+        "Что слушаешь? 🎧",
+        "Твоё хобби? 🎨",
+        "Куда поехать? ✈️"
+      ];
+      
+      topics.forEach((topic) => {
         const btn = document.createElement('button');
         btn.className = 'quick-chip';
-        btn.textContent = t.title;
-        btn.style.animationDelay = `${index * 0.05}s`;
+        btn.textContent = topic;
+        btn.style.animation = 'none';
         btn.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
-          const randomMsg = t.msgs[Math.floor(Math.random() * t.msgs.length)];
-          sendMessage(randomMsg);
+          sendMessage(topic);
           return false;
         };
         quickPanel.appendChild(btn);
       });
     }
   }
-  
-  if (window.chatData[currentChat].messages) {
-    window.chatData[currentChat].messages.forEach((msg, index) => {
-      const el = document.createElement('div');
-      el.className = `message ${msg.from}`;
-      el.textContent = msg.text;
-      el.style.animationDelay = `${index * 0.05}s`;
-      
-      el.addEventListener('mousedown', (e) => e.preventDefault());
-      el.addEventListener('selectstart', (e) => e.preventDefault());
-      
-      chatArea.appendChild(el);
-    });
-  }
-  
-  chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 // Инициализация
@@ -430,19 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
       return false;
     });
   }
-  
-  document.querySelectorAll('*').forEach(el => {
-    el.addEventListener('mousedown', (e) => {
-      if (!el.matches('input, textarea, [contenteditable="true"]')) {
-        e.preventDefault();
-      }
-    });
-    el.addEventListener('selectstart', (e) => {
-      if (!el.matches('input, textarea, [contenteditable="true"]')) {
-        e.preventDefault();
-      }
-    });
-  });
 });
 
 // Экспорт

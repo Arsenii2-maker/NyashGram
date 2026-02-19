@@ -771,13 +771,24 @@
       <div style="width: 36px;"></div>
     </header>
     <div style="padding: 16px; overflow-y: auto; width: 100%;">
-      <div class="glass-container" style="margin-bottom: 16px;">
-        <h3 style="color: var(--text); margin-bottom: 16px;">Твой профиль</h3>
-        <input type="text" id="settingsName" placeholder="Имя" style="width:100%; margin-bottom: 8px;" />
-        <input type="text" id="settingsUsername" placeholder="Юзернейм (уникальный)" style="width:100%; margin-bottom: 8px;" />
-        <div id="settingsUsernameError" style="color: #e67e8f; font-size: 13px; margin-bottom: 10px; min-height: 20px;"></div>
-        <button id="saveSettingsBtn" class="active" style="margin-top: 0;">Сохранить</button>
-      </div>
+     <!-- Внутри settingsScreen, в блоке с профилем -->
+<div class="glass-container" style="margin-bottom: 16px;">
+  <h3 style="color: var(--text); margin-bottom: 16px;">Твой профиль</h3>
+  <input type="text" id="settingsName" placeholder="Имя" style="width:100%; margin-bottom: 8px;" />
+  
+  <div style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%;">
+    <input type="text" id="settingsUsername" placeholder="Юзернейм (уникальный)" style="flex: 1;" />
+    <button id="settingsGenerateBtn" style="width: auto; padding: 12px 16px; background: var(--accent); color: white;">🎲</button>
+  </div>
+  
+  <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 10px; text-align: left;">
+    ⚡ Только латинские буквы, цифры и _<br>
+    ⚡ От 3 до 50 символов
+  </div>
+  
+  <div id="settingsUsernameError" style="color: #e67e8f; font-size: 13px; margin-bottom: 10px; min-height: 20px;"></div>
+  <button id="saveSettingsBtn" class="active" style="margin-top: 0;">Сохранить</button>
+</div>
       <div class="glass-container" style="margin-bottom: 16px;">
         <h3 style="color: var(--text); margin-bottom: 16px;">Тема</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">

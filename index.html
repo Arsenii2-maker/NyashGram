@@ -4,677 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NyashGram — говори по-няшному 💗</title>
+  
+  <!-- Шрифты -->
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&family=Fredoka:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
-  <style>
-    /* ===== СБРОС ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-    }
-
-    /* Разрешаем выделение только в полях ввода */
-    input, textarea, [contenteditable="true"] {
-      -webkit-user-select: text;
-      -moz-user-select: text;
-      -ms-user-select: text;
-      user-select: text;
-    }
-
-    body {
-      font-family: 'Comfortaa', cursive;
-      background: linear-gradient(145deg, #ffd1dc, #ffe4e1);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s ease;
-    }
-
-    /* ===== ТЕМЫ ===== */
-    .theme-pastel-pink {
-      --bg-start: #ffd1dc;
-      --bg-end: #ffe4e1;
-      --text: #5c3a4a;
-      --text-soft: #8b6f8b;
-      --accent: #ffadd6;
-      --card-bg: rgba(255, 255, 255, 0.25);
-      --bubble-user: rgba(255, 255, 255, 0.8);
-      --bubble-bot: rgba(240, 225, 255, 0.7);
-    }
-    .theme-milk-rose {
-      --bg-start: #f9e6e6;
-      --bg-end: #f5d9d9;
-      --text: #4a2c1f;
-      --text-soft: #8b6f6f;
-      --accent: #ffb199;
-      --card-bg: rgba(250, 240, 235, 0.3);
-      --bubble-user: rgba(255, 255, 255, 0.8);
-      --bubble-bot: rgba(255, 235, 225, 0.7);
-    }
-    .theme-night-blue {
-      --bg-start: #d4e0f0;
-      --bg-end: #c0d0e8;
-      --text: #1a2a4a;
-      --text-soft: #4a5a7a;
-      --accent: #7ab8ff;
-      --card-bg: rgba(255, 255, 255, 0.2);
-      --bubble-user: rgba(255, 255, 255, 0.8);
-      --bubble-bot: rgba(210, 230, 255, 0.7);
-    }
-    .theme-lo-fi-beige {
-      --bg-start: #f9f5ee;
-      --bg-end: #f0e6d9;
-      --text: #4a3c2e;
-      --text-soft: #8b7a6f;
-      --accent: #d9b99b;
-      --card-bg: rgba(255, 250, 240, 0.3);
-      --bubble-user: rgba(255, 255, 255, 0.8);
-      --bubble-bot: rgba(235, 220, 210, 0.7);
-    }
-    .theme-soft-lilac {
-      --bg-start: #f5f0ff;
-      --bg-end: #e6d9ff;
-      --text: #3c1f5c;
-      --text-soft: #6f4f8f;
-      --accent: #c4a0ff;
-      --card-bg: rgba(255, 255, 255, 0.25);
-      --bubble-user: rgba(255, 255, 255, 0.8);
-      --bubble-bot: rgba(220, 200, 255, 0.7);
-    }
-
-    /* ===== ШРИФТЫ ===== */
-    .font-system { font-family: system-ui, -apple-system, sans-serif; }
-    .font-rounded { font-family: 'Quicksand', 'M PLUS Rounded 1c', sans-serif; }
-    .font-cozy { font-family: 'Comfortaa', cursive; }
-    .font-elegant { font-family: 'Nunito', sans-serif; }
-    .font-bold-soft { font-family: 'Fredoka', sans-serif; }
-    .font-mono-cozy { font-family: 'Kosugi Maru', monospace; }
-
-    body {
-      background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-      color: var(--text);
-      transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ===== ЭКРАНЫ ===== */
-    .screen {
-      position: absolute;
-      inset: 0;
-      display: none;
-      flex-direction: column;
-      width: 100%;
-      height: 100vh;
-      opacity: 0;
-      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .screen.active { 
-      display: flex; 
-      opacity: 1;
-    }
-
-    /* ===== КОНТЕЙНЕРЫ ===== */
-    #contactsList, #chatArea, #quickReplyPanel, #messageInputArea, .top-bar, #chatHeader, .search-bar {
-      padding-left: 12px;
-      padding-right: 12px;
-      width: 100%;
-    }
-
-    #contactsList {
-      padding-top: 8px;
-      padding-bottom: 8px;
-      overflow-y: auto;
-      flex: 1;
-      scroll-behavior: smooth;
-    }
-
-    #chatArea {
-      padding-top: 12px;
-      padding-bottom: 12px;
-      overflow-y: auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      scroll-behavior: smooth;
-    }
-
-    #quickReplyPanel {
-      padding-top: 8px;
-      padding-bottom: 8px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(5px);
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #messageInputArea {
-      padding-top: 8px;
-      padding-bottom: 8px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      display: flex;
-      gap: 6px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .top-bar, #chatHeader {
-      padding-top: 12px;
-      padding-bottom: 12px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .top-bar {
-      justify-content: space-between;
-    }
-
-    #chatHeader {
-      gap: 12px;
-    }
-
-    /* ===== СТРОКА ПОИСКА ===== */
-    .search-bar {
-      padding-top: 8px;
-      padding-bottom: 8px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(5px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 10px 16px;
-      border-radius: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      background: rgba(255, 255, 255, 0.6);
-      font-size: 14px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.9);
-      transform: scale(1.02);
-    }
-
-    /* ===== ЭЛЕМЕНТЫ ===== */
-    .glass-container {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      border-radius: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 24px 20px;
-      width: 90%;
-      max-width: 360px;
-      margin: 0 auto;
-      text-align: center;
-      transform: translateY(0);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .glass-container:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 { 
-      color: var(--text); 
-      font-size: 2.2rem; 
-      margin-bottom: 8px; 
-    }
-
-    input, select, button {
-      font-family: inherit;
-      border-radius: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      background: rgba(255, 255, 255, 0.6);
-      padding: 12px 16px;
-      font-size: 16px;
-      color: var(--text);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    button {
-      background: rgba(255, 255, 255, 0.4);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      font-weight: 600;
-    }
-
-    button:active {
-      transform: scale(0.95);
-    }
-
-    button.active {
-      background: white;
-      border-color: var(--accent);
-      color: var(--text);
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
-    }
-
-    /* ===== КОНТАКТЫ ===== */
-    .contact {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      background: var(--card-bg);
-      backdrop-filter: blur(8px);
-      padding: 10px 12px;
-      border-radius: 24px;
-      margin-bottom: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      transform: translateX(0);
-    }
-
-    .contact:hover {
-      transform: translateX(4px);
-      background: rgba(255, 255, 255, 0.35);
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.2);
-    }
-
-    .contact:active { transform: scale(0.98); }
-    .contact.pinned { border-left: 4px solid var(--accent); }
-    .contact.bot-section { 
-      background: rgba(195, 142, 240, 0.2);
-      border-left: 4px solid #c38ef0;
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 2px solid white;
-      background-size: cover;
-      background-position: center;
-      flex-shrink: 0;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .contact:hover .avatar {
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
-    }
-
-    .info { 
-      flex: 1; 
-      min-width: 0;
-    }
-    .name { 
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .username { 
-      font-size: 11px; 
-      color: var(--text-soft);
-      opacity: 0.8;
-    }
-    .status { 
-      font-size: 12px; 
-      color: var(--text-soft);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .pin-icon {
-      font-size: 14px;
-      color: var(--accent);
-      margin-left: 4px;
-      animation: bounceIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .section-header {
-      padding: 16px 0 4px 4px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-soft);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      opacity: 0.8;
-      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ===== СООБЩЕНИЯ ===== */
-    .message {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 20px;
-      animation: messageSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      word-wrap: break-word;
-      transform-origin: left;
-    }
-    .message.user {
-      align-self: flex-end;
-      background: var(--bubble-user);
-      border: 1px solid white;
-      animation: messageSlideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .message.bot {
-      align-self: flex-start;
-      background: var(--bubble-bot);
-      border: 1px solid rgba(255,255,255,0.4);
-      animation: messageSlideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .quick-chip {
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(255,255,255,0.8);
-      border-radius: 40px;
-      padding: 6px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: chipPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .quick-chip:hover {
-      background: white;
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
-    }
-
-    .quick-chip:active {
-      transform: scale(0.95);
-    }
-
-    /* ===== КНОПКИ ===== */
-    #backBtn, #settingsBtn, #backFromSettingsBtn, #pinChatBtn, #muteChatBtn, #renameChatBtn, #deleteChatBtn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.4);
-      border: none;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #backBtn:hover, #settingsBtn:hover, #backFromSettingsBtn:hover, #pinChatBtn:hover {
-      transform: scale(1.1);
-      background: rgba(255,255,255,0.6);
-    }
-
-    #sendMessageBtn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: white;
-      border: 1px solid var(--accent);
-      color: var(--text);
-      font-size: 20px;
-      padding: 0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #sendMessageBtn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
-    }
-
-    #sendMessageBtn:active {
-      transform: scale(0.95);
-    }
-
-    /* ===== ПАНЕЛЬ ДЕЙСТВИЙ ===== */
-    .chat-actions-panel {
-      display: flex;
-      gap: 8px;
-      padding: 8px 12px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.3);
-      justify-content: flex-end;
-      animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ===== USERNAME DISPLAY ===== */
-    .username-display {
-      font-size: 13px;
-      color: var(--text-soft);
-      margin-left: 8px;
-      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ===== МОДАЛКА ДЛЯ ПЕРЕИМЕНОВАНИЯ ===== */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .modal-content {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border-radius: 32px;
-      padding: 24px;
-      width: 80%;
-      max-width: 300px;
-      border: 1px solid rgba(255,255,255,0.4);
-      animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .modal-content h3 {
-      margin-bottom: 16px;
-      color: var(--text);
-    }
-
-    .modal-content input {
-      width: 100%;
-      margin-bottom: 16px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .modal-content input:focus {
-      transform: scale(1.02);
-      border-color: var(--accent);
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .modal-buttons button {
-      flex: 1;
-      margin: 0;
-    }
-
-    /* ===== АНИМАЦИИ ===== */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideDown {
-      from { 
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideUp {
-      from { 
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideLeft {
-      from { 
-        opacity: 0;
-        transform: translateX(-10px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideRight {
-      from { 
-        opacity: 0;
-        transform: translateX(10px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes messageSlide {
-      from { 
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes messageSlideRight {
-      from { 
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes messageSlideLeft {
-      from { 
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes chipPop {
-      0% { 
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      80% { 
-        transform: scale(1.05);
-      }
-      100% { 
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes scaleIn {
-      from { 
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to { 
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes bounceIn {
-      0% { 
-        opacity: 0;
-        transform: scale(0.3);
-      }
-      50% { 
-        transform: scale(1.1);
-      }
-      70% { 
-        transform: scale(0.9);
-      }
-      100% { 
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    /* ===== СКРОЛЛБАР ===== */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 10px;
-      transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-  </style>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-pastel-pink font-cozy">
+<body> <!-- body ПУСТОЙ, без классов -->
 
   <!-- Экран ввода номера -->
   <section id="phoneScreen" class="screen active">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
-      <p style="color: var(--text-soft); margin-bottom: 24px;">Вход по номеру</p>
-      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-        <select id="countryCode" style="width: auto;">
+      <p class="subtitle">Вход по номеру телефона</p>
+      
+      <div class="phone-input">
+        <select id="countryCode">
           <option value="+7">🇷🇺 +7</option>
           <option value="+380">🇺🇦 +380</option>
           <option value="+375">🇧🇾 +375</option>
         </select>
         <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
       </div>
-      <div id="errorMessage" style="color: #e67e8f; font-size: 14px; min-height: 20px;"></div>
+
+      <div id="errorMessage" class="error-message"></div>
       <button id="sendBtn" disabled>✨ Получить код ✨</button>
-      <p style="font-size: 12px; color: var(--text-soft); margin-top: 16px;">Введи любой номер — это тест</p>
+      <p style="font-size:12px; color: var(--text-soft); margin-top:16px;">Введи любой номер — это тест</p>
     </div>
   </section>
 
@@ -682,46 +38,51 @@
   <section id="codeScreen" class="screen">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
-      <p style="color: var(--text-soft); margin-bottom: 24px;">Введи код</p>
-      <input type="text" id="codeInput" placeholder="------" maxlength="6" style="font-size: 28px; text-align: center; letter-spacing: 8px;" />
-      <div id="codeError" style="color: #e67e8f; font-size: 14px; min-height: 20px; margin-top: 12px;"></div>
+      <p class="subtitle">Введи код из смс</p>
+      
+      <input type="text" id="codeInput" placeholder="------" maxlength="6" />
+      <div id="codeError" class="error-message"></div>
+      
       <button id="verifyBtn" disabled>💕 Войти 💕</button>
-      <p style="font-size: 12px; color: var(--text-soft); margin-top: 16px;">Код: <span id="generatedCodeHint">******</span></p>
+      <p style="font-size:12px; color: var(--text-soft); margin-top:16px;">Код: <span id="generatedCodeHint">******</span></p>
     </div>
   </section>
 
   <!-- Экран создания профиля -->
-<section id="profileScreen" class="screen">
-  <div class="glass-container">
-    <h1>Создай профиль 💫</h1>
-    <input type="text" id="displayName" placeholder="Твой ник (имя)" style="width:100%; margin: 20px 0;" />
-    
-    <div style="display: flex; gap: 8px; margin-bottom: 20px; width: 100%;">
-      <input type="text" id="displayUsername" placeholder="Юзернейм (уникальный)" style="flex: 1;" />
-      <button id="generateUsernameBtn" style="width: auto; padding: 12px 16px; background: var(--accent); color: white;">🎲</button>
+  <section id="profileScreen" class="screen">
+    <div class="glass-container">
+      <h1>Создай профиль 💫</h1>
+      
+      <input type="text" id="displayName" placeholder="Твой ник (имя)" />
+      
+      <div style="display: flex; gap: 8px; margin: 20px 0;">
+        <input type="text" id="displayUsername" placeholder="Юзернейм (уникальный)" style="flex: 1;" />
+        <button id="generateUsernameBtn" style="width: auto; padding: 12px 16px;">🎲</button>
+      </div>
+      
+      <div id="usernameError" class="error-message"></div>
+      <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 20px; text-align: left;">
+        ⚡ Только латинские буквы, цифры и _<br>
+        ⚡ От 3 до 50 символов
+      </div>
+      
+      <div style="margin: 20px 0;">
+        <label for="avatarInput">
+          <div id="avatarPreview" class="avatar-large">+</div>
+          <p style="margin-top: 12px; color: var(--text-soft);">Выбрать фото</p>
+        </label>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+      </div>
+      
+      <button id="saveBtn" class="active">✨ Готово ✨</button>
     </div>
-    
-    <div id="usernameError" style="color: #e67e8f; font-size: 13px; margin-bottom: 10px; min-height: 20px;"></div>
-    <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 20px; text-align: left;">
-      ⚡ Только латинские буквы, цифры и _<br>
-      ⚡ От 3 до 50 символов
-    </div>
-    
-    <div style="margin: 20px 0;">
-      <label for="avatarInput">
-        <div id="avatarPreview" style="width: 100px; height: 100px; background: linear-gradient(135deg, #fbc2c2, #c2b9f0); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; border: 3px solid white; cursor: pointer; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">+</div>
-        <p style="margin-top: 12px; color: var(--text-soft);">Выбрать фото</p>
-      </label>
-      <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
-    </div>
-    <button id="saveBtn" class="active">✨ Готово ✨</button>
-  </div>
-</section>
+  </section>
+
   <!-- Экран контактов -->
   <section id="contactsScreen" class="screen">
     <header class="top-bar">
       <div style="display: flex; align-items: center;">
-        <div class="top-title" style="font-size: 1.4rem;">Мой мирок 💗</div>
+        <div class="top-title">Мой мирок 💗</div>
         <span id="usernameDisplay" class="username-display"></span>
       </div>
       <button id="settingsBtn">⚙️</button>
@@ -736,14 +97,13 @@
   </section>
 
   <!-- Экран чата -->
-<!-- Экран чата -->
   <section id="chatScreen" class="screen">
     <header id="chatHeader">
       <button id="backBtn">←</button>
       <div id="chatAvatar" class="avatar"></div>
       <div style="flex: 1;">
         <span id="chatContactName" style="font-weight: 600;">Загрузка...</span>
-        <div id="chatContactUsername" style="font-size: 11px; color: var(--text-soft);"></div>
+        <div id="chatContactUsername" style="font-size: 11px;"></div>
       </div>
       <button id="pinChatBtn">📌</button>
     </header>
@@ -762,8 +122,8 @@
     <!-- Область сообщений -->
     <div id="chatArea" class="chat-area"></div>
     
-    <!-- Поле ввода сообщения -->
-    <div id="messageInputArea" class="message-input-area">
+    <!-- Поле ввода -->
+    <div id="messageInputArea">
       <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." />
       <button id="sendMessageBtn">➤</button>
     </div>
@@ -776,42 +136,38 @@
       <div class="top-title">Настройки</div>
       <div style="width: 36px;"></div>
     </header>
+    
     <div style="padding: 16px; overflow-y: auto; width: 100%;">
-     <!-- Внутри settingsScreen, в блоке с профилем -->
-<div class="glass-container" style="margin-bottom: 16px;">
-  <h3 style="color: var(--text); margin-bottom: 16px;">Твой профиль</h3>
-  <input type="text" id="settingsName" placeholder="Имя" style="width:100%; margin-bottom: 8px;" />
-  
-  <div style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%;">
-    <input type="text" id="settingsUsername" placeholder="Юзернейм (уникальный)" style="flex: 1;" />
-    <button id="settingsGenerateBtn" style="width: auto; padding: 12px 16px; background: var(--accent); color: white;">🎲</button>
-  </div>
-  
-  <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 10px; text-align: left;">
-    ⚡ Только латинские буквы, цифры и _<br>
-    ⚡ От 3 до 50 символов
-  </div>
-  
-  <div id="settingsUsernameError" style="color: #e67e8f; font-size: 13px; margin-bottom: 10px; min-height: 20px;"></div>
-  <button id="saveSettingsBtn" class="active" style="margin-top: 0;">Сохранить</button>
-</div>
-     <div class="glass-container" style="margin-bottom: 16px; position: relative;">
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-    <h3 style="color: var(--text);">Тема</h3>
-    <button id="themeModeToggle" class="theme-mode-btn" style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.4); border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-      ☀️
-    </button>
-  </div>
-  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-    <button class="theme-btn active" data-theme="pastel-pink">Pastel Pink</button>
-<button class="theme-btn" data-theme="milk-rose">Milk Rose</button>
-<button class="theme-btn" data-theme="night-blue">Night Blue</button>
-<button class="theme-btn" data-theme="lo-fi-beige">Lo-Fi Beige</button>
-<button class="theme-btn" data-theme="soft-lilac">Soft Lilac</button>
-  </div>
-</div>
+      <!-- Профиль -->
+      <div class="glass-container" style="margin-bottom: 16px;">
+        <h3>Твой профиль</h3>
+        <input type="text" id="settingsName" placeholder="Имя" />
+        <div style="display: flex; gap: 8px; margin: 12px 0;">
+          <input type="text" id="settingsUsername" placeholder="Юзернейм" style="flex: 1;" />
+          <button id="settingsGenerateBtn" style="width: auto; padding: 12px 16px;">🎲</button>
+        </div>
+        <div id="settingsUsernameError" class="error-message"></div>
+        <button id="saveSettingsBtn" class="active">Сохранить</button>
+      </div>
+      
+      <!-- Темы -->
+      <div class="glass-container" style="margin-bottom: 16px; position: relative;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <h3>Тема</h3>
+          <button id="themeModeToggle" class="theme-mode-btn">☀️</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button class="theme-btn active" data-theme="pastel-pink">Pastel Pink</button>
+          <button class="theme-btn" data-theme="milk-rose">Milk Rose</button>
+          <button class="theme-btn" data-theme="night-blue">Night Blue</button>
+          <button class="theme-btn" data-theme="lo-fi-beige">Lo-Fi Beige</button>
+          <button class="theme-btn" data-theme="soft-lilac">Soft Lilac</button>
+        </div>
+      </div>
+      
+      <!-- Шрифты -->
       <div class="glass-container">
-        <h3 style="color: var(--text); margin-bottom: 16px;">Шрифт</h3>
+        <h3>Шрифт</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
           <button class="font-btn active" data-font="font-system">System</button>
           <button class="font-btn" data-font="font-rounded">Rounded</button>
@@ -824,7 +180,7 @@
     </div>
   </section>
 
-  <!-- Модалка для переименования чата -->
+  <!-- Модалка переименования -->
   <div id="renameModal" class="modal" style="display: none;">
     <div class="modal-content">
       <h3>Переименовать чат</h3>
@@ -835,43 +191,8 @@
       </div>
     </div>
   </div>
-  <script>
-  // Отладка для проверки работы чата
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 Проверка элементов чата:');
-    console.log('- chatArea:', document.getElementById('chatArea'));
-    console.log('- messageInput:', document.getElementById('messageInput'));
-    console.log('- sendMessageBtn:', document.getElementById('sendMessageBtn'));
-    console.log('- quickReplyPanel:', document.getElementById('quickReplyPanel'));
-    
-    // Проверяем, что функции доступны
-    console.log('- openChat:', typeof window.openChat);
-    console.log('- sendMessage:', typeof window.sendMessage);
-  });
-</script>
-<script>
-  // МГНОВЕННАЯ ДИАГНОСТИКА
-  setTimeout(() => {
-    console.log('=== ДИАГНОСТИКА ===');
-    console.log('Классы body:', document.body.className);
-    
-    // Проверяем, какие стили реально применяются
-    const styles = getComputedStyle(document.body);
-    console.log('Фон:', styles.background);
-    console.log('--bg-start:', styles.getPropertyValue('--bg-start'));
-    console.log('--bg-end:', styles.getPropertyValue('--bg-end'));
-    
-    // Проверяем, есть ли конфликтующие стили
-    console.log('Все классы:', document.body.classList);
-    
-    // Тест принудительного применения тёмной темы
-    console.log('\nТЕСТ: Применяем тёмную тему Pastel Pink');
-    document.body.className = 'dark-mode theme-pastel-pink';
-    console.log('Новые классы:', document.body.className);
-    console.log('Новый фон:', getComputedStyle(document.body).background);
-  }, 2000);
-</script>
 
+  <!-- Скрипты (ВАЖНО: именно в этом порядке) -->
   <script src="app.js"></script>
   <script src="contacts.js"></script>
   <script src="chat.js"></script>

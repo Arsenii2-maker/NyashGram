@@ -1,5 +1,5 @@
 // contacts.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
-
+ 
 const contacts = [
   { id: "bestie", name: "Bestie", username: "bestie_nyash", status: "онлайн 💕" },
   { id: "philosopher", name: "Философ", username: "thinker_deep", status: "пишет трактат 📜" },

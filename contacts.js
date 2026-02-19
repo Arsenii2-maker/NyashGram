@@ -17,7 +17,6 @@ const allContacts = [...fixedChats, ...contacts];
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned') || '[]');
 let currentSearchTerm = '';
 
-// Убеждаемся что chatData существует
 if (!window.chatData) {
   window.chatData = {};
 }
@@ -66,6 +65,11 @@ function contactMatchesSearch(contact) {
   return username.includes(currentSearchTerm);
 }
 
+function getDisplayName(contact) {
+  if (!contact) return '';
+  return window.customNames?.[contact.id] || contact.name;
+}
+
 function renderContacts() {
   const list = document.getElementById('contactsList');
   if (!list) return;
@@ -111,7 +115,6 @@ function renderContacts() {
     emptyEl.style.padding = '20px';
     emptyEl.style.textAlign = 'center';
     emptyEl.style.color = 'var(--text-soft)';
-    emptyEl.style.animation = 'fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
     emptyEl.textContent = '😿 Ничего не найдено';
     list.appendChild(emptyEl);
   }
@@ -127,28 +130,25 @@ function createContactElement(contact, isBot = false) {
   const avatarStyle = contact.avatar || getGradientForName(contact.name);
   const draftText = window.chatData[contact.id]?.draft || '';
   const pinIcon = isPinned(contact.id) && !isBot ? '<span class="pin-icon">📌</span>' : '';
+  const displayName = getDisplayName(contact);
   
   el.innerHTML = `
     <div class="avatar" style="background: ${avatarStyle}; background-size: cover;"></div>
     <div class="info">
-      <div class="name">${contact.name} ${pinIcon}</div>
+      <div class="name">${displayName} ${pinIcon}</div>
       <div class="username">@${contact.username || 'unknown'}</div>
       <div class="status">${contact.status}</div>
-      ${draftText ? `<div class="draft" style="font-size: 11px; color: var(--accent); margin-top: 2px; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
+      ${draftText ? `<div class="draft">📝 ${draftText.slice(0, 20)}${draftText.length > 20 ? '...' : ''}</div>` : ''}
     </div>
   `;
   
   el.onclick = (e) => {
     e.preventDefault();
-    e.stopPropagation();
     if (typeof window.openChat === 'function') {
       window.openChat(contact);
     }
     return false;
   };
-  
-  el.addEventListener('mousedown', (e) => e.preventDefault());
-  el.addEventListener('selectstart', (e) => e.preventDefault());
   
   return el;
 }

@@ -849,6 +849,28 @@
     console.log('- sendMessage:', typeof window.sendMessage);
   });
 </script>
+<script>
+  // МГНОВЕННАЯ ДИАГНОСТИКА
+  setTimeout(() => {
+    console.log('=== ДИАГНОСТИКА ===');
+    console.log('Классы body:', document.body.className);
+    
+    // Проверяем, какие стили реально применяются
+    const styles = getComputedStyle(document.body);
+    console.log('Фон:', styles.background);
+    console.log('--bg-start:', styles.getPropertyValue('--bg-start'));
+    console.log('--bg-end:', styles.getPropertyValue('--bg-end'));
+    
+    // Проверяем, есть ли конфликтующие стили
+    console.log('Все классы:', document.body.classList);
+    
+    // Тест принудительного применения тёмной темы
+    console.log('\nТЕСТ: Применяем тёмную тему Pastel Pink');
+    document.body.className = 'dark-mode theme-pastel-pink';
+    console.log('Новые классы:', document.body.className);
+    console.log('Новый фон:', getComputedStyle(document.body).background);
+  }, 2000);
+</script>
 
   <script src="app.js"></script>
   <script src="contacts.js"></script>

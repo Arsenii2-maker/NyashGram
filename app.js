@@ -335,17 +335,32 @@ function checkAuth() {
   if (localStorage.getItem('nyashgram_entered') === 'true') {
     addUsername(AppState.currentUser.username);
     
-    // Применяем режим темы
-    document.body.classList.add(currentThemeMode === 'light' ? 'light-mode' : 'dark-mode');
+    // Загружаем сохранённый режим
+    const savedMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
+    currentThemeMode = savedMode;
     
+    // ВАЖНО: добавляем класс режима на body
+    document.body.classList.add(savedMode + '-mode');
+    
+    // Применяем сохранённую тему
     applyTheme(AppState.currentUser.theme);
     applyFont(AppState.currentUser.font);
+    
+    // Обновляем кнопку луны
+    const modeToggle = document.getElementById('themeModeToggle');
+    if (modeToggle) {
+      modeToggle.textContent = savedMode === 'light' ? '☀️' : '🌙';
+    }
+    
     showScreen('contactsScreen');
   } else {
     showScreen('phoneScreen');
+    // По умолчанию светлый режим
+    document.body.classList.add('light-mode');
+    applyTheme('pastel-pink');
+    applyFont('font-cozy');
   }
 }
-
 // Генерация кода
 let generatedCode = '';
 function generateCode() {

@@ -1,5 +1,41 @@
 // app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С ГЕНЕРАТОРОМ ЮЗЕРНЕЙМОВ
+// В начале app.js добавьте
+let currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
 
+// Функция переключения режима темы
+function toggleThemeMode() {
+  const modeToggle = document.getElementById('themeModeToggle');
+  
+  if (currentThemeMode === 'light') {
+    currentThemeMode = 'dark';
+    if (modeToggle) modeToggle.textContent = '🌙';
+    document.body.classList.remove('light-mode');
+    document.body.classList.add('dark-mode');
+  } else {
+    currentThemeMode = 'light';
+    if (modeToggle) modeToggle.textContent = '☀️';
+    document.body.classList.remove('dark-mode');
+    document.body.classList.add('light-mode');
+  }
+  
+  localStorage.setItem('nyashgram_theme_mode', currentThemeMode);
+  
+  // Переприменяем текущую тему
+  const currentTheme = AppState.currentUser.theme;
+  document.body.classList.remove(
+    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue', 
+    'theme-lo-fi-beige', 'theme-soft-lilac'
+  );
+  document.body.classList.add(`theme-${currentTheme}`);
+}
+
+// В DOMContentLoaded добавьте:
+const themeModeToggle = document.getElementById('themeModeToggle');
+if (themeModeToggle) {
+  themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
+  document.body.classList.add(currentThemeMode === 'light' ? 'light-mode' : 'dark-mode');
+  themeModeToggle.addEventListener('click', toggleThemeMode);
+}
 const AppState = {
   currentUser: {
     name: localStorage.getItem('nyashgram_name') || "Няша",

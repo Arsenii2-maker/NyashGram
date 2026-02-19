@@ -17,6 +17,67 @@ const AppState = {
     font: localStorage.getItem('nyashgram_font') || "font-cozy"
   }
 };
+// В начале файла, после AppState, добавьте:
+
+// Текущая тема и режим
+let currentThemeBase = localStorage.getItem('nyashgram_theme_base') || 'pastel-pink';
+let currentThemeMode = localStorage.getItem('nyashgram_theme_mode') || 'light';
+
+// Функция применения темы
+function applyTheme(themeBase, mode) {
+  const themeClass = `theme-${themeBase}-${mode}`;
+  
+  // Удаляем все классы тем
+  document.body.classList.remove(
+    'theme-pastel-pink-light', 'theme-pastel-pink-dark',
+    'theme-milk-rose-light', 'theme-milk-rose-dark',
+    'theme-night-blue-light', 'theme-night-blue-dark',
+    'theme-lo-fi-beige-light', 'theme-lo-fi-beige-dark',
+    'theme-soft-lilac-light', 'theme-soft-lilac-dark'
+  );
+  
+  // Добавляем новую тему
+  document.body.classList.add(themeClass);
+  
+  // Сохраняем
+  currentThemeBase = themeBase;
+  currentThemeMode = mode;
+  localStorage.setItem('nyashgram_theme_base', themeBase);
+  localStorage.setItem('nyashgram_theme_mode', mode);
+  
+  console.log('Применена тема:', themeClass);
+}
+
+// Функция переключения режима (луна/солнце)
+function toggleThemeMode() {
+  const newMode = currentThemeMode === 'light' ? 'dark' : 'light';
+  applyTheme(currentThemeBase, newMode);
+  
+  // Обновляем иконку
+  const modeToggle = document.getElementById('themeModeToggle');
+  if (modeToggle) {
+    modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';
+  }
+}
+
+// В функции checkAuth() замените применение темы на:
+// После загрузки пользователя
+applyTheme(currentThemeBase, currentThemeMode);
+
+// В обработчиках кнопок тем замените на:
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const themeBase = btn.dataset.theme; // теперь data-theme="pastel-pink" и т.д.
+    applyTheme(themeBase, currentThemeMode);
+  });
+});
+
+// Для кнопки луны:
+const themeModeToggle = document.getElementById('themeModeToggle');
+if (themeModeToggle) {
+  themeModeToggle.textContent = currentThemeMode === 'light' ? '☀️' : '🌙';
+  themeModeToggle.addEventListener('click', toggleThemeMode);
+}
 
 // База данных занятых юзернеймов
 let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames') || '["nyasha", "nyashhelp_official", "nyashtalk_bot", "nyashgame_bot", "nyashhoroscope_bot", "bestie_nyash", "thinker_deep", "study_buddy", "melody_lover", "midnight_vibes", "admin", "user"]');
@@ -25,7 +86,7 @@ let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames'
 const cuteWords = [
   "nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", 
   "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango",
-  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream"
+  "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream", "Parallelogram"
 ];
 
 const cuteSuffixes = [

@@ -332,7 +332,9 @@ async function loginWithEmail(email, password) {
 async function loginWithGoogle() {
   try {
     console.log('🔄 Начинаем вход через Google...');
-    
+    // В начале loginWithGoogle добавьте:
+showLoadingScreen('Вход через Google...');
+
     // Определяем, мобильное устройство или нет
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
@@ -364,6 +366,8 @@ async function loginWithGoogle() {
     }
     
     alert(errorMessage);
+    // В конце, перед return:
+setTimeout(() => hideLoadingScreen(), 1000);
     return { success: false, error: errorMessage };
   }
 }
@@ -474,8 +478,15 @@ auth.getRedirectResult().then(async (result) => {
 // ===== АНОНИМНЫЙ ВХОД =====
 async function loginAnonymously() {
   try {
+    console.log('🔄 Начинаем анонимный вход...');
+    
+    // Показываем экран загрузки
+    showLoadingScreen('Создаём гостевой аккаунт...');
+    
     const result = await auth.signInAnonymously();
     const user = result.user;
+    
+    console.log('✅ Анонимный вход успешен:', user.uid);
     
     const username = `guest_${Math.floor(Math.random() * 10000)}`;
     
@@ -491,24 +502,38 @@ async function loginAnonymously() {
       isAnonymous: true
     };
     
-    // Для анонимного входа НЕ сохраняем в Firestore
+    // Для анонимного входа сохраняем только в localStorage
     localStorage.setItem('nyashgram_anonymous', 'true');
     localStorage.setItem('nyashgram_entered', 'true');
     localStorage.setItem('nyashgram_name', 'Гость');
     localStorage.setItem('nyashgram_username', username);
     
+    // Применяем настройки
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
     
-    showScreen('contactsScreen');
-    if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+    // Даём время увидеть советы, потом показываем контакты
+    setTimeout(() => {
+      hideLoadingScreen();
+      if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+    }, 2000);
     
     return { success: true };
   } catch (error) {
-    return { success: false, error: 'Ошибка анонимного входа' };
+    console.error('❌ Ошибка анонимного входа:', error);
+    hideLoadingScreen();
+    
+    let errorMessage = 'Ошибка анонимного входа';
+    if (error.code === 'auth/network-request-failed') {
+      errorMessage = 'Ошибка сети. Проверьте подключение к интернету.';
+    } else if (error.code === 'auth/operation-not-allowed') {
+      errorMessage = 'Анонимный вход не включен в Firebase Console.';
+    }
+    
+    alert(errorMessage);
+    return { success: false, error: errorMessage };
   }
 }
-
 // ===== СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ =====
 function saveUserToStorage() {
   localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));

@@ -2,14 +2,6 @@
 
 // ===== FIREBASE КОНФИГУРАЦИЯ =====
 // Замените на свои данные из Firebase Console
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCqTm_oMEVRjOwodVrhmWHLNl1DA4x9sUQ",
   authDomain: "nyashgram-e9f69.firebaseapp.com",
@@ -19,10 +11,6 @@ const firebaseConfig = {
   appId: "1:54620743155:web:4db4690057b103ef859e86",
   measurementId: "G-KXXQTJVEGV"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 // Инициализация Firebase
 firebase.initializeApp(firebaseConfig);
@@ -329,6 +317,9 @@ async function logout() {
       isFake: false
     };
     
+    setTheme('pastel-pink', 'light');
+    applyFont('font-cozy');
+    
     showScreen('loginMethodScreen');
     console.log('✅ Выход выполнен');
   } catch (error) {
@@ -388,6 +379,8 @@ function generateCode() {
 function fakeLogin() {
   AppState.currentUser.isFake = true;
   localStorage.setItem('nyashgram_entered', 'true');
+  setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+  applyFont(AppState.currentUser.font);
   showScreen('contactsScreen');
   if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
 }
@@ -455,6 +448,10 @@ function checkAuth() {
   const savedUser = localStorage.getItem('nyashgram_user');
   const fakeEntered = localStorage.getItem('nyashgram_entered');
   
+  // Сначала устанавливаем тему по умолчанию (розовую)
+  setTheme('pastel-pink', 'light');
+  applyFont('font-cozy');
+  
   if (savedUser) {
     const userData = JSON.parse(savedUser);
     AppState.currentUser = { ...AppState.currentUser, ...userData, isFake: false };
@@ -463,13 +460,9 @@ function checkAuth() {
     showScreen('contactsScreen');
   } else if (fakeEntered === 'true') {
     AppState.currentUser.isFake = true;
-    setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
-    applyFont(AppState.currentUser.font);
     showScreen('contactsScreen');
   } else {
     showScreen('loginMethodScreen');
-    setTheme('pastel-pink', 'light');
-    applyFont('font-cozy');
   }
 }
 
@@ -479,10 +472,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // ===== НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ =====
   document.getElementById('phoneMethodBtn')?.addEventListener('click', () => {
+    console.log('📱 Выбран вход по телефону');
     showScreen('phoneScreen');
   });
   
   document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
+    console.log('📧 Выбран вход по email');
     showScreen('emailRegisterScreen');
   });
   
@@ -693,7 +688,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (user) {
       await user.reload();
       if (user.emailVerified) {
+        // После подтверждения email, выполняем вход автоматически
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        const userData = userDoc.data();
+        
+        AppState.currentUser = {
+          uid: user.uid,
+          name: userData.name,
+          username: userData.username,
+          email: user.email,
+          avatar: userData.avatar,
+          theme: userData.theme || 'pastel-pink',
+          mode: userData.mode || 'light',
+          font: userData.font || 'font-cozy',
+          isFake: false
+        };
+        
+        localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+        localStorage.setItem('nyashgram_name', userData.name);
+        localStorage.setItem('nyashgram_username', userData.username);
+        localStorage.setItem('nyashgram_email', user.email);
+        localStorage.setItem('nyashgram_entered', 'true');
+        
+        setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+        applyFont(AppState.currentUser.font);
+        
         showScreen('contactsScreen');
+        if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
       } else {
         alert('Email ещё не подтверждён! Проверь почту и нажми на ссылку.');
       }
@@ -751,6 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // Проверяем авторизацию и устанавливаем тему
   checkAuth();
   
   window.showScreen = showScreen;

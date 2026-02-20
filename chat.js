@@ -403,14 +403,35 @@ function showRenameModal() {
   if (modal && input) {
     input.value = customNames[currentContact.id] || currentContact.name;
     modal.style.display = 'flex';
+    
+    // Автоматически фокусируемся на поле ввода
+    setTimeout(() => {
+      input.focus();
+      input.select(); // Выделяем текст для удобства
+    }, 100);
   }
 }
 
 function hideRenameModal() {
   const modal = document.getElementById('renameModal');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.style.animation = 'modalFadeOut 0.2s ease';
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.style.animation = '';
+    }, 200);
+  }
 }
 
+// Добавьте эту анимацию в style.css
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 function renameCurrentChat() {
   const input = document.getElementById('renameInput');
   if (!input || !currentContact) return;

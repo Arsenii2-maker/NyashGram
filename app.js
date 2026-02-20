@@ -657,6 +657,10 @@ function checkAuth() {
   const savedUser = localStorage.getItem('nyashgram_user');
   const anonymous = localStorage.getItem('nyashgram_anonymous');
   
+  // Показываем загрузку
+  showLoadingScreen('Загружаем твой профиль...');
+  
+  // Устанавливаем тему по умолчанию
   setTheme('pastel-pink', 'light');
   applyFont('font-cozy');
   
@@ -665,10 +669,19 @@ function checkAuth() {
     AppState.currentUser = { ...AppState.currentUser, ...userData };
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
-    showScreen('contactsScreen');
+    
+    setTimeout(() => {
+      hideLoadingScreen();
+      showScreen('contactsScreen');
+    }, 1500);
   } else if (anonymous === 'true') {
-    showScreen('contactsScreen');
+    setTimeout(() => {
+      hideLoadingScreen();
+      showScreen('contactsScreen');
+    }, 1500);
   } else {
+    // Если не авторизован, сразу показываем экран входа
+    hideLoadingScreen();
     showScreen('loginMethodScreen');
   }
 }

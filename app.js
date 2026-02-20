@@ -23,12 +23,11 @@ let takenUsernames = JSON.parse(localStorage.getItem('nyashgram_taken_usernames'
 const cuteWords = ["nyasha", "kawaii", "cutie", "sweetie", "honey", "bunny", "kitty", "pudding", "mochi", "cookie", "candy", "sugar", "strawberry", "cherry", "peach", "mango", "cloud", "star", "moon", "sunny", "rainbow", "sparkle", "glitter", "dream"];
 const cuteSuffixes = ["chan", "kun", "san", "tan", "chin", "rin", "pii", "nyan", "mimi"];
 
-// ===== ПРОСТАЯ СИСТЕМА ТЕМ =====
 function setTheme(theme, mode) {
   // Сохраняем текущий шрифт
   const currentFont = AppState.currentUser.font;
   
-  // Полностью очищаем классы на body
+  // ПОЛНОСТЬЮ очищаем классы на body
   document.body.className = '';
   
   // Добавляем класс темы и режима
@@ -42,6 +41,17 @@ function setTheme(theme, mode) {
   AppState.currentUser.mode = mode;
   localStorage.setItem('nyashgram_theme', theme);
   localStorage.setItem('nyashgram_mode', mode);
+  
+  // Обновляем активные кнопки тем
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.theme === theme) {
+      btn.classList.add('active');
+    }
+  });
+  
+  console.log('✅ Тема установлена:', `${theme}-${mode}`);
+}
   
   // Кнопки тем - ИСПРАВЛЕНО
 document.querySelectorAll('.theme-btn').forEach(btn => {

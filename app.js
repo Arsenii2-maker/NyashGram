@@ -1,4 +1,4 @@
-// app.js — НОВАЯ ПРОСТАЯ ВЕРСИЯ
+// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ
 
 // Инициализация
 if (!window.chatData) {
@@ -44,33 +44,23 @@ function setTheme(theme, mode) {
   localStorage.setItem('nyashgram_mode', mode);
   
   console.log('✅ Тема установлена:', `${theme}-${mode}`);
-  console.log('📌 Классы body:', document.body.className);
 }
 
 // Переключение режима (луна/солнце)
-function toggleMode() {
-  const newMode = AppState.currentUser.mode === 'light' ? 'dark' : 'light';
-  setTheme(AppState.currentUser.theme, newMode);
-  // В функции toggleMode добавьте небольшую анимацию
 function toggleMode() {
   const newMode = AppState.currentUser.mode === 'light' ? 'dark' : 'light';
   
   // Анимация для кнопки
   const modeToggle = document.getElementById('themeModeToggle');
   if (modeToggle) {
-    modeToggle.style.transform = 'rotate(180deg) scale(1.2)';
+    modeToggle.classList.add('mode-switch-animation');
     setTimeout(() => {
-      modeToggle.style.transform = '';
-    }, 200);
+      modeToggle.classList.remove('mode-switch-animation');
+    }, 300);
   }
   
   setTheme(AppState.currentUser.theme, newMode);
   
-  if (modeToggle) {
-    modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';
-  }
-}
-  const modeToggle = document.getElementById('themeModeToggle');
   if (modeToggle) {
     modeToggle.textContent = newMode === 'light' ? '☀️' : '🌙';
   }
@@ -404,22 +394,6 @@ document.addEventListener('DOMContentLoaded', function() {
       window.filterContactsByUsername(this.value);
     }
   });
-  // В chat.js, функция toggleChatActions
-function toggleChatActions() {
-  const panel = document.getElementById('chatActionsPanel');
-  if (!panel) return;
-  
-  if (panel.style.display === 'none' || panel.style.display === '') {
-    panel.style.display = 'flex';
-    panel.style.animation = 'slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-  } else {
-    panel.style.animation = 'slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-    setTimeout(() => {
-      panel.style.display = 'none';
-      panel.style.animation = ''; // Сбрасываем анимацию
-    }, 200);
-  }
-}
   
   // Проверка авторизации
   checkAuth();

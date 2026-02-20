@@ -34,9 +34,12 @@
     <h1>NyashGram 💗</h1>
     <p class="subtitle">Выбери способ входа</p>
     
-    <!--<button id="phoneMethodBtn" class="active" style="margin-bottom: 12px;">📱 По телефону</button> -->
-    <button id="realPhoneMethodBtn" class="active" style="margin-bottom: 12px;">📱 По телефону</button>
-    <button id="emailMethodBtn" class="active">📧 По email</button>
+    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+      <button id="realPhoneMethodBtn" class="active" style="width: 100%; padding: 16px;">📱 По телефону (настоящий)</button>
+      <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px;">📧 По email (настоящий)</button>
+    </div>
+    
+    <p style="font-size:12px; color: var(--text-soft); margin-top: 24px;">✨ Выбери способ входа ✨</p>
   </div>
 </section>
 
@@ -118,22 +121,22 @@
     <p class="subtitle">Регистрация по email</p>
     
     <div class="input-with-icon">
-      <span class="input-icon">👤</span>
+      <span class="input-icon"></span>
       <input type="text" id="regName" placeholder="Твоё имя" />
     </div>
     
     <div class="input-with-icon">
-      <span class="input-icon">📧</span>
+      <span class="input-icon"></span>
       <input type="email" id="regEmail" placeholder="Email" />
     </div>
     
     <div class="input-with-icon">
-      <span class="input-icon">🔒</span>
+      <span class="input-icon"></span>
       <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" />
     </div>
     
     <div class="input-with-icon">
-      <span class="input-icon">🔐</span>
+      <span class="input-icon"></span>
       <input type="password" id="regConfirmPassword" placeholder="Повтори пароль" />
     </div>
     

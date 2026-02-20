@@ -447,6 +447,101 @@ body.soft-lilac-dark button.active {
   border-color: #6a4fa7;
   color: #ffffff;
 }
+/* ===== Forest Mint - НОВАЯ ЗЕЛЁНАЯ ТЕМА ===== */
+
+/* Forest Mint - Light (светлая зелёная) */
+body.forest-mint-light {
+  --bg-start: #e0f2e0;
+  --bg-end: #c8e6c9;
+  --text: #1d3b1d;
+  --text-soft: #2d5a2d;
+  --accent: #81c784;
+  --accent-soft: #a5d6a7;
+  --card-bg: rgba(200, 230, 200, 0.25);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(200, 230, 200, 0.7);
+  --border-light: rgba(100, 150, 100, 0.3);
+  background: linear-gradient(145deg, #e0f2e0, #c8e6c9);
+  color: #1d3b1d;
+}
+body.forest-mint-light .glass-container,
+body.forest-mint-light .contact,
+body.forest-mint-light #chatHeader,
+body.forest-mint-light .top-bar,
+body.forest-mint-light #messageInputArea,
+body.forest-mint-light .chat-actions-panel {
+  background: rgba(200, 230, 200, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(100, 150, 100, 0.3);
+}
+body.forest-mint-light .message.user {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid white;
+}
+body.forest-mint-light .message.bot {
+  background: rgba(200, 230, 200, 0.7);
+  border: 1px solid rgba(100, 150, 100, 0.3);
+}
+body.forest-mint-light .quick-chip {
+  background: rgba(200, 230, 200, 0.6);
+  border: 1px solid rgba(100, 150, 100, 0.4);
+  color: #1d3b1d;
+}
+body.forest-mint-light button.active {
+  background: #81c784;
+  border-color: #4caf50;
+  color: #1d3b1d;
+}
+body.forest-mint-light #themeModeToggle {
+  color: #1d3b1d;
+}
+
+/* Forest Mint - Dark (тёмная зелёная) */
+body.forest-mint-dark {
+  --bg-start: #1b4d1b;
+  --bg-end: #0a330a;
+  --text: #e8f5e8;
+  --text-soft: #a5d6a5;
+  --accent: #2e7d32;
+  --accent-soft: #388e3c;
+  --card-bg: rgba(27, 77, 27, 0.4);
+  --bubble-user: rgba(46, 125, 50, 0.7);
+  --bubble-bot: rgba(20, 70, 20, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, #1b4d1b, #0a330a);
+  color: #e8f5e8;
+}
+body.forest-mint-dark .glass-container,
+body.forest-mint-dark .contact,
+body.forest-mint-dark #chatHeader,
+body.forest-mint-dark .top-bar,
+body.forest-mint-dark #messageInputArea,
+body.forest-mint-dark .chat-actions-panel {
+  background: rgba(27, 77, 27, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+body.forest-mint-dark .message.user {
+  background: rgba(46, 125, 50, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+body.forest-mint-dark .message.bot {
+  background: rgba(20, 70, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+body.forest-mint-dark .quick-chip {
+  background: rgba(46, 125, 50, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+body.forest-mint-dark button.active {
+  background: #2e7d32;
+  border-color: #1b5e20;
+  color: #ffffff;
+}
+body.forest-mint-dark #themeModeToggle {
+  color: #ffffff;
+}
 
 /* ===== ШРИФТЫ ===== */
 .font-system { font-family: system-ui, -apple-system, sans-serif; }

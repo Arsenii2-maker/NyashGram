@@ -1,14 +1,13 @@
-// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С EMAIL И APPLE
+// app.js — С Email, Google и Анонимным входом
 
 // ===== FIREBASE КОНФИГУРАЦИЯ =====
 const firebaseConfig = {
-  apiKey: "AIzaSyCqTm_oMEVRjOwodVrhmWHLNl1DA4x9sUQ",
-  authDomain: "nyashgram-e9f69.firebaseapp.com",
-  projectId: "nyashgram-e9f69",
-  storageBucket: "nyashgram-e9f69.firebasestorage.app",
-  messagingSenderId: "54620743155",
-  appId: "1:54620743155:web:4db4690057b103ef859e86",
-  measurementId: "G-KXXQTJVEGV"
+  apiKey: "AIzaSyCqTm_oMEV_6e8E2SnE3x5jGR15jPcFbF8",
+  authDomain: "nyashgram-ff9c4.firebaseapp.com",
+  projectId: "nyashgram-ff9c4",
+  storageBucket: "nyashgram-ff9c4.firebasestorage.app",
+  messagingSenderId: "1091195998837",
+  appId: "1:1091195998837:web:aa9e1e55030e7809ea6e27"
 };
 
 // Инициализация Firebase
@@ -20,8 +19,8 @@ const storage = firebase.storage();
 // Настройка сохранения сессии
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-// Провайдер для Apple
-const appleProvider = new firebase.auth.OAuthProvider('apple.com');
+// Провайдеры
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // Инициализация
 if (!window.chatData) {
@@ -38,7 +37,8 @@ const AppState = {
     theme: localStorage.getItem('nyashgram_theme') || "pastel-pink",
     mode: localStorage.getItem('nyashgram_mode') || "light",
     font: localStorage.getItem('nyashgram_font') || "font-cozy",
-    isFake: false // Больше никакого фейка!
+    isAnonymous: false,
+    isFake: false
   }
 };
 
@@ -184,10 +184,7 @@ async function registerWithEmail(name, email, password) {
     const user = userCredential.user;
     
     await user.sendEmailVerification();
-    
-    await user.updateProfile({
-      displayName: name
-    });
+    await user.updateProfile({ displayName: name });
     
     const username = generateCuteUsername();
     
@@ -200,31 +197,17 @@ async function registerWithEmail(name, email, password) {
       mode: 'light',
       font: 'font-cozy',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      emailVerified: false
+      emailVerified: false,
+      isAnonymous: false
     });
     
     addUsername(username);
-    
-    console.log('✅ Регистрация успешна!');
     showScreen('verifyEmailScreen');
-    
-    return { success: true, user };
+    return { success: true };
   } catch (error) {
-    console.error('❌ Ошибка регистрации:', error);
-    
     let errorMessage = 'Ошибка регистрации';
-    switch(error.code) {
-      case 'auth/email-already-in-use':
-        errorMessage = 'Этот email уже зарегистрирован';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Некорректный email';
-        break;
-      case 'auth/weak-password':
-        errorMessage = 'Пароль слишком слабый (минимум 6 символов)';
-        break;
-    }
-    
+    if (error.code === 'auth/email-already-in-use') errorMessage = 'Этот email уже зарегистрирован';
+    if (error.code === 'auth/weak-password') errorMessage = 'Пароль слишком слабый (минимум 6 символов)';
     return { success: false, error: errorMessage };
   }
 }
@@ -236,11 +219,7 @@ async function loginWithEmail(email, password) {
     const user = userCredential.user;
     
     if (!user.emailVerified) {
-      return { 
-        success: false, 
-        error: 'Подтверди email по ссылке в письме',
-        needVerification: true 
-      };
+      return { success: false, error: 'Подтверди email по ссылке в письме', needVerification: true };
     }
     
     const userDoc = await db.collection('users').doc(user.uid).get();
@@ -255,152 +234,44 @@ async function loginWithEmail(email, password) {
       theme: userData.theme || 'pastel-pink',
       mode: userData.mode || 'light',
       font: userData.font || 'font-cozy',
-      isFake: false
+      isAnonymous: false
     };
     
-    localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
-    localStorage.setItem('nyashgram_name', userData.name);
-    localStorage.setItem('nyashgram_username', userData.username);
-    localStorage.setItem('nyashgram_email', user.email);
-    localStorage.setItem('nyashgram_theme', userData.theme || 'pastel-pink');
-    localStorage.setItem('nyashgram_mode', userData.mode || 'light');
-    localStorage.setItem('nyashgram_font', userData.font || 'font-cozy');
-    localStorage.setItem('nyashgram_entered', 'true');
-    
-    setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
-    applyFont(AppState.currentUser.font);
-    
-    console.log('✅ Вход успешен!');
-    showScreen('contactsScreen');
-    if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
-    
-    return { success: true, user };
-  } catch (error) {
-    console.error('❌ Ошибка входа:', error);
-    
-    let errorMessage = 'Ошибка входа';
-    switch(error.code) {
-      case 'auth/user-not-found':
-        errorMessage = 'Пользователь не найден';
-        break;
-      case 'auth/wrong-password':
-        errorMessage = 'Неверный пароль';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Некорректный email';
-        break;
-    }
-    
-    return { success: false, error: errorMessage };
-  }
-}
-
-// ===== APPLE ВХОД (ИСПРАВЛЕННАЯ ВЕРСИЯ) =====
-
-// Настройка провайдера Apple
-function getAppleProvider() {
-  const provider = new firebase.auth.OAuthProvider('apple.com');
-  
-  // Добавляем необходимые scope
-  provider.addScope('email');
-  provider.addScope('name');
-  
-  // Настройки для мобильных устройств
-  provider.setCustomParameters({
-    // Для мобильных устройств
-    locale: 'ru',
-    // Чтобы не было проблем с попапами на мобильных
-    response_mode: 'web_message'
-  });
-  
-  return provider;
-}
-
-// Вход через Apple (улучшенная версия)
-async function loginWithApple() {
-  try {
-    console.log('🍎 Начинаем вход через Apple...');
-    
-    const provider = getAppleProvider();
-    
-    // Определяем, мобильное устройство или нет
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    let result;
-    
-    if (isMobile) {
-      // На мобильных используем redirect вместо popup
-      console.log('📱 Мобильное устройство, используем redirect');
-      await auth.signInWithRedirect(provider);
-      // После редиректа результат обработается в onAuthStateChanged
-      return { success: true, redirect: true };
-    } else {
-      // На десктопе используем popup
-      console.log('💻 Десктоп, используем popup');
-      result = await auth.signInWithPopup(provider);
-    }
-    
-    // Обработка результата (для popup)
-    if (result) {
-      return await handleAppleSignInResult(result);
-    }
-    
+    saveUserToStorage();
     return { success: true };
-    
   } catch (error) {
-    console.error('❌ Ошибка входа через Apple:', error);
-    
-    let errorMessage = 'Ошибка входа через Apple';
-    if (error.code === 'auth/popup-closed-by-user') {
-      errorMessage = 'Вход отменён';
-    } else if (error.code === 'auth/popup-blocked') {
-      errorMessage = 'Всплывающее окно заблокировано. Разрешите всплывающие окна.';
-    } else if (error.code === 'auth/cancelled-popup-request') {
-      errorMessage = 'Запрос отменён';
-    }
-    
+    let errorMessage = 'Ошибка входа';
+    if (error.code === 'auth/user-not-found') errorMessage = 'Пользователь не найден';
+    if (error.code === 'auth/wrong-password') errorMessage = 'Неверный пароль';
     return { success: false, error: errorMessage };
   }
 }
 
-// Обработка результата входа через Apple
-async function handleAppleSignInResult(result) {
+// ===== GOOGLE ВХОД =====
+async function loginWithGoogle() {
   try {
+    const result = await auth.signInWithPopup(googleProvider);
     const user = result.user;
-    console.log('✅ Вход через Apple успешен:', user.email);
     
-    // Проверяем, есть ли пользователь в базе
     const userDoc = await db.collection('users').doc(user.uid).get();
     
     if (!userDoc.exists) {
-      // Новый пользователь - создаём профиль
       const username = generateCuteUsername();
-      
-      // Получаем имя от Apple (если есть)
-      let name = 'Apple User';
-      if (result.additionalUserInfo && result.additionalUserInfo.profile) {
-        const profile = result.additionalUserInfo.profile;
-        if (profile.name) {
-          name = profile.name.firstName || profile.name.fullName || 'Apple User';
-        }
-      }
-      
       await db.collection('users').doc(user.uid).set({
-        name: name,
+        name: user.displayName || 'Google User',
         email: user.email,
         username: username,
-        avatar: user.photoURL || null,
+        avatar: user.photoURL,
         theme: 'pastel-pink',
         mode: 'light',
         font: 'font-cozy',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        emailVerified: true
+        emailVerified: true,
+        isAnonymous: false
       });
-      
       addUsername(username);
     }
     
-    // Загружаем данные пользователя
     const userData = (await db.collection('users').doc(user.uid).get()).data();
     
     AppState.currentUser = {
@@ -412,17 +283,42 @@ async function handleAppleSignInResult(result) {
       theme: userData.theme || 'pastel-pink',
       mode: userData.mode || 'light',
       font: userData.font || 'font-cozy',
-      isFake: false
+      isAnonymous: false
     };
     
-    // Сохраняем в localStorage
-    localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
-    localStorage.setItem('nyashgram_name', userData.name);
-    localStorage.setItem('nyashgram_username', userData.username);
-    localStorage.setItem('nyashgram_email', user.email);
-    localStorage.setItem('nyashgram_entered', 'true');
+    saveUserToStorage();
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Ошибка входа через Google' };
+  }
+}
+
+// ===== АНОНИМНЫЙ ВХОД =====
+async function loginAnonymously() {
+  try {
+    const result = await auth.signInAnonymously();
+    const user = result.user;
     
-    // Применяем настройки
+    const username = `guest_${Math.floor(Math.random() * 10000)}`;
+    
+    AppState.currentUser = {
+      uid: user.uid,
+      name: 'Гость',
+      username: username,
+      email: null,
+      avatar: null,
+      theme: 'pastel-pink',
+      mode: 'light',
+      font: 'font-cozy',
+      isAnonymous: true
+    };
+    
+    // Для анонимного входа НЕ сохраняем в Firestore
+    localStorage.setItem('nyashgram_anonymous', 'true');
+    localStorage.setItem('nyashgram_entered', 'true');
+    localStorage.setItem('nyashgram_name', 'Гость');
+    localStorage.setItem('nyashgram_username', username);
+    
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
     
@@ -431,20 +327,27 @@ async function handleAppleSignInResult(result) {
     
     return { success: true };
   } catch (error) {
-    console.error('❌ Ошибка обработки Apple входа:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Ошибка анонимного входа' };
   }
 }
 
-// Обработка редиректа (для мобильных)
-auth.getRedirectResult().then(async (result) => {
-  if (result.user) {
-    console.log('✅ Результат редиректа получен');
-    await handleAppleSignInResult(result);
-  }
-}).catch((error) => {
-  console.error('❌ Ошибка редиректа:', error);
-});
+// ===== СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ =====
+function saveUserToStorage() {
+  localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+  localStorage.setItem('nyashgram_name', AppState.currentUser.name);
+  localStorage.setItem('nyashgram_username', AppState.currentUser.username);
+  if (AppState.currentUser.email) localStorage.setItem('nyashgram_email', AppState.currentUser.email);
+  localStorage.setItem('nyashgram_theme', AppState.currentUser.theme);
+  localStorage.setItem('nyashgram_mode', AppState.currentUser.mode);
+  localStorage.setItem('nyashgram_font', AppState.currentUser.font);
+  localStorage.setItem('nyashgram_entered', 'true');
+  
+  setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+  applyFont(AppState.currentUser.font);
+  
+  showScreen('contactsScreen');
+  if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+}
 
 // ===== ВЫХОД =====
 async function logout() {
@@ -456,6 +359,7 @@ async function logout() {
     localStorage.removeItem('nyashgram_name');
     localStorage.removeItem('nyashgram_username');
     localStorage.removeItem('nyashgram_email');
+    localStorage.removeItem('nyashgram_anonymous');
     
     AppState.currentUser = {
       name: "Няша",
@@ -464,14 +368,13 @@ async function logout() {
       theme: 'pastel-pink',
       mode: 'light',
       font: 'font-cozy',
-      isFake: false
+      isAnonymous: false
     };
     
     setTheme('pastel-pink', 'light');
     applyFont('font-cozy');
     
     showScreen('loginMethodScreen');
-    console.log('✅ Выход выполнен');
   } catch (error) {
     console.error('❌ Ошибка выхода:', error);
   }
@@ -483,26 +386,37 @@ function loadSettingsIntoUI() {
   document.getElementById('settingsUsername').value = AppState.currentUser.username;
   
   const emailEl = document.getElementById('profileEmail');
+  const typeEl = document.getElementById('profileType');
+  
   if (emailEl) {
     emailEl.textContent = AppState.currentUser.email || 'Нет email';
   }
   
+  if (typeEl) {
+    if (AppState.currentUser.isAnonymous) {
+      typeEl.textContent = '⚠️ Анонимный режим - данные не сохраняются';
+    } else {
+      typeEl.textContent = '✅ Постоянный аккаунт';
+    }
+  }
+  
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
-    if (btn.dataset.theme === AppState.currentUser.theme) {
-      btn.classList.add('active');
-    }
+    if (btn.dataset.theme === AppState.currentUser.theme) btn.classList.add('active');
   });
   
   document.querySelectorAll('.font-btn').forEach(btn => {
     btn.classList.remove('active');
-    if (btn.dataset.font === AppState.currentUser.font) {
-      btn.classList.add('active');
-    }
+    if (btn.dataset.font === AppState.currentUser.font) btn.classList.add('active');
   });
 }
 
 function saveSettings() {
+  if (AppState.currentUser.isAnonymous) {
+    alert('В анонимном режиме настройки не сохраняются!');
+    return;
+  }
+  
   const newName = document.getElementById('settingsName').value.trim();
   const newUsername = document.getElementById('settingsUsername').value.trim().toLowerCase();
   const errorEl = document.getElementById('settingsUsernameError');
@@ -538,16 +452,18 @@ function saveSettings() {
 // ===== ПРОВЕРКА АВТОРИЗАЦИИ =====
 function checkAuth() {
   const savedUser = localStorage.getItem('nyashgram_user');
+  const anonymous = localStorage.getItem('nyashgram_anonymous');
   
-  // Сначала устанавливаем тему по умолчанию
   setTheme('pastel-pink', 'light');
   applyFont('font-cozy');
   
   if (savedUser) {
     const userData = JSON.parse(savedUser);
-    AppState.currentUser = { ...AppState.currentUser, ...userData, isFake: false };
+    AppState.currentUser = { ...AppState.currentUser, ...userData };
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
+    showScreen('contactsScreen');
+  } else if (anonymous === 'true') {
     showScreen('contactsScreen');
   } else {
     showScreen('loginMethodScreen');
@@ -558,20 +474,22 @@ function checkAuth() {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 NyashGram загружается...');
   
-  // ===== НАВИГАЦИЯ =====
+  // Навигация
   document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
-    console.log('📧 Выбран вход по email');
     showScreen('emailRegisterScreen');
   });
   
-  document.getElementById('appleMethodBtn')?.addEventListener('click', async () => {
-    console.log('🍎 Выбран вход через Apple');
-    const result = await loginWithApple();
-    if (!result.success) {
-      alert(result.error || 'Ошибка входа через Apple');
-    }
+  document.getElementById('googleMethodBtn')?.addEventListener('click', async () => {
+    const result = await loginWithGoogle();
+    if (!result.success) alert(result.error);
   });
   
+  document.getElementById('anonymousMethodBtn')?.addEventListener('click', async () => {
+    const result = await loginAnonymously();
+    if (!result.success) alert(result.error);
+  });
+  
+  // Навигация назад
   document.getElementById('backToLoginFromRegBtn')?.addEventListener('click', () => {
     showScreen('loginMethodScreen');
   });
@@ -594,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
     showScreen('emailRegisterScreen');
   });
   
-  // ===== EMAIL РЕГИСТРАЦИЯ =====
+  // Email регистрация
   document.getElementById('registerBtn')?.addEventListener('click', async () => {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -602,69 +520,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirm = document.getElementById('regConfirmPassword').value;
     const errorEl = document.getElementById('regError');
     
-    if (!name) {
-      errorEl.textContent = 'Введи имя!';
-      return;
-    }
-    
-    if (!email || !email.includes('@')) {
-      errorEl.textContent = 'Введи корректный email!';
-      return;
-    }
-    
-    if (password.length < 6) {
-      errorEl.textContent = 'Пароль должен быть минимум 6 символов';
-      return;
-    }
-    
-    if (password !== confirm) {
-      errorEl.textContent = 'Пароли не совпадают';
-      return;
-    }
+    if (!name) return errorEl.textContent = 'Введи имя!';
+    if (!email || !email.includes('@')) return errorEl.textContent = 'Введи корректный email!';
+    if (password.length < 6) return errorEl.textContent = 'Пароль должен быть минимум 6 символов';
+    if (password !== confirm) return errorEl.textContent = 'Пароли не совпадают';
     
     errorEl.textContent = '';
-    
     const result = await registerWithEmail(name, email, password);
-    
-    if (!result.success) {
-      errorEl.textContent = result.error;
-    }
+    if (!result.success) errorEl.textContent = result.error;
   });
   
+  // Email вход
   document.getElementById('loginBtn')?.addEventListener('click', async () => {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const errorEl = document.getElementById('loginError');
     
-    if (!email || !email.includes('@')) {
-      errorEl.textContent = 'Введи корректный email!';
-      return;
-    }
-    
-    if (!password) {
-      errorEl.textContent = 'Введи пароль!';
-      return;
-    }
+    if (!email || !email.includes('@')) return errorEl.textContent = 'Введи корректный email!';
+    if (!password) return errorEl.textContent = 'Введи пароль!';
     
     errorEl.textContent = '';
-    
     const result = await loginWithEmail(email, password);
     
     if (!result.success) {
       errorEl.textContent = result.error;
-      
-      if (result.needVerification) {
-        showScreen('verifyEmailScreen');
-      }
+      if (result.needVerification) showScreen('verifyEmailScreen');
     }
   });
   
+  // Подтверждение email
   document.getElementById('checkVerificationBtn')?.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (user) {
       await user.reload();
       if (user.emailVerified) {
-        // После подтверждения email, выполняем вход автоматически
         const userDoc = await db.collection('users').doc(user.uid).get();
         const userData = userDoc.data();
         
@@ -677,22 +566,12 @@ document.addEventListener('DOMContentLoaded', function() {
           theme: userData.theme || 'pastel-pink',
           mode: userData.mode || 'light',
           font: userData.font || 'font-cozy',
-          isFake: false
+          isAnonymous: false
         };
         
-        localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
-        localStorage.setItem('nyashgram_name', userData.name);
-        localStorage.setItem('nyashgram_username', userData.username);
-        localStorage.setItem('nyashgram_email', user.email);
-        localStorage.setItem('nyashgram_entered', 'true');
-        
-        setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
-        applyFont(AppState.currentUser.font);
-        
-        showScreen('contactsScreen');
-        if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+        saveUserToStorage();
       } else {
-        alert('Email ещё не подтверждён! Проверь почту и нажми на ссылку.');
+        alert('Email ещё не подтверждён!');
       }
     }
   });
@@ -701,11 +580,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const user = auth.currentUser;
     if (user) {
       await user.sendEmailVerification();
-      alert('Письмо отправлено повторно! Проверь почту.');
+      alert('Письмо отправлено повторно!');
     }
   });
   
-  // ===== НАСТРОЙКИ =====
+  // Настройки
   document.getElementById('settingsBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
     loadSettingsIntoUI();
@@ -718,7 +597,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
-  
   document.getElementById('logoutBtn')?.addEventListener('click', logout);
   
   document.getElementById('settingsGenerateBtn')?.addEventListener('click', function(e) {
@@ -727,15 +605,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('settingsUsernameError').textContent = '';
   });
   
-  const themeModeToggle = document.getElementById('themeModeToggle');
-  if (themeModeToggle) {
-    themeModeToggle.addEventListener('click', toggleMode);
-  }
+  // Темы и шрифты
+  document.getElementById('themeModeToggle')?.addEventListener('click', toggleMode);
   
   document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      setTheme(btn.dataset.theme, AppState.currentUser.mode);
-    });
+    btn.addEventListener('click', () => setTheme(btn.dataset.theme, AppState.currentUser.mode));
   });
   
   document.querySelectorAll('.font-btn').forEach(btn => {
@@ -748,9 +622,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Проверяем авторизацию
   checkAuth();
   
+  // Экспорт
   window.showScreen = showScreen;
   window.applyFont = applyFont;
   window.AppState = AppState;

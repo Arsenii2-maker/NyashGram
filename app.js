@@ -128,6 +128,86 @@ function showScreen(id) {
     setTimeout(renderContacts, 100);
   }
 }
+// ===== СОВЕТЫ ДЛЯ ЭКРАНА ЗАГРУЗКИ =====
+const loadingTips = [
+  "⚙️ NyashHelp расскажет про приложение подробнее!",
+  "🐱 У NyashTalk можно спросить про любую тему!",
+  "🎮 NyashGame знает много игр: угадай число, камень-ножницы-бумага и другие!",
+  "🔮 NyashHoroscope расскажет, что звёзды приготовили на сегодня",
+  "💕 Bestie всегда поддержит и поднимет настроение",
+  "🧠 Философ любит порассуждать о смысле жизни",
+  "📚 Учёба поможет с домашкой и напомнит о контрольных",
+  "🎧 Music Pal посоветует, что послушать",
+  "🌙 Night Chat создан для ночных разговоров под звёздами",
+  "🎨 Можно менять темы и шрифты в настройках",
+  "📌 Чат можно закрепить вверху списка",
+  "✏️ Чат можно переименовать как хочешь",
+  "💬 Черновики сохраняются автоматически",
+  "🌈 У нас 6 красивых тем оформления",
+  "📱 Скоро появятся голосовые сообщения!",
+  "🐾 В будущем у каждого будет свой питомец"
+];
+
+let tipInterval = null;
+
+// Показать экран загрузки с советами
+function showLoadingScreen(message = 'Загружаем твой мирок...', duration = null) {
+  showScreen('loadingScreen');
+  
+  // Обновляем сообщение
+  const msgEl = document.getElementById('loadingMessage');
+  if (msgEl) msgEl.textContent = message;
+  
+  // Показываем первый совет
+  showRandomTip();
+  
+  // Меняем советы каждые 3 секунды
+  if (tipInterval) clearInterval(tipInterval);
+  tipInterval = setInterval(showRandomTip, 3000);
+  
+  // Если указана длительность, скрываем через время
+  if (duration) {
+    setTimeout(() => {
+      hideLoadingScreen();
+    }, duration);
+  }
+}
+
+// Скрыть экран загрузки
+function hideLoadingScreen() {
+  if (tipInterval) {
+    clearInterval(tipInterval);
+    tipInterval = null;
+  }
+  // Не скрываем сразу, даём время на последний совет
+  setTimeout(() => {
+    // Проверяем, не показываем ли мы другой экран
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen?.id === 'loadingScreen') {
+      showScreen('contactsScreen');
+    }
+  }, 500);
+}
+
+// Показать случайный совет
+function showRandomTip() {
+  const tipEl = document.getElementById('tipText');
+  const currentEl = document.getElementById('currentTip');
+  const totalEl = document.getElementById('totalTips');
+  
+  if (!tipEl) return;
+  
+  const randomIndex = Math.floor(Math.random() * loadingTips.length);
+  tipEl.textContent = loadingTips[randomIndex];
+  
+  if (currentEl) currentEl.textContent = randomIndex + 1;
+  if (totalEl) totalEl.textContent = loadingTips.length;
+  
+  // Анимация появления
+  tipEl.style.animation = 'none';
+  tipEl.offsetHeight; // форсируем ререндер
+  tipEl.style.animation = 'fadeIn 0.5s ease';
+}
 
 // ===== ПРОВЕРКА ЮЗЕРНЕЙМА =====
 function isValidUsername(username) {

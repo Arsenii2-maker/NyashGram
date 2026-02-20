@@ -1528,3 +1528,36 @@ body.forest-mint-dark input::placeholder {
   background: rgba(255, 255, 255, 0.3);
   border-color: var(--accent);
 }
+/* Стили для reCAPTCHA */
+#recaptcha-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  min-height: 78px;
+  transition: all 0.3s ease;
+}
+
+#recaptcha-container > div {
+  transform: scale(0.9);
+  margin: 0 auto;
+}
+
+/* Анимация загрузки капчи */
+@keyframes recaptchaPulse {
+  0% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.6; transform: scale(0.95); }
+}
+
+.recaptcha-loading {
+  width: 100%;
+  height: 78px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  font-size: 14px;
+  animation: recaptchaPulse 1.5s infinite;
+}

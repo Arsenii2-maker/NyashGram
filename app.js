@@ -316,11 +316,11 @@ function clearRecaptcha() {
   // Очищаем контейнер
   const container = document.getElementById(recaptchaContainerId);
   if (container) {
-    container.innerHTML = '<div class="recaptcha-loading"><span>Загрузка капчи...</span></div>';
+    container.innerHTML = '<div class="recaptcha-loading"><span>⏳ Загрузка капчи...</span></div>';
   }
 }
 
-// Инициализация reCAPTCHA
+// Инициализация reCAPTCHA (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 function setupRecaptcha() {
   // Очищаем старую капчу
   clearRecaptcha();
@@ -333,8 +333,16 @@ function setupRecaptcha() {
       return;
     }
     
+    // Очищаем контейнер перед созданием новой капчи
+    container.innerHTML = '';
+    
     try {
-      recaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptchaContainerId, {
+      // ВАЖНО: создаём новый div для капчи
+      const recaptchaDiv = document.createElement('div');
+      recaptchaDiv.id = 'recaptcha-widget';
+      container.appendChild(recaptchaDiv);
+      
+      recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-widget', {
         'size': 'normal',
         'callback': () => {
           console.log('✅ reCAPTCHA пройдена');
@@ -353,32 +361,43 @@ function setupRecaptcha() {
           }
           // Автоматически обновляем капчу
           setupRecaptcha();
-        },
-        'error-callback': (error) => {
-          console.error('❌ Ошибка reCAPTCHA:', error);
         }
       });
       
       recaptchaVerifier.render().then((widgetId) => {
         console.log('✅ reCAPTCHA отрисована, widgetId:', widgetId);
+      }).catch((error) => {
+        console.error('❌ Ошибка рендера reCAPTCHA:', error);
+        // Пробуем ещё раз через секунду
+        setTimeout(() => setupRecaptcha(), 1000);
       });
+      
     } catch (error) {
       console.error('❌ Ошибка создания reCAPTCHA:', error);
+      // Пробуем ещё раз через секунду
+      setTimeout(() => setupRecaptcha(), 1000);
     }
   }, 100);
 }
 
-// Отправка SMS
+// Отправка SMS (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 async function sendSmsCode(phoneNumber) {
   try {
     // Проверяем, есть ли капча
     if (!recaptchaVerifier) {
+      console.log('🔄 Капча не найдена, создаём новую...');
       setupRecaptcha();
       // Даём время капче загрузиться
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+    
+    if (!recaptchaVerifier) {
+      throw new Error('Не удалось создать капчу');
     }
     
     const appVerifier = recaptchaVerifier;
+    console.log('📞 Отправляем SMS на:', phoneNumber);
+    
     confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
     
     console.log('✅ SMS отправлен на:', phoneNumber);
@@ -409,6 +428,8 @@ async function sendSmsCode(phoneNumber) {
         clearRecaptcha();
         setTimeout(() => setupRecaptcha(), 1000);
         break;
+      default:
+        errorMessage = error.message || 'Неизвестная ошибка';
     }
     
     return { success: false, error: errorMessage };

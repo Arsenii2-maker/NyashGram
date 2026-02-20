@@ -100,25 +100,40 @@
     </div>
   </section>
 
-  <!-- Экран регистрации по email -->
-  <section id="emailRegisterScreen" class="screen">
-    <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">Регистрация по email</p>
-      
+  <!-- Экран регистрации по email (УЛУЧШЕННЫЙ) -->
+<section id="emailRegisterScreen" class="screen">
+  <div class="glass-container">
+    <h1>NyashGram 💗</h1>
+    <p class="subtitle">Регистрация по email</p>
+    
+    <div class="input-with-icon">
+      <span class="input-icon">👤</span>
       <input type="text" id="regName" placeholder="Твоё имя" />
-      <input type="email" id="regEmail" placeholder="Email" />
-      <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" />
-      <input type="password" id="regConfirmPassword" placeholder="Повтори пароль" />
-      
-      <div id="regError" class="error-message"></div>
-      
-      <button id="registerBtn" class="active">✨ Зарегистрироваться ✨</button>
-      <button id="backToLoginFromRegBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
-      
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Уже есть аккаунт? <a href="#" id="showLoginLink">Войти</a></p>
     </div>
-  </section>
+    
+    <div class="input-with-icon">
+      <span class="input-icon">📧</span>
+      <input type="email" id="regEmail" placeholder="Email" />
+    </div>
+    
+    <div class="input-with-icon">
+      <span class="input-icon">🔒</span>
+      <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" />
+    </div>
+    
+    <div class="input-with-icon">
+      <span class="input-icon">🔐</span>
+      <input type="password" id="regConfirmPassword" placeholder="Повтори пароль" />
+    </div>
+    
+    <div id="regError" class="error-message"></div>
+    
+    <button id="registerBtn" class="active">✨ Зарегистрироваться ✨</button>
+    <button id="backToLoginFromRegBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+    
+    <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Уже есть аккаунт? <a href="#" id="showLoginLink">Войти</a></p>
+  </div>
+</section>
 
   <!-- Экран входа по email -->
   <section id="emailLoginScreen" class="screen">

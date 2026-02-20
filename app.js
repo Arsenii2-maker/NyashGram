@@ -2,12 +2,13 @@
 
 // ===== FIREBASE КОНФИГУРАЦИЯ =====
 const firebaseConfig = {
-  apiKey: "AIzaSyCqTm_oMEV_6e8E2SnE3x5jGR15jPcFbF8",
-  authDomain: "nyashgram-ff9c4.firebaseapp.com",
-  projectId: "nyashgram-ff9c4",
-  storageBucket: "nyashgram-ff9c4.firebasestorage.app",
-  messagingSenderId: "1091195998837",
-  appId: "1:1091195998837:web:aa9e1e55030e7809ea6e27"
+  apiKey: "AIzaSyCqTm_oMEVRjOwodVrhmWHLNl1DA4x9sUQ",
+  authDomain: "nyashgram-e9f69.firebaseapp.com",
+  projectId: "nyashgram-e9f69",
+  storageBucket: "nyashgram-e9f69.firebasestorage.app",
+  messagingSenderId: "54620743155",
+  appId: "1:54620743155:web:4db4690057b103ef859e86",
+  measurementId: "G-KXXQTJVEGV"
 };
 
 // Инициализация Firebase

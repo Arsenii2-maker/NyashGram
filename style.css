@@ -1390,3 +1390,141 @@ body.soft-lilac-dark .modal-content button:last-child {
     transform: translateY(0) scale(1);
   }
 }
+/* ===== КРАСИВЫЕ ПОЛЯ ВВОДА ===== */
+
+/* Стили для всех полей ввода */
+#regName, #regEmail, #regPassword, #regConfirmPassword,
+#loginEmail, #loginPassword,
+#displayName, #displayUsername,
+#settingsName, #settingsUsername,
+#phoneNumber, #codeInput {
+  width: 100%;
+  padding: 16px 20px;
+  margin: 10px 0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--text);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Эффект при фокусе */
+#regName:focus, #regEmail:focus, #regPassword:focus, #regConfirmPassword:focus,
+#loginEmail:focus, #loginPassword:focus,
+#displayName:focus, #displayUsername:focus,
+#settingsName:focus, #settingsUsername:focus,
+#phoneNumber:focus, #codeInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 20px rgba(255, 120, 160, 0.3);
+  transform: scale(1.02);
+}
+
+/* Placeholder */
+#regName::placeholder, #regEmail::placeholder, #regPassword::placeholder, #regConfirmPassword::placeholder,
+#loginEmail::placeholder, #loginPassword::placeholder,
+#displayName::placeholder, #displayUsername::placeholder,
+#settingsName::placeholder, #settingsUsername::placeholder,
+#phoneNumber::placeholder, #codeInput::placeholder {
+  color: var(--text-soft);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Специально для тёмных тем */
+body.night-blue-dark input,
+body.pastel-pink-dark input,
+body.milk-rose-dark input,
+body.lo-fi-beige-dark input,
+body.soft-lilac-dark input,
+body.forest-mint-dark input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+body.night-blue-dark input::placeholder,
+body.pastel-pink-dark input::placeholder,
+body.milk-rose-dark input::placeholder,
+body.lo-fi-beige-dark input::placeholder,
+body.soft-lilac-dark input::placeholder,
+body.forest-mint-dark input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Стили для меток (если добавите) */
+.input-label {
+  display: block;
+  text-align: left;
+  margin-left: 10px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+/* Контейнер для полей с иконками */
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-icon input {
+  padding-left: 50px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: var(--text-soft);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Стили для select (выбор страны) */
+#countryCode {
+  padding: 16px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#countryCode:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Кнопка генерации юзернейма */
+#generateUsernameBtn, #settingsGenerateBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+#generateUsernameBtn:hover, #settingsGenerateBtn:hover {
+  transform: rotate(180deg) scale(1.1);
+  background: rgba(255, 255, 255, 0.3);
+  border-color: var(--accent);
+}

@@ -248,51 +248,114 @@ async function loginWithEmail(email, password) {
   }
 }
 
-// ===== GOOGLE ВХОД =====
+// ===== GOOGLE ВХОД (С ПОДДЕРЖКОЙ ТЕЛЕФОНОВ) =====
 async function loginWithGoogle() {
   try {
-    const result = await auth.signInWithPopup(googleProvider);
-    const user = result.user;
+    console.log('🔄 Начинаем вход через Google...');
     
-    const userDoc = await db.collection('users').doc(user.uid).get();
+    // Определяем, мобильное устройство или нет
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    if (!userDoc.exists) {
-      const username = generateCuteUsername();
-      await db.collection('users').doc(user.uid).set({
-        name: user.displayName || 'Google User',
-        email: user.email,
-        username: username,
-        avatar: user.photoURL,
-        theme: 'pastel-pink',
-        mode: 'light',
-        font: 'font-cozy',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        emailVerified: true,
-        isAnonymous: false
-      });
-      addUsername(username);
+    if (isMobile) {
+      console.log('📱 Мобильное устройство, используем redirect');
+      
+      // На мобильных используем редирект
+      await auth.signInWithRedirect(googleProvider);
+      
+      // После редиректа результат обработается в getRedirectResult
+      return { success: true, redirect: true };
+    } else {
+      console.log('💻 Десктоп, используем popup');
+      
+      // На десктопе используем popup
+      const result = await auth.signInWithPopup(googleProvider);
+      return await handleGoogleSignInResult(result);
+    }
+  } catch (error) {
+    console.error('❌ Ошибка входа через Google:', error);
+    
+    let errorMessage = 'Ошибка входа через Google';
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Вход отменён';
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = 'Всплывающее окно заблокировано. Разрешите всплывающие окна.';
+    } else if (error.code === 'auth/network-request-failed') {
+      errorMessage = 'Ошибка сети. Проверьте подключение к интернету.';
     }
     
-    const userData = (await db.collection('users').doc(user.uid).get()).data();
-    
-    AppState.currentUser = {
-      uid: user.uid,
-      name: userData.name,
-      username: userData.username,
-      email: user.email,
-      avatar: userData.avatar,
-      theme: userData.theme || 'pastel-pink',
-      mode: userData.mode || 'light',
-      font: userData.font || 'font-cozy',
-      isAnonymous: false
-    };
-    
-    saveUserToStorage();
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: 'Ошибка входа через Google' };
+    alert(errorMessage);
+    return { success: false, error: errorMessage };
   }
 }
+
+// Обработка результата Google входа
+async function handleGoogleSignInResult(result) {
+  const user = result.user;
+  console.log('✅ Успешный вход через Google:', user.email);
+  
+  // Проверяем, есть ли пользователь в базе
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  
+  if (!userDoc.exists) {
+    // Новый пользователь - создаём профиль
+    const username = generateCuteUsername();
+    await db.collection('users').doc(user.uid).set({
+      name: user.displayName || 'Google User',
+      email: user.email,
+      username: username,
+      avatar: user.photoURL || null,
+      theme: 'pastel-pink',
+      mode: 'light',
+      font: 'font-cozy',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      isAnonymous: false
+    });
+    addUsername(username);
+  }
+  
+  // Загружаем данные пользователя
+  const userData = (await db.collection('users').doc(user.uid).get()).data();
+  
+  AppState.currentUser = {
+    uid: user.uid,
+    name: userData.name,
+    username: userData.username,
+    email: user.email,
+    avatar: userData.avatar,
+    theme: userData.theme || 'pastel-pink',
+    mode: userData.mode || 'light',
+    font: userData.font || 'font-cozy',
+    isAnonymous: false
+  };
+  
+  // Сохраняем в localStorage
+  localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+  localStorage.setItem('nyashgram_name', userData.name);
+  localStorage.setItem('nyashgram_username', userData.username);
+  localStorage.setItem('nyashgram_email', user.email);
+  localStorage.setItem('nyashgram_entered', 'true');
+  
+  // Применяем настройки
+  setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+  applyFont(AppState.currentUser.font);
+  
+  // Показываем экран контактов
+  showScreen('contactsScreen');
+  if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+  
+  return { success: true };
+}
+
+// Обработка редиректа (для мобильных)
+auth.getRedirectResult().then(async (result) => {
+  if (result.user) {
+    console.log('✅ Результат редиректа получен');
+    await handleGoogleSignInResult(result);
+  }
+}).catch((error) => {
+  console.error('❌ Ошибка редиректа:', error);
+  alert('Ошибка входа: ' + error.message);
+});
 
 // ===== АНОНИМНЫЙ ВХОД =====
 async function loginAnonymously() {

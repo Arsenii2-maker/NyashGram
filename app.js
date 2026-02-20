@@ -43,16 +43,21 @@ function setTheme(theme, mode) {
   localStorage.setItem('nyashgram_theme', theme);
   localStorage.setItem('nyashgram_mode', mode);
   
-  // 👇 ВАЖНО: сразу обновляем активные кнопки тем
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.theme === theme) {
-      btn.classList.add('active');
-    }
+  // Кнопки тем - ИСПРАВЛЕНО
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.theme;
+    setTheme(theme, AppState.currentUser.mode);
   });
-  
-  console.log('✅ Тема установлена:', `${theme}-${mode}`);
-}
+});
+
+// Кнопки шрифтов - ИСПРАВЛЕНО
+document.querySelectorAll('.font-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const font = btn.dataset.font;
+    applyFont(font);
+  });
+});
 
 // Переключение режима (луна/солнце)
 function toggleMode() {

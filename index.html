@@ -49,40 +49,35 @@
     <h1>NyashGram 💗</h1>
     <p class="subtitle">Вход по телефону</p>
     
-    <div style="margin-bottom: 20px;" id="recaptcha-container"></div>
+    <!-- reCAPTCHA контейнер -->
+    <div id="recaptcha-container" class="recaptcha-loading">
+      <span>⏳ Загрузка капчи...</span>
+    </div>
     
-    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-      <select id="realCountryCode" style="width: auto;">
+    <!-- Красивое поле ввода номера -->
+    <div class="phone-input-container">
+      <select id="realCountryCode" class="country-select">
         <option value="+7">🇷🇺 +7</option>
         <option value="+1">🇺🇸 +1</option>
         <option value="+44">🇬🇧 +44</option>
+        <option value="+49">🇩🇪 +49</option>
+        <option value="+33">🇫🇷 +33</option>
+        <option value="+81">🇯🇵 +81</option>
+        <option value="+86">🇨🇳 +86</option>
       </select>
-      <input type="tel" id="realPhoneNumber" placeholder="999 999 99 99" />
+      <input type="tel" id="realPhoneNumber" class="phone-number-input" placeholder="999 999 99 99" />
     </div>
 
     <div id="realPhoneError" class="error-message"></div>
+    
     <button id="sendRealCodeBtn" disabled>📱 Отправить SMS с кодом</button>
     <button id="backFromRealPhoneBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+    
+    <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">
+      📝 Тестовые номера: +7 123 456 78 90 (код 123456)
+    </p>
   </div>
 </section>
-
-<!-- Экран ввода SMS кода -->
-<section id="smsCodeScreen" class="screen">
-  <div class="glass-container">
-    <h1>NyashGram 💗</h1>
-    <p class="subtitle">Введи код из SMS</p>
-    
-    <input type="text" id="smsCodeInput" placeholder="------" maxlength="6" style="font-size: 28px; text-align: center; letter-spacing: 8px;" />
-    
-    <div id="smsCodeError" class="error-message"></div>
-    
-    <button id="verifySmsBtn" disabled>✅ Подтвердить</button>
-    <button id="backFromSmsBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
-    
-    <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Не пришёл код? <a href="#" id="resendSmsLink">Отправить снова</a></p>
-  </div>
-</section>
-
   <!-- Экран создания профиля (ФЕЙК) -->
   <section id="profileScreen" class="screen">
     <div class="glass-container">

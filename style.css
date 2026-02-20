@@ -60,6 +60,12 @@ body.pastel-pink-light .message.bot {
 body.pastel-pink-light .quick-chip {
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(255,255,255,0.8);
+  color: #5c3a4a;
+}
+body.pastel-pink-light button.active {
+  background: #ffadd6;
+  border-color: #ff69b4;
+  color: #5c3a4a;
 }
 
 /* Pastel Pink - Dark */
@@ -98,6 +104,12 @@ body.pastel-pink-dark .message.bot {
 body.pastel-pink-dark .quick-chip {
   background: rgba(255, 105, 180, 0.4);
   border: 1px solid rgba(255,255,255,0.2);
+  color: #ffffff;
+}
+body.pastel-pink-dark button.active {
+  background: #ff69b4;
+  border-color: #ff1493;
+  color: #ffffff;
 }
 
 /* Milk Rose - Light */
@@ -131,6 +143,16 @@ body.milk-rose-light .message.user {
 body.milk-rose-light .message.bot {
   background: rgba(255, 200, 200, 0.7);
 }
+body.milk-rose-light .quick-chip {
+  background: rgba(255, 200, 200, 0.6);
+  border: 1px solid rgba(255, 235, 220, 0.8);
+  color: #4a2c1f;
+}
+body.milk-rose-light button.active {
+  background: #ffb199;
+  border-color: #ff8a7a;
+  color: #4a2c1f;
+}
 
 /* Milk Rose - Dark */
 body.milk-rose-dark {
@@ -162,6 +184,16 @@ body.milk-rose-dark .message.user {
 }
 body.milk-rose-dark .message.bot {
   background: rgba(255, 71, 87, 0.6);
+}
+body.milk-rose-dark .quick-chip {
+  background: rgba(255, 127, 80, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+body.milk-rose-dark button.active {
+  background: #ff7f50;
+  border-color: #ff4500;
+  color: #ffffff;
 }
 
 /* Night Blue - Light */
@@ -195,6 +227,16 @@ body.night-blue-light .message.user {
 body.night-blue-light .message.bot {
   background: rgba(210, 230, 255, 0.7);
 }
+body.night-blue-light .quick-chip {
+  background: rgba(210, 230, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #1a2a4a;
+}
+body.night-blue-light button.active {
+  background: #7ab8ff;
+  border-color: #4169e1;
+  color: #1a2a4a;
+}
 
 /* Night Blue - Dark */
 body.night-blue-dark {
@@ -226,6 +268,16 @@ body.night-blue-dark .message.user {
 }
 body.night-blue-dark .message.bot {
   background: rgba(0, 0, 139, 0.6);
+}
+body.night-blue-dark .quick-chip {
+  background: rgba(65, 105, 225, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+body.night-blue-dark button.active {
+  background: #4169e1;
+  border-color: #0000cd;
+  color: #ffffff;
 }
 
 /* Lo-Fi Beige - Light */
@@ -259,6 +311,16 @@ body.lo-fi-beige-light .message.user {
 body.lo-fi-beige-light .message.bot {
   background: rgba(235, 220, 210, 0.7);
 }
+body.lo-fi-beige-light .quick-chip {
+  background: rgba(235, 220, 210, 0.6);
+  border: 1px solid rgba(230, 210, 190, 0.8);
+  color: #4a3c2e;
+}
+body.lo-fi-beige-light button.active {
+  background: #d9b99b;
+  border-color: #c49a7c;
+  color: #4a3c2e;
+}
 
 /* Lo-Fi Beige - Dark */
 body.lo-fi-beige-dark {
@@ -290,6 +352,16 @@ body.lo-fi-beige-dark .message.user {
 }
 body.lo-fi-beige-dark .message.bot {
   background: rgba(139, 69, 19, 0.6);
+}
+body.lo-fi-beige-dark .quick-chip {
+  background: rgba(205, 133, 63, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+body.lo-fi-beige-dark button.active {
+  background: #cd853f;
+  border-color: #8b4513;
+  color: #ffffff;
 }
 
 /* Soft Lilac - Light */
@@ -323,6 +395,16 @@ body.soft-lilac-light .message.user {
 body.soft-lilac-light .message.bot {
   background: rgba(220, 200, 255, 0.7);
 }
+body.soft-lilac-light .quick-chip {
+  background: rgba(220, 200, 255, 0.6);
+  border: 1px solid rgba(220, 200, 255, 0.8);
+  color: #3c1f5c;
+}
+body.soft-lilac-light button.active {
+  background: #c4a0ff;
+  border-color: #9b7bff;
+  color: #3c1f5c;
+}
 
 /* Soft Lilac - Dark */
 body.soft-lilac-dark {
@@ -354,6 +436,16 @@ body.soft-lilac-dark .message.user {
 }
 body.soft-lilac-dark .message.bot {
   background: rgba(138, 43, 226, 0.6);
+}
+body.soft-lilac-dark .quick-chip {
+  background: rgba(147, 112, 219, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+body.soft-lilac-dark button.active {
+  background: #9370db;
+  border-color: #6a4fa7;
+  color: #ffffff;
 }
 
 /* ===== ШРИФТЫ ===== */
@@ -550,7 +642,7 @@ button {
   padding: 12px 20px;
   font-size: 16px;
   border-radius: 40px;
-  border: none;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
@@ -560,9 +652,10 @@ button {
 }
 
 button.active {
-  background: white;
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
+  background: var(--accent);
+  border-color: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
 }
 
 button:hover {

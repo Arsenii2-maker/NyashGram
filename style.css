@@ -1561,3 +1561,100 @@ body.forest-mint-dark input::placeholder {
   font-size: 14px;
   animation: recaptchaPulse 1.5s infinite;
 }
+/* ===== КРАСИВОЕ ПОЛЕ ТЕЛЕФОНА ===== */
+.phone-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.country-select {
+  width: 100px;
+  padding: 16px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b6f8b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.country-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.phone-number-input {
+  flex: 1;
+  padding: 16px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  color: var(--text);
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.phone-number-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 20px rgba(255, 120, 160, 0.2);
+}
+
+.phone-number-input::placeholder {
+  color: var(--text-soft);
+  opacity: 0.7;
+}
+
+/* Стили для тёмных тем */
+body.night-blue-dark .country-select,
+body.pastel-pink-dark .country-select,
+body.milk-rose-dark .country-select,
+body.lo-fi-beige-dark .country-select,
+body.soft-lilac-dark .country-select,
+body.forest-mint-dark .country-select {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+
+/* reCAPTCHA контейнер */
+#recaptcha-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  min-height: 78px;
+  transform: scale(0.9);
+}
+
+.recaptcha-loading {
+  width: 100%;
+  height: 78px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

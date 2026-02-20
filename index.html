@@ -9,142 +9,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&family=Fredoka:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
   
   <!-- Firebase SDK (Compat версия) -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-<!-- Firebase SDK (Compat версия) -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-<!-- ДОБАВЬТЕ ЭТУ СТРОКУ: -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <!-- reCAPTCHA -->
-<script src="https://www.google.com/recaptcha/api.js?render=explicit"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
   
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Экран выбора метода входа -->
-<section id="loginMethodScreen" class="screen active">
-  <div class="glass-container">
-    <h1>NyashGram 💗</h1>
-    <p class="subtitle">Выбери способ входа</p>
-    
-    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-      <button id="realPhoneMethodBtn" class="active" style="width: 100%; padding: 16px;">📱 По телефону (настоящий)</button>
-      <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px;">📧 По email (настоящий)</button>
-    </div>
-    
-    <p style="font-size:12px; color: var(--text-soft); margin-top: 24px;">✨ Выбери способ входа ✨</p>
-  </div>
-</section>
-
-  <!-- Экран настоящего телефона -->
-<section id="realPhoneScreen" class="screen">
-  <div class="glass-container">
-    <h1>NyashGram 💗</h1>
-    <p class="subtitle">Вход по телефону</p>
-    
-    <!-- reCAPTCHA контейнер -->
-    <div id="recaptcha-container" class="recaptcha-loading">
-      <span>⏳ Загрузка капчи...</span>
-    </div>
-    
-    <!-- Красивое поле ввода номера -->
-    <div class="phone-input-container">
-      <select id="realCountryCode" class="country-select">
-        <option value="+7">🇷🇺 +7</option>
-        <option value="+1">🇺🇸 +1</option>
-        <option value="+44">🇬🇧 +44</option>
-        <option value="+49">🇩🇪 +49</option>
-        <option value="+33">🇫🇷 +33</option>
-        <option value="+81">🇯🇵 +81</option>
-        <option value="+86">🇨🇳 +86</option>
-      </select>
-      <input type="tel" id="realPhoneNumber" class="phone-number-input" placeholder="999 999 99 99" />
-    </div>
-
-    <div id="realPhoneError" class="error-message"></div>
-    
-    <button id="sendRealCodeBtn" disabled>📱 Отправить SMS с кодом</button>
-    <button id="backFromRealPhoneBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
-    
-    <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">
-      📝 Тестовые номера: +7 123 456 78 90 (код 123456)
-    </p>
-  </div>
-</section>
-  <!-- Экран создания профиля (ФЕЙК) -->
-  <section id="profileScreen" class="screen">
+  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА (НОВЫЙ) -->
+  <section id="loginMethodScreen" class="screen active">
     <div class="glass-container">
-      <h1>Создай профиль 💫</h1>
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Вход в аккаунт</p>
       
-      <input type="text" id="displayName" placeholder="Твой ник (имя)" />
-      
-      <div style="display: flex; gap: 8px; margin: 20px 0;">
-        <input type="text" id="displayUsername" placeholder="Юзернейм (уникальный)" style="flex: 1;" />
-        <button id="generateUsernameBtn" style="width: auto; padding: 12px 16px;">🎲</button>
+      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+        <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px;">
+          📧 По email
+        </button>
+        
+        <button id="appleMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px;">
+          🍎 Через Apple
+        </button>
       </div>
       
-      <div id="usernameError" class="error-message"></div>
-      <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 20px; text-align: left;">
-        ⚡ Только латинские буквы, цифры и _<br>
-        ⚡ От 3 до 50 символов
-      </div>
-      
-      <div style="margin: 20px 0;">
-        <label for="avatarInput">
-          <div id="avatarPreview" class="avatar-large">+</div>
-          <p style="margin-top: 12px; color: var(--text-soft);">Выбрать фото</p>
-        </label>
-        <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
-      </div>
-      
-      <button id="saveBtn" class="active">✨ Готово ✨</button>
-      <button id="backFromProfileBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 24px;">
+        ✨ Только настоящие аккаунты ✨
+      </p>
     </div>
   </section>
 
-  <!-- Экран регистрации по email (УЛУЧШЕННЫЙ) -->
-<section id="emailRegisterScreen" class="screen">
-  <div class="glass-container">
-    <h1>NyashGram 💗</h1>
-    <p class="subtitle">Регистрация по email</p>
-    
-    <div class="input-with-icon">
-      <span class="input-icon"></span>
+  <!-- ЭКРАН РЕГИСТРАЦИИ ПО EMAIL -->
+  <section id="emailRegisterScreen" class="screen">
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Регистрация по email</p>
+      
       <input type="text" id="regName" placeholder="Твоё имя" />
-    </div>
-    
-    <div class="input-with-icon">
-      <span class="input-icon"></span>
       <input type="email" id="regEmail" placeholder="Email" />
-    </div>
-    
-    <div class="input-with-icon">
-      <span class="input-icon"></span>
       <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" />
-    </div>
-    
-    <div class="input-with-icon">
-      <span class="input-icon"></span>
       <input type="password" id="regConfirmPassword" placeholder="Повтори пароль" />
+      
+      <div id="regError" class="error-message"></div>
+      
+      <button id="registerBtn" class="active">✨ Зарегистрироваться ✨</button>
+      <button id="backToLoginFromRegBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">
+        Уже есть аккаунт? <a href="#" id="showLoginLink">Войти</a>
+      </p>
     </div>
-    
-    <div id="regError" class="error-message"></div>
-    
-    <button id="registerBtn" class="active">✨ Зарегистрироваться ✨</button>
-    <button id="backToLoginFromRegBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
-    
-    <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Уже есть аккаунт? <a href="#" id="showLoginLink">Войти</a></p>
-  </div>
-</section>
+  </section>
 
-  <!-- Экран входа по email -->
+  <!-- ЭКРАН ВХОДА ПО EMAIL -->
   <section id="emailLoginScreen" class="screen">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
@@ -158,29 +77,32 @@
       <button id="loginBtn" class="active">💕 Войти 💕</button>
       <button id="backFromEmailLoginBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
       
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Нет аккаунта? <a href="#" id="showRegisterLink">Зарегистрироваться</a></p>
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">
+        Нет аккаунта? <a href="#" id="showRegisterLink">Зарегистрироваться</a>
+      </p>
     </div>
   </section>
 
-  <!-- Экран подтверждения email -->
+  <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ EMAIL -->
   <section id="verifyEmailScreen" class="screen">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
       <p class="subtitle">Подтверди email</p>
       
-      <div style="font-size: 48px; margin: 20px 0;">📧</div>
-      <p style="margin-bottom: 20px;">
+      <div style="font-size: 64px; margin: 20px 0; animation: float 3s ease-in-out infinite;">📧</div>
+      
+      <p style="margin-bottom: 20px; line-height: 1.6;">
         Мы отправили письмо с подтверждением на твой email.<br>
-        Перейди по ссылке в письме, чтобы активировать аккаунт.
+        <span style="color: var(--accent); font-weight: bold;">Перейди по ссылке</span> в письме, чтобы активировать аккаунт.
       </p>
       
-      <button id="checkVerificationBtn" class="active">✅ Я подтвердил</button>
-      <button id="resendEmailBtn" style="margin-top: 8px;">🔄 Отправить снова</button>
+      <button id="checkVerificationBtn" class="active" style="margin-bottom: 10px;">✅ Я подтвердил</button>
+      <button id="resendEmailBtn" style="background: rgba(255,255,255,0.1);">🔄 Отправить снова</button>
       <button id="backToLoginFromVerifyBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
     </div>
   </section>
 
-  <!-- Экран контактов -->
+  <!-- ЭКРАН КОНТАКТОВ -->
   <section id="contactsScreen" class="screen">
     <header class="top-bar">
       <div style="display: flex; align-items: center;">
@@ -198,7 +120,7 @@
     <div id="contactsList"></div>
   </section>
 
-  <!-- Экран чата -->
+  <!-- ЭКРАН ЧАТА -->
   <section id="chatScreen" class="screen">
     <header id="chatHeader">
       <button id="backBtn">←</button>
@@ -231,7 +153,7 @@
     </div>
   </section>
 
-  <!-- Экран настроек -->
+  <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
     <header class="top-bar">
       <button id="backFromSettingsBtn">←</button>
@@ -284,7 +206,7 @@
     </div>
   </section>
 
-  <!-- Модалка переименования -->
+  <!-- МОДАЛКА ПЕРЕИМЕНОВАНИЯ -->
   <div id="renameModal" class="modal" style="display: none;">
     <div class="modal-content">
       <h3>Переименовать чат</h3>
@@ -295,6 +217,15 @@
       </div>
     </div>
   </div>
+
+  <!-- АНИМАЦИЯ ДЛЯ КОНВЕРТА -->
+  <style>
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
 
   <!-- Скрипты -->
   <script src="app.js"></script>

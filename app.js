@@ -300,36 +300,92 @@ async function loginWithEmail(email, password) {
 
 let recaptchaVerifier;
 let confirmationResult;
+let recaptchaContainerId = 'recaptcha-container';
+
+// Очистка старой reCAPTCHA
+function clearRecaptcha() {
+  if (recaptchaVerifier) {
+    try {
+      recaptchaVerifier.clear();
+      recaptchaVerifier = null;
+    } catch (e) {
+      console.log('Ошибка очистки reCAPTCHA:', e);
+    }
+  }
+  
+  // Очищаем контейнер
+  const container = document.getElementById(recaptchaContainerId);
+  if (container) {
+    container.innerHTML = '<div class="recaptcha-loading"><span>Загрузка капчи...</span></div>';
+  }
+}
 
 // Инициализация reCAPTCHA
 function setupRecaptcha() {
-  if (!recaptchaVerifier) {
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      'size': 'normal',
-      'callback': () => {
-        console.log('✅ reCAPTCHA пройдена');
-        document.getElementById('sendRealCodeBtn').disabled = false;
-        document.getElementById('sendRealCodeBtn').classList.add('active');
-      },
-      'expired-callback': () => {
-        console.log('❌ reCAPTCHA истекла');
-        document.getElementById('sendRealCodeBtn').disabled = true;
-        document.getElementById('sendRealCodeBtn').classList.remove('active');
-      }
-    });
-    recaptchaVerifier.render();
-  }
+  // Очищаем старую капчу
+  clearRecaptcha();
+  
+  // Даём время на очистку
+  setTimeout(() => {
+    const container = document.getElementById(recaptchaContainerId);
+    if (!container) {
+      console.error('❌ Контейнер reCAPTCHA не найден');
+      return;
+    }
+    
+    try {
+      recaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptchaContainerId, {
+        'size': 'normal',
+        'callback': () => {
+          console.log('✅ reCAPTCHA пройдена');
+          const btn = document.getElementById('sendRealCodeBtn');
+          if (btn) {
+            btn.disabled = false;
+            btn.classList.add('active');
+          }
+        },
+        'expired-callback': () => {
+          console.log('❌ reCAPTCHA истекла');
+          const btn = document.getElementById('sendRealCodeBtn');
+          if (btn) {
+            btn.disabled = true;
+            btn.classList.remove('active');
+          }
+          // Автоматически обновляем капчу
+          setupRecaptcha();
+        },
+        'error-callback': (error) => {
+          console.error('❌ Ошибка reCAPTCHA:', error);
+        }
+      });
+      
+      recaptchaVerifier.render().then((widgetId) => {
+        console.log('✅ reCAPTCHA отрисована, widgetId:', widgetId);
+      });
+    } catch (error) {
+      console.error('❌ Ошибка создания reCAPTCHA:', error);
+    }
+  }, 100);
 }
 
 // Отправка SMS
 async function sendSmsCode(phoneNumber) {
   try {
-    setupRecaptcha();
+    // Проверяем, есть ли капча
+    if (!recaptchaVerifier) {
+      setupRecaptcha();
+      // Даём время капче загрузиться
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
     
     const appVerifier = recaptchaVerifier;
     confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
     
     console.log('✅ SMS отправлен на:', phoneNumber);
+    
+    // Очищаем капчу после успешной отправки
+    setTimeout(() => clearRecaptcha(), 1000);
+    
     return { success: true };
   } catch (error) {
     console.error('❌ Ошибка отправки SMS:', error);
@@ -340,10 +396,18 @@ async function sendSmsCode(phoneNumber) {
         errorMessage = 'Неверный формат номера';
         break;
       case 'auth/too-many-requests':
-        errorMessage = 'Слишком много попыток. Попробуй позже';
+        errorMessage = 'Слишком много попыток. Подожди 1 минуту и попробуй снова';
+        // Сбрасываем капчу при этой ошибке
+        clearRecaptcha();
+        setTimeout(() => setupRecaptcha(), 2000);
         break;
       case 'auth/network-request-failed':
         errorMessage = 'Ошибка сети. Проверь подключение';
+        break;
+      case 'auth/captcha-check-failed':
+        errorMessage = 'Ошибка капчи. Попробуй снова';
+        clearRecaptcha();
+        setTimeout(() => setupRecaptcha(), 1000);
         break;
     }
     
@@ -604,8 +668,14 @@ document.addEventListener('DOMContentLoaded', function() {
   
   document.getElementById('realPhoneMethodBtn')?.addEventListener('click', () => {
     console.log('📱 Выбран вход по телефону (настоящий)');
+    
+    // Очищаем старую капчу перед показом экрана
+    clearRecaptcha();
+    
     showScreen('realPhoneScreen');
-    setTimeout(() => setupRecaptcha(), 300);
+    
+    // Даём время экрану появиться, затем создаём капчу
+    setTimeout(() => setupRecaptcha(), 500);
   });
   
   document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
@@ -638,10 +708,12 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   document.getElementById('backFromRealPhoneBtn')?.addEventListener('click', () => {
+    clearRecaptcha();
     showScreen('loginMethodScreen');
   });
   
   document.getElementById('backFromSmsBtn')?.addEventListener('click', () => {
+    // Не очищаем капчу при возврате на экран телефона, просто переключаем
     showScreen('realPhoneScreen');
   });
   

@@ -8,13 +8,32 @@
   <!-- Шрифты -->
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&family=Fredoka:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
   
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"></script>
+  
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body> <!-- ВАЖНО: body ПУСТОЙ, без классов! -->
+<body>
 
-  <!-- Экран ввода номера -->
-  <section id="phoneScreen" class="screen active">
+  <!-- Экран выбора метода входа -->
+  <section id="loginMethodScreen" class="screen active">
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Выбери способ входа</p>
+      
+      <button id="phoneMethodBtn" class="active" style="margin-bottom: 12px;">📱 По телефону (фейк)</button>
+      <button id="emailMethodBtn" class="active">📧 По email (настоящий)</button>
+      
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 24px;">✨ Выбери email для настоящей регистрации ✨</p>
+    </div>
+  </section>
+
+  <!-- Экран ввода номера (ФЕЙК) -->
+  <section id="phoneScreen" class="screen">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
       <p class="subtitle">Вход по номеру телефона</p>
@@ -30,11 +49,12 @@
 
       <div id="errorMessage" class="error-message"></div>
       <button id="sendBtn" disabled>✨ Получить код ✨</button>
+      <button id="backFromPhoneBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
       <p style="font-size:12px; color: var(--text-soft); margin-top:16px;">Введи любой номер — это тест</p>
     </div>
   </section>
 
-  <!-- Экран ввода кода -->
+  <!-- Экран ввода кода (ФЕЙК) -->
   <section id="codeScreen" class="screen">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
@@ -44,11 +64,12 @@
       <div id="codeError" class="error-message"></div>
       
       <button id="verifyBtn" disabled>💕 Войти 💕</button>
+      <button id="backFromCodeBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
       <p style="font-size:12px; color: var(--text-soft); margin-top:16px;">Код: <span id="generatedCodeHint">******</span></p>
     </div>
   </section>
 
-  <!-- Экран создания профиля -->
+  <!-- Экран создания профиля (ФЕЙК) -->
   <section id="profileScreen" class="screen">
     <div class="glass-container">
       <h1>Создай профиль 💫</h1>
@@ -75,6 +96,63 @@
       </div>
       
       <button id="saveBtn" class="active">✨ Готово ✨</button>
+      <button id="backFromProfileBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+    </div>
+  </section>
+
+  <!-- Экран регистрации по email -->
+  <section id="emailRegisterScreen" class="screen">
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Регистрация по email</p>
+      
+      <input type="text" id="regName" placeholder="Твоё имя" />
+      <input type="email" id="regEmail" placeholder="Email" />
+      <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" />
+      <input type="password" id="regConfirmPassword" placeholder="Повтори пароль" />
+      
+      <div id="regError" class="error-message"></div>
+      
+      <button id="registerBtn" class="active">✨ Зарегистрироваться ✨</button>
+      <button id="backToLoginFromRegBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Уже есть аккаунт? <a href="#" id="showLoginLink">Войти</a></p>
+    </div>
+  </section>
+
+  <!-- Экран входа по email -->
+  <section id="emailLoginScreen" class="screen">
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Вход по email</p>
+      
+      <input type="email" id="loginEmail" placeholder="Email" />
+      <input type="password" id="loginPassword" placeholder="Пароль" />
+      
+      <div id="loginError" class="error-message"></div>
+      
+      <button id="loginBtn" class="active">💕 Войти 💕</button>
+      <button id="backFromEmailLoginBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Нет аккаунта? <a href="#" id="showRegisterLink">Зарегистрироваться</a></p>
+    </div>
+  </section>
+
+  <!-- Экран подтверждения email -->
+  <section id="verifyEmailScreen" class="screen">
+    <div class="glass-container">
+      <h1>NyashGram 💗</h1>
+      <p class="subtitle">Подтверди email</p>
+      
+      <div style="font-size: 48px; margin: 20px 0;">📧</div>
+      <p style="margin-bottom: 20px;">
+        Мы отправили письмо с подтверждением на твой email.<br>
+        Перейди по ссылке в письме, чтобы активировать аккаунт.
+      </p>
+      
+      <button id="checkVerificationBtn" class="active">✅ Я подтвердил</button>
+      <button id="resendEmailBtn" style="margin-top: 8px;">🔄 Отправить снова</button>
+      <button id="backToLoginFromVerifyBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
     </div>
   </section>
 
@@ -134,13 +212,14 @@
     <header class="top-bar">
       <button id="backFromSettingsBtn">←</button>
       <div class="top-title">Настройки</div>
-      <div style="width: 36px;"></div>
+      <button id="logoutBtn" style="width: auto; padding: 8px 12px;">🚪 Выйти</button>
     </header>
     
     <div style="padding: 16px; overflow-y: auto; width: 100%;">
       <!-- Профиль -->
       <div class="glass-container" style="margin-bottom: 16px;">
         <h3>Твой профиль</h3>
+        <div id="profileEmail" style="font-size: 14px; color: var(--text-soft); margin-bottom: 12px;"></div>
         <input type="text" id="settingsName" placeholder="Имя" />
         <div style="display: flex; gap: 8px; margin: 12px 0;">
           <input type="text" id="settingsUsername" placeholder="Юзернейм" style="flex: 1;" />
@@ -151,20 +230,20 @@
       </div>
       
       <!-- Темы -->
-<div class="glass-container" style="margin-bottom: 16px; position: relative;">
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-    <h3>Тема</h3>
-    <button id="themeModeToggle" class="theme-mode-btn">☀️</button>
-  </div>
-  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-    <button class="theme-btn active" data-theme="pastel-pink">Pastel Pink</button>
-    <button class="theme-btn" data-theme="milk-rose">Milk Rose</button>
-    <button class="theme-btn" data-theme="night-blue">Night Blue</button>
-    <button class="theme-btn" data-theme="lo-fi-beige">Lo-Fi Beige</button>
-    <button class="theme-btn" data-theme="soft-lilac">Soft Lilac</button>
-    <button class="theme-btn" data-theme="forest-mint">Forest Mint</button> <!-- НОВАЯ КНОПКА -->
-  </div>
-</div>
+      <div class="glass-container" style="margin-bottom: 16px; position: relative;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <h3>Тема</h3>
+          <button id="themeModeToggle" class="theme-mode-btn">☀️</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button class="theme-btn active" data-theme="pastel-pink">Pastel Pink</button>
+          <button class="theme-btn" data-theme="milk-rose">Milk Rose</button>
+          <button class="theme-btn" data-theme="night-blue">Night Blue</button>
+          <button class="theme-btn" data-theme="lo-fi-beige">Lo-Fi Beige</button>
+          <button class="theme-btn" data-theme="soft-lilac">Soft Lilac</button>
+          <button class="theme-btn" data-theme="forest-mint">Forest Mint</button>
+        </div>
+      </div>
       
       <!-- Шрифты -->
       <div class="glass-container">
@@ -182,16 +261,16 @@
   </section>
 
   <!-- Модалка переименования -->
-<div id="renameModal" class="modal" style="display: none;">
-  <div class="modal-content">
-    <h3>Переименовать чат</h3>
-    <input type="text" id="renameInput" placeholder="Введите новое название..." autocomplete="off" />
-    <div class="modal-buttons">
-      <button id="renameCancelBtn">Отмена</button>
-      <button id="renameConfirmBtn" class="active">Сохранить</button>
+  <div id="renameModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3>Переименовать чат</h3>
+      <input type="text" id="renameInput" placeholder="Новое название" />
+      <div class="modal-buttons">
+        <button id="renameCancelBtn">Отмена</button>
+        <button id="renameConfirmBtn" class="active">Сохранить</button>
+      </div>
     </div>
   </div>
-</div>
 
   <!-- Скрипты -->
   <script src="app.js"></script>

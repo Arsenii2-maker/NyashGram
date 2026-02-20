@@ -295,11 +295,79 @@ async function loginWithEmail(email, password) {
   }
 }
 
-// ===== APPLE ВХОД =====
+// ===== APPLE ВХОД (ИСПРАВЛЕННАЯ ВЕРСИЯ) =====
+
+// Настройка провайдера Apple
+function getAppleProvider() {
+  const provider = new firebase.auth.OAuthProvider('apple.com');
+  
+  // Добавляем необходимые scope
+  provider.addScope('email');
+  provider.addScope('name');
+  
+  // Настройки для мобильных устройств
+  provider.setCustomParameters({
+    // Для мобильных устройств
+    locale: 'ru',
+    // Чтобы не было проблем с попапами на мобильных
+    response_mode: 'web_message'
+  });
+  
+  return provider;
+}
+
+// Вход через Apple (улучшенная версия)
 async function loginWithApple() {
   try {
-    const result = await auth.signInWithPopup(appleProvider);
+    console.log('🍎 Начинаем вход через Apple...');
+    
+    const provider = getAppleProvider();
+    
+    // Определяем, мобильное устройство или нет
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    let result;
+    
+    if (isMobile) {
+      // На мобильных используем redirect вместо popup
+      console.log('📱 Мобильное устройство, используем redirect');
+      await auth.signInWithRedirect(provider);
+      // После редиректа результат обработается в onAuthStateChanged
+      return { success: true, redirect: true };
+    } else {
+      // На десктопе используем popup
+      console.log('💻 Десктоп, используем popup');
+      result = await auth.signInWithPopup(provider);
+    }
+    
+    // Обработка результата (для popup)
+    if (result) {
+      return await handleAppleSignInResult(result);
+    }
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Ошибка входа через Apple:', error);
+    
+    let errorMessage = 'Ошибка входа через Apple';
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Вход отменён';
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = 'Всплывающее окно заблокировано. Разрешите всплывающие окна.';
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      errorMessage = 'Запрос отменён';
+    }
+    
+    return { success: false, error: errorMessage };
+  }
+}
+
+// Обработка результата входа через Apple
+async function handleAppleSignInResult(result) {
+  try {
     const user = result.user;
+    console.log('✅ Вход через Apple успешен:', user.email);
     
     // Проверяем, есть ли пользователь в базе
     const userDoc = await db.collection('users').doc(user.uid).get();
@@ -307,18 +375,26 @@ async function loginWithApple() {
     if (!userDoc.exists) {
       // Новый пользователь - создаём профиль
       const username = generateCuteUsername();
-      const name = user.displayName || 'Apple User';
+      
+      // Получаем имя от Apple (если есть)
+      let name = 'Apple User';
+      if (result.additionalUserInfo && result.additionalUserInfo.profile) {
+        const profile = result.additionalUserInfo.profile;
+        if (profile.name) {
+          name = profile.name.firstName || profile.name.fullName || 'Apple User';
+        }
+      }
       
       await db.collection('users').doc(user.uid).set({
         name: name,
         email: user.email,
         username: username,
-        avatar: user.photoURL,
+        avatar: user.photoURL || null,
         theme: 'pastel-pink',
         mode: 'light',
         font: 'font-cozy',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        emailVerified: true // Apple аккаунты уже подтверждены
+        emailVerified: true
       });
       
       addUsername(username);
@@ -339,34 +415,36 @@ async function loginWithApple() {
       isFake: false
     };
     
+    // Сохраняем в localStorage
     localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
     localStorage.setItem('nyashgram_name', userData.name);
     localStorage.setItem('nyashgram_username', userData.username);
     localStorage.setItem('nyashgram_email', user.email);
-    localStorage.setItem('nyashgram_theme', userData.theme || 'pastel-pink');
-    localStorage.setItem('nyashgram_mode', userData.mode || 'light');
-    localStorage.setItem('nyashgram_font', userData.font || 'font-cozy');
     localStorage.setItem('nyashgram_entered', 'true');
     
+    // Применяем настройки
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
     
-    console.log('✅ Вход через Apple успешен!');
     showScreen('contactsScreen');
     if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
     
     return { success: true };
   } catch (error) {
-    console.error('❌ Ошибка входа через Apple:', error);
-    
-    let errorMessage = 'Ошибка входа через Apple';
-    if (error.code === 'auth/popup-closed-by-user') {
-      errorMessage = 'Вход отменён';
-    }
-    
-    return { success: false, error: errorMessage };
+    console.error('❌ Ошибка обработки Apple входа:', error);
+    return { success: false, error: error.message };
   }
 }
+
+// Обработка редиректа (для мобильных)
+auth.getRedirectResult().then(async (result) => {
+  if (result.user) {
+    console.log('✅ Результат редиректа получен');
+    await handleAppleSignInResult(result);
+  }
+}).catch((error) => {
+  console.error('❌ Ошибка редиректа:', error);
+});
 
 // ===== ВЫХОД =====
 async function logout() {

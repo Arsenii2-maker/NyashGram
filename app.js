@@ -303,6 +303,9 @@ async function loginWithEmail(email, password) {
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
+    // В начале loginWithGoogle добавьте:
+showLoadingScreen('Вход через email...');
+
     
     if (!user.emailVerified) {
       return { success: false, error: 'Подтверди email по ссылке в письме', needVerification: true };
@@ -329,6 +332,8 @@ async function loginWithEmail(email, password) {
     let errorMessage = 'Ошибка входа';
     if (error.code === 'auth/user-not-found') errorMessage = 'Пользователь не найден';
     if (error.code === 'auth/wrong-password') errorMessage = 'Неверный пароль';
+    // В конце, перед return:
+setTimeout(() => hideLoadingScreen(), 1000);
     return { success: false, error: errorMessage };
   }
 }

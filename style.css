@@ -1035,3 +1035,146 @@ body.soft-lilac-dark .quick-chip {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
 }
+/* ===== УЛУЧШЕННАЯ МОДАЛКА ПЕРЕИМЕНОВАНИЯ ===== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28px;
+  padding: 28px 24px;
+  width: 85%;
+  max-width: 320px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(255, 192, 203, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+  color: var(--text);
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 4px rgba(255, 120, 160, 0.2);
+}
+
+.modal-content input::placeholder {
+  color: var(--text-soft);
+  opacity: 0.6;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 14px 0;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: var(--text);
+}
+
+.modal-buttons button:first-child:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.02);
+}
+
+.modal-buttons button:first-child:active {
+  transform: scale(0.98);
+}
+
+.modal-buttons button:last-child {
+  background: var(--accent);
+  border: 2px solid var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
+}
+
+.modal-buttons button:last-child:hover {
+  transform: scale(1.02);
+  background: var(--accent-soft);
+  box-shadow: 0 6px 16px rgba(255, 120, 160, 0.4);
+}
+
+.modal-buttons button:last-child:active {
+  transform: scale(0.98);
+}
+
+/* Специально для тёмных тем */
+body.night-blue-dark .modal-content button:last-child,
+body.pastel-pink-dark .modal-content button:last-child,
+body.milk-rose-dark .modal-content button:last-child,
+body.lo-fi-beige-dark .modal-content button:last-child,
+body.soft-lilac-dark .modal-content button:last-child {
+  color: #ffffff;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

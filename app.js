@@ -356,6 +356,40 @@ auth.getRedirectResult().then(async (result) => {
   console.error('❌ Ошибка редиректа:', error);
   alert('Ошибка входа: ' + error.message);
 });
+// ===== ОБРАБОТКА РЕДИРЕКТА ПОСЛЕ GOOGLE ВХОДА =====
+// Этот код должен быть после определения handleGoogleSignInResult
+
+// Обработка редиректа (для мобильных)
+auth.getRedirectResult().then(async (result) => {
+  console.log('🔄 Проверяем результат редиректа...');
+  
+  if (result.user) {
+    console.log('✅ Результат редиректа получен, пользователь:', result.user.email);
+    
+    // Показываем индикатор загрузки
+    const loading = document.getElementById('loadingIndicator');
+    if (loading) loading.style.display = 'block';
+    
+    try {
+      await handleGoogleSignInResult(result);
+      console.log('✅ Вход через Google успешно завершён');
+    } catch (error) {
+      console.error('❌ Ошибка при обработке результата:', error);
+      alert('Ошибка входа: ' + error.message);
+    } finally {
+      if (loading) loading.style.display = 'none';
+    }
+  } else {
+    console.log('ℹ️ Нет результата редиректа');
+  }
+}).catch((error) => {
+  console.error('❌ Ошибка редиректа:', error);
+  
+  // Показываем ошибку пользователю
+  setTimeout(() => {
+    alert('Ошибка входа: ' + (error.message || 'Неизвестная ошибка'));
+  }, 500);
+});
 
 // ===== АНОНИМНЫЙ ВХОД =====
 async function loginAnonymously() {

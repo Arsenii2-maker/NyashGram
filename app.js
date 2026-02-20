@@ -544,10 +544,19 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   document.getElementById('googleMethodBtn')?.addEventListener('click', async () => {
-    const result = await loginWithGoogle();
-    if (!result.success) alert(result.error);
-  });
+  console.log('🌐 Нажата кнопка Google');
   
+  // Показываем индикатор загрузки
+  const loading = document.getElementById('loadingIndicator');
+  if (loading) loading.style.display = 'block';
+  
+  const result = await loginWithGoogle();
+  
+  // Если это редирект, индикатор останется
+  if (!result.redirect) {
+    if (loading) loading.style.display = 'none';
+  }
+});
   document.getElementById('anonymousMethodBtn')?.addEventListener('click', async () => {
     const result = await loginAnonymously();
     if (!result.success) alert(result.error);

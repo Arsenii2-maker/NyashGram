@@ -687,17 +687,21 @@ document.addEventListener('DOMContentLoaded', function() {
     showScreen('phoneScreen');
   });
   
-  document.getElementById('realPhoneMethodBtn')?.addEventListener('click', () => {
-    console.log('📱 Выбран вход по телефону (настоящий)');
-    
-    // Очищаем старую капчу перед показом экрана
-    clearRecaptcha();
-    
-    showScreen('realPhoneScreen');
-    
-    // Даём время экрану появиться, затем создаём капчу
-    setTimeout(() => setupRecaptcha(), 500);
-  });
+  // В обработчике кнопки реального телефона:
+document.getElementById('realPhoneMethodBtn')?.addEventListener('click', () => {
+  console.log('📱 Выбран вход по телефону (настоящий)');
+  
+  // Очищаем старую капчу перед показом экрана
+  clearRecaptcha();
+  
+  showScreen('realPhoneScreen');
+  
+  // Даём время экрану появиться, затем создаём капчу
+  setTimeout(() => {
+    console.log('🔄 Создаём reCAPTCHA...');
+    setupRecaptcha();
+  }, 500);
+});
   
   document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
     console.log('📧 Выбран вход по email');

@@ -152,6 +152,16 @@ function applyFont(fontClass) {
   document.body.classList.add(fontClass);
   AppState.currentUser.font = fontClass;
   localStorage.setItem('nyashgram_font', fontClass);
+  
+  // 👇 ВАЖНО: сразу обновляем активные кнопки шрифтов
+  document.querySelectorAll('.font-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.font === fontClass) {
+      btn.classList.add('active');
+    }
+  });
+  
+  console.log('✅ Шрифт применён:', fontClass);
 }
 
 // ===== НАСТРОЙКИ =====

@@ -316,57 +316,123 @@ function hideTypingIndicator() {
   isTyping = false;
 }
 
+// ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ OPENCHAT =====
 function openChat(contact) {
-  console.log('Открываем чат с:', contact);
+  console.log('🔥 Открываем чат с:', contact);
   
-  if (!contact || !contact.id) return;
+  // Проверяем, что контакт существует
+  if (!contact || !contact.id) {
+    console.error('❌ Ошибка: контакт не существует');
+    return;
+  }
   
+  // Устанавливаем текущий чат
   currentChat = contact.id;
   currentContact = contact;
   
+  // Инициализируем данные чата если нужно
   if (!window.chatData[currentChat]) {
-    window.chatData[currentChat] = { messages: [], draft: '' };
+    window.chatData[currentChat] = { 
+      messages: [], 
+      draft: '' 
+    };
   }
   
+  // Переключаем экран на чат
   if (typeof window.showScreen === 'function') {
     window.showScreen('chatScreen');
+  } else {
+    // Резервный метод переключения
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const chatScreen = document.getElementById('chatScreen');
+    if (chatScreen) {
+      chatScreen.classList.add('active');
+    } else {
+      console.error('❌ Экран чата не найден');
+      return;
+    }
   }
   
+  // Заполняем информацию о контакте
   const nameEl = document.getElementById('chatContactName');
-  if (nameEl) nameEl.textContent = getDisplayName(contact);
+  if (nameEl) {
+    nameEl.textContent = getDisplayName(contact);
+  } else {
+    console.error('❌ Элемент chatContactName не найден');
+  }
   
   const usernameEl = document.getElementById('chatContactUsername');
-  if (usernameEl) usernameEl.textContent = `@${contact.username || 'unknown'}`;
+  if (usernameEl) {
+    usernameEl.textContent = `@${contact.username || 'unknown'}`;
+  }
   
+  // Устанавливаем аватар
   const avatarEl = document.getElementById('chatAvatar');
   if (avatarEl) {
-    avatarEl.style.background = contact.avatar || (typeof window.getGradientForName === 'function' ? window.getGradientForName(contact.name) : 'linear-gradient(135deg, #fbc2c2, #c2b9f0)');
+    const gradient = contact.avatar || 
+                    (typeof window.getGradientForName === 'function' ? 
+                     window.getGradientForName(contact.name) : 
+                     'linear-gradient(135deg, #fbc2c2, #c2b9f0)');
+    avatarEl.style.background = gradient;
     avatarEl.style.backgroundSize = 'cover';
   }
   
+  // Обновляем иконку пина
   updatePinIcon();
   
+  // Восстанавливаем черновик
   const input = document.getElementById('messageInput');
-  if (input) input.value = window.chatData[currentChat].draft || '';
-  
-  if (!window.chatData[currentChat].messages || window.chatData[currentChat].messages.length === 0) {
-    window.chatData[currentChat].messages = [];
-    let welcome = 'Привет! 💕';
-    switch(contact.id) {
-      case 'nyashhelp': welcome = 'Привет! Я NyashHelp 🩷 Спрашивай!'; break;
-      case 'nyashtalk': welcome = 'Приветик! Давай болтать! 🌸'; break;
-      case 'nyashgame': welcome = '🎮 Привет! Хочешь поиграть?'; break;
-      case 'nyashhoroscope': welcome = '🔮 Привет! Я расскажу тебе, что звёзды приготовили!'; break;
-      case 'bestie': welcome = 'Привееет, моя няша! 💖'; break;
-      case 'philosopher': welcome = 'Здравствуй... 🧠'; break;
-      case 'study': welcome = 'Привет! Уроки сделал? 📚'; break;
-      case 'musicpal': welcome = 'Йо! Что в плейлисте? 🎧'; break;
-      case 'nightchat': welcome = 'Тсс... Полночь... 🌙'; break;
-    }
-    window.chatData[currentChat].messages.push({ from: 'bot', text: welcome });
+  if (input) {
+    input.value = window.chatData[currentChat].draft || '';
   }
   
+  // Добавляем приветствие если сообщений нет
+  if (!window.chatData[currentChat].messages || window.chatData[currentChat].messages.length === 0) {
+    window.chatData[currentChat].messages = [];
+    
+    let welcome = 'Привет! 💕';
+    switch(contact.id) {
+      case 'nyashhelp': 
+        welcome = 'Привет! Я NyashHelp 🩷 Спрашивай про приложение!'; 
+        break;
+      case 'nyashtalk': 
+        welcome = 'Приветик! Давай болтать! 🌸 О чём поговорим?'; 
+        break;
+      case 'nyashgame': 
+        welcome = '🎮 Привет! Хочешь поиграть? У меня есть угадай число, камень-ножницы-бумага и другие игры!'; 
+        break;
+      case 'nyashhoroscope': 
+        welcome = '🔮 Привет! Я расскажу тебе, что звёзды приготовили на сегодня!'; 
+        break;
+      case 'bestie': 
+        welcome = 'Привееет, моя няша! 💖 Как делишки? Рассказывай!'; 
+        break;
+      case 'philosopher': 
+        welcome = 'Здравствуй... 🧠 О чём хочешь пофилософствовать?'; 
+        break;
+      case 'study': 
+        welcome = 'Привет! Уроки сделал? 📚 Что проходили?'; 
+        break;
+      case 'musicpal': 
+        welcome = 'Йо! Что в плейлисте? 🎧 Делись!'; 
+        break;
+      case 'nightchat': 
+        welcome = 'Тсс... Полночь... Добро пожаловать в ночной чат 🌙'; 
+        break;
+      default:
+        welcome = 'Привет! 💕';
+    }
+    
+    window.chatData[currentChat].messages.push({ 
+      from: 'bot', 
+      text: welcome 
+    });
+  }
+  
+  // Отрисовываем сообщения
   renderMessages();
+  
+  console.log('✅ Чат открыт успешно');
 }
 
 function updatePinIcon() {
@@ -404,10 +470,9 @@ function showRenameModal() {
     input.value = customNames[currentContact.id] || currentContact.name;
     modal.style.display = 'flex';
     
-    // Автоматически фокусируемся на поле ввода
     setTimeout(() => {
       input.focus();
-      input.select(); // Выделяем текст для удобства
+      input.select();
     }, 100);
   }
 }
@@ -415,23 +480,10 @@ function showRenameModal() {
 function hideRenameModal() {
   const modal = document.getElementById('renameModal');
   if (modal) {
-    modal.style.animation = 'modalFadeOut 0.2s ease';
-    setTimeout(() => {
-      modal.style.display = 'none';
-      modal.style.animation = '';
-    }, 200);
+    modal.style.display = 'none';
   }
 }
 
-// Добавьте эту анимацию в style.css
-@keyframes modalFadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
 function renameCurrentChat() {
   const input = document.getElementById('renameInput');
   if (!input || !currentContact) return;
@@ -568,6 +620,8 @@ function renderMessages() {
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔧 Настройка chat.js...');
+  
   const sendBtn = document.getElementById('sendMessageBtn');
   const msgInput = document.getElementById('messageInput');
   const backBtn = document.getElementById('backBtn');
@@ -578,6 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const deleteBtn = document.getElementById('deleteChatBtn');
   const renameCancelBtn = document.getElementById('renameCancelBtn');
   const renameConfirmBtn = document.getElementById('renameConfirmBtn');
+  const renameInput = document.getElementById('renameInput');
   
   if (sendBtn && msgInput) {
     sendBtn.addEventListener('click', (e) => {
@@ -666,12 +721,21 @@ document.addEventListener('DOMContentLoaded', function() {
       renameCurrentChat();
     });
   }
+  
+  if (renameInput) {
+    renameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        renameCurrentChat();
+      }
+    });
+  }
+  
+  // Делаем функцию openChat глобально доступной
+  window.openChat = openChat;
+  window.sendMessage = sendMessage;
+  window.toggleChatActions = toggleChatActions;
+  window.customNames = customNames;
+  
+  console.log('✅ chat.js загружен, openChat доступна:', typeof window.openChat);
 });
-
-// Экспорт
-window.openChat = openChat;
-window.sendMessage = sendMessage;
-window.toggleChatActions = toggleChatActions;
-window.customNames = customNames;
-
-console.log('✅ chat.js загружен');

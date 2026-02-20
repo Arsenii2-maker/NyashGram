@@ -263,6 +263,9 @@ async function registerWithEmail(name, email, password) {
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
+    // В начале loginWithGoogle добавьте:
+showLoadingScreen('Вход через email...');
+
     
     await user.sendEmailVerification();
     await user.updateProfile({ displayName: name });
@@ -289,6 +292,8 @@ async function registerWithEmail(name, email, password) {
     let errorMessage = 'Ошибка регистрации';
     if (error.code === 'auth/email-already-in-use') errorMessage = 'Этот email уже зарегистрирован';
     if (error.code === 'auth/weak-password') errorMessage = 'Пароль слишком слабый (минимум 6 символов)';
+    // В конце, перед return:
+setTimeout(() => hideLoadingScreen(), 1000);
     return { success: false, error: errorMessage };
   }
 }

@@ -43,6 +43,14 @@ function setTheme(theme, mode) {
   localStorage.setItem('nyashgram_theme', theme);
   localStorage.setItem('nyashgram_mode', mode);
   
+  // 👇 ВАЖНО: сразу обновляем активные кнопки тем
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.theme === theme) {
+      btn.classList.add('active');
+    }
+  });
+  
   console.log('✅ Тема установлена:', `${theme}-${mode}`);
 }
 

@@ -126,6 +126,34 @@
       <button id="backToLoginFromVerifyBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
     </div>
   </section>
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+<section id="loadingScreen" class="screen">
+  <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
+    <h1 style="margin-bottom: 30px;">NyashGram 💗</h1>
+    
+    <!-- Анимированный лоадер -->
+    <div class="nyash-loader">
+      <div class="loader-circle"></div>
+      <div class="loader-paw">🐾</div>
+    </div>
+    
+    <div id="loadingMessage" style="font-size: 18px; margin: 30px 0 20px; color: var(--accent);">
+      Загружаем твой мирок...
+    </div>
+    
+    <!-- Блок с советами -->
+    <div class="tips-container">
+      <div id="tipText" class="tip-text"></div>
+      <div class="tip-counter">
+        <span id="currentTip">1</span>/<span id="totalTips">10</span>
+      </div>
+    </div>
+    
+    <p style="font-size: 12px; color: var(--text-soft); margin-top: 40px;">
+      ✨ Первая загрузка может быть долгой ✨
+    </p>
+  </div>
+</section>
 
   <!-- ЭКРАН КОНТАКТОВ -->
   <section id="contactsScreen" class="screen">

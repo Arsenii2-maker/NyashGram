@@ -461,39 +461,98 @@ body.forest-mint-light {
   --bubble-user: rgba(255, 255, 255, 0.8);
   --bubble-bot: rgba(200, 230, 200, 0.7);
   --border-light: rgba(100, 150, 100, 0.3);
-  background: linear-gradient(145deg, #e0f2e0, #c8e6c9);
+  background: linear-gradient(145deg, #e0f2e0, #c8e6c9) !important;
   color: #1d3b1d;
 }
+
+/* Forest Mint - Light - все элементы */
 body.forest-mint-light .glass-container,
 body.forest-mint-light .contact,
 body.forest-mint-light #chatHeader,
 body.forest-mint-light .top-bar,
 body.forest-mint-light #messageInputArea,
-body.forest-mint-light .chat-actions-panel {
-  background: rgba(200, 230, 200, 0.25);
+body.forest-mint-light .chat-actions-panel,
+body.forest-mint-light #quickReplyPanel,
+body.forest-mint-light .search-bar {
+  background: rgba(200, 230, 200, 0.25) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(100, 150, 100, 0.3);
+  border: 1px solid rgba(100, 150, 100, 0.3) !important;
 }
+
 body.forest-mint-light .message.user {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid white;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  color: #1d3b1d;
 }
+
 body.forest-mint-light .message.bot {
-  background: rgba(200, 230, 200, 0.7);
-  border: 1px solid rgba(100, 150, 100, 0.3);
+  background: rgba(200, 230, 200, 0.7) !important;
+  border: 1px solid rgba(100, 150, 100, 0.3) !important;
+  color: #1d3b1d;
 }
+
 body.forest-mint-light .quick-chip {
-  background: rgba(200, 230, 200, 0.6);
-  border: 1px solid rgba(100, 150, 100, 0.4);
+  background: rgba(200, 230, 200, 0.6) !important;
+  border: 1px solid rgba(100, 150, 100, 0.4) !important;
   color: #1d3b1d;
 }
+
+body.forest-mint-light .quick-chip:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.forest-mint-light button:not(.active) {
+  background: rgba(200, 230, 200, 0.3) !important;
+  border: 1px solid rgba(100, 150, 100, 0.3) !important;
+  color: #1d3b1d;
+}
+
 body.forest-mint-light button.active {
-  background: #81c784;
-  border-color: #4caf50;
+  background: #81c784 !important;
+  border-color: #4caf50 !important;
+  color: #1d3b1d !important;
+}
+
+body.forest-mint-light #themeModeToggle,
+body.forest-mint-light #backBtn,
+body.forest-mint-light #settingsBtn,
+body.forest-mint-light #pinChatBtn {
+  background: rgba(200, 230, 200, 0.4) !important;
+  border: 1px solid rgba(100, 150, 100, 0.3) !important;
   color: #1d3b1d;
 }
-body.forest-mint-light #themeModeToggle {
+
+body.forest-mint-light #themeModeToggle:hover,
+body.forest-mint-light #backBtn:hover,
+body.forest-mint-light #settingsBtn:hover,
+body.forest-mint-light #pinChatBtn:hover {
+  background: rgba(200, 230, 200, 0.6) !important;
+}
+
+body.forest-mint-light input,
+body.forest-mint-light select,
+body.forest-mint-light #messageInput,
+body.forest-mint-light .search-input {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(100, 150, 100, 0.3) !important;
   color: #1d3b1d;
+}
+
+body.forest-mint-light input::placeholder,
+body.forest-mint-light #messageInput::placeholder,
+body.forest-mint-light .search-input::placeholder {
+  color: #2d5a2d !important;
+  opacity: 0.7;
+}
+
+body.forest-mint-light .section-header {
+  color: #2d5a2d;
+}
+
+body.forest-mint-light .username-display,
+body.forest-mint-light .status,
+body.forest-mint-light .username {
+  color: #2d5a2d;
 }
 
 /* Forest Mint - Dark (тёмная зелёная) */
@@ -508,39 +567,97 @@ body.forest-mint-dark {
   --bubble-user: rgba(46, 125, 50, 0.7);
   --bubble-bot: rgba(20, 70, 20, 0.6);
   --border-light: rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, #1b4d1b, #0a330a);
+  background: linear-gradient(145deg, #1b4d1b, #0a330a) !important;
   color: #e8f5e8;
 }
+
+/* Forest Mint - Dark - все элементы */
 body.forest-mint-dark .glass-container,
 body.forest-mint-dark .contact,
 body.forest-mint-dark #chatHeader,
 body.forest-mint-dark .top-bar,
 body.forest-mint-dark #messageInputArea,
-body.forest-mint-dark .chat-actions-panel {
-  background: rgba(27, 77, 27, 0.4);
+body.forest-mint-dark .chat-actions-panel,
+body.forest-mint-dark #quickReplyPanel,
+body.forest-mint-dark .search-bar {
+  background: rgba(27, 77, 27, 0.4) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
+
 body.forest-mint-dark .message.user {
-  background: rgba(46, 125, 50, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(46, 125, 50, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff;
 }
+
 body.forest-mint-dark .message.bot {
-  background: rgba(20, 70, 20, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(20, 70, 20, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff;
 }
+
 body.forest-mint-dark .quick-chip {
-  background: rgba(46, 125, 50, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(46, 125, 50, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #ffffff;
 }
+
+body.forest-mint-dark .quick-chip:hover {
+  background: rgba(46, 125, 50, 0.6) !important;
+}
+
+body.forest-mint-dark button:not(.active) {
+  background: rgba(46, 125, 50, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff;
+}
+
 body.forest-mint-dark button.active {
-  background: #2e7d32;
-  border-color: #1b5e20;
+  background: #2e7d32 !important;
+  border-color: #1b5e20 !important;
+  color: #ffffff !important;
+}
+
+body.forest-mint-dark #themeModeToggle,
+body.forest-mint-dark #backBtn,
+body.forest-mint-dark #settingsBtn,
+body.forest-mint-dark #pinChatBtn {
+  background: rgba(46, 125, 50, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #ffffff;
 }
-body.forest-mint-dark #themeModeToggle {
+
+body.forest-mint-dark #themeModeToggle:hover,
+body.forest-mint-dark #backBtn:hover,
+body.forest-mint-dark #settingsBtn:hover,
+body.forest-mint-dark #pinChatBtn:hover {
+  background: rgba(46, 125, 50, 0.6) !important;
+}
+
+body.forest-mint-dark input,
+body.forest-mint-dark select,
+body.forest-mint-dark #messageInput,
+body.forest-mint-dark .search-input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #ffffff;
+}
+
+body.forest-mint-dark input::placeholder,
+body.forest-mint-dark #messageInput::placeholder,
+body.forest-mint-dark .search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.forest-mint-dark .section-header {
+  color: #a5d6a5;
+}
+
+body.forest-mint-dark .username-display,
+body.forest-mint-dark .status,
+body.forest-mint-dark .username {
+  color: #a5d6a5;
 }
 
 /* ===== ШРИФТЫ ===== */

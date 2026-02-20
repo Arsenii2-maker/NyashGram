@@ -1,4 +1,4 @@
-// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С EMAIL РЕГИСТРАЦИЕЙ
+// app.js — ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ С EMAIL И ТЕЛЕФОН РЕГИСТРАЦИЕЙ
 
 // ===== FIREBASE КОНФИГУРАЦИЯ =====
 // Замените на свои данные из Firebase Console
@@ -33,6 +33,7 @@ const AppState = {
     username: localStorage.getItem('nyashgram_username') || "nyasha",
     avatar: localStorage.getItem('nyashgram_avatar') || null,
     email: localStorage.getItem('nyashgram_email') || null,
+    phoneNumber: localStorage.getItem('nyashgram_phone') || null,
     theme: localStorage.getItem('nyashgram_theme') || "pastel-pink",
     mode: localStorage.getItem('nyashgram_mode') || "light",
     font: localStorage.getItem('nyashgram_font') || "font-cozy",
@@ -295,7 +296,131 @@ async function loginWithEmail(email, password) {
   }
 }
 
-// Выход
+// ===== НАСТОЯЩАЯ РЕГИСТРАЦИЯ ПО ТЕЛЕФОНУ =====
+
+let recaptchaVerifier;
+let confirmationResult;
+
+// Инициализация reCAPTCHA
+function setupRecaptcha() {
+  if (!recaptchaVerifier) {
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'normal',
+      'callback': () => {
+        console.log('✅ reCAPTCHA пройдена');
+        document.getElementById('sendRealCodeBtn').disabled = false;
+        document.getElementById('sendRealCodeBtn').classList.add('active');
+      },
+      'expired-callback': () => {
+        console.log('❌ reCAPTCHA истекла');
+        document.getElementById('sendRealCodeBtn').disabled = true;
+        document.getElementById('sendRealCodeBtn').classList.remove('active');
+      }
+    });
+    recaptchaVerifier.render();
+  }
+}
+
+// Отправка SMS
+async function sendSmsCode(phoneNumber) {
+  try {
+    setupRecaptcha();
+    
+    const appVerifier = recaptchaVerifier;
+    confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+    
+    console.log('✅ SMS отправлен на:', phoneNumber);
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Ошибка отправки SMS:', error);
+    
+    let errorMessage = 'Ошибка отправки SMS';
+    switch(error.code) {
+      case 'auth/invalid-phone-number':
+        errorMessage = 'Неверный формат номера';
+        break;
+      case 'auth/too-many-requests':
+        errorMessage = 'Слишком много попыток. Попробуй позже';
+        break;
+      case 'auth/network-request-failed':
+        errorMessage = 'Ошибка сети. Проверь подключение';
+        break;
+    }
+    
+    return { success: false, error: errorMessage };
+  }
+}
+
+// Подтверждение SMS кода
+async function verifySmsCode(code) {
+  try {
+    const result = await confirmationResult.confirm(code);
+    const user = result.user;
+    
+    console.log('✅ Вход по телефону успешен:', user.phoneNumber);
+    
+    // Создаём профиль пользователя если его нет
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    
+    if (!userDoc.exists) {
+      const username = generateCuteUsername();
+      await db.collection('users').doc(user.uid).set({
+        name: 'Пользователь',
+        username: username,
+        phoneNumber: user.phoneNumber,
+        avatar: null,
+        theme: 'pastel-pink',
+        mode: 'light',
+        font: 'font-cozy',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      addUsername(username);
+    }
+    
+    // Загружаем данные пользователя
+    const userData = (await db.collection('users').doc(user.uid).get()).data();
+    
+    AppState.currentUser = {
+      uid: user.uid,
+      name: userData.name,
+      username: userData.username,
+      phoneNumber: user.phoneNumber,
+      avatar: userData.avatar,
+      theme: userData.theme || 'pastel-pink',
+      mode: userData.mode || 'light',
+      font: userData.font || 'font-cozy',
+      isFake: false
+    };
+    
+    localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+    localStorage.setItem('nyashgram_name', userData.name);
+    localStorage.setItem('nyashgram_username', userData.username);
+    localStorage.setItem('nyashgram_phone', user.phoneNumber);
+    localStorage.setItem('nyashgram_theme', userData.theme || 'pastel-pink');
+    localStorage.setItem('nyashgram_mode', userData.mode || 'light');
+    localStorage.setItem('nyashgram_font', userData.font || 'font-cozy');
+    localStorage.setItem('nyashgram_entered', 'true');
+    
+    setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+    applyFont(AppState.currentUser.font);
+    
+    showScreen('contactsScreen');
+    if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Ошибка подтверждения кода:', error);
+    
+    let errorMessage = 'Неверный код';
+    if (error.code === 'auth/invalid-verification-code') {
+      errorMessage = 'Неверный код подтверждения';
+    }
+    
+    return { success: false, error: errorMessage };
+  }
+}
+
+// ===== ВЫХОД =====
 async function logout() {
   try {
     if (!AppState.currentUser.isFake) {
@@ -306,6 +431,7 @@ async function logout() {
     localStorage.removeItem('nyashgram_name');
     localStorage.removeItem('nyashgram_username');
     localStorage.removeItem('nyashgram_email');
+    localStorage.removeItem('nyashgram_phone');
     
     AppState.currentUser = {
       name: "Няша",
@@ -392,7 +518,7 @@ function loadSettingsIntoUI() {
   
   const emailEl = document.getElementById('profileEmail');
   if (emailEl) {
-    emailEl.textContent = AppState.currentUser.email || 'Фейковый аккаунт';
+    emailEl.textContent = AppState.currentUser.email || AppState.currentUser.phoneNumber || 'Фейковый аккаунт';
   }
   
   document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -472,8 +598,14 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // ===== НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ =====
   document.getElementById('phoneMethodBtn')?.addEventListener('click', () => {
-    console.log('📱 Выбран вход по телефону');
+    console.log('📱 Выбран вход по телефону (фейк)');
     showScreen('phoneScreen');
+  });
+  
+  document.getElementById('realPhoneMethodBtn')?.addEventListener('click', () => {
+    console.log('📱 Выбран вход по телефону (настоящий)');
+    showScreen('realPhoneScreen');
+    setTimeout(() => setupRecaptcha(), 300);
   });
   
   document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
@@ -505,6 +637,14 @@ document.addEventListener('DOMContentLoaded', function() {
     showScreen('loginMethodScreen');
   });
   
+  document.getElementById('backFromRealPhoneBtn')?.addEventListener('click', () => {
+    showScreen('loginMethodScreen');
+  });
+  
+  document.getElementById('backFromSmsBtn')?.addEventListener('click', () => {
+    showScreen('realPhoneScreen');
+  });
+  
   document.getElementById('showLoginLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     showScreen('emailLoginScreen');
@@ -513,6 +653,80 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('showRegisterLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     showScreen('emailRegisterScreen');
+  });
+  
+  // ===== НАСТОЯЩАЯ РЕГИСТРАЦИЯ ПО ТЕЛЕФОНУ =====
+  const realPhoneInput = document.getElementById('realPhoneNumber');
+  const sendRealCodeBtn = document.getElementById('sendRealCodeBtn');
+
+  if (realPhoneInput && sendRealCodeBtn) {
+    realPhoneInput.addEventListener('input', function() {
+      const phone = this.value.replace(/\D/g, '');
+      if (phone.length >= 10) {
+        sendRealCodeBtn.classList.add('active');
+        sendRealCodeBtn.disabled = false;
+      } else {
+        sendRealCodeBtn.classList.remove('active');
+        sendRealCodeBtn.disabled = true;
+      }
+    });
+  }
+
+  sendRealCodeBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    const countryCode = document.getElementById('realCountryCode').value;
+    const phone = document.getElementById('realPhoneNumber').value.replace(/\D/g, '');
+    const fullPhone = countryCode + phone;
+    
+    const errorEl = document.getElementById('realPhoneError');
+    
+    const result = await sendSmsCode(fullPhone);
+    
+    if (result.success) {
+      showScreen('smsCodeScreen');
+    } else {
+      errorEl.textContent = result.error;
+    }
+  });
+
+  const smsCodeInput = document.getElementById('smsCodeInput');
+  const verifySmsBtn = document.getElementById('verifySmsBtn');
+
+  if (smsCodeInput && verifySmsBtn) {
+    smsCodeInput.addEventListener('input', function() {
+      if (this.value.length === 6) {
+        verifySmsBtn.disabled = false;
+        verifySmsBtn.classList.add('active');
+      } else {
+        verifySmsBtn.disabled = true;
+        verifySmsBtn.classList.remove('active');
+      }
+    });
+  }
+
+  verifySmsBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    const code = smsCodeInput.value.trim();
+    const errorEl = document.getElementById('smsCodeError');
+    
+    const result = await verifySmsCode(code);
+    
+    if (!result.success) {
+      errorEl.textContent = result.error;
+    }
+  });
+
+  document.getElementById('resendSmsLink')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    const countryCode = document.getElementById('realCountryCode').value;
+    const phone = document.getElementById('realPhoneNumber').value.replace(/\D/g, '');
+    const fullPhone = countryCode + phone;
+    
+    await sendSmsCode(fullPhone);
+    alert('Код отправлен повторно!');
   });
   
   // ===== ФЕЙКОВАЯ РЕГИСТРАЦИЯ =====

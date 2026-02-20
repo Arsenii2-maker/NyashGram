@@ -34,49 +34,52 @@
       <h1>NyashGram 💗</h1>
       <p class="subtitle">Выбери способ входа</p>
       
-      <button id="phoneMethodBtn" class="active" style="margin-bottom: 12px;">📱 По телефону (фейк)</button>
-      <button id="emailMethodBtn" class="active">📧 По email (настоящий)</button>
+      <button id="phoneMethodBtn" class="active" style="margin-bottom: 12px;">📱 По телефону</button>
+      <button id="emailMethodBtn" class="active">📧 По email</button>
       
       <p style="font-size:12px; color: var(--text-soft); margin-top: 24px;">✨ Выбери email для настоящей регистрации ✨</p>
     </div>
   </section>
 
-  <!-- Экран ввода номера (ФЕЙК) -->
-  <section id="phoneScreen" class="screen">
-    <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">Вход по номеру телефона</p>
-      
-      <div class="phone-input">
-        <select id="countryCode">
-          <option value="+7">🇷🇺 +7</option>
-          <option value="+380">🇺🇦 +380</option>
-          <option value="+375">🇧🇾 +375</option>
-        </select>
-        <input type="tel" id="phoneNumber" placeholder="999 999 99 99" />
-      </div>
-
-      <div id="errorMessage" class="error-message"></div>
-      <button id="sendBtn" disabled>✨ Получить код ✨</button>
-      <button id="backFromPhoneBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
-      <p style="font-size:12px; color: var(--text-soft); margin-top:16px;">Введи любой номер — это тест</p>
+  <!-- Экран настоящего телефона -->
+<section id="realPhoneScreen" class="screen">
+  <div class="glass-container">
+    <h1>NyashGram 💗</h1>
+    <p class="subtitle">Вход по телефону</p>
+    
+    <div style="margin-bottom: 20px;" id="recaptcha-container"></div>
+    
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <select id="realCountryCode" style="width: auto;">
+        <option value="+7">🇷🇺 +7</option>
+        <option value="+1">🇺🇸 +1</option>
+        <option value="+44">🇬🇧 +44</option>
+      </select>
+      <input type="tel" id="realPhoneNumber" placeholder="999 999 99 99" />
     </div>
-  </section>
 
-  <!-- Экран ввода кода (ФЕЙК) -->
-  <section id="codeScreen" class="screen">
-    <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">Введи код из смс</p>
-      
-      <input type="text" id="codeInput" placeholder="------" maxlength="6" />
-      <div id="codeError" class="error-message"></div>
-      
-      <button id="verifyBtn" disabled>💕 Войти 💕</button>
-      <button id="backFromCodeBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
-      <p style="font-size:12px; color: var(--text-soft); margin-top:16px;">Код: <span id="generatedCodeHint">******</span></p>
-    </div>
-  </section>
+    <div id="realPhoneError" class="error-message"></div>
+    <button id="sendRealCodeBtn" disabled>📱 Отправить SMS с кодом</button>
+    <button id="backFromRealPhoneBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+  </div>
+</section>
+
+<!-- Экран ввода SMS кода -->
+<section id="smsCodeScreen" class="screen">
+  <div class="glass-container">
+    <h1>NyashGram 💗</h1>
+    <p class="subtitle">Введи код из SMS</p>
+    
+    <input type="text" id="smsCodeInput" placeholder="------" maxlength="6" style="font-size: 28px; text-align: center; letter-spacing: 8px;" />
+    
+    <div id="smsCodeError" class="error-message"></div>
+    
+    <button id="verifySmsBtn" disabled>✅ Подтвердить</button>
+    <button id="backFromSmsBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+    
+    <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">Не пришёл код? <a href="#" id="resendSmsLink">Отправить снова</a></p>
+  </div>
+</section>
 
   <!-- Экран создания профиля (ФЕЙК) -->
   <section id="profileScreen" class="screen">

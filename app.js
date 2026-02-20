@@ -261,11 +261,11 @@ function removeUsername(username) {
 // ===== EMAIL РЕГИСТРАЦИЯ =====
 async function registerWithEmail(name, email, password) {
   try {
-    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    const user = userCredential.user;
     // В начале loginWithGoogle добавьте:
 showLoadingScreen('Вход через email...');
-
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
     
     await user.sendEmailVerification();
     await user.updateProfile({ displayName: name });
@@ -301,11 +301,11 @@ setTimeout(() => hideLoadingScreen(), 1000);
 // ===== EMAIL ВХОД =====
 async function loginWithEmail(email, password) {
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
     // В начале loginWithGoogle добавьте:
 showLoadingScreen('Вход через email...');
-
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
     
     if (!user.emailVerified) {
       return { success: false, error: 'Подтверди email по ссылке в письме', needVerification: true };

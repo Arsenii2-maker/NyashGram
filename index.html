@@ -8,7 +8,7 @@
   <!-- Шрифты -->
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&family=Fredoka:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK (Compat версия) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -19,24 +19,28 @@
 </head>
 <body>
 
-  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА (НОВЫЙ) -->
+  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА (В ЦЕНТРЕ) -->
   <section id="loginMethodScreen" class="screen active">
-    <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">Вход в аккаунт</p>
+    <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
+      <h1 style="margin-bottom: 20px;">NyashGram 💗</h1>
+      <p class="subtitle" style="margin-bottom: 30px;">Вход в аккаунт</p>
       
-      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-        <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px;">
+        <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
           📧 По email
         </button>
         
-        <button id="appleMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px;">
-          🍎 Через Apple
+        <button id="googleMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
+          🌐 Через Google
+        </button>
+        
+        <button id="anonymousMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
+          👤 Гостем (без сохранения)
         </button>
       </div>
       
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 24px;">
-        ✨ Только настоящие аккаунты ✨
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 30px;">
+        ✨ Анонимный вход - история не сохраняется ✨
       </p>
     </div>
   </section>
@@ -93,7 +97,7 @@
       
       <p style="margin-bottom: 20px; line-height: 1.6;">
         Мы отправили письмо с подтверждением на твой email.<br>
-        <span style="color: var(--accent); font-weight: bold;">Перейди по ссылке</span> в письме, чтобы активировать аккаунт.
+        <span style="color: var(--accent); font-weight: bold;">Перейди по ссылке</span> в письме.
       </p>
       
       <button id="checkVerificationBtn" class="active" style="margin-bottom: 10px;">✅ Я подтвердил</button>
@@ -112,7 +116,6 @@
       <button id="settingsBtn">⚙️</button>
     </header>
     
-    <!-- Строка поиска -->
     <div class="search-bar">
       <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по юзернейму..." />
     </div>
@@ -132,7 +135,6 @@
       <button id="pinChatBtn">📌</button>
     </header>
     
-    <!-- Панель действий -->
     <div id="chatActionsPanel" class="chat-actions-panel" style="display: none;">
       <button id="pinChatActionBtn" title="Закрепить">📌</button>
       <button id="renameChatBtn" title="Переименовать">✏️</button>
@@ -140,13 +142,9 @@
       <button id="deleteChatBtn" title="Удалить чат">🗑️</button>
     </div>
     
-    <!-- Панель быстрых ответов -->
     <div id="quickReplyPanel" class="quick-reply-panel"></div>
-    
-    <!-- Область сообщений -->
     <div id="chatArea" class="chat-area"></div>
     
-    <!-- Поле ввода -->
     <div id="messageInputArea">
       <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." />
       <button id="sendMessageBtn">➤</button>
@@ -162,10 +160,10 @@
     </header>
     
     <div style="padding: 16px; overflow-y: auto; width: 100%;">
-      <!-- Профиль -->
       <div class="glass-container" style="margin-bottom: 16px;">
         <h3>Твой профиль</h3>
         <div id="profileEmail" style="font-size: 14px; color: var(--text-soft); margin-bottom: 12px;"></div>
+        <div id="profileType" style="font-size: 12px; color: var(--accent); margin-bottom: 12px;"></div>
         <input type="text" id="settingsName" placeholder="Имя" />
         <div style="display: flex; gap: 8px; margin: 12px 0;">
           <input type="text" id="settingsUsername" placeholder="Юзернейм" style="flex: 1;" />
@@ -175,8 +173,7 @@
         <button id="saveSettingsBtn" class="active">Сохранить</button>
       </div>
       
-      <!-- Темы -->
-      <div class="glass-container" style="margin-bottom: 16px; position: relative;">
+      <div class="glass-container" style="margin-bottom: 16px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <h3>Тема</h3>
           <button id="themeModeToggle" class="theme-mode-btn">☀️</button>
@@ -191,7 +188,6 @@
         </div>
       </div>
       
-      <!-- Шрифты -->
       <div class="glass-container">
         <h3>Шрифт</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -218,7 +214,6 @@
     </div>
   </div>
 
-  <!-- АНИМАЦИЯ ДЛЯ КОНВЕРТА -->
   <style>
     @keyframes float {
       0% { transform: translateY(0px); }
@@ -227,7 +222,6 @@
     }
   </style>
 
-  <!-- Скрипты -->
   <script src="app.js"></script>
   <script src="contacts.js"></script>
   <script src="chat.js"></script>

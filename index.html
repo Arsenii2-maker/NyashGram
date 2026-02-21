@@ -18,117 +18,124 @@
   <link rel="stylesheet" href="style.css">
   
   <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
 
-  <!-- ЭКРАН ЗАГРУЗКИ (ВСЕГДА ПОВЕРХ ВСЕГО) -->
+  <!-- ЭКРАН ЗАГРУЗКИ (ПОВЕРХ ВСЕГО) -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="loading-container">
-      <h2 style="margin-bottom: 30px;">NyashGram 💗</h2>
+      <h2 style="margin-bottom: 30px; color: var(--text);">NyashGram 💗</h2>
       
       <div class="nyash-loader">
         <div class="loader-circle"></div>
         <div class="loader-paw">🐾</div>
       </div>
       
-      <div id="loadingMessage" style="font-size: 18px; margin: 30px 0 20px; color: var(--accent);">
+      <div id="loadingMessage" class="loading-message">
         Загружаем...
       </div>
       
       <div class="tips-container">
         <div id="tipText" class="tip-text"></div>
         <div class="tip-counter">
-          <span id="currentTip">1</span>/<span id="totalTips">10</span>
+          <span id="currentTip">1</span>/<span id="totalTips">12</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА -->
+  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА (С ЦЕНТРИРОВАНИЕМ) -->
   <section id="loginMethodScreen" class="screen active">
-    <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 500px;">
-      <h1 style="margin-bottom: 10px; font-size: 2.5rem;">NyashGram</h1>
-      <p class="subtitle" style="margin-bottom: 40px;">💗 говори по-няшному</p>
-      
-      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px;">
-        <button id="googleMethodBtn" class="login-btn">
-          <span style="font-size: 20px; margin-right: 10px;">🌐</span> Google
-        </button>
+    <div class="center-wrapper">
+      <div class="glass-container" style="width: 100%; max-width: 320px;">
+        <h1 style="margin-bottom: 8px; font-size: 2.2rem;">NyashGram</h1>
+        <p class="subtitle" style="margin-bottom: 32px;">💗 говори по-няшному</p>
         
-        <button id="emailMethodBtn" class="login-btn">
-          <span style="font-size: 20px; margin-right: 10px;">📧</span> Email
-        </button>
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+          <button id="googleMethodBtn" class="login-btn">
+            <span style="font-size: 20px; margin-right: 10px;">🌐</span> Google
+          </button>
+          
+          <button id="emailMethodBtn" class="login-btn">
+            <span style="font-size: 20px; margin-right: 10px;">📧</span> Email
+          </button>
+          
+          <button id="anonymousMethodBtn" class="login-btn">
+            <span style="font-size: 20px; margin-right: 10px;">👤</span> Гостем
+          </button>
+        </div>
         
-        <button id="anonymousMethodBtn" class="login-btn">
-          <span style="font-size: 20px; margin-right: 10px;">👤</span> Гостем
-        </button>
+        <p style="font-size:12px; color: var(--text-soft); margin-top: 32px; opacity: 0.7;">
+          добавляй друзей и общайся ✨
+        </p>
       </div>
-      
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 40px; opacity: 0.7;">
-        добавляй друзей и общайся ✨
-      </p>
     </div>
   </section>
 
   <!-- ЭКРАН РЕГИСТРАЦИИ ПО EMAIL -->
   <section id="emailRegisterScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">Регистрация</p>
-      
-      <input type="text" id="regName" placeholder="твоё имя" />
-      <input type="email" id="regEmail" placeholder="email" />
-      <input type="password" id="regPassword" placeholder="пароль (минимум 6 символов)" />
-      <input type="password" id="regConfirmPassword" placeholder="повтори пароль" />
-      
-      <div id="regError" class="error-message"></div>
-      
-      <button id="registerBtn" class="active" style="margin-top: 10px;">✨ зарегистрироваться ✨</button>
-      <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
-      
-      <p style="font-size:12px; margin-top: 20px;">
-        уже есть аккаунт? <a href="#" id="showLoginLink">войти</a>
-      </p>
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">регистрация</p>
+        
+        <input type="text" id="regName" placeholder="твоё имя" />
+        <input type="email" id="regEmail" placeholder="email" />
+        <input type="password" id="regPassword" placeholder="пароль (6+ символов)" />
+        <input type="password" id="regConfirmPassword" placeholder="повтори пароль" />
+        
+        <div id="regError" class="error-message"></div>
+        
+        <button id="registerBtn" class="active" style="margin-top: 10px;">✨ зарегистрироваться ✨</button>
+        <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
+        
+        <p style="font-size:12px; margin-top: 20px;">
+          уже есть аккаунт? <a href="#" id="showLoginLink">войти</a>
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- ЭКРАН ВХОДА ПО EMAIL -->
   <section id="emailLoginScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">вход по email</p>
-      
-      <input type="email" id="loginEmail" placeholder="email" />
-      <input type="password" id="loginPassword" placeholder="пароль" />
-      
-      <div id="loginError" class="error-message"></div>
-      
-      <button id="loginBtn" class="active" style="margin-top: 10px;">💕 войти 💕</button>
-      <button id="backFromEmailLoginBtn" class="text-btn">← назад</button>
-      
-      <p style="font-size:12px; margin-top: 20px;">
-        нет аккаунта? <a href="#" id="showRegisterLink">зарегистрироваться</a>
-      </p>
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">вход по email</p>
+        
+        <input type="email" id="loginEmail" placeholder="email" />
+        <input type="password" id="loginPassword" placeholder="пароль" />
+        
+        <div id="loginError" class="error-message"></div>
+        
+        <button id="loginBtn" class="active" style="margin-top: 10px;">💕 войти 💕</button>
+        <button id="backFromEmailLoginBtn" class="text-btn">← назад</button>
+        
+        <p style="font-size:12px; margin-top: 20px;">
+          нет аккаунта? <a href="#" id="showRegisterLink">зарегистрироваться</a>
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ EMAIL -->
   <section id="verifyEmailScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">подтверди email</p>
-      
-      <div style="font-size: 64px; margin: 20px 0; animation: float 3s ease-in-out infinite;">📧</div>
-      
-      <p style="margin-bottom: 20px; line-height: 1.6;">
-        мы отправили письмо с подтверждением<br>
-        <span style="color: var(--accent);">перейди по ссылке</span>
-      </p>
-      
-      <button id="checkVerificationBtn" class="active" style="margin-bottom: 10px;">✅ я подтвердил</button>
-      <button id="resendEmailBtn" class="secondary-btn">🔄 отправить снова</button>
-      <button id="backToLoginFromVerifyBtn" class="text-btn">← назад</button>
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">подтверди email</p>
+        
+        <div style="font-size: 64px; margin: 20px 0; animation: float 3s ease-in-out infinite;">📧</div>
+        
+        <p style="margin-bottom: 20px; line-height: 1.6;">
+          мы отправили письмо с подтверждением<br>
+          <span style="color: var(--accent);">перейди по ссылке</span>
+        </p>
+        
+        <button id="checkVerificationBtn" class="active" style="margin-bottom: 10px;">✅ я подтвердил</button>
+        <button id="resendEmailBtn" class="secondary-btn">🔄 отправить снова</button>
+        <button id="backToLoginFromVerifyBtn" class="text-btn">← назад</button>
+      </div>
     </div>
   </section>
 
@@ -212,7 +219,7 @@
     <div class="main-header">
       <button id="backFromSettingsBtn" class="icon-btn">←</button>
       <span class="app-title">настройки</span>
-      <button id="logoutBtn" class="logout-btn">🚪</button>
+      <button id="logoutBtn" class="icon-btn" style="color: tomato;">🚪</button>
     </div>
     
     <div class="settings-content">
@@ -261,8 +268,18 @@
     </div>
   </section>
 
-  <!-- СТИЛИ ДЛЯ НОВОГО ИНТЕРФЕЙСА -->
+  <!-- СТИЛИ -->
   <style>
+    /* ===== ЦЕНТРИРОВАНИЕ ===== */
+    .center-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
     /* ===== ЗАГРУЗКА ПОВЕРХ ВСЕГО ===== */
     .loading-overlay {
       position: fixed;
@@ -282,6 +299,68 @@
       text-align: center;
       max-width: 300px;
       padding: 20px;
+    }
+    
+    .loading-message {
+      font-size: 18px;
+      margin: 30px 0 20px;
+      color: var(--accent);
+    }
+    
+    .nyash-loader {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 20px auto;
+    }
+    
+    .loader-circle {
+      width: 80px;
+      height: 80px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid var(--accent);
+      border-right: 4px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    
+    .loader-paw {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      animation: bounce 1.5s ease infinite;
+    }
+    
+    .tips-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 100px;
+    }
+    
+    .tip-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 15px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .tip-counter {
+      font-size: 12px;
+      color: var(--text-soft);
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 10px;
     }
     
     /* ===== НОВЫЙ ХЕДЕР ===== */
@@ -328,6 +407,7 @@
       cursor: pointer;
       padding: 0;
       margin: 0;
+      color: var(--text);
     }
     
     .icon-btn:hover {
@@ -431,6 +511,7 @@
       padding: 10px;
       border-radius: 40px;
       cursor: pointer;
+      width: 100%;
     }
     
     /* ===== ЧАТ ===== */
@@ -448,6 +529,8 @@
       height: 44px;
       border-radius: 50%;
       border: 2px solid white;
+      background-size: cover;
+      background-position: center;
     }
     
     .chat-info {
@@ -457,6 +540,7 @@
     .chat-name {
       font-weight: 600;
       display: block;
+      color: var(--text);
     }
     
     .chat-username {
@@ -485,6 +569,7 @@
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid var(--border-light);
       cursor: pointer;
+      color: var(--text);
     }
     
     .messages-area {
@@ -525,6 +610,12 @@
       border: 1px solid var(--border-light);
       background: rgba(255, 255, 255, 0.1);
       color: var(--text);
+      font-size: 15px;
+    }
+    
+    .message-input-area input:focus {
+      outline: none;
+      border-color: var(--accent);
     }
     
     .send-btn {
@@ -536,6 +627,9 @@
       color: white;
       font-size: 20px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     /* ===== НАСТРОЙКИ ===== */
@@ -557,6 +651,7 @@
     .settings-section h3 {
       margin-bottom: 16px;
       font-size: 1.1rem;
+      color: var(--text);
     }
     
     .profile-email {
@@ -568,6 +663,7 @@
     .profile-type {
       font-size: 12px;
       margin-bottom: 16px;
+      color: var(--accent);
     }
     
     .settings-input {
@@ -578,6 +674,12 @@
       background: rgba(255, 255, 255, 0.1);
       color: var(--text);
       margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    .settings-input:focus {
+      outline: none;
+      border-color: var(--accent);
     }
     
     .username-row {
@@ -592,6 +694,8 @@
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid var(--border-light);
       cursor: pointer;
+      color: var(--text);
+      font-size: 18px;
     }
     
     .save-btn {
@@ -603,6 +707,7 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 8px;
     }
     
     .theme-header {
@@ -619,6 +724,8 @@
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid var(--border-light);
       cursor: pointer;
+      color: var(--text);
+      font-size: 18px;
     }
     
     .theme-grid, .font-grid {
@@ -635,22 +742,13 @@
       color: var(--text);
       cursor: pointer;
       font-size: 12px;
+      transition: all 0.2s ease;
     }
     
     .theme-grid button.active, .font-grid button.active {
       background: var(--accent);
       border-color: var(--accent);
       color: white;
-    }
-    
-    .logout-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 99, 71, 0.2);
-      border: 1px solid tomato;
-      color: tomato;
-      cursor: pointer;
     }
     
     /* ===== КОНТЕНТ ===== */
@@ -660,9 +758,45 @@
       overflow-y: auto;
     }
     
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -60%) scale(1.1); }
+    }
+    
     @keyframes typingBounce {
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-4px); }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    /* ===== СООБЩЕНИЯ ===== */
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 20px;
+      word-wrap: break-word;
+    }
+    
+    .message.user {
+      align-self: flex-end;
+      background: var(--bubble-user);
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message.bot {
+      align-self: flex-start;
+      background: var(--bubble-bot);
+      border-bottom-left-radius: 4px;
     }
   </style>
 

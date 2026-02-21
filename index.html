@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="style.css">
   
   <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
 
@@ -42,7 +43,7 @@
   <!-- ЭКРАН ВЫБОРА ВХОДА -->
   <section id="loginMethodScreen" class="screen active">
     <div class="center-wrapper">
-      <div class="glass-container" style="width: 100%; max-width: 340px;">
+      <div class="glass-container" style="width: 100%; max-width: 340px; margin: 0 auto;">
         <h1>NyashGram 💗</h1>
         <p class="subtitle">вход в аккаунт</p>
         
@@ -57,7 +58,7 @@
   <!-- ЭКРАН РЕГИСТРАЦИИ -->
   <section id="emailRegisterScreen" class="screen">
     <div class="center-wrapper">
-      <div class="glass-container" style="width: 100%; max-width: 340px;">
+      <div class="glass-container" style="width: 100%; max-width: 340px; margin: 0 auto;">
         <h2>NyashGram 💗</h2>
         <p class="subtitle">регистрация</p>
         
@@ -79,7 +80,7 @@
   <!-- ЭКРАН ВХОДА -->
   <section id="emailLoginScreen" class="screen">
     <div class="center-wrapper">
-      <div class="glass-container" style="width: 100%; max-width: 340px;">
+      <div class="glass-container" style="width: 100%; max-width: 340px; margin: 0 auto;">
         <h2>NyashGram 💗</h2>
         <p class="subtitle">вход</p>
         
@@ -99,7 +100,7 @@
   <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ EMAIL -->
   <section id="verifyEmailScreen" class="screen">
     <div class="center-wrapper">
-      <div class="glass-container" style="width: 100%; max-width: 340px;">
+      <div class="glass-container" style="width: 100%; max-width: 340px; margin: 0 auto;">
         <h2>NyashGram 💗</h2>
         <p class="subtitle">подтверди email</p>
         
@@ -173,7 +174,10 @@
         <span id="chatContactName" class="chat-name">загрузка...</span>
         <span id="chatContactUsername" class="chat-username"></span>
       </div>
-      <button id="chatMenuBtn" class="icon-btn">⋮</button>
+      <div style="display: flex; gap: 5px;">
+        <button id="toggleQuickPanelBtn" class="icon-btn" title="быстрые ответы">💬</button>
+        <button id="chatMenuBtn" class="icon-btn">⋮</button>
+      </div>
     </header>
     
     <div id="chatActionsPanel" class="chat-actions-panel" style="display: none;">
@@ -205,50 +209,52 @@
       <button id="logoutBtn" class="icon-btn logout-btn" title="выйти">🚪</button>
     </header>
     
-    <div class="settings-container">
-      <!-- ПРОФИЛЬ -->
-      <div class="glass-container settings-section">
-        <h3>👤 профиль</h3>
-        <div id="profileEmail" class="profile-email"></div>
-        <div id="profileType" class="profile-type"></div>
-        
-        <input type="text" id="settingsName" class="settings-input" placeholder="имя" />
-        
-        <div class="username-row">
-          <input type="text" id="settingsUsername" class="settings-input" placeholder="юзернейм" />
-          <button id="settingsGenerateBtn" class="generate-btn" title="сгенерировать">🎲</button>
+    <div class="settings-wrapper">
+      <div class="settings-container">
+        <!-- ПРОФИЛЬ -->
+        <div class="glass-container settings-section">
+          <h3>👤 профиль</h3>
+          <div id="profileEmail" class="profile-email"></div>
+          <div id="profileType" class="profile-type"></div>
+          
+          <input type="text" id="settingsName" class="settings-input" placeholder="имя" />
+          
+          <div class="username-row">
+            <input type="text" id="settingsUsername" class="settings-input" placeholder="юзернейм" />
+            <button id="settingsGenerateBtn" class="generate-btn" title="сгенерировать">🎲</button>
+          </div>
+          
+          <div id="settingsUsernameError" class="error-message"></div>
+          <button id="saveSettingsBtn" class="save-btn">💾 сохранить</button>
         </div>
         
-        <div id="settingsUsernameError" class="error-message"></div>
-        <button id="saveSettingsBtn" class="save-btn">💾 сохранить</button>
-      </div>
-      
-      <!-- ТЕМЫ -->
-      <div class="glass-container settings-section">
-        <div class="theme-header">
-          <h3>🎨 тема</h3>
-          <button id="themeModeToggle" class="mode-btn">☀️</button>
+        <!-- ТЕМЫ -->
+        <div class="glass-container settings-section">
+          <div class="theme-header">
+            <h3>🎨 тема</h3>
+            <button id="themeModeToggle" class="mode-btn">☀️</button>
+          </div>
+          <div class="theme-grid">
+            <button class="theme-btn" data-theme="pastel-pink">pink</button>
+            <button class="theme-btn" data-theme="milk-rose">rose</button>
+            <button class="theme-btn" data-theme="night-blue">blue</button>
+            <button class="theme-btn" data-theme="lo-fi-beige">beige</button>
+            <button class="theme-btn" data-theme="soft-lilac">lilac</button>
+            <button class="theme-btn" data-theme="forest-mint">mint</button>
+          </div>
         </div>
-        <div class="theme-grid">
-          <button class="theme-btn" data-theme="pastel-pink">pink</button>
-          <button class="theme-btn" data-theme="milk-rose">rose</button>
-          <button class="theme-btn" data-theme="night-blue">blue</button>
-          <button class="theme-btn" data-theme="lo-fi-beige">beige</button>
-          <button class="theme-btn" data-theme="soft-lilac">lilac</button>
-          <button class="theme-btn" data-theme="forest-mint">mint</button>
-        </div>
-      </div>
-      
-      <!-- ШРИФТЫ -->
-      <div class="glass-container settings-section">
-        <h3>📝 шрифт</h3>
-        <div class="font-grid">
-          <button class="font-btn" data-font="font-system">system</button>
-          <button class="font-btn" data-font="font-rounded">rounded</button>
-          <button class="font-btn" data-font="font-cozy">cozy</button>
-          <button class="font-btn" data-font="font-elegant">elegant</button>
-          <button class="font-btn" data-font="font-bold-soft">bold</button>
-          <button class="font-btn" data-font="font-mono-cozy">mono</button>
+        
+        <!-- ШРИФТЫ -->
+        <div class="glass-container settings-section">
+          <h3>📝 шрифт</h3>
+          <div class="font-grid">
+            <button class="font-btn" data-font="font-system">system</button>
+            <button class="font-btn" data-font="font-rounded">rounded</button>
+            <button class="font-btn" data-font="font-cozy">cozy</button>
+            <button class="font-btn" data-font="font-elegant">elegant</button>
+            <button class="font-btn" data-font="font-bold-soft">bold</button>
+            <button class="font-btn" data-font="font-mono-cozy">mono</button>
+          </div>
         </div>
       </div>
     </div>

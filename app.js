@@ -502,116 +502,140 @@ async function loginWithGoogle() {
   }
 }
 
-// ===== ОБРАБОТКА РЕЗУЛЬТАТА GOOGLE ВХОДА =====
+// ===== ОБРАБОТКА GOOGLE ВХОДА (СПЕЦИАЛЬНО ДЛЯ SAFARI) =====
 async function handleGoogleSignInResult(result) {
   const user = result.user;
   console.log('✅ Успешный вход через Google:', user.email);
   
-  showLoadingScreen('Загружаем данные...');
+  showLoadingScreen('Загружаем профиль...');
   
   try {
-    // Проверяем, есть ли пользователь в базе
+    // Сохраняем информацию о входе ДО загрузки данных
+    localStorage.setItem('google_login_success', 'true');
+    localStorage.setItem('google_user_email', user.email);
+    localStorage.setItem('google_user_uid', user.uid);
+    
     const userDoc = await db.collection('users').doc(user.uid).get();
-    let userData;
     
     if (!userDoc.exists) {
-      console.log('🆕 Новый пользователь Google, создаём профиль');
+      console.log('🆕 Новый пользователь Google');
+      const username = generateCuteUsername();
       
-      // Проверяем, нет ли пользователя с таким email от другого провайдера
-      const emailQuery = await db.collection('users').where('email', '==', user.email).get();
+      const newUser = {
+        name: user.displayName || 'Google User',
+        email: user.email,
+        username: username,
+        avatar: user.photoURL || null,
+        theme: 'pastel-pink',
+        mode: 'light',
+        font: 'font-cozy',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        friends: [],
+        friendRequests: [],
+        online: true,
+        providers: ['google']
+      };
       
-      if (!emailQuery.empty) {
-        // Такой email уже существует у другого провайдера
-        console.log('⚠️ Email уже используется, привязываем Google');
-        
-        // Получаем существующего пользователя
-        const existingUserDoc = emailQuery.docs[0];
-        const existingUserId = existingUserDoc.id;
-        const existingUserData = existingUserDoc.data();
-        
-        // Обновляем запись, добавляем Google UID
-        await db.collection('users').doc(existingUserId).update({
-          googleUid: user.uid,
-          providers: firebase.firestore.FieldValue.arrayUnion('google'),
-          avatar: user.photoURL || existingUserData.avatar,
-          name: existingUserData.name
-        });
-        
-        // Копируем данные
-        userData = {
-          ...existingUserData,
-          uid: existingUserId
-        };
-        
-        // Удаляем старую запись с новым UID если она создалась
-        if (user.uid !== existingUserId) {
-          await db.collection('users').doc(user.uid).delete().catch(() => {});
-        }
-        
-        user = { ...user, uid: existingUserId };
-      } else {
-        // Совершенно новый пользователь
-        const username = generateCuteUsername();
-        userData = {
-          name: user.displayName || 'Google User',
-          email: user.email,
-          username: username,
-          avatar: user.photoURL || null,
-          theme: 'pastel-pink',
-          mode: 'light',
-          font: 'font-cozy',
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          isAnonymous: false,
-          providers: ['google']
-        };
-        
-        await db.collection('users').doc(user.uid).set(userData);
-        addUsername(username);
-      }
+      await db.collection('users').doc(user.uid).set(newUser);
+      addUsername(username);
+      
+      // Сразу сохраняем в AppState
+      AppState.currentUser = {
+        uid: user.uid,
+        name: newUser.name,
+        username: username,
+        email: user.email,
+        avatar: newUser.avatar,
+        theme: 'pastel-pink',
+        mode: 'light',
+        font: 'font-cozy',
+        isAnonymous: false
+      };
     } else {
       console.log('🟢 Существующий пользователь Google');
-      userData = userDoc.data();
+      const userData = userDoc.data();
+      
+      AppState.currentUser = {
+        uid: user.uid,
+        name: userData.name,
+        username: userData.username,
+        email: user.email,
+        avatar: userData.avatar,
+        theme: userData.theme || 'pastel-pink',
+        mode: userData.mode || 'light',
+        font: userData.font || 'font-cozy',
+        isAnonymous: false
+      };
+      
+      // Обновляем статус онлайн
+      await db.collection('users').doc(user.uid).update({
+        online: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      });
     }
     
-    // Обновляем AppState
-    AppState.currentUser = {
-      uid: user.uid,
-      name: userData.name,
-      username: userData.username,
-      email: user.email,
-      avatar: userData.avatar,
-      theme: userData.theme || 'pastel-pink',
-      mode: userData.mode || 'light',
-      font: userData.font || 'font-cozy',
-      isAnonymous: false
-    };
-    
     // Сохраняем в localStorage
-    localStorage.removeItem('nyashgram_anonymous');
     localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
-    localStorage.setItem('nyashgram_name', userData.name);
-    localStorage.setItem('nyashgram_username', userData.username);
+    localStorage.setItem('nyashgram_name', AppState.currentUser.name);
+    localStorage.setItem('nyashgram_username', AppState.currentUser.username);
     localStorage.setItem('nyashgram_email', user.email);
-    localStorage.setItem('nyashgram_theme', userData.theme || 'pastel-pink');
-    localStorage.setItem('nyashgram_mode', userData.mode || 'light');
-    localStorage.setItem('nyashgram_font', userData.font || 'font-cozy');
+    localStorage.setItem('nyashgram_theme', AppState.currentUser.theme);
+    localStorage.setItem('nyashgram_mode', AppState.currentUser.mode);
+    localStorage.setItem('nyashgram_font', AppState.currentUser.font);
     localStorage.setItem('nyashgram_entered', 'true');
+    
+    // Удаляем флаги
+    localStorage.removeItem('google_redirect_started');
     
     // Применяем настройки
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
     
+    console.log('✅ Все данные сохранены, переходим на экран друзей');
+    
+    // Для Safari важно принудительно показать экран
     setTimeout(() => {
       hideLoadingScreen();
-      showScreen('contactsScreen');
-      if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
-    }, 1500);
+      showScreen('friendsScreen');
+      if (typeof renderFriendsScreen === 'function') renderFriendsScreen();
+    }, 1000);
     
     return { success: true };
   } catch (error) {
     console.error('❌ Ошибка при обработке Google входа:', error);
+    
+    // Проверяем, может у нас уже есть сохранённые данные
+    const savedUid = localStorage.getItem('google_user_uid');
+    if (savedUid === user.uid) {
+      console.log('🔄 Используем сохранённые данные');
+      
+      AppState.currentUser = {
+        uid: user.uid,
+        name: localStorage.getItem('nyashgram_name') || 'Google User',
+        username: localStorage.getItem('nyashgram_username') || generateCuteUsername(),
+        email: user.email,
+        avatar: null,
+        theme: 'pastel-pink',
+        mode: 'light',
+        font: 'font-cozy',
+        isAnonymous: false
+      };
+      
+      localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+      localStorage.setItem('nyashgram_entered', 'true');
+      
+      setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+      applyFont(AppState.currentUser.font);
+      
+      setTimeout(() => {
+        hideLoadingScreen();
+        showScreen('friendsScreen');
+      }, 1000);
+      
+      return { success: true };
+    }
+    
     hideLoadingScreen();
-    alert('Ошибка при загрузке профиля: ' + error.message);
     return { success: false, error: error.message };
   }
 }
@@ -637,42 +661,94 @@ async function linkGoogleToExistingAccount(email, password, googleCredential) {
     return { success: false, error: error.message };
   }
 }
-// ===== ОБРАБОТКА РЕДИРЕКТА ПОСЛЕ GOOGLE ВХОДА =====
+// ===== УЛУЧШЕННАЯ ОБРАБОТКА РЕДИРЕКТА ДЛЯ SAFARI =====
 auth.getRedirectResult().then(async (result) => {
   console.log('🔄 Проверяем результат редиректа...');
   
+  // Проверяем, есть ли результат
   if (result.user) {
-    console.log('✅ Результат редиректа получен, пользователь:', result.user.email);
+    console.log('✅ Результат редиректа получен:', result.user.email);
     
-    // Показываем загрузку если её нет
-    const loadingScreen = document.getElementById('loadingScreen');
-    if (!loadingScreen?.classList.contains('active')) {
-      showLoadingScreen('Завершаем вход через Google...');
-    }
+    // Показываем загрузку
+    showLoadingScreen('Завершаем вход...');
     
     try {
       await handleGoogleSignInResult(result);
-      console.log('✅ Вход через Google успешно завершён');
     } catch (error) {
-      console.error('❌ Ошибка при обработке результата:', error);
-      hideLoadingScreen();
-      alert('Ошибка входа: ' + error.message);
+      console.error('❌ Ошибка обработки:', error);
+      
+      // Если ошибка, но пользователь есть - пробуем прямой вход
+      if (result.user) {
+        console.log('🔄 Пробуем прямой вход для пользователя:', result.user.email);
+        
+        // Сохраняем минимальные данные
+        AppState.currentUser = {
+          uid: result.user.uid,
+          name: result.user.displayName || 'Google User',
+          username: localStorage.getItem('nyashgram_username') || generateCuteUsername(),
+          email: result.user.email,
+          avatar: result.user.photoURL || null,
+          theme: 'pastel-pink',
+          mode: 'light',
+          font: 'font-cozy',
+          isAnonymous: false
+        };
+        
+        localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+        localStorage.setItem('nyashgram_entered', 'true');
+        localStorage.setItem('google_emergency_login', 'true');
+        
+        setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+        applyFont(AppState.currentUser.font);
+        
+        setTimeout(() => {
+          hideLoadingScreen();
+          showScreen('friendsScreen');
+        }, 1000);
+      }
     }
   } else {
     console.log('ℹ️ Нет результата редиректа');
-    // Если нет результата, но мы на экране загрузки - скрываем его
-    const loadingScreen = document.getElementById('loadingScreen');
-    if (loadingScreen?.classList.contains('active')) {
+    
+    // Проверяем, может мы уже вошли ранее
+    const savedUser = localStorage.getItem('nyashgram_user');
+    const emergencyLogin = localStorage.getItem('google_emergency_login');
+    
+    if (savedUser) {
+      console.log('🔄 Есть сохранённый пользователь, выполняем вход');
+      const userData = JSON.parse(savedUser);
+      AppState.currentUser = userData;
+      setTheme(userData.theme, userData.mode);
+      applyFont(userData.font);
+      showScreen('friendsScreen');
+    } else if (emergencyLogin) {
+      console.log('🔄 Был экстренный вход');
+      localStorage.removeItem('google_emergency_login');
+    } else {
       hideLoadingScreen();
     }
   }
 }).catch((error) => {
   console.error('❌ Ошибка редиректа:', error);
-  hideLoadingScreen();
   
-  setTimeout(() => {
+  // Для Safari пробуем восстановить сессию
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    const savedUser = localStorage.getItem('nyashgram_user');
+    if (savedUser) {
+      console.log('🔄 Safari: восстанавливаем сессию');
+      const userData = JSON.parse(savedUser);
+      AppState.currentUser = userData;
+      setTheme(userData.theme, userData.mode);
+      applyFont(userData.font);
+      showScreen('friendsScreen');
+    } else {
+      hideLoadingScreen();
+      alert('Не удалось войти через Google. Используй email или попробуй ещё раз.');
+    }
+  } else {
+    hideLoadingScreen();
     alert('Ошибка входа: ' + (error.message || 'Неизвестная ошибка'));
-  }, 500);
+  }
 });
 
 // ===== АНОНИМНЫЙ ВХОД =====

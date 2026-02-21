@@ -18,13 +18,14 @@
   <link rel="stylesheet" href="style.css">
   
   <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
 
-  <!-- ЭКРАН ЗАГРУЗКИ -->
-  <section id="loadingScreen" class="screen">
-    <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
-      <h1 style="margin-bottom: 30px;">NyashGram 💗</h1>
+  <!-- ЭКРАН ЗАГРУЗКИ (ВСЕГДА ПОВЕРХ ВСЕГО) -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-container">
+      <h2 style="margin-bottom: 30px;">NyashGram 💗</h2>
       
       <div class="nyash-loader">
         <div class="loader-circle"></div>
@@ -32,50 +33,40 @@
       </div>
       
       <div id="loadingMessage" style="font-size: 18px; margin: 30px 0 20px; color: var(--accent);">
-        Загружаем твой мирок...
+        Загружаем...
       </div>
       
       <div class="tips-container">
         <div id="tipText" class="tip-text"></div>
         <div class="tip-counter">
-          <span id="currentTip">1</span>/<span id="totalTips">20</span>
+          <span id="currentTip">1</span>/<span id="totalTips">10</span>
         </div>
       </div>
-      
-      <p style="font-size: 12px; color: var(--text-soft); margin-top: 40px;">
-        ✨ Первая загрузка может быть долгой ✨
-      </p>
     </div>
-  </section>
+  </div>
 
   <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА -->
-  <section id="loginMethodScreen" class="screen">
-    <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
-      <h1 style="margin-bottom: 20px;">NyashGram 💗</h1>
-      <p class="subtitle" style="margin-bottom: 30px;">Вход в аккаунт</p>
+  <section id="loginMethodScreen" class="screen active">
+    <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 500px;">
+      <h1 style="margin-bottom: 10px; font-size: 2.5rem;">NyashGram</h1>
+      <p class="subtitle" style="margin-bottom: 40px;">💗 говори по-няшному</p>
       
-      <!-- Индикатор загрузки для мобильных -->
-      <div id="loadingIndicator" style="display: none; text-align: center; margin: 20px 0;">
-        <div class="spinner"></div>
-        <p style="color: var(--text-soft);">Перенаправление...</p>
-      </div>
-      
-      <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px;">
-        <button id="googleMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
-          🌐 Google
+      <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px;">
+        <button id="googleMethodBtn" class="login-btn">
+          <span style="font-size: 20px; margin-right: 10px;">🌐</span> Google
         </button>
         
-        <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
-          📧 Email
+        <button id="emailMethodBtn" class="login-btn">
+          <span style="font-size: 20px; margin-right: 10px;">📧</span> Email
         </button>
         
-        <button id="anonymousMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
-          👤 Гостем
+        <button id="anonymousMethodBtn" class="login-btn">
+          <span style="font-size: 20px; margin-right: 10px;">👤</span> Гостем
         </button>
       </div>
       
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 30px;">
-        ✨ Добавляй друзей и общайся! ✨
+      <p style="font-size:12px; color: var(--text-soft); margin-top: 40px; opacity: 0.7;">
+        добавляй друзей и общайся ✨
       </p>
     </div>
   </section>
@@ -83,21 +74,21 @@
   <!-- ЭКРАН РЕГИСТРАЦИИ ПО EMAIL -->
   <section id="emailRegisterScreen" class="screen">
     <div class="glass-container">
-      <h1>NyashGram 💗</h1>
+      <h2>NyashGram 💗</h2>
       <p class="subtitle">Регистрация</p>
       
-      <input type="text" id="regName" placeholder="Твоё имя" />
-      <input type="email" id="regEmail" placeholder="Email" />
-      <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" />
-      <input type="password" id="regConfirmPassword" placeholder="Повтори пароль" />
+      <input type="text" id="regName" placeholder="твоё имя" />
+      <input type="email" id="regEmail" placeholder="email" />
+      <input type="password" id="regPassword" placeholder="пароль (минимум 6 символов)" />
+      <input type="password" id="regConfirmPassword" placeholder="повтори пароль" />
       
       <div id="regError" class="error-message"></div>
       
-      <button id="registerBtn" class="active">✨ Зарегистрироваться ✨</button>
-      <button id="backToLoginFromRegBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      <button id="registerBtn" class="active" style="margin-top: 10px;">✨ зарегистрироваться ✨</button>
+      <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
       
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">
-        Уже есть аккаунт? <a href="#" id="showLoginLink">Войти</a>
+      <p style="font-size:12px; margin-top: 20px;">
+        уже есть аккаунт? <a href="#" id="showLoginLink">войти</a>
       </p>
     </div>
   </section>
@@ -105,19 +96,19 @@
   <!-- ЭКРАН ВХОДА ПО EMAIL -->
   <section id="emailLoginScreen" class="screen">
     <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">Вход по email</p>
+      <h2>NyashGram 💗</h2>
+      <p class="subtitle">вход по email</p>
       
-      <input type="email" id="loginEmail" placeholder="Email" />
-      <input type="password" id="loginPassword" placeholder="Пароль" />
+      <input type="email" id="loginEmail" placeholder="email" />
+      <input type="password" id="loginPassword" placeholder="пароль" />
       
       <div id="loginError" class="error-message"></div>
       
-      <button id="loginBtn" class="active">💕 Войти 💕</button>
-      <button id="backFromEmailLoginBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      <button id="loginBtn" class="active" style="margin-top: 10px;">💕 войти 💕</button>
+      <button id="backFromEmailLoginBtn" class="text-btn">← назад</button>
       
-      <p style="font-size:12px; color: var(--text-soft); margin-top: 16px;">
-        Нет аккаунта? <a href="#" id="showRegisterLink">Зарегистрироваться</a>
+      <p style="font-size:12px; margin-top: 20px;">
+        нет аккаунта? <a href="#" id="showRegisterLink">зарегистрироваться</a>
       </p>
     </div>
   </section>
@@ -125,178 +116,250 @@
   <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ EMAIL -->
   <section id="verifyEmailScreen" class="screen">
     <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">Подтверди email</p>
+      <h2>NyashGram 💗</h2>
+      <p class="subtitle">подтверди email</p>
       
       <div style="font-size: 64px; margin: 20px 0; animation: float 3s ease-in-out infinite;">📧</div>
       
       <p style="margin-bottom: 20px; line-height: 1.6;">
-        Мы отправили письмо с подтверждением на твой email.<br>
-        <span style="color: var(--accent); font-weight: bold;">Перейди по ссылке</span> в письме.
+        мы отправили письмо с подтверждением<br>
+        <span style="color: var(--accent);">перейди по ссылке</span>
       </p>
       
-      <button id="checkVerificationBtn" class="active" style="margin-bottom: 10px;">✅ Я подтвердил</button>
-      <button id="resendEmailBtn" style="background: rgba(255,255,255,0.1);">🔄 Отправить снова</button>
-      <button id="backToLoginFromVerifyBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
+      <button id="checkVerificationBtn" class="active" style="margin-bottom: 10px;">✅ я подтвердил</button>
+      <button id="resendEmailBtn" class="secondary-btn">🔄 отправить снова</button>
+      <button id="backToLoginFromVerifyBtn" class="text-btn">← назад</button>
     </div>
   </section>
 
-  <!-- ЭКРАН ДРУЗЕЙ -->
+  <!-- ГЛАВНЫЙ ЭКРАН (ДРУЗЬЯ) -->
   <section id="friendsScreen" class="screen">
-    <header class="top-bar">
-      <div style="display: flex; align-items: center;">
-        <div class="top-title">NyashGram 💗</div>
-        <span id="onlineCount" class="online-count"></span>
+    <div class="main-header">
+      <div class="header-left">
+        <span class="app-title">NyashGram</span>
+        <span id="onlineCount" class="online-badge"></span>
       </div>
-      <div>
-        <button id="addFriendBtn" style="width: auto; padding: 8px 12px; margin-right: 8px;">➕ Найти</button>
-        <button id="settingsBtn">⚙️</button>
+      <div class="header-right">
+        <button id="addFriendBtn" class="icon-btn">➕</button>
+        <button id="settingsBtn" class="icon-btn">⚙️</button>
       </div>
-    </header>
-    
-    <!-- Вкладки -->
-    <div class="friends-tabs">
-      <button class="tab-btn active" data-tab="chats">💬 Чаты</button>
-      <button class="tab-btn" data-tab="friends">👥 Друзья</button>
-      <button class="tab-btn" data-tab="requests">📨 Заявки <span id="requestsBadge" class="badge" style="display: none;">0</span></button>
     </div>
     
-    <!-- Поиск друзей (показывается только на вкладке "Друзья") -->
-    <div id="searchSection" class="search-bar" style="display: none;">
-      <input type="text" id="friendSearch" class="search-input" placeholder="🔍 Найти друга по юзернейму..." />
+    <div class="tabs-container">
+      <button class="tab-btn active" data-tab="chats">💬 чаты</button>
+      <button class="tab-btn" data-tab="friends">👥 друзья</button>
+      <button class="tab-btn" data-tab="requests">
+        📨 заявки
+        <span id="requestsBadge" class="badge" style="display: none;">0</span>
+      </button>
+    </div>
+    
+    <div id="searchSection" class="search-section" style="display: none;">
+      <input type="text" id="friendSearch" class="search-field" placeholder="найти друга по юзернейму..." />
       <div id="searchResults" class="search-results"></div>
     </div>
     
-    <!-- Список -->
-    <div id="friendsList"></div>
-  </section>
-
-  <!-- ЭКРАН ЧАТА -->
-  <section id="chatScreen" class="screen">
-    <header id="chatHeader">
-      <button id="backBtn">←</button>
-      <div id="chatAvatar" class="avatar"></div>
-      <div style="flex: 1;">
-        <span id="chatContactName" style="font-weight: 600;">Загрузка...</span>
-        <div id="chatContactUsername" style="font-size: 11px;"></div>
-        <div id="chatStatus" style="font-size: 10px; color: var(--text-soft);"></div>
-      </div>
-      <button id="chatMenuBtn">⋯</button>
-    </header>
-    
-    <!-- Панель действий -->
-    <div id="chatActionsPanel" class="chat-actions-panel" style="display: none;">
-      <button id="muteChatBtn" title="Выключить звук">🔇</button>
-      <button id="deleteChatBtn" title="Удалить чат">🗑️</button>
-    </div>
-    
-    <!-- Область сообщений -->
-    <div id="chatArea" class="chat-area"></div>
-    
-    <!-- Индикатор "печатает" -->
-    <div id="typingIndicator" class="typing-indicator" style="display: none;">
-      <span></span><span></span><span></span>
-    </div>
-    
-    <!-- Поле ввода -->
-    <div id="messageInputArea">
-      <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." />
-      <button id="sendMessageBtn">➤</button>
-    </div>
+    <div id="friendsList" class="content-list"></div>
   </section>
 
   <!-- ЭКРАН ПОИСКА ДРУЗЕЙ -->
   <section id="searchFriendsScreen" class="screen">
-    <header class="top-bar">
-      <button id="backFromSearchBtn">←</button>
-      <div class="top-title">Поиск друзей</div>
-      <div style="width: 36px;"></div>
-    </header>
-    
-    <div class="search-bar" style="padding: 16px;">
-      <input type="text" id="searchUsersInput" class="search-input" placeholder="🔍 Введите юзернейм..." autofocus />
+    <div class="main-header">
+      <button id="backFromSearchBtn" class="icon-btn">←</button>
+      <span class="app-title">поиск</span>
+      <div style="width: 40px;"></div>
     </div>
     
-    <div id="searchResultsList" class="search-results-list"></div>
+    <div class="search-section" style="padding: 16px;">
+      <input type="text" id="searchUsersInput" class="search-field" placeholder="введи юзернейм..." autofocus />
+    </div>
+    
+    <div id="searchResultsList" class="content-list"></div>
+  </section>
+
+  <!-- ЭКРАН ЧАТА -->
+  <section id="chatScreen" class="screen">
+    <div class="chat-header">
+      <button id="backBtn" class="icon-btn">←</button>
+      <div id="chatAvatar" class="chat-avatar"></div>
+      <div class="chat-info">
+        <span id="chatContactName" class="chat-name">загрузка...</span>
+        <span id="chatContactUsername" class="chat-username"></span>
+        <span id="chatStatus" class="chat-status"></span>
+      </div>
+      <button id="chatMenuBtn" class="icon-btn">⋯</button>
+    </div>
+    
+    <div id="chatActionsPanel" class="chat-actions" style="display: none;">
+      <button id="muteChatBtn" class="action-btn">🔇</button>
+      <button id="deleteChatBtn" class="action-btn">🗑️</button>
+    </div>
+    
+    <div id="chatArea" class="messages-area"></div>
+    
+    <div id="typingIndicator" class="typing-badge" style="display: none;">
+      <span></span><span></span><span></span>
+    </div>
+    
+    <div class="message-input-area">
+      <input type="text" id="messageInput" placeholder="напиши что-нибудь..." />
+      <button id="sendMessageBtn" class="send-btn">➤</button>
+    </div>
   </section>
 
   <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
-    <header class="top-bar">
-      <button id="backFromSettingsBtn">←</button>
-      <div class="top-title">Настройки</div>
-      <button id="logoutBtn" style="width: auto; padding: 8px 12px;">🚪 Выйти</button>
-    </header>
+    <div class="main-header">
+      <button id="backFromSettingsBtn" class="icon-btn">←</button>
+      <span class="app-title">настройки</span>
+      <button id="logoutBtn" class="logout-btn">🚪</button>
+    </div>
     
-    <div style="padding: 16px; overflow-y: auto; width: 100%;">
-      <!-- Профиль -->
-      <div class="glass-container" style="margin-bottom: 16px;">
-        <h3>Твой профиль</h3>
-        <div id="profileEmail" style="font-size: 14px; color: var(--text-soft); margin-bottom: 12px;"></div>
-        <div id="profileType" style="font-size: 12px; color: var(--accent); margin-bottom: 12px;"></div>
-        <input type="text" id="settingsName" placeholder="Имя" />
-        <div style="display: flex; gap: 8px; margin: 12px 0;">
-          <input type="text" id="settingsUsername" placeholder="Юзернейм" style="flex: 1;" />
-          <button id="settingsGenerateBtn" style="width: auto; padding: 12px 16px;">🎲</button>
+    <div class="settings-content">
+      <div class="settings-section">
+        <h3>👤 профиль</h3>
+        <div id="profileEmail" class="profile-email"></div>
+        <div id="profileType" class="profile-type"></div>
+        
+        <input type="text" id="settingsName" placeholder="имя" class="settings-input" />
+        
+        <div class="username-row">
+          <input type="text" id="settingsUsername" placeholder="юзернейм" class="settings-input" />
+          <button id="settingsGenerateBtn" class="generate-btn">🎲</button>
         </div>
+        
         <div id="settingsUsernameError" class="error-message"></div>
-        <button id="saveSettingsBtn" class="active">Сохранить</button>
+        <button id="saveSettingsBtn" class="save-btn">💾 сохранить</button>
       </div>
       
-      <!-- Темы -->
-      <div class="glass-container" style="margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <h3>Тема</h3>
-          <button id="themeModeToggle" class="theme-mode-btn">☀️</button>
+      <div class="settings-section">
+        <div class="theme-header">
+          <h3>🎨 тема</h3>
+          <button id="themeModeToggle" class="mode-btn">☀️</button>
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button class="theme-btn active" data-theme="pastel-pink">Pastel Pink</button>
-          <button class="theme-btn" data-theme="milk-rose">Milk Rose</button>
-          <button class="theme-btn" data-theme="night-blue">Night Blue</button>
-          <button class="theme-btn" data-theme="lo-fi-beige">Lo-Fi Beige</button>
-          <button class="theme-btn" data-theme="soft-lilac">Soft Lilac</button>
-          <button class="theme-btn" data-theme="forest-mint">Forest Mint</button>
+        <div class="theme-grid">
+          <button class="theme-btn" data-theme="pastel-pink">pink</button>
+          <button class="theme-btn" data-theme="milk-rose">rose</button>
+          <button class="theme-btn" data-theme="night-blue">blue</button>
+          <button class="theme-btn" data-theme="lo-fi-beige">beige</button>
+          <button class="theme-btn" data-theme="soft-lilac">lilac</button>
+          <button class="theme-btn" data-theme="forest-mint">mint</button>
         </div>
       </div>
       
-      <!-- Шрифты -->
-      <div class="glass-container">
-        <h3>Шрифт</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button class="font-btn active" data-font="font-system">System</button>
-          <button class="font-btn" data-font="font-rounded">Rounded</button>
-          <button class="font-btn" data-font="font-cozy">Cozy</button>
-          <button class="font-btn" data-font="font-elegant">Elegant</button>
-          <button class="font-btn" data-font="font-bold-soft">Bold Soft</button>
-          <button class="font-btn" data-font="font-mono-cozy">Mono Cozy</button>
+      <div class="settings-section">
+        <h3>📝 шрифт</h3>
+        <div class="font-grid">
+          <button class="font-btn" data-font="font-system">system</button>
+          <button class="font-btn" data-font="font-rounded">rounded</button>
+          <button class="font-btn" data-font="font-cozy">cozy</button>
+          <button class="font-btn" data-font="font-elegant">elegant</button>
+          <button class="font-btn" data-font="font-bold-soft">bold</button>
+          <button class="font-btn" data-font="font-mono-cozy">mono</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- МОДАЛКА ДЛЯ ЗАПРОСОВ -->
-  <div id="requestModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h3>Запрос в друзья</h3>
-      <p id="requestFromText">Пользователь хочет добавить тебя в друзья</p>
-      <div class="modal-buttons">
-        <button id="rejectRequestBtn">Отклонить</button>
-        <button id="acceptRequestBtn" class="active">Принять</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- СТИЛИ ДЛЯ НОВОГО ИНТЕРФЕЙСА -->
   <style>
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
+    /* ===== ЗАГРУЗКА ПОВЕРХ ВСЕГО ===== */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
     }
     
-    .online-dot {
-      color: #4caf50;
-      font-size: 14px;
-      margin-left: 5px;
+    .loading-container {
+      text-align: center;
+      max-width: 300px;
+      padding: 20px;
+    }
+    
+    /* ===== НОВЫЙ ХЕДЕР ===== */
+    .main-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .app-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .online-badge {
+      font-size: 11px;
+      color: var(--text-soft);
+      background: rgba(76, 175, 80, 0.2);
+      padding: 2px 8px;
+      border-radius: 40px;
+    }
+    
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--border-light);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+    
+    /* ===== ВКЛАДКИ ===== */
+    .tabs-container {
+      display: flex;
+      padding: 8px 16px;
+      gap: 8px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 40px;
+      background: transparent;
+      color: var(--text-soft);
+      border: 1px solid var(--border-light);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
     }
     
     .badge {
@@ -308,48 +371,298 @@
       margin-left: 5px;
     }
     
-    .friends-tabs {
-      display: flex;
-      padding: 10px;
-      gap: 10px;
+    /* ===== ПОЛЯ ВВОДА ===== */
+    .search-section {
+      padding: 12px 16px;
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border-light);
     }
     
-    .tab-btn {
-      flex: 1;
+    .search-field {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      font-size: 14px;
+    }
+    
+    .search-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* ===== КНОПКИ ВХОДА ===== */
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-light);
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .login-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+    
+    .text-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-soft);
+      margin-top: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-light);
+      color: var(--text);
       padding: 10px;
       border-radius: 40px;
-      background: transparent;
+      cursor: pointer;
+    }
+    
+    /* ===== ЧАТ ===== */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .chat-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+    
+    .chat-info {
+      flex: 1;
+    }
+    
+    .chat-name {
+      font-weight: 600;
+      display: block;
+    }
+    
+    .chat-username {
+      font-size: 11px;
       color: var(--text-soft);
+    }
+    
+    .chat-status {
+      font-size: 10px;
+      color: var(--text-soft);
+      margin-left: 5px;
+    }
+    
+    .chat-actions {
+      display: flex;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
       border: 1px solid var(--border-light);
+      cursor: pointer;
     }
     
-    .tab-btn.active {
+    .messages-area {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .typing-badge {
+      padding: 8px 16px;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .typing-badge span {
+      width: 6px;
+      height: 6px;
+      background: var(--text-soft);
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite;
+    }
+    
+    .message-input-area {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .message-input-area input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+    
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
       background: var(--accent);
+      border: none;
       color: white;
-      border-color: var(--accent);
+      font-size: 20px;
+      cursor: pointer;
     }
     
-    .search-results {
-      margin-top: 10px;
-      max-height: 200px;
+    /* ===== НАСТРОЙКИ ===== */
+    .settings-content {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .settings-section {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .settings-section h3 {
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+    }
+    
+    .profile-email {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+    
+    .profile-type {
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .settings-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    
+    .username-row {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .generate-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+    }
+    
+    .save-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 40px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .theme-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .mode-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+    }
+    
+    .theme-grid, .font-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .theme-grid button, .font-grid button {
+      padding: 10px;
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-light);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .theme-grid button.active, .font-grid button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .logout-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 99, 71, 0.2);
+      border: 1px solid tomato;
+      color: tomato;
+      cursor: pointer;
+    }
+    
+    /* ===== КОНТЕНТ ===== */
+    .content-list {
+      padding: 8px 12px;
+      flex: 1;
       overflow-y: auto;
     }
     
-    .search-result-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border-bottom: 1px solid var(--border-light);
-    }
-    
-    .time {
-      font-size: 10px;
-      color: var(--text-soft);
-      margin-left: 10px;
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
     }
   </style>
 

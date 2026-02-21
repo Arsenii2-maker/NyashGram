@@ -16,31 +16,66 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
+  
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
 </head>
 <body>
 
-  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА (В ЦЕНТРЕ) -->
-  <section id="loginMethodScreen" class="screen active">
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <section id="loadingScreen" class="screen">
+    <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
+      <h1 style="margin-bottom: 30px;">NyashGram 💗</h1>
+      
+      <div class="nyash-loader">
+        <div class="loader-circle"></div>
+        <div class="loader-paw">🐾</div>
+      </div>
+      
+      <div id="loadingMessage" style="font-size: 18px; margin: 30px 0 20px; color: var(--accent);">
+        Загружаем твой мирок...
+      </div>
+      
+      <div class="tips-container">
+        <div id="tipText" class="tip-text"></div>
+        <div class="tip-counter">
+          <span id="currentTip">1</span>/<span id="totalTips">20</span>
+        </div>
+      </div>
+      
+      <p style="font-size: 12px; color: var(--text-soft); margin-top: 40px;">
+        ✨ Первая загрузка может быть долгой ✨
+      </p>
+    </div>
+  </section>
+
+  <!-- ЭКРАН ВЫБОРА МЕТОДА ВХОДА -->
+  <section id="loginMethodScreen" class="screen">
     <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
       <h1 style="margin-bottom: 20px;">NyashGram 💗</h1>
       <p class="subtitle" style="margin-bottom: 30px;">Вход в аккаунт</p>
       
+      <!-- Индикатор загрузки для мобильных -->
+      <div id="loadingIndicator" style="display: none; text-align: center; margin: 20px 0;">
+        <div class="spinner"></div>
+        <p style="color: var(--text-soft);">Перенаправление...</p>
+      </div>
+      
       <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px;">
-        <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
-          📧 По email
+        <button id="googleMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
+          🌐 Google
         </button>
         
-        <button id="googleMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
-          🌐 Через Google
+        <button id="emailMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
+          📧 Email
         </button>
         
         <button id="anonymousMethodBtn" class="active" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 50px;">
-          👤 Гостем (без сохранения)
+          👤 Гостем
         </button>
       </div>
       
       <p style="font-size:12px; color: var(--text-soft); margin-top: 30px;">
-        ✨ Анонимный вход - история не сохраняется ✨
+        ✨ Добавляй друзей и общайся! ✨
       </p>
     </div>
   </section>
@@ -49,7 +84,7 @@
   <section id="emailRegisterScreen" class="screen">
     <div class="glass-container">
       <h1>NyashGram 💗</h1>
-      <p class="subtitle">Регистрация по email</p>
+      <p class="subtitle">Регистрация</p>
       
       <input type="text" id="regName" placeholder="Твоё имя" />
       <input type="email" id="regEmail" placeholder="Email" />
@@ -77,27 +112,6 @@
       <input type="password" id="loginPassword" placeholder="Пароль" />
       
       <div id="loginError" class="error-message"></div>
-      <!-- Добавьте в экран входа, перед кнопками -->
-<div id="loadingIndicator" style="display: none; text-align: center; margin: 20px 0;">
-  <div class="spinner"></div>
-  <p>Перенаправление...</p>
-</div>
-
-<style>
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top: 4px solid var(--accent);
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 10px;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
       
       <button id="loginBtn" class="active">💕 Войти 💕</button>
       <button id="backFromEmailLoginBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
@@ -126,50 +140,35 @@
       <button id="backToLoginFromVerifyBtn" style="background: transparent; border: none; margin-top: 8px;">← Назад</button>
     </div>
   </section>
-  <!-- ЭКРАН ЗАГРУЗКИ -->
-<section id="loadingScreen" class="screen">
-  <div class="glass-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
-    <h1 style="margin-bottom: 30px;">NyashGram 💗</h1>
-    
-    <!-- Анимированный лоадер -->
-    <div class="nyash-loader">
-      <div class="loader-circle"></div>
-      <div class="loader-paw">🐾</div>
-    </div>
-    
-    <div id="loadingMessage" style="font-size: 18px; margin: 30px 0 20px; color: var(--accent);">
-      Загружаем твой мирок...
-    </div>
-    
-    <!-- Блок с советами -->
-    <div class="tips-container">
-      <div id="tipText" class="tip-text"></div>
-      <div class="tip-counter">
-        <span id="currentTip">1</span>/<span id="totalTips">10</span>
-      </div>
-    </div>
-    
-    <p style="font-size: 12px; color: var(--text-soft); margin-top: 40px;">
-      ✨ Первая загрузка может быть долгой ✨
-    </p>
-  </div>
-</section>
 
-  <!-- ЭКРАН КОНТАКТОВ -->
-  <section id="contactsScreen" class="screen">
+  <!-- ЭКРАН ДРУЗЕЙ -->
+  <section id="friendsScreen" class="screen">
     <header class="top-bar">
       <div style="display: flex; align-items: center;">
-        <div class="top-title">Мой мирок 💗</div>
-        <span id="usernameDisplay" class="username-display"></span>
+        <div class="top-title">NyashGram 💗</div>
+        <span id="onlineCount" class="online-count"></span>
       </div>
-      <button id="settingsBtn">⚙️</button>
+      <div>
+        <button id="addFriendBtn" style="width: auto; padding: 8px 12px; margin-right: 8px;">➕ Найти</button>
+        <button id="settingsBtn">⚙️</button>
+      </div>
     </header>
     
-    <div class="search-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по юзернейму..." />
+    <!-- Вкладки -->
+    <div class="friends-tabs">
+      <button class="tab-btn active" data-tab="chats">💬 Чаты</button>
+      <button class="tab-btn" data-tab="friends">👥 Друзья</button>
+      <button class="tab-btn" data-tab="requests">📨 Заявки <span id="requestsBadge" class="badge" style="display: none;">0</span></button>
     </div>
     
-    <div id="contactsList"></div>
+    <!-- Поиск друзей (показывается только на вкладке "Друзья") -->
+    <div id="searchSection" class="search-bar" style="display: none;">
+      <input type="text" id="friendSearch" class="search-input" placeholder="🔍 Найти друга по юзернейму..." />
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    
+    <!-- Список -->
+    <div id="friendsList"></div>
   </section>
 
   <!-- ЭКРАН ЧАТА -->
@@ -180,24 +179,45 @@
       <div style="flex: 1;">
         <span id="chatContactName" style="font-weight: 600;">Загрузка...</span>
         <div id="chatContactUsername" style="font-size: 11px;"></div>
+        <div id="chatStatus" style="font-size: 10px; color: var(--text-soft);"></div>
       </div>
-      <button id="pinChatBtn">📌</button>
+      <button id="chatMenuBtn">⋯</button>
     </header>
     
+    <!-- Панель действий -->
     <div id="chatActionsPanel" class="chat-actions-panel" style="display: none;">
-      <button id="pinChatActionBtn" title="Закрепить">📌</button>
-      <button id="renameChatBtn" title="Переименовать">✏️</button>
       <button id="muteChatBtn" title="Выключить звук">🔇</button>
       <button id="deleteChatBtn" title="Удалить чат">🗑️</button>
     </div>
     
-    <div id="quickReplyPanel" class="quick-reply-panel"></div>
+    <!-- Область сообщений -->
     <div id="chatArea" class="chat-area"></div>
     
+    <!-- Индикатор "печатает" -->
+    <div id="typingIndicator" class="typing-indicator" style="display: none;">
+      <span></span><span></span><span></span>
+    </div>
+    
+    <!-- Поле ввода -->
     <div id="messageInputArea">
       <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." />
       <button id="sendMessageBtn">➤</button>
     </div>
+  </section>
+
+  <!-- ЭКРАН ПОИСКА ДРУЗЕЙ -->
+  <section id="searchFriendsScreen" class="screen">
+    <header class="top-bar">
+      <button id="backFromSearchBtn">←</button>
+      <div class="top-title">Поиск друзей</div>
+      <div style="width: 36px;"></div>
+    </header>
+    
+    <div class="search-bar" style="padding: 16px;">
+      <input type="text" id="searchUsersInput" class="search-input" placeholder="🔍 Введите юзернейм..." autofocus />
+    </div>
+    
+    <div id="searchResultsList" class="search-results-list"></div>
   </section>
 
   <!-- ЭКРАН НАСТРОЕК -->
@@ -209,6 +229,7 @@
     </header>
     
     <div style="padding: 16px; overflow-y: auto; width: 100%;">
+      <!-- Профиль -->
       <div class="glass-container" style="margin-bottom: 16px;">
         <h3>Твой профиль</h3>
         <div id="profileEmail" style="font-size: 14px; color: var(--text-soft); margin-bottom: 12px;"></div>
@@ -222,6 +243,7 @@
         <button id="saveSettingsBtn" class="active">Сохранить</button>
       </div>
       
+      <!-- Темы -->
       <div class="glass-container" style="margin-bottom: 16px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <h3>Тема</h3>
@@ -237,6 +259,7 @@
         </div>
       </div>
       
+      <!-- Шрифты -->
       <div class="glass-container">
         <h3>Шрифт</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -251,14 +274,14 @@
     </div>
   </section>
 
-  <!-- МОДАЛКА ПЕРЕИМЕНОВАНИЯ -->
-  <div id="renameModal" class="modal" style="display: none;">
+  <!-- МОДАЛКА ДЛЯ ЗАПРОСОВ -->
+  <div id="requestModal" class="modal" style="display: none;">
     <div class="modal-content">
-      <h3>Переименовать чат</h3>
-      <input type="text" id="renameInput" placeholder="Новое название" />
+      <h3>Запрос в друзья</h3>
+      <p id="requestFromText">Пользователь хочет добавить тебя в друзья</p>
       <div class="modal-buttons">
-        <button id="renameCancelBtn">Отмена</button>
-        <button id="renameConfirmBtn" class="active">Сохранить</button>
+        <button id="rejectRequestBtn">Отклонить</button>
+        <button id="acceptRequestBtn" class="active">Принять</button>
       </div>
     </div>
   </div>
@@ -269,10 +292,68 @@
       50% { transform: translateY(-10px); }
       100% { transform: translateY(0px); }
     }
+    
+    .online-dot {
+      color: #4caf50;
+      font-size: 14px;
+      margin-left: 5px;
+    }
+    
+    .badge {
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 10px;
+      margin-left: 5px;
+    }
+    
+    .friends-tabs {
+      display: flex;
+      padding: 10px;
+      gap: 10px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 40px;
+      background: transparent;
+      color: var(--text-soft);
+      border: 1px solid var(--border-light);
+    }
+    
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    .search-results {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .search-result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .time {
+      font-size: 10px;
+      color: var(--text-soft);
+      margin-left: 10px;
+    }
   </style>
 
   <script src="app.js"></script>
-  <script src="contacts.js"></script>
   <script src="chat.js"></script>
 </body>
 </html>

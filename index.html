@@ -21,12 +21,12 @@
 </head>
 <body>
 
-  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <!-- ЭКРАН ЗАГРУЗКИ (поверх всего) -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-    <div class="loading-container">
+    <div class="glass-container" style="background: var(--card-bg);">
       <h2>NyashGram 💗</h2>
       <div class="loader"></div>
-      <div id="loadingMessage">Загружаем...</div>
+      <p id="loadingMessage">загружаем...</p>
     </div>
   </div>
 
@@ -36,10 +36,8 @@
       <h1>NyashGram 💗</h1>
       <p class="subtitle">вход в аккаунт</p>
       
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <button id="emailMethodBtn" class="active">📧 email</button>
-        <button id="anonymousMethodBtn" class="active">👤 гостем</button>
-      </div>
+      <button id="emailMethodBtn" class="active">📧 по email</button>
+      <button id="anonymousMethodBtn" class="active" style="margin-top: 10px;">👤 гостем</button>
     </div>
   </section>
 
@@ -49,9 +47,9 @@
       <h2>NyashGram 💗</h2>
       <p class="subtitle">регистрация</p>
       
-      <input type="text" id="regName" placeholder="имя" />
+      <input type="text" id="regName" placeholder="твоё имя" />
       <input type="email" id="regEmail" placeholder="email" />
-      <input type="password" id="regPassword" placeholder="пароль" />
+      <input type="password" id="regPassword" placeholder="пароль (6+ символов)" />
       <input type="password" id="regConfirmPassword" placeholder="повтори пароль" />
       
       <div id="regError" class="error-message"></div>
@@ -81,7 +79,7 @@
     </div>
   </section>
 
-  <!-- ПОДТВЕРЖДЕНИЕ EMAIL -->
+  <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ -->
   <section id="verifyEmailScreen" class="screen">
     <div class="glass-container">
       <h2>NyashGram 💗</h2>
@@ -98,93 +96,117 @@
 
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="friendsScreen" class="screen">
-    <div class="top-bar">
-      <div class="top-title">NyashGram</div>
-      <div>
-        <button id="addFriendBtn" style="width: auto; padding: 8px 12px; margin-right: 8px;">➕ найти</button>
-        <button id="settingsBtn">⚙️</button>
+    <header class="top-bar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="top-title">NyashGram</div>
+        <span id="onlineCount" class="online-count"></span>
       </div>
-    </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="addFriendBtn" class="icon-btn">➕</button>
+        <button id="settingsBtn" class="icon-btn">⚙️</button>
+      </div>
+    </header>
     
-    <div class="tabs">
+    <div class="tabs-container">
       <button class="tab-btn active" data-tab="chats">💬 чаты</button>
       <button class="tab-btn" data-tab="friends">👥 друзья</button>
       <button class="tab-btn" data-tab="requests">📨 заявки</button>
     </div>
     
-    <div id="searchSection" style="padding: 10px; display: none;">
-      <input type="text" id="friendSearch" placeholder="найти друга по юзернейму..." />
+    <div id="searchSection" class="search-section" style="display: none;">
+      <div class="search-wrapper">
+        <input type="text" id="friendSearch" class="search-input" placeholder="найти друга по юзернейму..." />
+        <span class="search-icon">🔍</span>
+      </div>
     </div>
     
     <div id="friendsList" class="contacts-list"></div>
   </section>
 
-  <!-- ПОИСК ДРУЗЕЙ -->
+  <!-- ЭКРАН ПОИСКА -->
   <section id="searchFriendsScreen" class="screen">
-    <div class="top-bar">
-      <button id="backFromSearchBtn">←</button>
-      <div class="top-title">поиск</div>
+    <header class="top-bar">
+      <button id="backFromSearchBtn" class="icon-btn">←</button>
+      <div class="top-title">поиск друзей</div>
       <div style="width: 40px;"></div>
-    </div>
+    </header>
     
-    <div style="padding: 16px;">
-      <input type="text" id="searchUsersInput" placeholder="введи юзернейм..." />
+    <div class="search-section">
+      <div class="search-wrapper">
+        <input type="text" id="searchUsersInput" class="search-input" placeholder="введи юзернейм..." autofocus />
+        <span class="search-icon">🔍</span>
+      </div>
     </div>
     
     <div id="searchResultsList" class="contacts-list"></div>
   </section>
 
-  <!-- ЧАТ -->
+  <!-- ЭКРАН ЧАТА -->
   <section id="chatScreen" class="screen">
-    <div class="chat-header">
-      <button id="backBtn">←</button>
+    <header class="chat-header">
+      <button id="backBtn" class="icon-btn">←</button>
       <div id="chatAvatar" class="avatar"></div>
-      <div>
-        <div id="chatContactName">загрузка...</div>
-        <div id="chatContactUsername" style="font-size: 12px;"></div>
+      <div class="chat-info">
+        <span id="chatContactName" class="chat-name">загрузка...</span>
+        <span id="chatContactUsername" class="chat-username"></span>
       </div>
-      <button id="chatMenuBtn">⋮</button>
-    </div>
+      <button id="chatMenuBtn" class="icon-btn">⋮</button>
+    </header>
     
     <div id="chatActionsPanel" class="chat-actions" style="display: none;">
-      <button id="pinChatActionBtn">📌</button>
-      <button id="renameChatBtn">✏️</button>
-      <button id="muteChatBtn">🔇</button>
-      <button id="deleteChatBtn">🗑️</button>
+      <button id="pinChatActionBtn" class="action-btn" title="закрепить">📌</button>
+      <button id="renameChatBtn" class="action-btn" title="переименовать">✏️</button>
+      <button id="muteChatBtn" class="action-btn" title="выключить звук">🔇</button>
+      <button id="deleteChatBtn" class="action-btn" title="удалить">🗑️</button>
     </div>
     
-    <div id="chatArea" class="chat-area"></div>
-    <div id="typingIndicator" class="typing" style="display: none;">печатает...</div>
+    <div id="quickReplyPanel" class="quick-reply-panel"></div>
     
-    <div class="message-input">
-      <input type="text" id="messageInput" placeholder="сообщение..." />
-      <button id="sendMessageBtn">➤</button>
+    <div id="chatArea" class="chat-area"></div>
+    
+    <div id="typingIndicator" class="typing-indicator" style="display: none;">
+      <span></span><span></span><span></span>
+    </div>
+    
+    <div class="message-input-area">
+      <input type="text" id="messageInput" placeholder="напиши что-нибудь..." />
+      <button id="sendMessageBtn" class="send-btn">➤</button>
     </div>
   </section>
 
-  <!-- НАСТРОЙКИ -->
+  <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
-    <div class="top-bar">
-      <button id="backFromSettingsBtn">←</button>
+    <header class="top-bar">
+      <button id="backFromSettingsBtn" class="icon-btn">←</button>
       <div class="top-title">настройки</div>
-      <button id="logoutBtn">🚪</button>
-    </div>
+      <button id="logoutBtn" class="icon-btn">🚪</button>
+    </header>
     
-    <div style="padding: 16px;">
+    <div class="settings-container">
+      <!-- Профиль -->
       <div class="glass-container">
-        <h3>профиль</h3>
-        <div id="profileEmail"></div>
+        <h3>👤 профиль</h3>
+        <div id="profileEmail" class="profile-email"></div>
+        <div id="profileType" class="profile-type"></div>
+        
         <input type="text" id="settingsName" placeholder="имя" />
-        <div style="display: flex; gap: 8px;">
+        
+        <div class="username-row">
           <input type="text" id="settingsUsername" placeholder="юзернейм" />
-          <button id="settingsGenerateBtn">🎲</button>
+          <button id="settingsGenerateBtn" class="generate-btn">🎲</button>
         </div>
-        <button id="saveSettingsBtn">сохранить</button>
+        
+        <div id="settingsUsernameError" class="error-message"></div>
+        <button id="saveSettingsBtn" class="save-btn">сохранить</button>
       </div>
       
+      <!-- Темы -->
       <div class="glass-container">
-        <h3>тема</h3>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <div class="theme-header">
+          <h3>🎨 тема</h3>
+          <button id="themeModeToggle" class="mode-btn">☀️</button>
+        </div>
+        <div class="theme-grid">
           <button class="theme-btn" data-theme="pastel-pink">pink</button>
           <button class="theme-btn" data-theme="milk-rose">rose</button>
           <button class="theme-btn" data-theme="night-blue">blue</button>
@@ -192,12 +214,12 @@
           <button class="theme-btn" data-theme="soft-lilac">lilac</button>
           <button class="theme-btn" data-theme="forest-mint">mint</button>
         </div>
-        <button id="themeModeToggle" style="margin-top: 10px;">☀️ светлая/тёмная</button>
       </div>
       
+      <!-- Шрифты -->
       <div class="glass-container">
-        <h3>шрифт</h3>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <h3>📝 шрифт</h3>
+        <div class="font-grid">
           <button class="font-btn" data-font="font-system">system</button>
           <button class="font-btn" data-font="font-rounded">rounded</button>
           <button class="font-btn" data-font="font-cozy">cozy</button>
@@ -209,14 +231,14 @@
     </div>
   </section>
 
-  <!-- МОДАЛКА ПЕРЕИМЕНОВАНИЯ -->
+  <!-- МОДАЛКА -->
   <div id="renameModal" class="modal" style="display: none;">
     <div class="modal-content">
       <h3>переименовать чат</h3>
       <input type="text" id="renameInput" placeholder="новое название" />
       <div class="modal-buttons">
         <button id="renameCancelBtn">отмена</button>
-        <button id="renameConfirmBtn">сохранить</button>
+        <button id="renameConfirmBtn" class="active">сохранить</button>
       </div>
     </div>
   </div>

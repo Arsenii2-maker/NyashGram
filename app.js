@@ -390,7 +390,7 @@ async function loginWithEmail(email, password) {
   }
 }
 
-// ===== GOOGLE ВХОД (С ПОДДЕРЖКОЙ ТЕЛЕФОНОВ) =====
+// ===== GOOGLE ВХОД (ИСПРАВЛЕННАЯ ВЕРСИЯ) =====
 async function loginWithGoogle() {
   try {
     console.log('🔄 Начинаем вход через Google...');
@@ -401,6 +401,11 @@ async function loginWithGoogle() {
     // Показываем загрузку
     showLoadingScreen('Подключаемся к Google...');
     
+    // Настраиваем провайдер
+    googleProvider.setCustomParameters({
+      prompt: 'select_account' // Всегда показывать выбор аккаунта
+    });
+    
     if (isMobile) {
       console.log('📱 Мобильное устройство, используем redirect');
       
@@ -408,7 +413,6 @@ async function loginWithGoogle() {
       await auth.signInWithRedirect(googleProvider);
       
       // После редиректа результат обработается в getRedirectResult
-      // Загрузка останется на экране
       return { success: true, redirect: true };
     } else {
       console.log('💻 Десктоп, используем popup');
@@ -416,7 +420,7 @@ async function loginWithGoogle() {
       // На десктопе используем popup
       const result = await auth.signInWithPopup(googleProvider);
       
-      // Скрываем загрузку перед обработкой
+      // Скрываем загрузку
       hideLoadingScreen();
       
       return await handleGoogleSignInResult(result);
@@ -425,13 +429,72 @@ async function loginWithGoogle() {
     console.error('❌ Ошибка входа через Google:', error);
     hideLoadingScreen();
     
+    // Специальная обработка для ошибки "account-exists-with-different-credential"
+    if (error.code === 'auth/account-exists-with-different-credential') {
+      // Аккаунт уже существует с другим провайдером
+      const email = error.email;
+      const pendingCred = error.credential;
+      
+      // Спрашиваем пользователя, что делать
+      const action = confirm(
+        `Аккаунт с email ${email} уже существует.\n\n` +
+        `Хотите войти в существующий аккаунт и привязать к нему Google?`
+      );
+      
+      if (action) {
+        // Показываем диалог входа для существующего аккаунта
+        const password = prompt('Введите пароль от существующего аккаунта:');
+        if (password) {
+          try {
+            // Входим с email/паролем
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            
+            // Привязываем Google аккаунт
+            await userCredential.user.linkWithCredential(pendingCred);
+            
+            console.log('✅ Аккаунты успешно связаны');
+            
+            // Загружаем данные пользователя
+            const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+            const userData = userDoc.data();
+            
+            AppState.currentUser = {
+              uid: userCredential.user.uid,
+              name: userData.name,
+              username: userData.username,
+              email: userCredential.user.email,
+              avatar: userData.avatar,
+              theme: userData.theme || 'pastel-pink',
+              mode: userData.mode || 'light',
+              font: userData.font || 'font-cozy',
+              isAnonymous: false
+            };
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+            localStorage.setItem('nyashgram_entered', 'true');
+            
+            setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+            applyFont(AppState.currentUser.font);
+            
+            showScreen('contactsScreen');
+            if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+            
+            return { success: true };
+          } catch (linkError) {
+            alert('Ошибка при привязке аккаунта: ' + linkError.message);
+          }
+        }
+      }
+    }
+    
     let errorMessage = 'Ошибка входа через Google';
     if (error.code === 'auth/popup-closed-by-user') {
       errorMessage = 'Вход отменён';
     } else if (error.code === 'auth/popup-blocked') {
-      errorMessage = 'Всплывающее окно заблокировано. Разрешите всплывающие окна.';
+      errorMessage = 'Всплывающее окно заблокировано';
     } else if (error.code === 'auth/network-request-failed') {
-      errorMessage = 'Ошибка сети. Проверьте подключение к интернету.';
+      errorMessage = 'Ошибка сети';
     }
     
     alert(errorMessage);
@@ -444,8 +507,7 @@ async function handleGoogleSignInResult(result) {
   const user = result.user;
   console.log('✅ Успешный вход через Google:', user.email);
   
-  // Показываем загрузку
-  showLoadingScreen('Загружаем данные Google...');
+  showLoadingScreen('Загружаем данные...');
   
   try {
     // Проверяем, есть ли пользователь в базе
@@ -455,24 +517,57 @@ async function handleGoogleSignInResult(result) {
     if (!userDoc.exists) {
       console.log('🆕 Новый пользователь Google, создаём профиль');
       
-      // Новый пользователь - создаём профиль
-      const username = generateCuteUsername();
-      const newUserData = {
-        name: user.displayName || 'Google User',
-        email: user.email,
-        username: username,
-        avatar: user.photoURL || null,
-        theme: 'pastel-pink',
-        mode: 'light',
-        font: 'font-cozy',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        isAnonymous: false,
-        provider: 'google'
-      };
+      // Проверяем, нет ли пользователя с таким email от другого провайдера
+      const emailQuery = await db.collection('users').where('email', '==', user.email).get();
       
-      await db.collection('users').doc(user.uid).set(newUserData);
-      addUsername(username);
-      userData = newUserData;
+      if (!emailQuery.empty) {
+        // Такой email уже существует у другого провайдера
+        console.log('⚠️ Email уже используется, привязываем Google');
+        
+        // Получаем существующего пользователя
+        const existingUserDoc = emailQuery.docs[0];
+        const existingUserId = existingUserDoc.id;
+        const existingUserData = existingUserDoc.data();
+        
+        // Обновляем запись, добавляем Google UID
+        await db.collection('users').doc(existingUserId).update({
+          googleUid: user.uid,
+          providers: firebase.firestore.FieldValue.arrayUnion('google'),
+          avatar: user.photoURL || existingUserData.avatar,
+          name: existingUserData.name
+        });
+        
+        // Копируем данные
+        userData = {
+          ...existingUserData,
+          uid: existingUserId
+        };
+        
+        // Удаляем старую запись с новым UID если она создалась
+        if (user.uid !== existingUserId) {
+          await db.collection('users').doc(user.uid).delete().catch(() => {});
+        }
+        
+        user = { ...user, uid: existingUserId };
+      } else {
+        // Совершенно новый пользователь
+        const username = generateCuteUsername();
+        userData = {
+          name: user.displayName || 'Google User',
+          email: user.email,
+          username: username,
+          avatar: user.photoURL || null,
+          theme: 'pastel-pink',
+          mode: 'light',
+          font: 'font-cozy',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          isAnonymous: false,
+          providers: ['google']
+        };
+        
+        await db.collection('users').doc(user.uid).set(userData);
+        addUsername(username);
+      }
     } else {
       console.log('🟢 Существующий пользователь Google');
       userData = userDoc.data();
@@ -491,9 +586,8 @@ async function handleGoogleSignInResult(result) {
       isAnonymous: false
     };
     
-    // Сохраняем в localStorage (ВАЖНО: удаляем старые данные)
+    // Сохраняем в localStorage
     localStorage.removeItem('nyashgram_anonymous');
-    localStorage.removeItem('nyashgram_fake');
     localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
     localStorage.setItem('nyashgram_name', userData.name);
     localStorage.setItem('nyashgram_username', userData.username);
@@ -507,7 +601,6 @@ async function handleGoogleSignInResult(result) {
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
     
-    // Даём время увидеть загрузку
     setTimeout(() => {
       hideLoadingScreen();
       showScreen('contactsScreen');
@@ -519,6 +612,28 @@ async function handleGoogleSignInResult(result) {
     console.error('❌ Ошибка при обработке Google входа:', error);
     hideLoadingScreen();
     alert('Ошибка при загрузке профиля: ' + error.message);
+    return { success: false, error: error.message };
+  }
+}
+// ===== ПРИВЯЗКА GOOGLE К СУЩЕСТВУЮЩЕМУ АККАУНТУ =====
+async function linkGoogleToExistingAccount(email, password, googleCredential) {
+  try {
+    // Входим с email/паролем
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    // Привязываем Google
+    await user.linkWithCredential(googleCredential);
+    
+    // Обновляем данные в Firestore
+    await db.collection('users').doc(user.uid).update({
+      providers: firebase.firestore.FieldValue.arrayUnion('google'),
+      googleUid: googleCredential.providerId
+    });
+    
+    return { success: true, user };
+  } catch (error) {
+    console.error('❌ Ошибка привязки:', error);
     return { success: false, error: error.message };
   }
 }

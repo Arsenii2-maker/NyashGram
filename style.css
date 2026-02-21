@@ -2450,3 +2450,234 @@ body.forest-mint-dark .country-select {
   align-items: center;
   justify-content: center;
 }
+/* ===== ЦЕНТРИРОВАНИЕ ===== */
+.center-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* ===== КРАСИВЫЙ ЭКРАН ЗАГРУЗКИ ===== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-container {
+  text-align: center;
+  max-width: 320px;
+  padding: 30px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 48px;
+  border: 2px solid var(--border-light);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.nyash-loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 30px auto;
+}
+
+.loader-circle {
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid var(--accent);
+  border-right: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.loader-paw {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  animation: bounce 1.5s ease infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -60%) scale(1.1); }
+}
+
+.tips-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 20px;
+  margin: 20px 0 10px;
+  min-height: 100px;
+  border: 1px solid var(--border-light);
+}
+
+.tip-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 15px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip-counter {
+  font-size: 12px;
+  color: var(--text-soft);
+  text-align: center;
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
+}
+
+/* ===== КНОПКИ ВХОДА ===== */
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.02);
+}
+
+/* ===== КНОПКА ПОИСКА ===== */
+#addFriendBtn {
+  font-size: 20px;
+}
+
+/* ===== КНОПКА ГЕНЕРАЦИИ (без вращения) ===== */
+.generate-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.generate-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.generate-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== КНОПКИ ТЕМ (ОДИНАКОВЫЙ РАЗМЕР) ===== */
+.theme-btn, .font-btn {
+  width: calc(33.33% - 6px);
+  padding: 12px 0;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.theme-btn.active, .font-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.theme-grid, .font-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ===== ВРЕМЯ СООБЩЕНИЙ ===== */
+.message .message-time {
+  font-size: 10px;
+  color: var(--text-soft);
+  display: block;
+  text-align: right;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* ===== КНОПКА ОТПРАВКИ РЯДОМ ===== */
+.message-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-light);
+}
+
+.message-input-area input {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 40px;
+  border: 2px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  font-size: 15px;
+}
+
+.message-input-area input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.send-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.send-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ===== АНИМАЦИЯ ДЛЯ КОНВЕРТА ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

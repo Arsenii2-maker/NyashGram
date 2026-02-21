@@ -542,14 +542,6 @@ function setUserOffline(uid) {
   });
 }
 
-// ===== БОТЫ =====
-const botUsers = [
-  { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp', avatar: null, description: 'помощник по приложению 🩷' },
-  { id: 'nyashtalk', name: 'NyashTalk', username: 'nyashtalk', avatar: null, description: 'просто поболтать 🌸' },
-  { id: 'nyashgame', name: 'NyashGame', username: 'nyashgame', avatar: null, description: 'мини-игры 🎮' },
-  { id: 'nyashhoroscope', name: 'NyashHoroscope', username: 'nyashhoroscope', avatar: null, description: 'гороскопы 🔮' }
-];
-
 // ===== ОБНОВЛЕНИЕ БЕЙДЖА =====
 function updateRequestsBadge() {
   const badge = document.getElementById('requestsBadge');

@@ -21,76 +21,96 @@
 </head>
 <body>
 
-  <!-- ЭКРАН ЗАГРУЗКИ (поверх всего) -->
+  <!-- КРАСИВЫЙ ЭКРАН ЗАГРУЗКИ -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-    <div class="glass-container" style="background: var(--card-bg);">
-      <h2>NyashGram 💗</h2>
-      <div class="loader"></div>
-      <p id="loadingMessage">загружаем...</p>
+    <div class="loading-container">
+      <h1 style="margin-bottom: 30px;">NyashGram 💗</h1>
+      
+      <div class="nyash-loader">
+        <div class="loader-circle"></div>
+        <div class="loader-paw">🐾</div>
+      </div>
+      
+      <div id="loadingMessage" class="loading-message">Загружаем...</div>
+      
+      <div class="tips-container">
+        <div id="tipText" class="tip-text"></div>
+        <div class="tip-counter">
+          <span id="currentTip">1</span>/<span id="totalTips">20</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ЭКРАН ВЫБОРА ВХОДА -->
+  <!-- ЭКРАН ВЫБОРА ВХОДА (ПО ЦЕНТРУ) -->
   <section id="loginMethodScreen" class="screen active">
-    <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">вход в аккаунт</p>
-      
-      <button id="emailMethodBtn" class="active">📧 по email</button>
-      <button id="anonymousMethodBtn" class="active" style="margin-top: 10px;">👤 гостем</button>
+    <div class="center-wrapper">
+      <div class="glass-container" style="width: 100%; max-width: 340px;">
+        <h1>NyashGram 💗</h1>
+        <p class="subtitle">вход в аккаунт</p>
+        
+        <button id="emailMethodBtn" class="login-btn">📧 по email</button>
+        <button id="anonymousMethodBtn" class="login-btn" style="margin-top: 10px;">👤 гостем</button>
+      </div>
     </div>
   </section>
 
   <!-- ЭКРАН РЕГИСТРАЦИИ -->
   <section id="emailRegisterScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">регистрация</p>
-      
-      <input type="text" id="regName" placeholder="твоё имя" />
-      <input type="email" id="regEmail" placeholder="email" />
-      <input type="password" id="regPassword" placeholder="пароль (6+ символов)" />
-      <input type="password" id="regConfirmPassword" placeholder="повтори пароль" />
-      
-      <div id="regError" class="error-message"></div>
-      
-      <button id="registerBtn" class="active">✨ зарегистрироваться</button>
-      <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
-      
-      <p class="hint-text">уже есть аккаунт? <a href="#" id="showLoginLink">войти</a></p>
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">регистрация</p>
+        
+        <input type="text" id="regName" placeholder="твоё имя" />
+        <input type="email" id="regEmail" placeholder="email" />
+        <input type="password" id="regPassword" placeholder="пароль (6+ символов)" />
+        <input type="password" id="regConfirmPassword" placeholder="повтори пароль" />
+        
+        <div id="regError" class="error-message"></div>
+        
+        <button id="registerBtn" class="active">✨ зарегистрироваться</button>
+        <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
+        
+        <p class="hint-text">уже есть аккаунт? <a href="#" id="showLoginLink">войти</a></p>
+      </div>
     </div>
   </section>
 
   <!-- ЭКРАН ВХОДА -->
   <section id="emailLoginScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">вход</p>
-      
-      <input type="email" id="loginEmail" placeholder="email" />
-      <input type="password" id="loginPassword" placeholder="пароль" />
-      
-      <div id="loginError" class="error-message"></div>
-      
-      <button id="loginBtn" class="active">💕 войти</button>
-      <button id="backFromEmailLoginBtn" class="text-btn">← назад</button>
-      
-      <p class="hint-text">нет аккаунта? <a href="#" id="showRegisterLink">регистрация</a></p>
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">вход</p>
+        
+        <input type="email" id="loginEmail" placeholder="email" />
+        <input type="password" id="loginPassword" placeholder="пароль" />
+        
+        <div id="loginError" class="error-message"></div>
+        
+        <button id="loginBtn" class="active">💕 войти</button>
+        <button id="backFromEmailLoginBtn" class="text-btn">← назад</button>
+        
+        <p class="hint-text">нет аккаунта? <a href="#" id="showRegisterLink">регистрация</a></p>
+      </div>
     </div>
   </section>
 
   <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ -->
   <section id="verifyEmailScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">подтверди email</p>
-      
-      <div style="font-size: 64px; margin: 20px;">📧</div>
-      <p>мы отправили письмо с подтверждением</p>
-      
-      <button id="checkVerificationBtn" class="active">✅ я подтвердил</button>
-      <button id="resendEmailBtn">🔄 отправить снова</button>
-      <button id="backToLoginFromVerifyBtn" class="text-btn">← назад</button>
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">подтверди email</p>
+        
+        <div style="font-size: 64px; margin: 20px; animation: float 3s ease-in-out infinite;">📧</div>
+        <p>мы отправили письмо с подтверждением</p>
+        
+        <button id="checkVerificationBtn" class="active">✅ я подтвердил</button>
+        <button id="resendEmailBtn">🔄 отправить снова</button>
+        <button id="backToLoginFromVerifyBtn" class="text-btn">← назад</button>
+      </div>
     </div>
   </section>
 
@@ -102,7 +122,7 @@
         <span id="onlineCount" class="online-count"></span>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button id="addFriendBtn" class="icon-btn">➕</button>
+        <button id="addFriendBtn" class="icon-btn">🔍</button>
         <button id="settingsBtn" class="icon-btn">⚙️</button>
       </div>
     </header>
@@ -114,10 +134,7 @@
     </div>
     
     <div id="searchSection" class="search-section" style="display: none;">
-      <div class="search-wrapper">
-        <input type="text" id="friendSearch" class="search-input" placeholder="найти друга по юзернейму..." />
-        <span class="search-icon">🔍</span>
-      </div>
+      <input type="text" id="friendSearch" class="search-input" placeholder="найти друга по юзернейму..." />
     </div>
     
     <div id="friendsList" class="contacts-list"></div>
@@ -127,15 +144,12 @@
   <section id="searchFriendsScreen" class="screen">
     <header class="top-bar">
       <button id="backFromSearchBtn" class="icon-btn">←</button>
-      <div class="top-title">поиск друзей</div>
+      <div class="top-title">поиск</div>
       <div style="width: 40px;"></div>
     </header>
     
     <div class="search-section">
-      <div class="search-wrapper">
-        <input type="text" id="searchUsersInput" class="search-input" placeholder="введи юзернейм..." autofocus />
-        <span class="search-icon">🔍</span>
-      </div>
+      <input type="text" id="searchUsersInput" class="search-input" placeholder="введи юзернейм..." autofocus />
     </div>
     
     <div id="searchResultsList" class="contacts-list"></div>
@@ -154,10 +168,10 @@
     </header>
     
     <div id="chatActionsPanel" class="chat-actions" style="display: none;">
-      <button id="pinChatActionBtn" class="action-btn" title="закрепить">📌</button>
-      <button id="renameChatBtn" class="action-btn" title="переименовать">✏️</button>
-      <button id="muteChatBtn" class="action-btn" title="выключить звук">🔇</button>
-      <button id="deleteChatBtn" class="action-btn" title="удалить">🗑️</button>
+      <button id="pinChatActionBtn" class="action-btn">📌</button>
+      <button id="renameChatBtn" class="action-btn">✏️</button>
+      <button id="muteChatBtn" class="action-btn">🔇</button>
+      <button id="deleteChatBtn" class="action-btn">🗑️</button>
     </div>
     
     <div id="quickReplyPanel" class="quick-reply-panel"></div>
@@ -246,4 +260,4 @@
   <script src="app.js"></script>
   <script src="chat.js"></script>
 </body>
-</html> 
+</html>

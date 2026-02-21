@@ -928,40 +928,40 @@ function saveSettings() {
   showScreen('contactsScreen');
 }
 
-// ===== ПРОВЕРКА АВТОРИЗАЦИИ =====
+// В начало функции checkAuth() добавьте:
 function checkAuth() {
+  console.log('🔍 Проверка авторизации...');
+  
+  // Сначала проверяем, может мы уже вошли через Google
   const savedUser = localStorage.getItem('nyashgram_user');
-  const anonymous = localStorage.getItem('nyashgram_anonymous');
-  
-  // Показываем загрузку
-  showLoadingScreen('Загружаем твой профиль...');
-  
-  // Устанавливаем тему по умолчанию
-  setTheme('pastel-pink', 'light');
-  applyFont('font-cozy');
+  const googleSuccess = localStorage.getItem('google_login_success');
+  const emergencyLogin = localStorage.getItem('google_emergency_login');
   
   if (savedUser) {
+    console.log('✅ Найден сохранённый пользователь');
     const userData = JSON.parse(savedUser);
     AppState.currentUser = { ...AppState.currentUser, ...userData };
     setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
     applyFont(AppState.currentUser.font);
-    
-    setTimeout(() => {
-      hideLoadingScreen();
-      showScreen('contactsScreen');
-    }, 1500);
-  } else if (anonymous === 'true') {
-    setTimeout(() => {
-      hideLoadingScreen();
-      showScreen('contactsScreen');
-    }, 1500);
-  } else {
-    // Если не авторизован, сразу показываем экран входа
-    hideLoadingScreen();
-    showScreen('loginMethodScreen');
+    showScreen('friendsScreen');
+    return;
   }
+  
+  if (googleSuccess || emergencyLogin) {
+    console.log('🔄 Был успешный Google вход, но данные не сохранились');
+    localStorage.removeItem('google_login_success');
+    localStorage.removeItem('google_emergency_login');
+    // Показываем экран входа, но с сообщением
+    showScreen('loginMethodScreen');
+    setTimeout(() => {
+      alert('Произошла ошибка при входе. Пожалуйста, войди через email или попробуй ещё раз.');
+    }, 500);
+    return;
+  }
+  
+  // Если ничего нет - показываем экран входа
+  showScreen('loginMethodScreen');
 }
-
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 NyashGram загружается...');

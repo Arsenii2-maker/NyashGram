@@ -261,14 +261,18 @@ function removeUsername(username) {
 // ===== EMAIL РЕГИСТРАЦИЯ =====
 async function registerWithEmail(name, email, password) {
   try {
-    // В начале loginWithGoogle добавьте:
-showLoadingScreen('Вход через email...');
+    console.log('🔄 Регистрация email...');
+    
+    showLoadingScreen('Создаём аккаунт...');
+    
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
     
-    
     await user.sendEmailVerification();
-    await user.updateProfile({ displayName: name });
+    
+    await user.updateProfile({
+      displayName: name
+    });
     
     const username = generateCuteUsername();
     
@@ -282,18 +286,33 @@ showLoadingScreen('Вход через email...');
       font: 'font-cozy',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       emailVerified: false,
-      isAnonymous: false
+      isAnonymous: false,
+      provider: 'email'
     });
     
     addUsername(username);
-    showScreen('verifyEmailScreen');
+    
+    console.log('✅ Регистрация успешна!');
+    
+    setTimeout(() => {
+      hideLoadingScreen();
+      showScreen('verifyEmailScreen');
+    }, 1500);
+    
     return { success: true };
   } catch (error) {
+    console.error('❌ Ошибка регистрации:', error);
+    hideLoadingScreen();
+    
     let errorMessage = 'Ошибка регистрации';
-    if (error.code === 'auth/email-already-in-use') errorMessage = 'Этот email уже зарегистрирован';
-    if (error.code === 'auth/weak-password') errorMessage = 'Пароль слишком слабый (минимум 6 символов)';
-    // В конце, перед return:
-setTimeout(() => hideLoadingScreen(), 1000);
+    if (error.code === 'auth/email-already-in-use') {
+      errorMessage = 'Этот email уже зарегистрирован';
+    } else if (error.code === 'auth/weak-password') {
+      errorMessage = 'Пароль слишком слабый (минимум 6 символов)';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Некорректный email';
+    }
+    
     return { success: false, error: errorMessage };
   }
 }
@@ -301,14 +320,20 @@ setTimeout(() => hideLoadingScreen(), 1000);
 // ===== EMAIL ВХОД =====
 async function loginWithEmail(email, password) {
   try {
-    // В начале loginWithGoogle добавьте:
-showLoadingScreen('Вход через email...');
+    console.log('🔄 Вход по email...');
+    
+    showLoadingScreen('Выполняем вход...');
+    
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
     
-    
     if (!user.emailVerified) {
-      return { success: false, error: 'Подтверди email по ссылке в письме', needVerification: true };
+      hideLoadingScreen();
+      return { 
+        success: false, 
+        error: 'Подтверди email по ссылке в письме',
+        needVerification: true 
+      };
     }
     
     const userDoc = await db.collection('users').doc(user.uid).get();
@@ -326,14 +351,41 @@ showLoadingScreen('Вход через email...');
       isAnonymous: false
     };
     
-    saveUserToStorage();
+    // Сохраняем в localStorage
+    localStorage.removeItem('nyashgram_anonymous');
+    localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+    localStorage.setItem('nyashgram_name', userData.name);
+    localStorage.setItem('nyashgram_username', userData.username);
+    localStorage.setItem('nyashgram_email', user.email);
+    localStorage.setItem('nyashgram_theme', userData.theme || 'pastel-pink');
+    localStorage.setItem('nyashgram_mode', userData.mode || 'light');
+    localStorage.setItem('nyashgram_font', userData.font || 'font-cozy');
+    localStorage.setItem('nyashgram_entered', 'true');
+    
+    // Применяем настройки
+    setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+    applyFont(AppState.currentUser.font);
+    
+    setTimeout(() => {
+      hideLoadingScreen();
+      showScreen('contactsScreen');
+      if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+    }, 1500);
+    
     return { success: true };
   } catch (error) {
+    console.error('❌ Ошибка входа:', error);
+    hideLoadingScreen();
+    
     let errorMessage = 'Ошибка входа';
-    if (error.code === 'auth/user-not-found') errorMessage = 'Пользователь не найден';
-    if (error.code === 'auth/wrong-password') errorMessage = 'Неверный пароль';
-    // В конце, перед return:
-setTimeout(() => hideLoadingScreen(), 1000);
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'Пользователь не найден';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Неверный пароль';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Некорректный email';
+    }
+    
     return { success: false, error: errorMessage };
   }
 }
@@ -342,11 +394,12 @@ setTimeout(() => hideLoadingScreen(), 1000);
 async function loginWithGoogle() {
   try {
     console.log('🔄 Начинаем вход через Google...');
-    // В начале loginWithGoogle добавьте:
-showLoadingScreen('Вход через Google...');
-
+    
     // Определяем, мобильное устройство или нет
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // Показываем загрузку
+    showLoadingScreen('Подключаемся к Google...');
     
     if (isMobile) {
       console.log('📱 Мобильное устройство, используем redirect');
@@ -355,16 +408,22 @@ showLoadingScreen('Вход через Google...');
       await auth.signInWithRedirect(googleProvider);
       
       // После редиректа результат обработается в getRedirectResult
+      // Загрузка останется на экране
       return { success: true, redirect: true };
     } else {
       console.log('💻 Десктоп, используем popup');
       
       // На десктопе используем popup
       const result = await auth.signInWithPopup(googleProvider);
+      
+      // Скрываем загрузку перед обработкой
+      hideLoadingScreen();
+      
       return await handleGoogleSignInResult(result);
     }
   } catch (error) {
     console.error('❌ Ошибка входа через Google:', error);
+    hideLoadingScreen();
     
     let errorMessage = 'Ошибка входа через Google';
     if (error.code === 'auth/popup-closed-by-user') {
@@ -376,110 +435,126 @@ showLoadingScreen('Вход через Google...');
     }
     
     alert(errorMessage);
-    // В конце, перед return:
-setTimeout(() => hideLoadingScreen(), 1000);
     return { success: false, error: errorMessage };
   }
 }
 
-// Обработка результата Google входа
+// ===== ОБРАБОТКА РЕЗУЛЬТАТА GOOGLE ВХОДА =====
 async function handleGoogleSignInResult(result) {
   const user = result.user;
   console.log('✅ Успешный вход через Google:', user.email);
   
-  // Проверяем, есть ли пользователь в базе
-  const userDoc = await db.collection('users').doc(user.uid).get();
+  // Показываем загрузку
+  showLoadingScreen('Загружаем данные Google...');
   
-  if (!userDoc.exists) {
-    // Новый пользователь - создаём профиль
-    const username = generateCuteUsername();
-    await db.collection('users').doc(user.uid).set({
-      name: user.displayName || 'Google User',
+  try {
+    // Проверяем, есть ли пользователь в базе
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    let userData;
+    
+    if (!userDoc.exists) {
+      console.log('🆕 Новый пользователь Google, создаём профиль');
+      
+      // Новый пользователь - создаём профиль
+      const username = generateCuteUsername();
+      const newUserData = {
+        name: user.displayName || 'Google User',
+        email: user.email,
+        username: username,
+        avatar: user.photoURL || null,
+        theme: 'pastel-pink',
+        mode: 'light',
+        font: 'font-cozy',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        isAnonymous: false,
+        provider: 'google'
+      };
+      
+      await db.collection('users').doc(user.uid).set(newUserData);
+      addUsername(username);
+      userData = newUserData;
+    } else {
+      console.log('🟢 Существующий пользователь Google');
+      userData = userDoc.data();
+    }
+    
+    // Обновляем AppState
+    AppState.currentUser = {
+      uid: user.uid,
+      name: userData.name,
+      username: userData.username,
       email: user.email,
-      username: username,
-      avatar: user.photoURL || null,
-      theme: 'pastel-pink',
-      mode: 'light',
-      font: 'font-cozy',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      avatar: userData.avatar,
+      theme: userData.theme || 'pastel-pink',
+      mode: userData.mode || 'light',
+      font: userData.font || 'font-cozy',
       isAnonymous: false
-    });
-    addUsername(username);
+    };
+    
+    // Сохраняем в localStorage (ВАЖНО: удаляем старые данные)
+    localStorage.removeItem('nyashgram_anonymous');
+    localStorage.removeItem('nyashgram_fake');
+    localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
+    localStorage.setItem('nyashgram_name', userData.name);
+    localStorage.setItem('nyashgram_username', userData.username);
+    localStorage.setItem('nyashgram_email', user.email);
+    localStorage.setItem('nyashgram_theme', userData.theme || 'pastel-pink');
+    localStorage.setItem('nyashgram_mode', userData.mode || 'light');
+    localStorage.setItem('nyashgram_font', userData.font || 'font-cozy');
+    localStorage.setItem('nyashgram_entered', 'true');
+    
+    // Применяем настройки
+    setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
+    applyFont(AppState.currentUser.font);
+    
+    // Даём время увидеть загрузку
+    setTimeout(() => {
+      hideLoadingScreen();
+      showScreen('contactsScreen');
+      if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
+    }, 1500);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Ошибка при обработке Google входа:', error);
+    hideLoadingScreen();
+    alert('Ошибка при загрузке профиля: ' + error.message);
+    return { success: false, error: error.message };
   }
-  
-  // Загружаем данные пользователя
-  const userData = (await db.collection('users').doc(user.uid).get()).data();
-  
-  AppState.currentUser = {
-    uid: user.uid,
-    name: userData.name,
-    username: userData.username,
-    email: user.email,
-    avatar: userData.avatar,
-    theme: userData.theme || 'pastel-pink',
-    mode: userData.mode || 'light',
-    font: userData.font || 'font-cozy',
-    isAnonymous: false
-  };
-  
-  // Сохраняем в localStorage
-  localStorage.setItem('nyashgram_user', JSON.stringify(AppState.currentUser));
-  localStorage.setItem('nyashgram_name', userData.name);
-  localStorage.setItem('nyashgram_username', userData.username);
-  localStorage.setItem('nyashgram_email', user.email);
-  localStorage.setItem('nyashgram_entered', 'true');
-  
-  // Применяем настройки
-  setTheme(AppState.currentUser.theme, AppState.currentUser.mode);
-  applyFont(AppState.currentUser.font);
-  
-  // Показываем экран контактов
-  showScreen('contactsScreen');
-  if (typeof renderContacts === 'function') setTimeout(renderContacts, 100);
-  
-  return { success: true };
 }
-
-// Обработка редиректа (для мобильных)
-auth.getRedirectResult().then(async (result) => {
-  if (result.user) {
-    console.log('✅ Результат редиректа получен');
-    await handleGoogleSignInResult(result);
-  }
-}).catch((error) => {
-  console.error('❌ Ошибка редиректа:', error);
-  alert('Ошибка входа: ' + error.message);
-});
 // ===== ОБРАБОТКА РЕДИРЕКТА ПОСЛЕ GOOGLE ВХОДА =====
-// Этот код должен быть после определения handleGoogleSignInResult
-
-// Обработка редиректа (для мобильных)
 auth.getRedirectResult().then(async (result) => {
   console.log('🔄 Проверяем результат редиректа...');
   
   if (result.user) {
     console.log('✅ Результат редиректа получен, пользователь:', result.user.email);
     
-    // Показываем индикатор загрузки
-    const loading = document.getElementById('loadingIndicator');
-    if (loading) loading.style.display = 'block';
+    // Показываем загрузку если её нет
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (!loadingScreen?.classList.contains('active')) {
+      showLoadingScreen('Завершаем вход через Google...');
+    }
     
     try {
       await handleGoogleSignInResult(result);
       console.log('✅ Вход через Google успешно завершён');
     } catch (error) {
       console.error('❌ Ошибка при обработке результата:', error);
+      hideLoadingScreen();
       alert('Ошибка входа: ' + error.message);
-    } finally {
-      if (loading) loading.style.display = 'none';
     }
   } else {
     console.log('ℹ️ Нет результата редиректа');
+    // Если нет результата, но мы на экране загрузки - скрываем его
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen?.classList.contains('active')) {
+      hideLoadingScreen();
+    }
   }
 }).catch((error) => {
   console.error('❌ Ошибка редиректа:', error);
+  hideLoadingScreen();
   
-  // Показываем ошибку пользователю
   setTimeout(() => {
     alert('Ошибка входа: ' + (error.message || 'Неизвестная ошибка'));
   }, 500);

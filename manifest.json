@@ -2,7 +2,7 @@
   "name": "NyashGram",
   "short_name": "NyashGram",
   "description": "говори по-няшному 💗",
-  "start_url": ".",
+  "start_url": "/NyashGram/",
   "display": "standalone",
   "background_color": "#ffd1dc",
   "theme_color": "#ff9acb",

@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NyashGram — говори по-няшному 💗</title>
   
   <!-- Шрифты -->
@@ -19,6 +19,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="NyashGram">
   <meta name="theme-color" content="#ff9acb">
+  <meta name="color-scheme" content="light dark">
   
   <!-- Иконка -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff9acb'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white'>🐾</text></svg>">
@@ -112,7 +113,7 @@
     <div class="top-bar">
       <span class="top-title">NyashGram</span>
       <div class="header-buttons">
-        <button id="addFriendBtn" class="icon-btn" title="найти друга">🔍</button>
+        <button id="searchFriendsBtn" class="icon-btn" title="найти друга">🔍</button>
         <button id="settingsBtn" class="icon-btn" title="настройки">⚙️</button>
       </div>
     </div>
@@ -121,10 +122,6 @@
       <button class="tab-btn active" data-tab="chats">💬 чаты</button>
       <button class="tab-btn" data-tab="friends">👥 друзья</button>
       <button class="tab-btn" data-tab="requests">📨 заявки</button>
-    </div>
-    
-    <div id="searchSection" class="search-section" style="display: none;">
-      <input type="text" id="friendSearch" class="search-input" placeholder="найти друга по юзернейму..." />
     </div>
     
     <div id="friendsList" class="contacts-list"></div>
@@ -138,7 +135,7 @@
       <div style="width:40px;"></div>
     </div>
     <div class="search-section">
-      <input type="text" id="searchUsersInput" class="search-input" placeholder="введи юзернейм..." />
+      <input type="text" id="searchUsersInput" class="search-input" placeholder="введи юзернейм..." autofocus />
     </div>
     <div id="searchResultsList" class="contacts-list"></div>
   </section>
@@ -193,6 +190,7 @@
           </div>
           <button id="saveSettingsBtn">сохранить</button>
         </div>
+        
         <!-- ТЕМЫ (6 ШТУК) -->
         <div class="glass-container">
           <div class="theme-header">

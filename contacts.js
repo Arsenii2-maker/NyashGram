@@ -1,15 +1,18 @@
-// contacts.js — ТОЛЬКО БОТЫ (5 ШТУК)
+// contacts.js — ПОЛНЫЙ С ДРУЗЬЯМИ
 
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp' },
   { id: 'nyashtalk', name: 'NyashTalk', username: 'nyashtalk' },
   { id: 'nyashgame', name: 'NyashGame', username: 'nyashgame' },
   { id: 'nyashhoroscope', name: 'NyashHoroscope', username: 'nyashhoroscope' },
-  { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook' } // НОВЫЙ БОТ ПОВАР
+  { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook' }
 ];
 
-let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+// Друзья (пока пусто, но структура готова)
+let friendsList = [];
+let friendRequests = [];
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
+let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
 
 // ===== ЧЕРНОВИКИ =====
 function updateDraft(contactId, text) {
@@ -31,6 +34,16 @@ function isPinned(chatId) {
   return pinnedChats.includes(chatId);
 }
 
+function togglePin(chatId) {
+  if (pinnedChats.includes(chatId)) {
+    pinnedChats = pinnedChats.filter(id => id !== chatId);
+  } else {
+    pinnedChats.push(chatId);
+  }
+  localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
+  renderContacts();
+}
+
 // ===== ОТРИСОВКА =====
 function renderContacts() {
   const list = document.getElementById('friendsList');
@@ -38,7 +51,19 @@ function renderContacts() {
   
   list.innerHTML = '';
   
-  // Только боты, никаких друзей!
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'chats';
+  
+  if (activeTab === 'chats') {
+    renderChats(list);
+  } else if (activeTab === 'friends') {
+    renderFriends(list);
+  } else if (activeTab === 'requests') {
+    renderRequests(list);
+  }
+}
+
+function renderChats(list) {
+  // Секция ботов
   const botsHeader = document.createElement('div');
   botsHeader.className = 'section-header';
   botsHeader.textContent = '🤖 няш-боты';
@@ -55,8 +80,8 @@ function renderContacts() {
     const draft = getDraft(bot.id);
     const el = document.createElement('div');
     el.className = `contact bot-section ${isPinned(bot.id) ? 'pinned' : ''}`;
+    el.setAttribute('data-id', bot.id);
     
-    // Градиенты для ботов
     let gradient;
     switch(bot.id) {
       case 'nyashhelp':
@@ -72,10 +97,8 @@ function renderContacts() {
         gradient = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
         break;
       case 'nyashcook':
-        gradient = 'linear-gradient(135deg, #ff9a9e, #fad0c4)'; // Нежный персиково-розовый
+        gradient = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
         break;
-      default:
-        gradient = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
     }
     
     el.innerHTML = `
@@ -95,6 +118,114 @@ function renderContacts() {
     
     list.appendChild(el);
   });
+  
+  // Секция друзей (если есть)
+  if (friendsList.length > 0) {
+    const friendsHeader = document.createElement('div');
+    friendsHeader.className = 'section-header';
+    friendsHeader.textContent = '👥 друзья';
+    list.appendChild(friendsHeader);
+    
+    friendsList.forEach(friend => {
+      const draft = getDraft(friend.id);
+      const el = document.createElement('div');
+      el.className = `contact ${isPinned(friend.id) ? 'pinned' : ''}`;
+      
+      el.innerHTML = `
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="info">
+          <div class="name">${friend.name} ${isPinned(friend.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
+          <div class="username">@${friend.username}</div>
+          ${draft ? `<div class="draft">📝 ${draft.slice(0, 25)}${draft.length > 25 ? '...' : ''}</div>` : ''}
+        </div>
+      `;
+      
+      el.onclick = () => {
+        if (typeof window.openFriendChat === 'function') {
+          window.openFriendChat(friend);
+        }
+      };
+      
+      list.appendChild(el);
+    });
+  }
+}
+
+function renderFriends(list) {
+  if (friendsList.length > 0) {
+    friendsList.forEach(friend => {
+      const el = document.createElement('div');
+      el.className = 'contact';
+      
+      el.innerHTML = `
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="info">
+          <div class="name">${friend.name}</div>
+          <div class="username">@${friend.username}</div>
+        </div>
+        <button class="message-btn" data-id="${friend.id}">💬</button>
+      `;
+      
+      el.querySelector('.message-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof window.openFriendChat === 'function') {
+          window.openFriendChat(friend);
+        }
+      });
+      
+      list.appendChild(el);
+    });
+  } else {
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'empty-state';
+    emptyEl.innerHTML = `
+      <div class="empty-icon">👥</div>
+      <h3>у тебя пока нет друзей</h3>
+      <p>найди друзей по юзернейму</p>
+      <button id="findFriendsBtn" class="small-btn">🔍 найти</button>
+    `;
+    list.appendChild(emptyEl);
+    
+    setTimeout(() => {
+      document.getElementById('findFriendsBtn')?.addEventListener('click', () => {
+        if (typeof window.showScreen === 'function') {
+          window.showScreen('searchFriendsScreen');
+        }
+      });
+    }, 100);
+  }
+}
+
+function renderRequests(list) {
+  if (friendRequests.length > 0) {
+    friendRequests.forEach(request => {
+      const el = document.createElement('div');
+      el.className = 'contact';
+      
+      el.innerHTML = `
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="info">
+          <div class="name">${request.fromUser?.name || 'пользователь'}</div>
+          <div class="username">@${request.fromUser?.username || 'unknown'}</div>
+        </div>
+        <div class="request-actions">
+          <button class="accept-request" data-id="${request.from}">✅</button>
+          <button class="reject-request" data-id="${request.from}">❌</button>
+        </div>
+      `;
+      
+      list.appendChild(el);
+    });
+  } else {
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'empty-state';
+    emptyEl.innerHTML = `
+      <div class="empty-icon">📨</div>
+      <h3>нет заявок</h3>
+      <p>когда кто-то захочет добавить тебя, они появятся здесь</p>
+    `;
+    list.appendChild(emptyEl);
+  }
 }
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
@@ -104,8 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ===== ЭКСПОРТ =====
 window.renderContacts = renderContacts;
 window.updateDraft = updateDraft;
 window.getDraft = getDraft;
-
+window.togglePin = togglePin;

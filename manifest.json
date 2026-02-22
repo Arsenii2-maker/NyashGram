@@ -1,0 +1,23 @@
+{
+  "name": "NyashGram",
+  "short_name": "NyashGram",
+  "description": "говори по-няшному 💗",
+  "start_url": "/NyashGram/",
+  "display": "standalone",
+  "background_color": "#ffd1dc",
+  "theme_color": "#ff9acb",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff9acb'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white'>🐾</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff9acb'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='white'>🐾</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

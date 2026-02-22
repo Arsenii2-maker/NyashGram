@@ -21,40 +21,31 @@
 </head>
 <body>
 
-  <!-- ЭКРАН ЗАГРУЗКИ -->
-  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-    <div class="loading-container">
-      <h2>NyashGram 💗</h2>
-      <div class="loader"></div>
-      <div id="loadingMessage">Загружаем...</div>
-    </div>
-  </div>
-
   <!-- ЭКРАН ВЫБОРА ВХОДА -->
-  <section id="loginMethodScreen" class="screen active">
-    <div class="glass-container">
-      <h1>NyashGram 💗</h1>
-      <p class="subtitle">вход</p>
-      <button id="emailMethodBtn" class="active">📧 email</button>
-      <button id="anonymousMethodBtn" class="active" style="margin-top: 10px;">👤 гостем</button>
-    </div>
-  </section>
+<section id="loginMethodScreen" class="screen active">
+  <div class="glass-container">
+    <h1>NyashGram 💗</h1>
+    <p class="subtitle">вход в аккаунт</p>
+    <button id="emailMethodBtn" class="active">📧 по email</button>
+    <button id="anonymousMethodBtn" class="active" style="margin-top: 10px;">👤 гостем</button>
+  </div>
+</section>
 
-  <!-- ЭКРАН РЕГИСТРАЦИИ -->
-  <section id="emailRegisterScreen" class="screen">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">регистрация</p>
-      <input type="text" id="regName" placeholder="имя" />
-      <input type="email" id="regEmail" placeholder="email" />
-      <input type="password" id="regPassword" placeholder="пароль" />
-      <input type="password" id="regConfirmPassword" placeholder="повтори" />
-      <div id="regError" class="error-message"></div>
-      <button id="registerBtn" class="active">✨ создать</button>
-      <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
-      <p>уже есть? <a href="#" id="showLoginLink">войти</a></p>
-    </div>
-  </section>
+<!-- ЭКРАН РЕГИСТРАЦИИ -->
+<section id="emailRegisterScreen" class="screen">
+  <div class="glass-container">
+    <h2>NyashGram 💗</h2>
+    <p class="subtitle">регистрация</p>
+    <input type="text" id="regName" placeholder="имя" />
+    <input type="email" id="regEmail" placeholder="email" />
+    <input type="password" id="regPassword" placeholder="пароль" />
+    <input type="password" id="regConfirmPassword" placeholder="повтори" />
+    <div id="regError" class="error-message"></div>
+    <button id="registerBtn" class="active">✨ зарегистрироваться</button>
+    <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
+    <p>уже есть? <a href="#" id="showLoginLink">войти</a></p>
+  </div>
+</section>
 
   <!-- ЭКРАН ВХОДА -->
   <section id="emailLoginScreen" class="screen">

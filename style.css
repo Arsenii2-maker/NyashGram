@@ -1160,3 +1160,106 @@ button:active {
   .quick-chip { padding: 6px 12px; font-size: 12px; }
   .theme-btn, .font-btn { font-size: 11px; padding: 8px; }
 }
+/* Дополнительные стили для друзей и закрепления */
+.contact.pinned {
+  border-left: 4px solid var(--accent);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pin-icon {
+  font-size: 14px;
+  color: var(--accent);
+  margin-left: 4px;
+}
+
+.message-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.message-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.request-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.accept-request, .reject-request {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.accept-request {
+  background: rgba(76, 175, 80, 0.2);
+  border: 2px solid #4caf50;
+  color: #4caf50;
+}
+
+.reject-request {
+  background: rgba(244, 67, 54, 0.2);
+  border: 2px solid #f44336;
+  color: #f44336;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 40px;
+  border: 2px solid var(--accent);
+  color: var(--text);
+  z-index: 10000;
+  animation: slideDown 0.3s ease, fadeOut 0.3s ease 2s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+.theme-grid, .font-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.theme-btn, .font-btn {
+  flex: 0 1 auto;
+  min-width: 70px;
+  padding: 10px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.theme-btn.active, .font-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+

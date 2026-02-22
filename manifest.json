@@ -4,18 +4,20 @@
   "description": "говори по-няшному 💗",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffd1dc",
+  "background_color": "#ff9acb",
   "theme_color": "#ff9acb",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff9acb'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23ff9acb'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff9acb'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23ff9acb'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }

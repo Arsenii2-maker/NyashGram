@@ -8,6 +8,40 @@
   -ms-user-select: none;
   user-select: none;
 }
+/* Добавьте в начало файла */
+
+.status-bar-placeholder {
+  height: env(safe-area-inset-top, 0px);
+  width: 100%;
+  background: transparent;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  position: relative;
+  z-index: 10;
+}
+
+/* Убедитесь, что в chat-header тоже добавлен этот стиль */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  position: relative;
+  z-index: 10;
+}
 
 input, textarea, [contenteditable="true"] {
   -webkit-user-select: text;

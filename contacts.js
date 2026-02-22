@@ -1,4 +1,4 @@
-// contacts.js — ПОЛНЫЙ С ДРУЗЬЯМИ
+// contacts.js — ПОЛНЫЙ С ПРИВЕТСТВИЯМИ И ПЕРЕИМЕНОВАНИЕМ
 
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp' },
@@ -8,11 +8,12 @@ const botUsers = [
   { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook' }
 ];
 
-// Друзья (пока пусто, но структура готова)
+// Друзья (будут загружаться)
 let friendsList = [];
 let friendRequests = [];
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 
 // ===== ЧЕРНОВИКИ =====
 function updateDraft(contactId, text) {
@@ -27,6 +28,11 @@ function updateDraft(contactId, text) {
 
 function getDraft(contactId) {
   return chatDrafts[contactId] || '';
+}
+
+// ===== КАСТОМНЫЕ ИМЕНА =====
+function getDisplayName(contactId, defaultName) {
+  return customNames[contactId] || defaultName;
 }
 
 // ===== ЗАКРЕПЛЕНИЕ =====
@@ -78,6 +84,7 @@ function renderChats(list) {
   
   sortedBots.forEach(bot => {
     const draft = getDraft(bot.id);
+    const displayName = getDisplayName(bot.id, bot.name);
     const el = document.createElement('div');
     el.className = `contact bot-section ${isPinned(bot.id) ? 'pinned' : ''}`;
     el.setAttribute('data-id', bot.id);
@@ -85,7 +92,7 @@ function renderChats(list) {
     let gradient;
     switch(bot.id) {
       case 'nyashhelp':
-        gradient = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
+gradient = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
         break;
       case 'nyashtalk':
         gradient = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
@@ -104,7 +111,7 @@ function renderChats(list) {
     el.innerHTML = `
       <div class="avatar" style="background: ${gradient}; background-size: cover;"></div>
       <div class="info">
-        <div class="name">${bot.name} ${isPinned(bot.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
+        <div class="name">${displayName} ${isPinned(bot.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
         <div class="username">@${bot.username}</div>
         ${draft ? `<div class="draft">📝 ${draft.slice(0, 25)}${draft.length > 25 ? '...' : ''}</div>` : ''}
       </div>
@@ -128,13 +135,15 @@ function renderChats(list) {
     
     friendsList.forEach(friend => {
       const draft = getDraft(friend.id);
+      const displayName = getDisplayName(friend.id, friend.name);
       const el = document.createElement('div');
       el.className = `contact ${isPinned(friend.id) ? 'pinned' : ''}`;
+      el.setAttribute('data-id', friend.id);
       
       el.innerHTML = `
         <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
         <div class="info">
-          <div class="name">${friend.name} ${isPinned(friend.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
+          <div class="name">${displayName} ${isPinned(friend.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
           <div class="username">@${friend.username}</div>
           ${draft ? `<div class="draft">📝 ${draft.slice(0, 25)}${draft.length > 25 ? '...' : ''}</div>` : ''}
         </div>
@@ -156,6 +165,7 @@ function renderFriends(list) {
     friendsList.forEach(friend => {
       const el = document.createElement('div');
       el.className = 'contact';
+      el.setAttribute('data-id', friend.id);
       
       el.innerHTML = `
         <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
@@ -203,7 +213,7 @@ function renderRequests(list) {
       el.className = 'contact';
       
       el.innerHTML = `
-        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+      <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
         <div class="info">
           <div class="name">${request.fromUser?.name || 'пользователь'}</div>
           <div class="username">@${request.fromUser?.username || 'unknown'}</div>

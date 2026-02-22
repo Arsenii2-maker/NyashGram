@@ -1,4 +1,4 @@
-// chat.js — ПОЛНЫЙ С 5 БОТАМИ
+// chat.js — ПОЛНЫЙ С ПРИВЕТСТВИЯМИ И ПРАВИЛЬНЫМИ ЧЕРНОВИКАМИ
 
 let currentChat = null;
 let currentChatId = null;
@@ -6,12 +6,13 @@ let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
 let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 
 // ===== МИЛЫЕ БЫСТРЫЕ ВОПРОСЫ =====
 const quickQuestions = {
   nyashhelp: [
     "как сменить тему? 🎨",
-"как поменять шрифт? ✍️",
+    "как поменять шрифт? ✍️",
     "кто такие боты? 🤖",
     "сколько всего тем?",
     "расскажи о себе 💕"
@@ -88,6 +89,15 @@ const botResponses = {
   }
 };
 
+// ===== ПРИВЕТСТВИЯ =====
+const greetings = {
+  nyashhelp: "привет! я NyashHelp 🩷 твой помощник! спрашивай о приложении, темах или шрифтах!",
+  nyashtalk: "приветик! я NyashTalk 🌸 давай болтать! как твои дела?",
+  nyashgame: "🎮 привет! я NyashGame! хочешь поиграть? угадай число или камень-ножницы?",
+  nyashhoroscope: "🔮 привет! я NyashHoroscope! хочешь узнать, что звёзды приготовили на сегодня?",
+  nyashcook: "🍳 привет! я NyashCook! хочешь рецепт чего-нибудь вкусненького?"
+};
+
 // ===== СОХРАНЕНИЕ ИМЁН =====
 function saveCustomName(chatId, name) {
   if (name) customNames[chatId] = name;
@@ -106,8 +116,14 @@ function saveMessage(chatId, type, text) {
   localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
 }
 
+// ===== ЧЕРНОВИКИ =====
+let currentDraftChatId = null;
+
 // ===== ОТКРЫТИЕ ЧАТА =====
 function openBotChat(bot) {
+  // Сохраняем черновик предыдущего чата
+  saveCurrentDraft();
+  
   currentChat = bot;
   currentChatId = bot.id;
   currentChatType = 'bot';
@@ -121,7 +137,9 @@ function openBotChat(bot) {
   if (bot.id === 'nyashgame') avatar.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
   if (bot.id === 'nyashhoroscope') avatar.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
   if (bot.id === 'nyashcook') avatar.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
+  
   loadChatHistory(bot.id);
+  loadDraft(bot.id);
   showQuickReplies(bot.id);
   
   if (typeof window.showScreen === 'function') {
@@ -130,6 +148,9 @@ function openBotChat(bot) {
 }
 
 function openFriendChat(friend) {
+  // Сохраняем черновик предыдущего чата
+  saveCurrentDraft();
+  
   currentChat = friend;
   currentChatId = friend.id;
   currentChatType = 'friend';
@@ -141,6 +162,7 @@ function openFriendChat(friend) {
   avatar.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
   
   loadChatHistory(friend.id);
+  loadDraft(friend.id);
   
   if (typeof window.showScreen === 'function') {
     window.showScreen('chatScreen');
@@ -151,15 +173,50 @@ function loadChatHistory(chatId) {
   const area = document.getElementById('chatArea');
   area.innerHTML = '';
   
-  if (chatMessages[chatId]) {
+  if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
     chatMessages[chatId].forEach(msg => {
       const el = document.createElement('div');
       el.className = `message ${msg.type}`;
       el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
       area.appendChild(el);
     });
-    area.scrollTop = area.scrollHeight;
+  } else if (chatId.startsWith('nyash')) {
+    // Приветствие для ботов
+    const greeting = greetings[chatId] || "привет! давай общаться! 💕";
+    const el = document.createElement('div');
+    el.className = 'message bot';
+    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+    area.appendChild(el);
+    
+    // Сохраняем приветствие
+  saveMessage(chatId, 'bot', greeting);
   }
+  
+  area.scrollTop = area.scrollHeight;
+}
+
+// ===== ЧЕРНОВИКИ =====
+function saveCurrentDraft() {
+  if (currentChatId) {
+    const input = document.getElementById('messageInput');
+    if (input) {
+      const text = input.value.trim();
+      if (text) {
+        let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+        drafts[currentChatId] = text;
+        localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+      }
+    }
+  }
+}
+
+function loadDraft(chatId) {
+  const input = document.getElementById('messageInput');
+  if (!input) return;
+  
+  const drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+  input.value = drafts[chatId] || '';
+  currentDraftChatId = chatId;
 }
 
 // ===== БЫСТРЫЕ ОТВЕТЫ =====
@@ -198,9 +255,10 @@ function sendMessage() {
   addMessage(text, 'user', true);
   input.value = '';
   
-  if (typeof window.updateDraft === 'function') {
-    window.updateDraft(currentChatId, '');
-  }
+  // Очищаем черновик
+  let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+  delete drafts[currentChatId];
+  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
   
   if (currentChatType === 'bot') {
     setTimeout(() => {
@@ -260,7 +318,6 @@ function getBotResponse(botId, text) {
     if (text.includes('орёл')) return bot.coin;
     return bot.default;
   }
-  
   if (botId === 'nyashhoroscope') {
     if (text.includes('сегодня')) return bot.today;
     if (text.includes('любов')) return bot.love;
@@ -310,6 +367,11 @@ function renameCurrentChat() {
   if (newName) {
     saveCustomName(currentChatId, newName);
     document.getElementById('chatContactName').textContent = newName;
+    
+    // Обновляем в списке контактов
+    if (typeof window.renderContacts === 'function') {
+      setTimeout(window.renderContacts, 100);
+    }
   }
   hideRenameModal();
 }
@@ -325,6 +387,8 @@ function showNotification(msg) {
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('backBtn')?.addEventListener('click', () => {
+    // Сохраняем черновик перед уходом
+    saveCurrentDraft();
     if (typeof window.showScreen === 'function') {
       window.showScreen('friendsScreen');
     }
@@ -355,9 +419,21 @@ document.addEventListener('DOMContentLoaded', function() {
       delete chatMessages[currentChatId];
       localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
       document.getElementById('chatArea').innerHTML = '';
+      
+      // Добавляем новое приветствие
+      if (currentChatId.startsWith('nyash')) {
+        const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
+        const el = document.createElement('div');
+        el.className = 'message bot';
+        el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+        document.getElementById('chatArea').appendChild(el);
+        saveMessage(currentChatId, 'bot', greeting);
+      }
+      
       showNotification('🗑️ история удалена');
     }
-    document.getElementById('chatActionsPanel').style.display = 'none';
+    document.
+      getElementById('chatActionsPanel').style.display = 'none';
   });
   
   document.getElementById('renameCancelBtn')?.addEventListener('click', hideRenameModal);
@@ -367,9 +443,16 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
   });
-        document.getElementById('messageInput')?.addEventListener('input', (e) => {
-    if (currentChatId && typeof window.updateDraft === 'function') {
-      window.updateDraft(currentChatId, e.target.value);
+  
+  document.getElementById('messageInput')?.addEventListener('input', (e) => {
+    if (currentChatId) {
+      let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+      if (e.target.value.trim()) {
+        drafts[currentChatId] = e.target.value;
+      } else {
+        delete drafts[currentChatId];
+      }
+      localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
     }
   });
   

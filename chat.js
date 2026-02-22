@@ -5,8 +5,13 @@ let currentChatId = null;
 let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
-let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
+
+// Используем глобальный объект customNames из contacts.js
+// Если его нет, создаём свой
+if (typeof window.customNames === 'undefined') {
+  window.customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+}
 
 // ===== МИЛЫЕ БЫСТРЫЕ ВОПРОСЫ =====
 const quickQuestions = {
@@ -100,9 +105,14 @@ const greetings = {
 
 // ===== СОХРАНЕНИЕ ИМЁН =====
 function saveCustomName(chatId, name) {
-  if (name) customNames[chatId] = name;
-  else delete customNames[chatId];
-  localStorage.setItem('nyashgram_custom_names', JSON.stringify(customNames));
+  if (!window.customNames) window.customNames = {};
+  if (name) window.customNames[chatId] = name;
+  else delete window.customNames[chatId];
+  localStorage.setItem('nyashgram_custom_names', JSON.stringify(window.customNames));
+}
+
+function getCustomName(chatId, defaultName) {
+  return window.customNames?.[chatId] || defaultName;
 }
 
 // ===== СОХРАНЕНИЕ СООБЩЕНИЙ =====
@@ -128,7 +138,7 @@ function openBotChat(bot) {
   currentChatId = bot.id;
   currentChatType = 'bot';
   
-  document.getElementById('chatContactName').textContent = customNames[bot.id] || bot.name;
+  document.getElementById('chatContactName').textContent = getCustomName(bot.id, bot.name);
   document.getElementById('chatContactUsername').textContent = `@${bot.username}`;
   
   const avatar = document.getElementById('chatAvatar');
@@ -155,7 +165,7 @@ function openFriendChat(friend) {
   currentChatId = friend.id;
   currentChatType = 'friend';
   
-  document.getElementById('chatContactName').textContent = customNames[friend.id] || friend.name;
+  document.getElementById('chatContactName').textContent = getCustomName(friend.id, friend.name);
   document.getElementById('chatContactUsername').textContent = `@${friend.username}`;
   
   const avatar = document.getElementById('chatAvatar');
@@ -189,7 +199,7 @@ function loadChatHistory(chatId) {
     area.appendChild(el);
     
     // Сохраняем приветствие
-  saveMessage(chatId, 'bot', greeting);
+    saveMessage(chatId, 'bot', greeting);
   }
   
   area.scrollTop = area.scrollHeight;
@@ -258,7 +268,8 @@ function sendMessage() {
   // Очищаем черновик
   let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
   delete drafts[currentChatId];
-  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+  localStorage.
+    setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
   
   if (currentChatType === 'bot') {
     setTimeout(() => {
@@ -318,6 +329,7 @@ function getBotResponse(botId, text) {
     if (text.includes('орёл')) return bot.coin;
     return bot.default;
   }
+  
   if (botId === 'nyashhoroscope') {
     if (text.includes('сегодня')) return bot.today;
     if (text.includes('любов')) return bot.love;
@@ -349,7 +361,7 @@ function showRenameModal() {
   const modal = document.getElementById('renameModal');
   const input = document.getElementById('renameInput');
   if (modal && input && currentChatId) {
-    input.value = customNames[currentChatId] || document.getElementById('chatContactName').textContent;
+    input.value = getCustomName(currentChatId, document.getElementById('chatContactName').textContent);
     modal.style.display = 'flex';
     setTimeout(() => input.focus(), 100);
   }
@@ -432,8 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       showNotification('🗑️ история удалена');
     }
-    document.
-      getElementById('chatActionsPanel').style.display = 'none';
+    document.getElementById('chatActionsPanel').style.display = 'none';
   });
   
   document.getElementById('renameCancelBtn')?.addEventListener('click', hideRenameModal);

@@ -1835,3 +1835,124 @@ body {
     font-size: 11px;
   }
 }
+/* ===== КНОПКИ ПОИСКА И НАСТРОЕК РЯДОМ ===== */
+.header-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* ===== ПАНЕЛЬ ДЕЙСТВИЙ С КНОПКАМИ ПО ЦЕНТРУ ===== */
+.chat-actions-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-light);
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+/* ===== МАЛЕНЬКАЯ ПЛАШКА ===== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  min-height: 50px;
+}
+
+.top-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* ===== ЧЕРНОВИКИ ===== */
+.contact .draft {
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 4px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.contact .draft::before {
+  content: "📝 ";
+  opacity: 0.8;
+}
+
+/* ===== ВРЕМЯ СООБЩЕНИЙ ===== */
+.message {
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.message .message-time {
+  font-size: 9px;
+  color: var(--text-soft);
+  opacity: 0.6;
+  position: absolute;
+  bottom: 3px;
+  right: 8px;
+}
+
+/* ===== МАЛЕНЬКАЯ КНОПКА ===== */
+.small-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 40px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+} 

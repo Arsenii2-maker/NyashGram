@@ -49,23 +49,23 @@ async function loadFriends() {
       friendsList = [];
     }
     
-    // Загружаем заявки
-    if (userData.friendRequests && userData.friendRequests.length > 0) {
-      console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
-      
-      const requestsData = await Promise.all(
-        userData.friendRequests.map(async (req) => {
-          const userDoc = await window.db.collection('users').doc(req.from).get();
-          return {
-            ...req,
-            fromUser: { id: userDoc.id, ...userDoc.data() }
-          };
-        })
-      );
-      friendRequests = requestsData;
-    } else {
-      friendRequests = [];
-    }
+   // В функции loadFriends, часть с заявками:
+if (userData.friendRequests && userData.friendRequests.length > 0) {
+  console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
+  
+  const requestsData = await Promise.all(
+    userData.friendRequests.map(async (req) => {
+      const userDoc = await window.db.collection('users').doc(req.from).get();
+      return {
+        ...req,
+        fromUser: { id: userDoc.id, ...userDoc.data() }
+        // timestamp уже обычное число, не serverTimestamp
+      };
+    })
+  );
+  friendRequests = requestsData;
+}
+
     
     // Обновляем бейдж
     updateRequestsBadge();

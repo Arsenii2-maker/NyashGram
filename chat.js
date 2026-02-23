@@ -663,34 +663,105 @@ function showNotification(msg) {
   setTimeout(() => notif.remove(), 2000);
 }
 
-// ===== ОБРАБОТКА СВАЙПОВ =====
+// ===== ИСПРАВЛЕННАЯ ОБРАБОТКА СВАЙПОВ (ТОЛЬКО ОТ ЛЕВОГО КРАЯ) =====
 let touchStartX = 0;
-let touchEndX = 0;
+let touchStartY = 0;
+let isSwiping = false;
+let swipeStartTime = 0;
 
 function handleTouchStart(e) {
+  // Запоминаем начальные координаты
   touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  swipeStartTime = Date.now();
+  isSwiping = false; // Сбрасываем флаг
 }
 
-function handleTouchEnd(e) {
-  touchEndX = e.changedTouches[0].clientX;
-  handleSwipe();
-}
-
-function handleSwipe() {
-  const swipeThreshold = 100; // минимальное расстояние для свайпа
-  const swipeDistance = touchEndX - touchStartX;
-  
-  // Свайп вправо от левого края (возврат на главный экран)
-  if (swipeDistance > swipeThreshold && touchStartX < 50) {
-    // Проверяем, что мы не на главном экране
-    const activeScreen = document.querySelector('.screen.active');
-    if (activeScreen && activeScreen.id !== 'friendsScreen') {
-      // Плавно возвращаемся
-      if (typeof window.showScreen === 'function') {
-        window.showScreen('friendsScreen');
+function handleTouchMove(e) {
+  // Если уже не свайп или нет активного экрана - выходим
+  if (!isSwiping) {
+    // Проверяем, начинается ли свайп от левого края
+    if (touchStartX < 40) { // Только от левого края экрана
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = currentX - touchStartX;
+      const diffY = Math.abs(currentY - touchStartY);
+      
+      // Проверяем, что движение больше по горизонтали, чем по вертикали
+      if (diffX > 10 && diffY < 20) {
+        isSwiping = true;
+        
+        // Добавляем класс для отключения transition во время свайпа
+        const activeScreen = document.querySelector('.screen.active');
+        if (activeScreen) {
+          activeScreen.classList.add('swiping');
+        }
       }
     }
   }
+  
+  // Если это свайп - применяем трансформацию
+  if (isSwiping) {
+    e.preventDefault(); // Предотвращаем стандартное поведение
+    const currentX = e.touches[0].clientX;
+    const diffX = currentX - touchStartX;
+    const activeScreen = document.querySelector('.screen.active');
+    
+    if (activeScreen && diffX > 0) { // Только движение вправо
+      const translateX = Math.min(diffX * 0.5, 100);
+      activeScreen.style.transform = `translateX(${translateX}px)`;
+      activeScreen.style.opacity = 1 - (translateX / 200);
+    }
+  }
+}
+
+function handleTouchEnd(e) {
+  const activeScreen = document.querySelector('.screen.active');
+  if (!activeScreen) {
+    isSwiping = false;
+    return;
+  }
+  
+  if (isSwiping) {
+    e.preventDefault();
+    
+    const diffX = touchEndX - touchStartX;
+    const swipeDuration = Date.now() - swipeStartTime;
+    
+    // Убираем класс swiping
+    activeScreen.classList.remove('swiping');
+    
+    // Проверяем, был ли достаточно длинный свайп
+    if (diffX > 80 && swipeDuration < 300) {
+      // Успешный свайп - возвращаем на главный экран
+      activeScreen.classList.add('swipe-right');
+      
+      setTimeout(() => {
+        activeScreen.classList.remove('swipe-right');
+        activeScreen.style.transform = '';
+        activeScreen.style.opacity = '';
+        
+        // Проверяем, что мы не на главном экране
+        if (activeScreen.id !== 'friendsScreen') {
+          if (typeof window.showScreen === 'function') {
+            window.showScreen('friendsScreen');
+          }
+        }
+      }, 200);
+    } else {
+      // Недостаточный свайп - возвращаем обратно
+      activeScreen.style.transform = '';
+      activeScreen.style.opacity = '';
+      activeScreen.classList.add('swipe-in');
+      
+      setTimeout(() => {
+        activeScreen.classList.remove('swipe-in');
+      }, 300);
+    }
+  }
+  
+  // Сбрасываем флаги в любом случае
+  isSwiping = false;
 }
 
 // ===== ОБРАБОТКА ФОКУСА НА ПОЛЕ ВВОДА =====

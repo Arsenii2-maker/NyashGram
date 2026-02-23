@@ -1,4 +1,4 @@
-// contacts.js — ПОЛНЫЙ С ПРИВЕТСТВИЯМИ И ПЕРЕИМЕНОВАНИЕМ
+// contacts.js — ПОЛНЫЙ С ДРУЗЬЯМИ v3.5
 
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp' },
@@ -8,12 +8,75 @@ const botUsers = [
   { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook' }
 ];
 
-// Друзья (будут загружаться)
+// Состояние
 let friendsList = [];
 let friendRequests = [];
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
-let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
 let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+
+// Делаем глобальными
+window.customNames = customNames;
+window.pinnedChats = pinnedChats;
+
+// ===== ЗАГРУЗКА ДРУЗЕЙ ИЗ FIREBASE =====
+async function loadFriends() {
+  console.log('👥 Загружаем друзей...');
+  
+  if (!window.auth || !window.auth.currentUser) {
+    console.log('❌ Нет авторизации');
+    return;
+  }
+  
+  try {
+    const userDoc = await window.db.collection('users').doc(window.auth.currentUser.uid).get();
+    const userData = userDoc.data();
+    
+    if (!userData) return;
+    
+    // Загружаем друзей
+    if (userData.friends && userData.friends.length > 0) {
+      console.log(`👥 Найдено ${userData.friends.length} друзей`);
+      
+      const friendsData = await Promise.all(
+        userData.friends.map(async (friendId) => {
+          const friendDoc = await window.db.collection('users').doc(friendId).get();
+          return { id: friendDoc.id, ...friendDoc.data() };
+        })
+      );
+      friendsList = friendsData;
+    } else {
+      friendsList = [];
+    }
+    
+    // Загружаем заявки
+    if (userData.friendRequests && userData.friendRequests.length > 0) {
+      console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
+      
+      const requestsData = await Promise.all(
+        userData.friendRequests.map(async (req) => {
+          const userDoc = await window.db.collection('users').doc(req.from).get();
+          return {
+            ...req,
+            fromUser: { id: userDoc.id, ...userDoc.data() }
+          };
+        })
+      );
+      friendRequests = requestsData;
+    } else {
+      friendRequests = [];
+    }
+    
+    // Обновляем бейдж
+    updateRequestsBadge();
+    
+    // Рендерим
+    renderContacts();
+    
+  } catch (error) {
+    console.error('❌ Ошибка загрузки друзей:', error);
+  }
+}
 
 // ===== ЧЕРНОВИКИ =====
 function updateDraft(contactId, text) {
@@ -30,11 +93,6 @@ function getDraft(contactId) {
   return chatDrafts[contactId] || '';
 }
 
-// ===== КАСТОМНЫЕ ИМЕНА =====
-function getDisplayName(contactId, defaultName) {
-  return customNames[contactId] || defaultName;
-}
-
 // ===== ЗАКРЕПЛЕНИЕ =====
 function isPinned(chatId) {
   return pinnedChats.includes(chatId);
@@ -48,6 +106,19 @@ function togglePin(chatId) {
   }
   localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
   renderContacts();
+}
+
+// ===== ОБНОВЛЕНИЕ БЕЙДЖА =====
+function updateRequestsBadge() {
+  const badge = document.getElementById('requestsBadge');
+  if (badge) {
+    if (friendRequests.length > 0) {
+      badge.textContent = friendRequests.length;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 }
 
 // ===== ОТРИСОВКА =====
@@ -84,7 +155,7 @@ function renderChats(list) {
   
   sortedBots.forEach(bot => {
     const draft = getDraft(bot.id);
-    const displayName = getDisplayName(bot.id, bot.name);
+    const displayName = customNames[bot.id] || bot.name;
     const el = document.createElement('div');
     el.className = `contact bot-section ${isPinned(bot.id) ? 'pinned' : ''}`;
     el.setAttribute('data-id', bot.id);
@@ -92,7 +163,7 @@ function renderChats(list) {
     let gradient;
     switch(bot.id) {
       case 'nyashhelp':
-gradient = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
+        gradient = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
         break;
       case 'nyashtalk':
         gradient = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
@@ -135,15 +206,17 @@ gradient = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
     
     friendsList.forEach(friend => {
       const draft = getDraft(friend.id);
-      const displayName = getDisplayName(friend.id, friend.name);
+      const displayName = customNames[friend.id] || friend.name;
       const el = document.createElement('div');
       el.className = `contact ${isPinned(friend.id) ? 'pinned' : ''}`;
       el.setAttribute('data-id', friend.id);
       
+      const onlineStatus = friend.online ? '<span class="online-dot">●</span>' : '';
+      
       el.innerHTML = `
         <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
         <div class="info">
-          <div class="name">${displayName} ${isPinned(friend.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
+          <div class="name">${displayName} ${onlineStatus} ${isPinned(friend.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
           <div class="username">@${friend.username}</div>
           ${draft ? `<div class="draft">📝 ${draft.slice(0, 25)}${draft.length > 25 ? '...' : ''}</div>` : ''}
         </div>
@@ -167,10 +240,12 @@ function renderFriends(list) {
       el.className = 'contact';
       el.setAttribute('data-id', friend.id);
       
+      const onlineStatus = friend.online ? '<span class="online-dot">●</span>' : '';
+      
       el.innerHTML = `
         <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
         <div class="info">
-          <div class="name">${friend.name}</div>
+          <div class="name">${friend.name} ${onlineStatus}</div>
           <div class="username">@${friend.username}</div>
         </div>
         <button class="message-btn" data-id="${friend.id}">💬</button>
@@ -182,6 +257,12 @@ function renderFriends(list) {
           window.openFriendChat(friend);
         }
       });
+      
+      el.onclick = () => {
+        if (typeof window.openFriendChat === 'function') {
+          window.openFriendChat(friend);
+        }
+      };
       
       list.appendChild(el);
     });
@@ -213,7 +294,7 @@ function renderRequests(list) {
       el.className = 'contact';
       
       el.innerHTML = `
-      <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
         <div class="info">
           <div class="name">${request.fromUser?.name || 'пользователь'}</div>
           <div class="username">@${request.fromUser?.username || 'unknown'}</div>
@@ -223,6 +304,24 @@ function renderRequests(list) {
           <button class="reject-request" data-id="${request.from}">❌</button>
         </div>
       `;
+      
+      el.querySelector('.accept-request')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (typeof window.acceptFriendRequest === 'function') {
+          const result = await window.acceptFriendRequest(request.from);
+          if (result?.success) {
+            loadFriends();
+          }
+        }
+      });
+      
+      el.querySelector('.reject-request')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (typeof window.removeFriendRequest === 'function') {
+          await window.removeFriendRequest(request.from);
+          loadFriends();
+        }
+      });
       
       list.appendChild(el);
     });
@@ -240,12 +339,23 @@ function renderRequests(list) {
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('👥 contacts.js загружен');
+  
+  // Загружаем друзей если уже авторизованы
+  if (window.auth?.currentUser && !window.auth.currentUser.isAnonymous) {
+    setTimeout(loadFriends, 500);
+  }
+  
   if (document.getElementById('friendsScreen')?.classList.contains('active')) {
     renderContacts();
   }
 });
 
+// ===== ЭКСПОРТ =====
+window.loadFriends = loadFriends;
 window.renderContacts = renderContacts;
 window.updateDraft = updateDraft;
 window.getDraft = getDraft;
 window.togglePin = togglePin;
+
+    

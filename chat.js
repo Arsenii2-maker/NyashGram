@@ -146,7 +146,7 @@ function openBotChat(bot) {
   const avatarEl = document.getElementById('chatAvatar');
   
   if (nameEl) nameEl.textContent = getCustomName(bot.id, bot.name);
-  if (usernameEl) usernameEl.textContent = @${bot.username};
+  if (usernameEl) usernameEl.textContent = @${bot.username}; 
   
   if (avatarEl) {
     if (bot.id === 'nyashhelp') avatarEl.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';

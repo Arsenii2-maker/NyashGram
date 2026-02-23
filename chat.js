@@ -200,8 +200,8 @@ function loadChatHistory(chatId) {
   if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
     chatMessages[chatId].forEach(msg => {
       const el = document.createElement('div');
-      el.className = message ${msg.type};
-      el.innerHTML = ${msg.text}<span class="message-time">${msg.timeString}</span>;
+      el.className = `message ${msg.type}`;
+      el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
       area.appendChild(el);
     });
   } else if (chatId && chatId.startsWith('nyash')) {
@@ -209,7 +209,7 @@ function loadChatHistory(chatId) {
     const greeting = greetings[chatId] || "привет! давай общаться! 💕";
     const el = document.createElement('div');
     el.className = 'message bot';
-    el.innerHTML = ${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>;
+    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
     area.appendChild(el);
     
     // Сохраняем приветствие
@@ -300,10 +300,10 @@ function sendMessage() {
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');
   const msg = document.createElement('div');
-  msg.className = message ${type};
+  msg.className = `message ${type}`;
   
   const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  msg.innerHTML = ${text}<span class="message-time">${time}</span>;
+  msg.innerHTML = `${text}<span class="message-time">${time}</span>`;
   
   area.appendChild(msg);
   area.scrollTop = area.scrollHeight;
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const el = document.createElement('div');
           el.className = 'message bot';
           el.
-innerHTML = ${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>;
+innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
           if (chatArea) {
             chatArea.appendChild(el);
             saveMessage(currentChatId, 'bot', greeting);

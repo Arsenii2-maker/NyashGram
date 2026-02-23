@@ -5,7 +5,6 @@ let currentChatId = null;
 let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
-let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 
 // Убираем объявление customNames - используем глобальный из contacts.js
 if (typeof window.customNames === 'undefined') {

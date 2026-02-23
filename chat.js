@@ -8,7 +8,6 @@ let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') ||
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 
 // Убираем объявление customNames - используем глобальный из contacts.js
-// Если его нет, создаём пустой объект
 if (typeof window.customNames === 'undefined') {
   window.customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 }
@@ -72,7 +71,7 @@ const botResponses = {
   nyashgame: {
     game: "давай поиграем! угадай число от 1 до 10 🔢",
     rps: "камень-ножницы-бумага? выбирай! ✂️",
-    dice: "🎲 бросаю кубики... тебе выпало " + (Math.floor(Math.random()*6)+1),
+    dice: "🎲 бросаю кубики... тебе выпало " + (Math.floor(Math.random() * 6) + 1),
     coin: "🪙 бросаю монетку... " + (Math.random() < 0.5 ? "орёл!" : "решка!"),
     default: "хочешь поиграть? 🎮"
   },
@@ -110,15 +109,18 @@ function saveCustomName(chatId, name) {
   else delete window.customNames[chatId];
   localStorage.setItem('nyashgram_custom_names', JSON.stringify(window.customNames));
 }
+
 function getCustomName(chatId, defaultName) {
-  return window.customNames?.[chatId] || defaultName;
+  return window.
+customNames?.[chatId] || defaultName;
 }
 
 // ===== СОХРАНЕНИЕ СООБЩЕНИЙ =====
 function saveMessage(chatId, type, text) {
   if (!chatMessages[chatId]) chatMessages[chatId] = [];
   chatMessages[chatId].push({
-    type, text,
+    type: type,
+    text: text,
     timeString: new Date().toLocaleTimeString()
   });
   if (chatMessages[chatId].length > 50) chatMessages[chatId] = chatMessages[chatId].slice(-50);
@@ -231,8 +233,10 @@ function saveCurrentDraft() {
     }
   }
 }
+
 function loadDraft(chatId) {
-  const input = document.getElementById('messageInput');
+  const input = document.
+getElementById('messageInput');
   if (!input) return;
   
   const drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
@@ -353,9 +357,9 @@ function getBotResponse(botId, text) {
     if (text.includes('кекс') || text.includes('маффин')) return bot.muffin;
     if (text.includes('печень')) return bot.cookie;
     if (text.includes('торт')) return bot.cake;
+    if (text.includes('пирог')) return bot.pie;
     if (text.
-includes('пирог')) return bot.pie;
-    if (text.includes('завтрак')) return bot.breakfast;
+includes('завтрак')) return bot.breakfast;
     return bot.default;
   }
   
@@ -365,21 +369,25 @@ includes('пирог')) return bot.pie;
 // ===== ДЕЙСТВИЯ =====
 function toggleChatActions() {
   const panel = document.getElementById('chatActionsPanel');
-  panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+  if (panel) {
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+  }
 }
 
 function showRenameModal() {
   const modal = document.getElementById('renameModal');
   const input = document.getElementById('renameInput');
   if (modal && input && currentChatId) {
-    input.value = getCustomName(currentChatId, document.getElementById('chatContactName').textContent);
+    const nameEl = document.getElementById('chatContactName');
+    input.value = getCustomName(currentChatId, nameEl ? nameEl.textContent : '');
     modal.style.display = 'flex';
     setTimeout(() => input.focus(), 100);
   }
 }
 
 function hideRenameModal() {
-  document.getElementById('renameModal').style.display = 'none';
+  const modal = document.getElementById('renameModal');
+  if (modal) modal.style.display = 'none';
 }
 
 function renameCurrentChat() {
@@ -389,7 +397,8 @@ function renameCurrentChat() {
   const newName = input.value.trim();
   if (newName) {
     saveCustomName(currentChatId, newName);
-    document.getElementById('chatContactName').textContent = newName;
+    const nameEl = document.getElementById('chatContactName');
+    if (nameEl) nameEl.textContent = newName;
     
     // Обновляем в списке контактов
     if (typeof window.renderContacts === 'function') {
@@ -411,75 +420,119 @@ function showNotification(msg) {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔧 Настройка chat.js...');
   
-  document.getElementById('backBtn')?.addEventListener('click', () => {
-    // Сохраняем черновик перед уходом
-    saveCurrentDraft();
-    if (typeof window.showScreen === 'function') {
-      window.showScreen('friendsScreen');
-    }
-  });
-  
-  document.getElementById('chatMenuBtn')?.addEventListener('click', toggleChatActions);
-  document.getElementById('toggleQuickPanelBtn')?.addEventListener('click', toggleQuickPanel);
-  
-  document.getElementById('pinChatActionBtn')?.addEventListener('click', () => {
-    if (currentChatId && typeof window.togglePin === 'function') {
-      window.togglePin(currentChatId);
-    }
-    document.getElementById('chatActionsPanel').style.display = 'none';
-  });
-  
-  document.getElementById('renameChatBtn')?.addEventListener('click', () => {
-    showRenameModal();
-    document.getElementById('chatActionsPanel').style.display = 'none';
-  });
-  
-  document.getElementById('muteChatBtn')?.addEventListener('click', () => {
-    showNotification('🔇 звук выключен');
-    document.getElementById('chatActionsPanel').style.display = 'none';
-  });
-  
-  document.getElementById('deleteChatBtn')?.addEventListener('click', () => {
-    if (currentChatId && confirm('удалить историю?')) {
-      delete chatMessages[currentChatId];
-      localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
-      document.getElementById('chatArea').innerHTML = '';
-      
-      // Добавляем новое приветствие
-      if (currentChatId.startsWith('nyash')) {
-        const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
-        const el = document.createElement('div');
-        el.className = 'message bot';
-        el.innerHTML = ${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>;
-        document.getElementById('chatArea').appendChild(el);
-        saveMessage(currentChatId, 'bot', greeting);
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      // Сохраняем черновик перед уходом
+      saveCurrentDraft();
+      if (typeof window.showScreen === 'function') {
+        window.showScreen('friendsScreen');
       }
-      
-      showNotification('🗑️ история удалена');
-    }
-    document.getElementById('chatActionsPanel').style.display = 'none';
-  });
+    });
+  }
   
-  document.getElementById('renameCancelBtn')?.addEventListener('click', hideRenameModal);
-  document.getElementById('renameConfirmBtn')?.addEventListener('click', renameCurrentChat);
+  const chatMenuBtn = document.getElementById('chatMenuBtn');
+  if (chatMenuBtn) {
+    chatMenuBtn.addEventListener('click', toggleChatActions);
+  }
   
-  document.getElementById('sendMessageBtn')?.addEventListener('click', sendMessage);
-  document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
+  const toggleQuickPanelBtn = document.getElementById('toggleQuickPanelBtn');
+  if (toggleQuickPanelBtn) {
+    toggleQuickPanelBtn.addEventListener('click', toggleQuickPanel);
+  }
   
-  document.
-getElementById('messageInput')?.addEventListener('input', (e) => {
-    if (currentChatId) {
-      let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-      if (e.target.value.trim()) {
-        drafts[currentChatId] = e.target.value;
-      } else {
-        delete drafts[currentChatId];
+  const pinChatActionBtn = document.getElementById('pinChatActionBtn');
+  if (pinChatActionBtn) {
+    pinChatActionBtn.addEventListener('click', () => {
+      if (currentChatId && typeof window.togglePin === 'function') {
+        window.togglePin(currentChatId);
       }
-      localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-    }
-  });
+      const panel = document.getElementById('chatActionsPanel');
+      if (panel) panel.style.display = 'none';
+    });
+  }
+  
+  const renameChatBtn = document.getElementById('renameChatBtn');
+  if (renameChatBtn) {
+    renameChatBtn.addEventListener('click', () => {
+      showRenameModal();
+      const panel = document.getElementById('chatActionsPanel');
+      if (panel) panel.style.display = 'none';
+    });
+  }
+  
+  const muteChatBtn = document.getElementById('muteChatBtn');
+  if (muteChatBtn) {
+    muteChatBtn.addEventListener('click', () => {
+      showNotification('🔇 звук выключен');
+      const panel = document.getElementById('chatActionsPanel');
+      if (panel) panel.style.display = 'none';
+    });
+  }
+  
+  const deleteChatBtn = document.getElementById('deleteChatBtn');
+  if (deleteChatBtn) {
+    deleteChatBtn.addEventListener('click', () => {
+      if (currentChatId && confirm('удалить историю?')) {
+        delete chatMessages[currentChatId];
+        localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
+        const chatArea = document.getElementById('chatArea');
+        if (chatArea) chatArea.innerHTML = '';
+        
+        // Добавляем новое приветствие
+        if (currentChatId && currentChatId.startsWith('nyash')) {
+          const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
+          const el = document.createElement('div');
+          el.className = 'message bot';
+          el.
+innerHTML = ${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>;
+          if (chatArea) {
+            chatArea.appendChild(el);
+            saveMessage(currentChatId, 'bot', greeting);
+          }
+        }
+        
+        showNotification('🗑️ история удалена');
+      }
+      const panel = document.getElementById('chatActionsPanel');
+      if (panel) panel.style.display = 'none';
+    });
+  }
+  
+  const renameCancelBtn = document.getElementById('renameCancelBtn');
+  if (renameCancelBtn) {
+    renameCancelBtn.addEventListener('click', hideRenameModal);
+  }
+  
+  const renameConfirmBtn = document.getElementById('renameConfirmBtn');
+  if (renameConfirmBtn) {
+    renameConfirmBtn.addEventListener('click', renameCurrentChat);
+  }
+  
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
+  const messageInput = document.getElementById('messageInput');
+  
+  if (sendMessageBtn) {
+    sendMessageBtn.addEventListener('click', sendMessage);
+  }
+  
+  if (messageInput) {
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+    
+    messageInput.addEventListener('input', (e) => {
+      if (currentChatId) {
+        let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+        if (e.target.value.trim()) {
+          drafts[currentChatId] = e.target.value;
+        } else {
+          delete drafts[currentChatId];
+        }
+        localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+      }
+    });
+  }
   
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;

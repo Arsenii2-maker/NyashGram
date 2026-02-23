@@ -265,7 +265,7 @@ function openBotChat(bot) {
   }
 }
 
-// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ =====
+// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ (ИСПРАВЛЕНО) =====
 async function openFriendChat(friend) {
   console.log('Открываем чат с другом:', friend);
   
@@ -287,6 +287,12 @@ async function openFriendChat(friend) {
   if (nameEl) nameEl.textContent = getCustomName(friend.id, friend.name);
   if (usernameEl) usernameEl.textContent = `@${friend.username}`;
   if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
+  
+  // Скрываем панель быстрых ответов для друзей
+  const quickPanel = document.getElementById('quickReplyPanel');
+  if (quickPanel) {
+    quickPanel.style.display = 'none';
+  }
   
   // Создаём или получаем чат
   if (!friend.chatId) {
@@ -320,7 +326,8 @@ async function openFriendChat(friend) {
   }
 }
 
-// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ =====
+
+// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ (ИСПРАВЛЕНО) =====
 function renderRealMessages(messages) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -342,6 +349,7 @@ function renderRealMessages(messages) {
   
   area.scrollTop = area.scrollHeight;
 }
+
 
 // ===== ЗАГРУЗКА ИСТОРИИ ЧАТА =====
 function loadChatHistory(chatId) {
@@ -400,7 +408,7 @@ function toggleQuickPanel() {
   panel.style.display = quickPanelVisible ? 'flex' : 'none';
 }
 
-// ===== ОТПРАВКА СООБЩЕНИЯ =====
+// ===== ОТПРАВКА СООБЩЕНИЯ (ИСПРАВЛЕНО) =====
 async function sendMessage() {
   const input = document.getElementById('messageInput');
   if (!input) return;
@@ -412,6 +420,17 @@ async function sendMessage() {
     // Отправляем другу через Firebase
     const success = await sendMessageToFriend(currentChatId, text);
     if (success) {
+      // Добавляем сообщение в чат сразу (оптимистичное обновление)
+      const area = document.getElementById('chatArea');
+      if (area) {
+        const msg = document.createElement('div');
+        msg.className = 'message user';
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        msg.innerHTML = `${text}<span class="message-time">${time}</span>`;
+        area.appendChild(msg);
+        area.scrollTop = area.scrollHeight;
+      }
+      
       input.value = '';
       
       // Очищаем черновик
@@ -439,6 +458,7 @@ async function sendMessage() {
     }, 1000);
   }
 }
+
 
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');

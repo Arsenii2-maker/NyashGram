@@ -273,16 +273,19 @@ async function sendFriendRequest(toUserId) {
 }
 
 
-// ===== ПРИНЯТИЕ ЗАПРОСА =====
+// ===== ПРИНЯТИЕ ЗАПРОСА (ИСПРАВЛЕНО) =====
 async function acceptFriendRequest(fromUserId) {
   if (!auth.currentUser) return { success: false, error: 'не авторизован' };
   
   try {
-    // Добавляем друг друга в друзья (используем arrayUnion с простыми значениями)
+    console.log('✅ Принимаем заявку от:', fromUserId);
+    
+    // Добавляем друга в свой список
     await db.collection('users').doc(auth.currentUser.uid).update({
       friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
     });
     
+    // Добавляем себя в список друга
     await db.collection('users').doc(fromUserId).update({
       friends: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid)
     });
@@ -292,10 +295,10 @@ async function acceptFriendRequest(fromUserId) {
     const userDoc = await userRef.get();
     const requests = userDoc.data().friendRequests || [];
     
-    // Удаляем заявку (фильтруем)
+    // Удаляем принятую заявку
     const updatedRequests = requests.filter(req => req.from !== fromUserId);
     
-    // Обновляем без использования arrayUnion (просто заменяем массив)
+    // Обновляем
     await userRef.update({
       friendRequests: updatedRequests
     });
@@ -303,12 +306,18 @@ async function acceptFriendRequest(fromUserId) {
     // Создаём чат
     const chatId = await createPrivateChat(auth.currentUser.uid, fromUserId);
     
+    // Обновляем список друзей
+    if (typeof window.loadFriends === 'function') {
+      window.loadFriends();
+    }
+    
     return { success: true, chatId };
   } catch (error) {
-    console.error('Ошибка принятия запроса:', error);
+    console.error('❌ Ошибка принятия запроса:', error);
     return { success: false, error: error.message };
   }
 }
+
 
 
 // ===== УДАЛЕНИЕ ЗАПРОСА (ИСПРАВЛЕНО) =====

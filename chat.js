@@ -7,8 +7,8 @@ let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 
-// Используем глобальный объект customNames из contacts.js
-// Если его нет, создаём свой
+// Убираем объявление customNames - используем глобальный из contacts.js
+// Если его нет, создаём пустой объект
 if (typeof window.customNames === 'undefined') {
   window.customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 }
@@ -110,7 +110,6 @@ function saveCustomName(chatId, name) {
   else delete window.customNames[chatId];
   localStorage.setItem('nyashgram_custom_names', JSON.stringify(window.customNames));
 }
-
 function getCustomName(chatId, defaultName) {
   return window.customNames?.[chatId] || defaultName;
 }
@@ -131,6 +130,8 @@ let currentDraftChatId = null;
 
 // ===== ОТКРЫТИЕ ЧАТА =====
 function openBotChat(bot) {
+  console.log('Открываем чат с ботом:', bot);
+  
   // Сохраняем черновик предыдущего чата
   saveCurrentDraft();
   
@@ -138,15 +139,20 @@ function openBotChat(bot) {
   currentChatId = bot.id;
   currentChatType = 'bot';
   
-  document.getElementById('chatContactName').textContent = getCustomName(bot.id, bot.name);
-  document.getElementById('chatContactUsername').textContent = `@${bot.username}`;
+  const nameEl = document.getElementById('chatContactName');
+  const usernameEl = document.getElementById('chatContactUsername');
+  const avatarEl = document.getElementById('chatAvatar');
   
-  const avatar = document.getElementById('chatAvatar');
-  if (bot.id === 'nyashhelp') avatar.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
-  if (bot.id === 'nyashtalk') avatar.style.background = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
-  if (bot.id === 'nyashgame') avatar.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
-  if (bot.id === 'nyashhoroscope') avatar.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
-  if (bot.id === 'nyashcook') avatar.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
+  if (nameEl) nameEl.textContent = getCustomName(bot.id, bot.name);
+  if (usernameEl) usernameEl.textContent = @${bot.username};
+  
+  if (avatarEl) {
+    if (bot.id === 'nyashhelp') avatarEl.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
+    else if (bot.id === 'nyashtalk') avatarEl.style.background = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
+    else if (bot.id === 'nyashgame') avatarEl.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
+    else if (bot.id === 'nyashhoroscope') avatarEl.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
+    else if (bot.id === 'nyashcook') avatarEl.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
+  }
   
   loadChatHistory(bot.id);
   loadDraft(bot.id);
@@ -158,6 +164,8 @@ function openBotChat(bot) {
 }
 
 function openFriendChat(friend) {
+  console.log('Открываем чат с другом:', friend);
+  
   // Сохраняем черновик предыдущего чата
   saveCurrentDraft();
   
@@ -165,11 +173,13 @@ function openFriendChat(friend) {
   currentChatId = friend.id;
   currentChatType = 'friend';
   
-  document.getElementById('chatContactName').textContent = getCustomName(friend.id, friend.name);
-  document.getElementById('chatContactUsername').textContent = `@${friend.username}`;
+  const nameEl = document.getElementById('chatContactName');
+  const usernameEl = document.getElementById('chatContactUsername');
+  const avatarEl = document.getElementById('chatAvatar');
   
-  const avatar = document.getElementById('chatAvatar');
-  avatar.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
+  if (nameEl) nameEl.textContent = getCustomName(friend.id, friend.name);
+  if (usernameEl) usernameEl.textContent = @${friend.username};
+  if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
   
   loadChatHistory(friend.id);
   loadDraft(friend.id);
@@ -181,21 +191,23 @@ function openFriendChat(friend) {
 
 function loadChatHistory(chatId) {
   const area = document.getElementById('chatArea');
+  if (!area) return;
+  
   area.innerHTML = '';
   
   if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
     chatMessages[chatId].forEach(msg => {
       const el = document.createElement('div');
-      el.className = `message ${msg.type}`;
-      el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
+      el.className = message ${msg.type};
+      el.innerHTML = ${msg.text}<span class="message-time">${msg.timeString}</span>;
       area.appendChild(el);
     });
-  } else if (chatId.startsWith('nyash')) {
+  } else if (chatId && chatId.startsWith('nyash')) {
     // Приветствие для ботов
     const greeting = greetings[chatId] || "привет! давай общаться! 💕";
     const el = document.createElement('div');
     el.className = 'message bot';
-    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+    el.innerHTML = ${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>;
     area.appendChild(el);
     
     // Сохраняем приветствие
@@ -219,7 +231,6 @@ function saveCurrentDraft() {
     }
   }
 }
-
 function loadDraft(chatId) {
   const input = document.getElementById('messageInput');
   if (!input) return;
@@ -268,8 +279,7 @@ function sendMessage() {
   // Очищаем черновик
   let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
   delete drafts[currentChatId];
-  localStorage.
-    setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
   
   if (currentChatType === 'bot') {
     setTimeout(() => {
@@ -286,10 +296,10 @@ function sendMessage() {
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');
   const msg = document.createElement('div');
-  msg.className = `message ${type}`;
+  msg.className = message ${type};
   
   const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  msg.innerHTML = `${text}<span class="message-time">${time}</span>`;
+  msg.innerHTML = ${text}<span class="message-time">${time}</span>;
   
   area.appendChild(msg);
   area.scrollTop = area.scrollHeight;
@@ -343,7 +353,8 @@ function getBotResponse(botId, text) {
     if (text.includes('кекс') || text.includes('маффин')) return bot.muffin;
     if (text.includes('печень')) return bot.cookie;
     if (text.includes('торт')) return bot.cake;
-    if (text.includes('пирог')) return bot.pie;
+    if (text.
+includes('пирог')) return bot.pie;
     if (text.includes('завтрак')) return bot.breakfast;
     return bot.default;
   }
@@ -398,6 +409,8 @@ function showNotification(msg) {
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔧 Настройка chat.js...');
+  
   document.getElementById('backBtn')?.addEventListener('click', () => {
     // Сохраняем черновик перед уходом
     saveCurrentDraft();
@@ -437,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
         const el = document.createElement('div');
         el.className = 'message bot';
-        el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+        el.innerHTML = ${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>;
         document.getElementById('chatArea').appendChild(el);
         saveMessage(currentChatId, 'bot', greeting);
       }
@@ -455,7 +468,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Enter') sendMessage();
   });
   
-  document.getElementById('messageInput')?.addEventListener('input', (e) => {
+  document.
+getElementById('messageInput')?.addEventListener('input', (e) => {
     if (currentChatId) {
       let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
       if (e.target.value.trim()) {
@@ -469,4 +483,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;
+  
+  console.log('✅ chat.js готов');
 });

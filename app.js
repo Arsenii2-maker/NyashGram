@@ -248,32 +248,37 @@ async function searchUsers(query) {
   }
 }
 
-// ОТПРАВКА ЗАПРОСА В ДРУЗЬЯ
+// ===== ОТПРАВКА ЗАПРОСА В ДРУЗЬЯ (ИСПРАВЛЕНО) =====
 async function sendFriendRequest(toUserId) {
   if (!auth.currentUser) return { success: false, error: 'не авторизован' };
   
   try {
+    // Создаём объект запроса БЕЗ serverTimestamp внутри arrayUnion
     const request = {
       from: auth.currentUser.uid,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      timestamp: Date.now(), // Используем обычную дату вместо serverTimestamp
       status: 'pending'
     };
+    
+    // Отправляем запрос
     await db.collection('users').doc(toUserId).update({
       friendRequests: firebase.firestore.FieldValue.arrayUnion(request)
     });
     
     return { success: true };
   } catch (error) {
+    console.error('Ошибка отправки запроса:', error);
     return { success: false, error: error.message };
   }
 }
 
-// ПРИНЯТИЕ ЗАПРОСА
+
+// ===== ПРИНЯТИЕ ЗАПРОСА =====
 async function acceptFriendRequest(fromUserId) {
-  if (!auth.currentUser) return;
+  if (!auth.currentUser) return { success: false, error: 'не авторизован' };
   
   try {
-    // Добавляем друг друга в друзья
+    // Добавляем друг друга в друзья (используем arrayUnion с простыми значениями)
     await db.collection('users').doc(auth.currentUser.uid).update({
       friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
     });
@@ -282,32 +287,51 @@ async function acceptFriendRequest(fromUserId) {
       friends: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid)
     });
     
-    // Удаляем заявку
-    await removeFriendRequest(fromUserId);
+    // Получаем текущие заявки
+    const userRef = db.collection('users').doc(auth.currentUser.uid);
+    const userDoc = await userRef.get();
+    const requests = userDoc.data().friendRequests || [];
+    
+    // Удаляем заявку (фильтруем)
+    const updatedRequests = requests.filter(req => req.from !== fromUserId);
+    
+    // Обновляем без использования arrayUnion (просто заменяем массив)
+    await userRef.update({
+      friendRequests: updatedRequests
+    });
     
     // Создаём чат
-    await createPrivateChat(auth.currentUser.uid, fromUserId);
+    const chatId = await createPrivateChat(auth.currentUser.uid, fromUserId);
     
-    return { success: true };
+    return { success: true, chatId };
   } catch (error) {
+    console.error('Ошибка принятия запроса:', error);
     return { success: false, error: error.message };
   }
 }
 
-// УДАЛЕНИЕ ЗАПРОСА
+
+// ===== УДАЛЕНИЕ ЗАПРОСА (ИСПРАВЛЕНО) =====
 async function removeFriendRequest(fromUserId) {
   if (!auth.currentUser) return;
   
-  const userRef = db.collection('users').doc(auth.currentUser.uid);
-  const userDoc = await userRef.get();
-  const requests = userDoc.data().friendRequests || [];
-  
-  const updatedRequests = requests.filter(req => req.from !== fromUserId);
-  
-  await userRef.update({
-    friendRequests: updatedRequests
-  });
+  try {
+    const userRef = db.collection('users').doc(auth.currentUser.uid);
+    const userDoc = await userRef.get();
+    const requests = userDoc.data().friendRequests || [];
+    
+    // Фильтруем массив (убираем запрос от fromUserId)
+    const updatedRequests = requests.filter(req => req.from !== fromUserId);
+    
+    // Обновляем документ (просто заменяем массив)
+    await userRef.update({
+      friendRequests: updatedRequests
+    });
+  } catch (error) {
+    console.error('Ошибка удаления запроса:', error);
+  }
 }
+
 
 // СОЗДАНИЕ ЧАТА
 async function createPrivateChat(userId1, userId2) {

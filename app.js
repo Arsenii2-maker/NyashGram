@@ -1,25 +1,29 @@
-// app.js — ПОЛНЫЙ С РАБОЧИМ ПОИСКОМ ДРУЗЕЙ
+// app.js — ПОЛНЫЙ С РЕАЛЬНЫМИ ДРУЗЬЯМИ
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCqTm_oMEVRjOwodVrhmWHLNl1DA4x9sUQ",
-  authDomain: "nyashgram-e9f69.firebaseapp.com",
-  projectId: "nyashgram-e9f69",
-  storageBucket: "nyashgram-e9f69.firebasestorage.app",
-  messagingSenderId: "54620743155",
-  appId: "1:54620743155:web:4db4690057b103ef859e86",
-  measurementId: "G-KXXQTJVEGV"
+  apiKey: "AIzaSyCqTm_oMEV_6e8E2SnE3x5jGR15jPcFbF8",
+  authDomain: "nyashgram-ff9c4.firebaseapp.com",
+  projectId: "nyashgram-ff9c4",
+  storageBucket: "nyashgram-ff9c4.firebasestorage.app",
+  messagingSenderId: "1091195998837",
+  appId: "1:1091195998837:web:aa9e1e55030e7809ea6e27"
 };
 
+// Инициализация Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// Настройка сохранения сессии
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+// ===== СОСТОЯНИЕ ПРИЛОЖЕНИЯ =====
 let currentTheme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
 let currentMode = localStorage.getItem('nyashgram_mode') || 'light';
 let currentFont = localStorage.getItem('nyashgram_font') || 'font-cozy';
 let currentUser = null;
 
-// ===== ПОДСКАЗКИ =====
+// ===== ПОДСКАЗКИ ДЛЯ ЗАГРУЗКИ =====
 const loadingTips = [
   "🐱 NyashHelp поможет с любой темой!",
   "🎮 NyashGame знает много игр!",
@@ -62,17 +66,17 @@ function showRandomTip() {
   tipEl.textContent = loadingTips[randomIndex];
 }
 
-// ===== ЭКРАНЫ =====
+// ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const screen = document.getElementById(id);
   if (screen) screen.classList.add('active');
-  if (id === 'friendsScreen' && typeof renderContacts === 'function') {
-    setTimeout(renderContacts, 100);
+  if (id === 'friendsScreen' && typeof window.renderContacts === 'function') {
+    setTimeout(window.renderContacts, 100);
   }
 }
 
-// ===== ТЕМЫ =====
+// ===== СИСТЕМА ТЕМ =====
 function setTheme(theme, mode) {
   document.body.classList.remove(
     'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue',
@@ -98,7 +102,7 @@ function toggleMode() {
   setTheme(currentTheme, currentMode === 'light' ? 'dark' : 'light');
 }
 
-// ===== ШРИФТЫ =====
+// ===== СИСТЕМА ШРИФТОВ =====
 function applyFont(fontClass) {
   document.body.classList.remove(
     'font-system', 'font-rounded', 'font-cozy',
@@ -118,19 +122,40 @@ function applyFont(fontClass) {
 async function registerWithEmail(name, email, password) {
   try {
     showLoadingScreen('создаём аккаунт...');
-    const user = await auth.createUserWithEmailAndPassword(email, password);
-    await user.user.sendEmailVerification();
-    await user.user.updateProfile({ displayName: name });
-    await db.collection('users').doc(user.user.uid).set({
-      name, email, username: name.toLowerCase().replace(/\s/g, '') + Math.floor(Math.random() * 1000),
-      theme: currentTheme, mode: currentMode, font: currentFont, friends: [], friendRequests: []
+    
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    await user.sendEmailVerification();
+    await user.updateProfile({ displayName: name });
+    
+    // Создаём профиль в Firestore
+    await db.collection('users').doc(user.uid).set({
+      name: name,
+      email: email,
+      username: name.toLowerCase().replace(/\s/g, '') + Math.floor(Math.random() * 1000),
+      avatar: null,
+      theme: currentTheme,
+      mode: currentMode,
+      font: currentFont,
+      friends: [],
+      friendRequests: [],
+      online: true,
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
     hideLoadingScreen();
     alert('✅ письмо отправлено! проверь почту');
     showScreen('loginMethodScreen');
+    return true;
   } catch (error) {
     hideLoadingScreen();
-    alert('❌ ' + (error.message || 'ошибка'));
+    let message = 'ошибка регистрации';
+    if (error.code === 'auth/email-already-in-use') message = 'email уже используется';
+    if (error.code === 'auth/weak-password') message = 'пароль слишком слабый';
+    alert('❌ ' + message);
+    return false;
   }
 }
 
@@ -138,47 +163,72 @@ async function registerWithEmail(name, email, password) {
 async function loginWithEmail(email, password) {
   try {
     showLoadingScreen('вход...');
-    const user = await auth.signInWithEmailAndPassword(email, password);
-    if (!user.user.emailVerified) {
+    
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    if (!user.emailVerified) {
       hideLoadingScreen();
-      alert('❌ подтверди email');
-      return;
+      alert('❌ подтверди email сначала');
+      return false;
     }
-    currentUser = user.user;
+    
+    // Обновляем статус онлайн
+    await db.collection('users').doc(user.uid).update({
+      online: true,
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    currentUser = user;
     hideLoadingScreen();
     showScreen('friendsScreen');
-    if (typeof renderContacts === 'function') renderContacts();
+    if (typeof window.loadFriends === 'function') window.loadFriends();
+    return true;
   } catch (error) {
     hideLoadingScreen();
-    alert('❌ ' + (error.message || 'ошибка'));
+    let message = 'ошибка входа';
+    if (error.code === 'auth/user-not-found') message = 'пользователь не найден';
+    if (error.code === 'auth/wrong-password') message = 'неверный пароль';
+    alert('❌ ' + message);
+    return false;
   }
 }
 
-// ===== АНОНИМНО =====
+// ===== АНОНИМНЫЙ ВХОД =====
 async function loginAnonymously() {
   try {
     showLoadingScreen('создаём гостя...');
-    const user = await auth.signInAnonymously();
-    currentUser = user.user;
+    const userCredential = await auth.signInAnonymously();
+    currentUser = userCredential.user;
     hideLoadingScreen();
     showScreen('friendsScreen');
-    if (typeof renderContacts === 'function') renderContacts();
+    if (typeof window.renderContacts === 'function') window.renderContacts();
+    return true;
   } catch (error) {
     hideLoadingScreen();
     alert('❌ ' + error.message);
+    return false;
   }
 }
 
 // ===== ВЫХОД =====
 async function logout() {
+  if (auth.currentUser && !auth.currentUser.isAnonymous) {
+    await db.collection('users').doc(auth.currentUser.uid).update({
+      online: false,
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
   await auth.signOut();
   currentUser = null;
   showScreen('loginMethodScreen');
 }
 
-// ===== ПОИСК ПОЛЬЗОВАТЕЛЕЙ =====
+// ===== 🔥 НОВЫЕ ФУНКЦИИ ДЛЯ ДРУЗЕЙ =====
+
+// ПОИСК ПОЛЬЗОВАТЕЛЕЙ
 async function searchUsers(query) {
-  if (!query || query.length < 2) return [];
+  if (!query || query.length < 2 || !auth.currentUser) return [];
   
   try {
     const usersRef = db.collection('users');
@@ -190,33 +240,105 @@ async function searchUsers(query) {
     
     return snapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(user => user.id !== currentUser?.uid);
+      .filter(user => user.id !== auth.currentUser.uid);
   } catch (error) {
     console.error('Ошибка поиска:', error);
     return [];
   }
 }
 
-// ===== ОТПРАВКА ЗАПРОСА =====
+// ОТПРАВКА ЗАПРОСА В ДРУЗЬЯ
 async function sendFriendRequest(toUserId) {
-  if (!currentUser) return { success: false, error: 'не авторизован' };
+  if (!auth.currentUser) return { success: false, error: 'не авторизован' };
   
   try {
+    const request = {
+      from: auth.currentUser.uid,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      status: 'pending'
+    };
     await db.collection('users').doc(toUserId).update({
-      friendRequests: firebase.firestore.FieldValue.arrayUnion({
-        from: currentUser.uid,
-        status: 'pending',
-        timestamp: Date.now()
-      })
+      friendRequests: firebase.firestore.FieldValue.arrayUnion(request)
     });
+    
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
   }
 }
 
+// ПРИНЯТИЕ ЗАПРОСА
+async function acceptFriendRequest(fromUserId) {
+  if (!auth.currentUser) return;
+  
+  try {
+    // Добавляем друг друга в друзья
+    await db.collection('users').doc(auth.currentUser.uid).update({
+      friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
+    });
+    
+    await db.collection('users').doc(fromUserId).update({
+      friends: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid)
+    });
+    
+    // Удаляем заявку
+    await removeFriendRequest(fromUserId);
+    
+    // Создаём чат
+    await createPrivateChat(auth.currentUser.uid, fromUserId);
+    
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// УДАЛЕНИЕ ЗАПРОСА
+async function removeFriendRequest(fromUserId) {
+  if (!auth.currentUser) return;
+  
+  const userRef = db.collection('users').doc(auth.currentUser.uid);
+  const userDoc = await userRef.get();
+  const requests = userDoc.data().friendRequests || [];
+  
+  const updatedRequests = requests.filter(req => req.from !== fromUserId);
+  
+  await userRef.update({
+    friendRequests: updatedRequests
+  });
+}
+
+// СОЗДАНИЕ ЧАТА
+async function createPrivateChat(userId1, userId2) {
+  // Проверяем, есть ли уже чат
+  const chatsRef = db.collection('chats');
+  const snapshot = await chatsRef
+    .where('type', '==', 'private')
+    .where('participants', 'array-contains', userId1)
+    .get();
+  
+  const existingChat = snapshot.docs.find(doc => 
+    doc.data().participants.includes(userId2)
+  );
+  
+  if (existingChat) return existingChat.id;
+  
+  // Создаём новый чат
+  const newChat = await chatsRef.add({
+    type: 'private',
+    participants: [userId1, userId2],
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    lastMessage: null,
+    typing: {}
+  });
+  
+  return newChat.id;
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 NyashGram v3.5 загружается...');
+  
   setTheme(currentTheme, currentMode);
   applyFont(currentFont);
   
@@ -272,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
           hideLoadingScreen();
           showScreen('friendsScreen');
-          if (typeof renderContacts === 'function') renderContacts();
+          if (typeof window.loadFriends === 'function') window.loadFriends();
         }, 1500);
       } else {
         alert('❌ email ещё не подтверждён');
@@ -310,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (name) localStorage.setItem('nyashgram_name', name);
     if (username) localStorage.setItem('nyashgram_username', username);
     showScreen('friendsScreen');
-    if (typeof renderContacts === 'function') renderContacts();
+    if (typeof window.renderContacts === 'function') window.renderContacts();
   });
   
   document.getElementById('settingsGenerateBtn')?.addEventListener('click', () => {
@@ -333,11 +455,11 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      if (typeof renderContacts === 'function') renderContacts();
+      if (typeof window.renderContacts === 'function') window.renderContacts();
     });
   });
   
-  // Поиск пользователей
+  // 🔥 ПОИСК ПОЛЬЗОВАТЕЛЕЙ (НОВОЕ)
   const searchInput = document.getElementById('searchUsersInput');
   const resultsList = document.getElementById('searchResultsList');
   
@@ -357,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const users = await searchUsers(query);
         
         if (users.length === 0) {
-          resultsList.innerHTML = '<div class="empty-state">ничего не найдено</div>';
+          resultsList.innerHTML = '<div class="empty-state">❌ ничего не найдено</div>';
           return;
         }
         
@@ -377,7 +499,13 @@ document.addEventListener('DOMContentLoaded', function() {
           el.querySelector('.add-friend-btn')?.addEventListener('click', async (e) => {
             e.stopPropagation();
             const result = await sendFriendRequest(user.id);
-            alert(result.success ? '✅ запрос отправлен' : '❌ ' + result.error);
+            if (result.success) {
+              alert('✅ запрос отправлен');
+              searchInput.value = '';
+              resultsList.innerHTML = '';
+            } else {
+              alert('❌ ошибка: ' + result.error);
+            }
           });
           
           resultsList.appendChild(el);
@@ -386,14 +514,32 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Проверка входа
-  auth.onAuthStateChanged(user => {
+  // Проверка авторизации
+  auth.onAuthStateChanged(async (user) => {
     currentUser = user;
-    if (user) {
+    if (user && !user.isAnonymous) {
+      // Обновляем статус онлайн
+      await db.collection('users').doc(user.uid).update({
+        online: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
       showScreen('friendsScreen');
-      if (typeof renderContacts === 'function') renderContacts();
+      if (typeof window.loadFriends === 'function') window.loadFriends();
+    } else if (user && user.isAnonymous) {
+      showScreen('friendsScreen');
     } else {
       showScreen('loginMethodScreen');
     }
   });
+  
+  // Экспортируем функции для других скриптов
+  window.showScreen = showScreen;
+  window.searchUsers = searchUsers;
+  window.sendFriendRequest = sendFriendRequest;
+  window.acceptFriendRequest = acceptFriendRequest;
+  window.createPrivateChat = createPrivateChat;
+  window.db = db;
+  window.auth = auth;
 });
+

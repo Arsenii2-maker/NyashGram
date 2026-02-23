@@ -1,4 +1,5 @@
 // chat.js — ПОЛНЫЙ С РЕАЛЬНЫМИ ДРУЗЬЯМИ v3.5
+// ИСПРАВЛЕНО: двойная отправка, черновики, свайпы, закрепление
 
 let currentChat = null;
 let currentChatId = null;
@@ -6,6 +7,7 @@ let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
 let currentDraftChatId = null;
+let isSending = false; // Флаг для предотвращения двойной отправки
 
 // Слушатели Firebase
 let messagesListener = null;
@@ -103,7 +105,7 @@ const greetings = {
 
 // ===== 🔥 НОВЫЕ ФУНКЦИИ ДЛЯ РЕАЛЬНЫХ СООБЩЕНИЙ =====
 
-// ОТПРАВКА СООБЩЕНИЯ ДРУГУ
+// ОТПРАВКА СООБЩЕНИЯ ДРУГУ (ИСПРАВЛЕНО: убрана двойная отправка)
 async function sendMessageToFriend(chatId, text) {
   if (!window.auth?.currentUser || !text.trim()) return false;
   
@@ -183,13 +185,18 @@ function saveCustomName(chatId, name) {
   if (name) window.customNames[chatId] = name;
   else delete window.customNames[chatId];
   localStorage.setItem('nyashgram_custom_names', JSON.stringify(window.customNames));
+  
+  // Обновляем в списке контактов
+  if (typeof window.renderContacts === 'function') {
+    setTimeout(window.renderContacts, 100);
+  }
 }
 
 function getCustomName(chatId, defaultName) {
   return window.customNames?.[chatId] || defaultName;
 }
 
-// ===== СОХРАНЕНИЕ СООБЩЕНИЙ =====
+// ===== СОХРАНЕНИЕ СООБЩЕНИЙ (ДЛЯ БОТОВ) =====
 function saveMessage(chatId, type, text) {
   if (!chatMessages[chatId]) chatMessages[chatId] = [];
   chatMessages[chatId].push({
@@ -251,14 +258,19 @@ function openBotChat(bot) {
     if (bot.id === 'nyashhelp') avatarEl.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
     else if (bot.id === 'nyashtalk') avatarEl.style.background = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
     else if (bot.id === 'nyashgame') avatarEl.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
-    else if (bot.id === 'nyashhoroscope') avatarEl.style.
-      background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
+    else if (bot.id === 'nyashhoroscope') avatarEl.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
     else if (bot.id === 'nyashcook') avatarEl.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
+  }
+  
+  // Показываем панель быстрых ответов для ботов
+  const quickPanel = document.getElementById('quickReplyPanel');
+  if (quickPanel) {
+    quickPanel.style.display = 'flex';
+    showQuickReplies(bot.id);
   }
   
   loadChatHistory(bot.id);
   loadDraft(bot.id);
-  showQuickReplies(bot.id);
   
   if (typeof window.showScreen === 'function') {
     window.showScreen('chatScreen');
@@ -326,8 +338,7 @@ async function openFriendChat(friend) {
   }
 }
 
-
-// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ (ИСПРАВЛЕНО) =====
+// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ =====
 function renderRealMessages(messages) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -349,7 +360,6 @@ function renderRealMessages(messages) {
   
   area.scrollTop = area.scrollHeight;
 }
-
 
 // ===== ЗАГРУЗКА ИСТОРИИ ЧАТА =====
 function loadChatHistory(chatId) {
@@ -394,8 +404,11 @@ function showQuickReplies(botId) {
     btn.textContent = q;
     btn.onclick = () => {
       const input = document.getElementById('messageInput');
-      if (input) input.value = q;
-      sendMessage();
+      if (input) {
+        input.value = q;
+        // Автоматически отправляем сообщение (можно убрать, если не нужно)
+        // sendMessage();
+      }
     };
     panel.appendChild(btn);
   });
@@ -407,49 +420,50 @@ function toggleQuickPanel() {
   quickPanelVisible = !quickPanelVisible;
   panel.style.display = quickPanelVisible ? 'flex' : 'none';
 }
-
-// ===== ОТПРАВКА СООБЩЕНИЯ (ИСПРАВЛЕНО) =====
+// ===== ОТПРАВКА СООБЩЕНИЯ (ИСПРАВЛЕНО: убрана двойная отправка и задержка ввода) =====
 async function sendMessage() {
   const input = document.getElementById('messageInput');
   if (!input) return;
   
+  // Защита от двойной отправки
+  if (isSending) return;
+  
   const text = input.value.trim();
   if (!text || !currentChat) return;
   
+  // Блокируем кнопку отправки
+  isSending = true;
+  const sendBtn = document.getElementById('sendMessageBtn');
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.5';
+  }
+  
+  // ОЧЕНЬ ВАЖНО: сразу очищаем поле ввода, чтобы нельзя было заспамить
+  input.value = '';
+  
+  // Очищаем черновик
+  let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+  delete drafts[currentChatId];
+  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+  
   if (currentChatType === 'friend') {
-    // Отправляем другу через Firebase
+    // Отправляем другу через Firebase (реальное сообщение)
     const success = await sendMessageToFriend(currentChatId, text);
-    if (success) {
-      // Добавляем сообщение в чат сразу (оптимистичное обновление)
-      const area = document.getElementById('chatArea');
-      if (area) {
-        const msg = document.createElement('div');
-        msg.className = 'message user';
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        msg.innerHTML = `${text}<span class="message-time">${time}</span>`;
-        area.appendChild(msg);
-        area.scrollTop = area.scrollHeight;
-      }
-      
-      input.value = '';
-      
-      // Очищаем черновик
-      let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-      delete drafts[currentChatId];
-      localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-      
-      // Отправляем статус "печатает" (false)
-      await setTyping(currentChatId, false);
+    
+    // Визуально сообщение добавится через слушатель, ничего не делаем
+    if (!success) {
+      // Если ошибка, показываем уведомление
+      showNotification('❌ Ошибка отправки');
+      // Возвращаем текст обратно в поле
+      input.value = text;
     }
+    
+    // Отправляем статус "печатает" (false)
+    await setTyping(currentChatId, false);
   } else {
     // Отправляем боту (локально)
     addMessage(text, 'user', true);
-    input.value = '';
-    
-    // Очищаем черновик
-    let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-    delete drafts[currentChatId];
-    localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
     
     // Ответ бота
     setTimeout(() => {
@@ -457,9 +471,18 @@ async function sendMessage() {
       addMessage(response, 'bot', true);
     }, 1000);
   }
+  
+  // Разблокируем кнопку отправки через небольшую задержку
+  setTimeout(() => {
+    isSending = false;
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.style.opacity = '1';
+    }
+  }, 500);
 }
 
-
+// ===== ДОБАВЛЕНИЕ СООБЩЕНИЯ (ЛОКАЛЬНО) =====
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -478,6 +501,7 @@ function addMessage(text, type, save = false) {
   }
 }
 
+// ===== ПОЛУЧЕНИЕ ОТВЕТА ОТ БОТА =====
 function getBotResponse(botId, text) {
   const bot = botResponses[botId];
   if (!bot) return "💕";
@@ -554,6 +578,7 @@ function hideRenameModal() {
   if (modal) modal.style.display = 'none';
 }
 
+// ===== ПЕРЕИМЕНОВАНИЕ ЧАТА (ИСПРАВЛЕНО: теперь работает везде) =====
 function renameCurrentChat() {
   const input = document.getElementById('renameInput');
   if (!input || !currentChatId) return;
@@ -564,12 +589,65 @@ function renameCurrentChat() {
     const nameEl = document.getElementById('chatContactName');
     if (nameEl) nameEl.textContent = newName;
     
-    // Обновляем в списке контактов
-    if (typeof window.renderContacts === 'function') {
-      setTimeout(window.renderContacts, 100);
-    }
+    // Обновляем в списке контактов (уже есть в saveCustomName)
+    showNotification('✏️ имя изменено');
   }
   hideRenameModal();
+}
+
+// ===== ЗАКРЕПЛЕНИЕ ЧАТА (ИСПРАВЛЕНО) =====
+function togglePinChat() {
+  if (!currentChatId) return;
+  
+  let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
+  
+  if (pinnedChats.includes(currentChatId)) {
+    pinnedChats = pinnedChats.filter(id => id !== currentChatId);
+    showNotification('📌 чат откреплён');
+  } else {
+    pinnedChats.push(currentChatId);
+    showNotification('📌 чат закреплён');
+  }
+  
+  localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
+  
+  // Обновляем отображение в списке контактов
+  if (typeof window.renderContacts === 'function') {
+    window.renderContacts();
+  }
+}
+
+// ===== УДАЛЕНИЕ ИСТОРИИ (ИСПРАВЛЕНО) =====
+function deleteChatHistory() {
+  if (!currentChatId) return;
+  
+  if (currentChatType === 'bot') {
+    if (confirm('удалить историю чата с ботом?')) {
+      delete chatMessages[currentChatId];
+      localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
+      const chatArea = document.getElementById('chatArea');
+      if (chatArea) chatArea.innerHTML = '';
+      
+      // Добавляем новое приветствие
+      if (currentChatId && currentChatId.startsWith('nyash')) {
+        const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
+        const el = document.createElement('div');
+        el.className = 'message bot';
+        el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+        if (chatArea) {
+          chatArea.appendChild(el);
+          saveMessage(currentChatId, 'bot', greeting);
+        }
+      }
+      showNotification('🗑️ история удалена');
+    }
+  } else {
+    // Для друзей удаление истории из локального хранилища не имеет смысла,
+    // так как сообщения хранятся в Firebase. Можно либо:
+    // 1. Ничего не делать (просто показать уведомление)
+    // 2. Удалить все сообщения из Firebase (сложно, нужно право)
+    alert('История сообщений с друзьями хранится в облаке и не может быть удалена из этого чата');
+  }
 }
 
 function showNotification(msg) {
@@ -580,9 +658,62 @@ function showNotification(msg) {
   setTimeout(() => notif.remove(), 2000);
 }
 
+// ===== ОБРАБОТКА СВАЙПОВ =====
+let touchStartX = 0;
+let touchEndX = 0;
+
+function handleTouchStart(e) {
+  touchStartX = e.touches[0].clientX;
+}
+
+function handleTouchEnd(e) {
+  touchEndX = e.changedTouches[0].clientX;
+  handleSwipe();
+}
+
+function handleSwipe() {
+  const swipeThreshold = 100; // минимальное расстояние для свайпа
+  const swipeDistance = touchEndX - touchStartX;
+  
+  // Свайп вправо от левого края (возврат на главный экран)
+  if (swipeDistance > swipeThreshold && touchStartX < 50) {
+    // Проверяем, что мы не на главном экране
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen && activeScreen.id !== 'friendsScreen') {
+      // Плавно возвращаемся
+      if (typeof window.showScreen === 'function') {
+        window.showScreen('friendsScreen');
+      }
+    }
+  }
+}
+
+// ===== ОБРАБОТКА ФОКУСА НА ПОЛЕ ВВОДА =====
+function setupInputFocusHandling() {
+  const messageInput = document.getElementById('messageInput');
+  if (!messageInput) return;
+  
+  messageInput.addEventListener('focus', () => {
+    // Когда поле ввода получает фокус, добавляем класс для анимации
+    document.body.classList.add('input-focused');
+  });
+  
+  messageInput.addEventListener('blur', () => {
+    // Когда поле ввода теряет фокус, убираем класс
+    document.body.classList.remove('input-focused');
+  });
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔧 chat.js загружен');
+  
+  // Настройка обработки свайпов
+  document.addEventListener('touchstart', handleTouchStart, false);
+  document.addEventListener('touchend', handleTouchEnd, false);
+  
+  // Настройка обработки фокуса на поле ввода
+  setupInputFocusHandling();
   
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
@@ -613,9 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const pinChatActionBtn = document.getElementById('pinChatActionBtn');
   if (pinChatActionBtn) {
     pinChatActionBtn.addEventListener('click', () => {
-      if (currentChatId && typeof window.togglePin === 'function') {
-        window.togglePin(currentChatId);
-      }
+      togglePinChat();
       const panel = document.getElementById('chatActionsPanel');
       if (panel) panel.style.display = 'none';
     });
@@ -642,26 +771,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const deleteChatBtn = document.getElementById('deleteChatBtn');
   if (deleteChatBtn) {
     deleteChatBtn.addEventListener('click', () => {
-      if (currentChatId && confirm('удалить историю?')) {
-        if (currentChatType === 'bot') {
-          delete chatMessages[currentChatId];
-          localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
-          const chatArea = document.getElementById('chatArea');
-          if (chatArea) chatArea.innerHTML = '';
-          
-          // Добавляем новое приветствие
-          if (currentChatId && currentChatId.startsWith('nyash')) {const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
-            const el = document.createElement('div');
-            el.className = 'message bot';
-            el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
-            if (chatArea) {
-              chatArea.appendChild(el);
-              saveMessage(currentChatId, 'bot', greeting);
-            }
-          }
-        }
-        showNotification('🗑️ история удалена');
-      }
+      deleteChatHistory();
       const panel = document.getElementById('chatActionsPanel');
       if (panel) panel.style.display = 'none';
     });
@@ -686,7 +796,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (messageInput) {
     messageInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
+      if (e.key === 'Enter' && !isSending) {
+        e.preventDefault();
+        sendMessage();
+      }
     });
     
     messageInput.addEventListener('input', (e) => {
@@ -700,8 +813,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
         
-        // Отправляем статус "печатает" другу
-        if (currentChatType === 'friend') {
+        // Отправляем статус "печатает" другу (только для чатов с друзьями)
+        if (currentChatType === 'friend' && currentChatId) {
           setTyping(currentChatId, e.target.value.trim().length > 0);
         }
       }
@@ -713,4 +826,6 @@ document.addEventListener('DOMContentLoaded', function() {
   window.openFriendChat = openFriendChat;
   window.sendMessageToFriend = sendMessageToFriend;
   window.setTyping = setTyping;
+  
+  console.log('✅ chat.js готов');
 });

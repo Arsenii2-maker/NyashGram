@@ -985,6 +985,10 @@ function handleTouchEnd(e) {
 document.addEventListener('touchstart', handleTouchStart, { passive: true });
 document.addEventListener('touchmove', handleTouchMove, { passive: true });
 document.addEventListener('touchend', handleTouchEnd, { passive: true });
+// Добавьте в инициализацию
+document.addEventListener('touchstart', handleTouchStart, { passive: true });
+document.addEventListener('touchmove', handleTouchMove, { passive: false }); // passive: false чтобы можно было вызвать preventDefault
+document.addEventListener('touchend', handleTouchEnd, { passive: true });
   // Экспорт функций
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;

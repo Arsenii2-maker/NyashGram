@@ -180,7 +180,7 @@ function openFriendChat(friend) {
   const avatarEl = document.getElementById('chatAvatar');
   
   if (nameEl) nameEl.textContent = getCustomName(friend.id, friend.name);
-  if (usernameEl) usernameEl.textContent = @${friend.username};
+  if (usernameEl) usernameEl.textContent = `@${friend.username}`;
   if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
   
   loadChatHistory(friend.id);

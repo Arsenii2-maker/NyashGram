@@ -578,7 +578,9 @@ function hideRenameModal() {
   if (modal) modal.style.display = 'none';
 }
 
-// ===== ПЕРЕИМЕНОВАНИЕ ЧАТА (ИСПРАВЛЕНО: теперь работает везде) =====
+// ===== ДЕЙСТВИЯ (ПОЛНОСТЬЮ ИСПРАВЛЕНЫ) =====
+
+// ПЕРЕИМЕНОВАНИЕ ЧАТА (ТЕПЕРЬ РАБОТАЕТ ВЕЗДЕ)
 function renameCurrentChat() {
   const input = document.getElementById('renameInput');
   if (!input || !currentChatId) return;
@@ -589,13 +591,17 @@ function renameCurrentChat() {
     const nameEl = document.getElementById('chatContactName');
     if (nameEl) nameEl.textContent = newName;
     
-    // Обновляем в списке контактов (уже есть в saveCustomName)
+    // Принудительно обновляем список контактов
+    if (typeof window.renderContacts === 'function') {
+      window.renderContacts();
+    }
+    
     showNotification('✏️ имя изменено');
   }
   hideRenameModal();
 }
 
-// ===== ЗАКРЕПЛЕНИЕ ЧАТА (ИСПРАВЛЕНО) =====
+// ЗАКРЕПЛЕНИЕ ЧАТА (ТЕПЕРЬ РАБОТАЕТ)
 function togglePinChat() {
   if (!currentChatId) return;
   
@@ -611,12 +617,11 @@ function togglePinChat() {
   
   localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
   
-  // Обновляем отображение в списке контактов
+  // Принудительно обновляем список контактов
   if (typeof window.renderContacts === 'function') {
     window.renderContacts();
   }
 }
-
 // ===== УДАЛЕНИЕ ИСТОРИИ (ИСПРАВЛЕНО) =====
 function deleteChatHistory() {
   if (!currentChatId) return;

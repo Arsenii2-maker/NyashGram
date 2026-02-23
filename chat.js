@@ -825,7 +825,95 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  // ===== УЛУЧШЕННАЯ ОБРАБОТКА СВАЙПОВ С АНИМАЦИЕЙ =====
+let touchStartX = 0;
+let touchEndX = 0;
+let isSwiping = false;
+let swipeStartTime = 0;
+
+function handleTouchStart(e) {
+  touchStartX = e.touches[0].clientX;
+  swipeStartTime = Date.now();
+  isSwiping = true;
   
+  // Добавляем класс для отключения transition во время свайпа
+  const activeScreen = document.querySelector('.screen.active');
+  if (activeScreen) {
+    activeScreen.classList.add('swiping');
+  }
+}
+
+function handleTouchMove(e) {
+  if (!isSwiping) return;
+  
+  const currentX = e.touches[0].clientX;
+  const diff = currentX - touchStartX;
+  
+  // Если свайп от левого края и достаточно длинный
+  if (touchStartX < 50 && diff > 20) {
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen) {
+      // Применяем трансформацию в реальном времени
+      const translateX = Math.min(diff * 0.5, 100);
+      activeScreen.style.transform = `translateX(${translateX}px)`;
+      activeScreen.style.opacity = 1 - (translateX / 200);
+    }
+  }
+}
+
+function handleTouchEnd(e) {
+  if (!isSwiping) return;
+  
+  touchEndX = e.changedTouches[0].clientX;
+  const swipeDistance = touchEndX - touchStartX;
+  const swipeDuration = Date.now() - swipeStartTime;
+  const activeScreen = document.querySelector('.screen.active');
+  
+  if (!activeScreen) {
+    isSwiping = false;
+    return;
+  }
+  
+  // Убираем класс swiping
+  activeScreen.classList.remove('swiping');
+  
+  // Проверяем, был ли свайп от левого края
+  if (touchStartX < 50 && swipeDistance > 80 && swipeDuration < 300) {
+    // Достаточно быстрый и длинный свайп - выполняем действие
+    activeScreen.style.transform = '';
+    activeScreen.style.opacity = '';
+    
+    // Добавляем класс анимации
+    activeScreen.classList.add('swipe-right');
+    
+    setTimeout(() => {
+      activeScreen.classList.remove('swipe-right');
+      
+      // Проверяем, что мы не на главном экране
+      if (activeScreen.id !== 'friendsScreen') {
+        if (typeof window.showScreen === 'function') {
+          window.showScreen('friendsScreen');
+        }
+      }
+    }, 200);
+  } else {
+    // Возвращаем на место с анимацией
+    activeScreen.style.transform = '';
+    activeScreen.style.opacity = '';
+    activeScreen.classList.add('swipe-in');
+    
+    setTimeout(() => {
+      activeScreen.classList.remove('swipe-in');
+    }, 300);
+  }
+  
+  isSwiping = false;
+}
+
+// Добавьте в инициализацию
+document.addEventListener('touchstart', handleTouchStart, { passive: true });
+document.addEventListener('touchmove', handleTouchMove, { passive: true });
+document.addEventListener('touchend', handleTouchEnd, { passive: true });
   // Экспорт функций
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;

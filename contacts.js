@@ -199,6 +199,7 @@ function renderChats(list) {
     list.appendChild(el);
   });
   
+  
   // Секция друзей (если есть)
   if (friendsList.length > 0) {
     const friendsHeader = document.createElement('div');

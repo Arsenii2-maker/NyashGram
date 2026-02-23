@@ -1,15 +1,15 @@
-// chat.js — ПОЛНЫЙ С ПРИВЕТСТВИЯМИ И ПРАВИЛЬНЫМИ ЧЕРНОВИКАМИ
+// chat.js — ПОЛНЫЙ С РЕАЛЬНЫМИ ДРУЗЬЯМИ v3.5
 
 let currentChat = null;
 let currentChatId = null;
 let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
+let currentDraftChatId = null;
 
-// Убираем объявление customNames - используем глобальный из contacts.js
-if (typeof window.customNames === 'undefined') {
-  window.customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
-}
+// Слушатели Firebase
+let messagesListener = null;
+let chatListener = null;
 
 // ===== МИЛЫЕ БЫСТРЫЕ ВОПРОСЫ =====
 const quickQuestions = {
@@ -101,6 +101,82 @@ const greetings = {
   nyashcook: "🍳 привет! я NyashCook! хочешь рецепт чего-нибудь вкусненького?"
 };
 
+// ===== 🔥 НОВЫЕ ФУНКЦИИ ДЛЯ РЕАЛЬНЫХ СООБЩЕНИЙ =====
+
+// ОТПРАВКА СООБЩЕНИЯ ДРУГУ
+async function sendMessageToFriend(chatId, text) {
+  if (!window.auth?.currentUser || !text.trim()) return false;
+  
+  try {
+    await window.db.collection('messages').add({
+      chatId: chatId,
+      from: window.auth.currentUser.uid,
+      text: text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      readBy: [window.auth.currentUser.uid]
+    });
+    
+    await window.db.collection('chats').doc(chatId).update({
+      lastMessage: {
+        text: text,
+        from: window.auth.currentUser.uid,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        readBy: [window.auth.currentUser.uid]
+      }
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Ошибка отправки:', error);
+    return false;
+  }
+}
+
+// СТАТУС "ПЕЧАТАЕТ..."
+async function setTyping(chatId, isTyping) {
+  if (!window.auth?.currentUser || !chatId) return;
+  
+  try {
+    await window.db.collection('chats').doc(chatId).update({
+      [`typing.${window.auth.currentUser.uid}`]: isTyping
+    });
+  } catch (error) {
+    console.error('Ошибка статуса печати:', error);
+  }
+}
+
+// СЛУШАТЕЛЬ СООБЩЕНИЙ
+function listenToMessages(chatId, callback) {
+  if (messagesListener) messagesListener();
+  
+  messagesListener = window.db.collection('messages')
+    .where('chatId', '==', chatId)
+    .orderBy('timestamp', 'asc')
+    .onSnapshot((snapshot) => {
+      const messages = [];
+      snapshot.forEach(doc => {
+        messages.push({ id: doc.id, ...doc.data() });
+      });
+      callback(messages);
+    }, (error) => {
+      console.error('Ошибка слушателя:', error);
+    });
+  
+  return messagesListener;
+}
+
+// СЛУШАТЕЛЬ СТАТУСА ЧАТА
+function listenToChat(chatId, callback) {
+  if (chatListener) chatListener();
+  
+  chatListener = window.db.collection('chats').doc(chatId)
+    .onSnapshot((doc) => {
+      if (doc.exists) callback(doc.data());
+    });
+  
+  return chatListener;
+}
+
 // ===== СОХРАНЕНИЕ ИМЁН =====
 function saveCustomName(chatId, name) {
   if (!window.customNames) window.customNames = {};
@@ -110,8 +186,7 @@ function saveCustomName(chatId, name) {
 }
 
 function getCustomName(chatId, defaultName) {
-  return window.
-customNames?.[chatId] || defaultName;
+  return window.customNames?.[chatId] || defaultName;
 }
 
 // ===== СОХРАНЕНИЕ СООБЩЕНИЙ =====
@@ -127,11 +202,36 @@ function saveMessage(chatId, type, text) {
 }
 
 // ===== ЧЕРНОВИКИ =====
-let currentDraftChatId = null;
+function saveCurrentDraft() {
+  if (currentChatId) {
+    const input = document.getElementById('messageInput');
+    if (input) {
+      const text = input.value.trim();
+      if (text) {
+        let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+        drafts[currentChatId] = text;
+        localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+      }
+    }
+  }
+}
 
-// ===== ОТКРЫТИЕ ЧАТА =====
+function loadDraft(chatId) {
+  const input = document.getElementById('messageInput');
+  if (!input) return;
+  
+  const drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+  input.value = drafts[chatId] || '';
+  currentDraftChatId = chatId;
+}
+
+// ===== ОТКРЫТИЕ ЧАТА С БОТОМ =====
 function openBotChat(bot) {
   console.log('Открываем чат с ботом:', bot);
+  
+  // Очищаем слушатели
+  if (messagesListener) messagesListener();
+  if (chatListener) chatListener();
   
   // Сохраняем черновик предыдущего чата
   saveCurrentDraft();
@@ -151,7 +251,8 @@ function openBotChat(bot) {
     if (bot.id === 'nyashhelp') avatarEl.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
     else if (bot.id === 'nyashtalk') avatarEl.style.background = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
     else if (bot.id === 'nyashgame') avatarEl.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
-    else if (bot.id === 'nyashhoroscope') avatarEl.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
+    else if (bot.id === 'nyashhoroscope') avatarEl.style.
+      background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
     else if (bot.id === 'nyashcook') avatarEl.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
   }
   
@@ -164,8 +265,13 @@ function openBotChat(bot) {
   }
 }
 
-function openFriendChat(friend) {
+// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ =====
+async function openFriendChat(friend) {
   console.log('Открываем чат с другом:', friend);
+  
+  // Очищаем слушатели
+  if (messagesListener) messagesListener();
+  if (chatListener) chatListener();
   
   // Сохраняем черновик предыдущего чата
   saveCurrentDraft();
@@ -179,17 +285,65 @@ function openFriendChat(friend) {
   const avatarEl = document.getElementById('chatAvatar');
   
   if (nameEl) nameEl.textContent = getCustomName(friend.id, friend.name);
-  if (usernameEl) usernameEl.textContent = `@${friend.username}`; 
+  if (usernameEl) usernameEl.textContent = `@${friend.username}`;
   if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
   
-  loadChatHistory(friend.id);
-  loadDraft(friend.id);
+  // Создаём или получаем чат
+  if (!friend.chatId) {
+    const chatId = await window.createPrivateChat(window.auth.currentUser.uid, friend.id);
+    friend.chatId = chatId;
+    currentChatId = chatId;
+  } else {
+    currentChatId = friend.chatId;
+  }
+  
+  // Подписываемся на сообщения
+  listenToMessages(currentChatId, (messages) => {
+    renderRealMessages(messages);
+  });
+  
+  // Подписываемся на статус чата
+  listenToChat(currentChatId, (chatData) => {
+    if (chatData.typing) {
+      const isTyping = chatData.typing[friend.id];
+      const typingEl = document.getElementById('typingIndicator');
+      if (typingEl) {
+        typingEl.style.display = isTyping ? 'flex' : 'none';
+      }
+    }
+  });
+  
+  loadDraft(currentChatId);
   
   if (typeof window.showScreen === 'function') {
     window.showScreen('chatScreen');
   }
 }
 
+// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ =====
+function renderRealMessages(messages) {
+  const area = document.getElementById('chatArea');
+  if (!area) return;
+  
+  area.innerHTML = '';
+  
+  messages.forEach(msg => {
+    const isMe = msg.from === window.auth?.currentUser?.uid;
+    const el = document.createElement('div');
+    el.className = `message ${isMe ? 'user' : 'bot'}`;
+    
+    const time = msg.timestamp?.toDate 
+      ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    el.innerHTML = `${msg.text}<span class="message-time">${time}</span>`;
+    area.appendChild(el);
+  });
+  
+  area.scrollTop = area.scrollHeight;
+}
+
+// ===== ЗАГРУЗКА ИСТОРИИ ЧАТА =====
 function loadChatHistory(chatId) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -218,31 +372,6 @@ function loadChatHistory(chatId) {
   area.scrollTop = area.scrollHeight;
 }
 
-// ===== ЧЕРНОВИКИ =====
-function saveCurrentDraft() {
-  if (currentChatId) {
-    const input = document.getElementById('messageInput');
-    if (input) {
-      const text = input.value.trim();
-      if (text) {
-        let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-        drafts[currentChatId] = text;
-        localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-      }
-    }
-  }
-}
-
-function loadDraft(chatId) {
-  const input = document.
-getElementById('messageInput');
-  if (!input) return;
-  
-  const drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-  input.value = drafts[chatId] || '';
-  currentDraftChatId = chatId;
-}
-
 // ===== БЫСТРЫЕ ОТВЕТЫ =====
 function showQuickReplies(botId) {
   const panel = document.getElementById('quickReplyPanel');
@@ -256,7 +385,8 @@ function showQuickReplies(botId) {
     btn.className = 'quick-chip';
     btn.textContent = q;
     btn.onclick = () => {
-      document.getElementById('messageInput').value = q;
+      const input = document.getElementById('messageInput');
+      if (input) input.value = q;
       sendMessage();
     };
     panel.appendChild(btn);
@@ -270,34 +400,50 @@ function toggleQuickPanel() {
   panel.style.display = quickPanelVisible ? 'flex' : 'none';
 }
 
-// ===== ОТПРАВКА =====
-function sendMessage() {
+// ===== ОТПРАВКА СООБЩЕНИЯ =====
+async function sendMessage() {
   const input = document.getElementById('messageInput');
+  if (!input) return;
+  
   const text = input.value.trim();
   if (!text || !currentChat) return;
   
-  addMessage(text, 'user', true);
-  input.value = '';
-  
-  // Очищаем черновик
-  let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-  delete drafts[currentChatId];
-  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-  
-  if (currentChatType === 'bot') {
+  if (currentChatType === 'friend') {
+    // Отправляем другу через Firebase
+    const success = await sendMessageToFriend(currentChatId, text);
+    if (success) {
+      input.value = '';
+      
+      // Очищаем черновик
+      let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+      delete drafts[currentChatId];
+      localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+      
+      // Отправляем статус "печатает" (false)
+      await setTyping(currentChatId, false);
+    }
+  } else {
+    // Отправляем боту (локально)
+    addMessage(text, 'user', true);
+    input.value = '';
+    
+    // Очищаем черновик
+    let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+    delete drafts[currentChatId];
+    localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+    
+    // Ответ бота
     setTimeout(() => {
       const response = getBotResponse(currentChatId, text);
       addMessage(response, 'bot', true);
     }, 1000);
-  } else {
-    setTimeout(() => {
-      addMessage('💬 сообщение доставлено', 'bot', true);
-    }, 500);
   }
 }
 
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');
+  if (!area) return;
+  
   const msg = document.createElement('div');
   msg.className = `message ${type}`;
   
@@ -357,8 +503,7 @@ function getBotResponse(botId, text) {
     if (text.includes('печень')) return bot.cookie;
     if (text.includes('торт')) return bot.cake;
     if (text.includes('пирог')) return bot.pie;
-    if (text.
-includes('завтрак')) return bot.breakfast;
+    if (text.includes('завтрак')) return bot.breakfast;
     return bot.default;
   }
   
@@ -417,13 +562,18 @@ function showNotification(msg) {
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔧 Настройка chat.js...');
+  console.log('🔧 chat.js загружен');
   
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
       // Сохраняем черновик перед уходом
       saveCurrentDraft();
+      
+      // Очищаем слушатели
+      if (messagesListener) messagesListener();
+      if (chatListener) chatListener();
+      
       if (typeof window.showScreen === 'function') {
         window.showScreen('friendsScreen');
       }
@@ -473,24 +623,23 @@ document.addEventListener('DOMContentLoaded', function() {
   if (deleteChatBtn) {
     deleteChatBtn.addEventListener('click', () => {
       if (currentChatId && confirm('удалить историю?')) {
-        delete chatMessages[currentChatId];
-        localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
-        const chatArea = document.getElementById('chatArea');
-        if (chatArea) chatArea.innerHTML = '';
-        
-        // Добавляем новое приветствие
-        if (currentChatId && currentChatId.startsWith('nyash')) {
-          const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
-          const el = document.createElement('div');
-          el.className = 'message bot';
-          el.
-innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
-          if (chatArea) {
-            chatArea.appendChild(el);
-            saveMessage(currentChatId, 'bot', greeting);
+        if (currentChatType === 'bot') {
+          delete chatMessages[currentChatId];
+          localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
+          const chatArea = document.getElementById('chatArea');
+          if (chatArea) chatArea.innerHTML = '';
+          
+          // Добавляем новое приветствие
+          if (currentChatId && currentChatId.startsWith('nyash')) {const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
+            const el = document.createElement('div');
+            el.className = 'message bot';
+            el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+            if (chatArea) {
+              chatArea.appendChild(el);
+              saveMessage(currentChatId, 'bot', greeting);
+            }
           }
         }
-        
         showNotification('🗑️ история удалена');
       }
       const panel = document.getElementById('chatActionsPanel');
@@ -522,6 +671,7 @@ innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeStri
     
     messageInput.addEventListener('input', (e) => {
       if (currentChatId) {
+        // Сохраняем черновик
         let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
         if (e.target.value.trim()) {
           drafts[currentChatId] = e.target.value;
@@ -529,12 +679,18 @@ innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeStri
           delete drafts[currentChatId];
         }
         localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+        
+        // Отправляем статус "печатает" другу
+        if (currentChatType === 'friend') {
+          setTyping(currentChatId, e.target.value.trim().length > 0);
+        }
       }
     });
   }
   
+  // Экспорт функций
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;
-  
-  console.log('✅ chat.js готов');
+  window.sendMessageToFriend = sendMessageToFriend;
+  window.setTyping = setTyping;
 });

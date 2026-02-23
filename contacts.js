@@ -34,20 +34,22 @@ async function loadFriends() {
     
     if (!userData) return;
     
-    // Загружаем друзей
-    if (userData.friends && userData.friends.length > 0) {
-      console.log(`👥 Найдено ${userData.friends.length} друзей`);
-      
-      const friendsData = await Promise.all(
-        userData.friends.map(async (friendId) => {
-          const friendDoc = await window.db.collection('users').doc(friendId).get();
-          return { id: friendDoc.id, ...friendDoc.data() };
-        })
-      );
-      friendsList = friendsData;
-    } else {
-      friendsList = [];
-    }
+   // В функции loadFriends, после загрузки друзей:
+if (userData.friends && userData.friends.length > 0) {
+  console.log(`👥 Найдено ${userData.friends.length} друзей`);
+  
+  const friendsData = await Promise.all(
+    userData.friends.map(async (friendId) => {
+      const friendDoc = await window.db.collection('users').doc(friendId).get();
+      return { id: friendDoc.id, ...friendDoc.data() };
+    })
+  );
+  friendsList = friendsData;
+  
+  // Обновляем отображение
+  renderContacts();
+}
+
     
    // В функции loadFriends, часть с заявками:
 if (userData.friendRequests && userData.friendRequests.length > 0) {

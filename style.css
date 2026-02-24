@@ -1452,3 +1452,116 @@ button:active {
   min-width: 35px;
   text-align: right;
 }
+/* ===== СТИЛИ ДЛЯ ЗАПИСИ ГОЛОСА ===== */
+.voice-recording-ui {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.voice-waveform {
+  flex: 1;
+  height: 50px;
+  border-radius: 25px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.voice-recording-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.voice-timer {
+  font-size: 16px;
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 45px;
+}
+
+.voice-stop-btn, .voice-cancel-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-stop-btn {
+  background: #ff4444;
+  color: white;
+}
+
+.voice-cancel-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text);
+  border: 2px solid var(--border-light);
+}
+
+.voice-preview-ui {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.voice-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card-bg);
+  border-radius: 40px;
+  padding: 8px 16px;
+}
+
+.voice-timeline-preview {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  position: relative;
+}
+
+.voice-progress-preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.voice-duration-preview {
+  font-size: 14px;
+  color: var(--text);
+  min-width: 45px;
+}
+
+.voice-send-btn, .voice-delete-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-send-btn {
+  background: var(--accent);
+  color: white;
+}
+
+.voice-delete-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  border: 1px solid var(--border-light);
+}

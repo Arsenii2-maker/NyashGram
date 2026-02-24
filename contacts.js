@@ -123,23 +123,38 @@ function updateRequestsBadge() {
   }
 }
 
-// ===== ОТРИСОВКА =====
+// ===== ПЛАВНОЕ ПОЯВЛЕНИЕ КОНТАКТОВ =====
 function renderContacts() {
   const list = document.getElementById('friendsList');
   if (!list) return;
   
-  list.innerHTML = '';
+  // Показываем загрузку
+  list.innerHTML = '<div class="loading-contacts">✨ Загружаем контакты...</div>';
   
-  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'chats';
-  
-  if (activeTab === 'chats') {
-    renderChats(list);
-  } else if (activeTab === 'friends') {
-    renderFriends(list);
-  } else if (activeTab === 'requests') {
-    renderRequests(list);
-  }
+  // Небольшая задержка для плавности
+  setTimeout(() => {
+    const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'chats';
+    
+    list.innerHTML = '';
+    
+    if (activeTab === 'chats') {
+      renderChats(list);
+    } else if (activeTab === 'friends') {
+      renderFriends(list);
+    } else if (activeTab === 'requests') {
+      renderRequests(list);
+    }
+    
+    // Добавляем анимацию появления
+    const contacts = list.querySelectorAll('.contact');
+    contacts.forEach((contact, index) => {
+      contact.style.animation = `contactAppear 0.3s ease ${index * 0.05}s forwards`;
+      contact.style.opacity = '0';
+      contact.style.transform = 'translateY(10px)';
+    });
+  }, 200);
 }
+
 
 function renderChats(list) {
   // Секция ботов

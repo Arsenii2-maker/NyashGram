@@ -67,15 +67,203 @@ function showRandomTip() {
   tipEl.textContent = loadingTips[randomIndex];
 }
 
-// ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
+// app.js — ПОЛНЫЙ С ПЛАВНЫМИ ПЕРЕХОДАМИ
+
+// ===== СОСТОЯНИЕ =====
+let isLoading = true;
+let loadingStartTime = Date.now();
+
+// ===== ПЛАВНОЕ ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const screen = document.getElementById(id);
-  if (screen) screen.classList.add('active');
+  console.log('📱 Переключаем на экран:', id);
+  
+  const currentScreen = document.querySelector('.screen.active');
+  const nextScreen = document.getElementById(id);
+  
+  if (!nextScreen) return;
+  
+  if (currentScreen) {
+    // Плавно скрываем текущий экран
+    currentScreen.style.opacity = '0';
+    currentScreen.style.transform = 'scale(0.98)';
+    
+    setTimeout(() => {
+      currentScreen.classList.remove('active');
+      
+      // Показываем новый экран с анимацией
+      nextScreen.classList.add('active');
+      nextScreen.style.opacity = '0';
+      nextScreen.style.transform = 'scale(0.98)';
+      
+      setTimeout(() => {
+        nextScreen.style.opacity = '1';
+        nextScreen.style.transform = 'scale(1)';
+      }, 50);
+    }, 200);
+  } else {
+    // Если нет текущего экрана, просто показываем новый
+    nextScreen.classList.add('active');
+    nextScreen.style.opacity = '0';
+    nextScreen.style.transform = 'scale(0.98)';
+    
+    setTimeout(() => {
+      nextScreen.style.opacity = '1';
+      nextScreen.style.transform = 'scale(1)';
+    }, 50);
+  }
+  
   if (id === 'friendsScreen' && typeof window.renderContacts === 'function') {
-    setTimeout(window.renderContacts, 100);
+    // Показываем загрузку контактов
+    const list = document.getElementById('friendsList');
+    if (list) {
+      list.innerHTML = '<div class="loading-contacts">Загрузка контактов...</div>';
+    }
+    
+    // Загружаем контакты с небольшой задержкой для плавности
+    setTimeout(() => {
+      window.renderContacts();
+    }, 300);
   }
 }
+
+// ===== УЛУЧШЕННЫЙ ЭКРАН ЗАГРУЗКИ =====
+function showLoadingScreen(message = 'Загружаем...', minDuration = 1000) {
+  const overlay = document.getElementById('loadingOverlay');
+  if (!overlay) return;
+  
+  const msgEl = document.getElementById('loadingMessage');
+  if (msgEl) msgEl.textContent = message;
+  
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '0';
+  
+  setTimeout(() => {
+    overlay.style.opacity = '1';
+  }, 50);
+  
+  showRandomTip();
+  if (tipInterval) clearInterval(tipInterval);
+  tipInterval = setInterval(showRandomTip, 3000);
+  
+  loadingStartTime = Date.now();
+  isLoading = true;
+  
+  return new Promise((resolve) => {
+    window.loadingResolve = resolve;
+  });
+}
+
+function hideLoadingScreen() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (!overlay) return;
+  
+  const elapsedTime = Date.now() - loadingStartTime;
+  const minDuration = 1000; // Минимальное время показа загрузки
+  const delay = Math.max(0, minDuration - elapsedTime);
+  
+  setTimeout(() => {
+    overlay.style.opacity = '0';
+    
+    if (tipInterval) {
+      clearInterval(tipInterval);
+      tipInterval = null;
+    }
+    
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      isLoading = false;
+      if (window.loadingResolve) {
+        window.loadingResolve();
+        window.loadingResolve = null;
+      }
+    }, 300);
+  }, delay);
+}
+
+// ===== ПРОВЕРКА АВТОРИЗАЦИИ (ИСПРАВЛЕНО) =====
+async function checkAuthAndRedirect() {
+  showLoadingScreen('Загружаем профиль...');
+  
+  const user = auth.currentUser;
+  
+  if (user && !user.isAnonymous) {
+    try {
+      await loadUserData(user.uid);
+      
+      // Загружаем друзей
+      if (typeof window.loadFriends === 'function') {
+        await window.loadFriends();
+      }
+      
+      hideLoadingScreen();
+      showScreen('friendsScreen');
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+      hideLoadingScreen();
+      showScreen('loginMethodScreen');
+    }
+  } else if (user && user.isAnonymous) {
+    hideLoadingScreen();
+    showScreen('friendsScreen');
+  } else {
+    hideLoadingScreen();
+    showScreen('loginMethodScreen');
+  }
+}
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 NyashGram v3.5 загружается...');
+  
+  setTheme(currentTheme, currentMode);
+  applyFont(currentFont);
+  
+  // Кнопки входа
+  document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
+    showLoadingScreen('Переходим к регистрации...', 500);
+    setTimeout(() => {
+      hideLoadingScreen();
+      showScreen('emailRegisterScreen');
+    }, 500);
+  });
+  
+  document.getElementById('anonymousMethodBtn')?.addEventListener('click', async () => {
+    showLoadingScreen('Создаём гостевой аккаунт...', 1000);
+    await loginAnonymously();
+    hideLoadingScreen();
+  });
+  
+  // Навигация назад (ИСПРАВЛЕНО)
+  document.getElementById('backToLoginFromRegBtn')?.addEventListener('click', () => {
+    showScreen('loginMethodScreen');
+  });
+  
+  document.getElementById('backFromEmailLoginBtn')?.addEventListener('click', () => {
+    showScreen('loginMethodScreen');
+  });
+  
+  document.getElementById('backToLoginFromVerifyBtn')?.addEventListener('click', () => {
+    showScreen('loginMethodScreen');
+  });
+  
+  document.getElementById('backFromSearchBtn')?.addEventListener('click', () => {
+    showScreen('friendsScreen');
+  });
+  
+  document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => {
+    showScreen('friendsScreen');
+  });
+  
+  document.getElementById('backBtn')?.addEventListener('click', () => {
+    showScreen('friendsScreen');
+  });
+  
+  // Проверяем авторизацию
+  auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    checkAuthAndRedirect();
+  });
+});
 
 // ===== СИСТЕМА ТЕМ =====
 function setTheme(theme, mode) {

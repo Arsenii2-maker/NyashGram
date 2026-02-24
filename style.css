@@ -1339,3 +1339,32 @@ button:active {
   position: relative;
   z-index: 90;
 }
+/* ===== УБИРАЕМ ПУСТОТУ МЕЖДУ ПАНЕЛЯМИ ===== */
+.top-bar {
+  margin-bottom: 0;
+  padding-bottom: 8px;
+}
+
+.tabs-container {
+  margin-top: 0;
+  padding-top: 8px;
+  border-top: none;
+  position: relative;
+  top: -1px; /* Убираем возможный зазор */
+}
+
+/* Убираем отступы у контейнера с контактами */
+.contacts-list {
+  padding-top: 4px;
+}
+
+/* Для мобильных устройств */
+@media (max-width: 480px) {
+  .top-bar {
+    padding-bottom: 6px;
+  }
+  
+  .tabs-container {
+    padding-top: 6px;
+  }
+}

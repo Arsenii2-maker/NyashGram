@@ -1477,3 +1477,24 @@ body.input-focused {
   user-select: none;
   -webkit-user-select: none;
 }
+// Добавьте в style.css
+
+@keyframes contactAppear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-contacts {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-soft);
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

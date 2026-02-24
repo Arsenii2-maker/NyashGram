@@ -1,4 +1,4 @@
-// chat.js — ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С ГОЛОСОВЫМИ
+// chat.js — ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ СО ВСЕМИ ФУНКЦИЯМИ
 
 let currentChat = null;
 let currentChatId = null;
@@ -7,6 +7,10 @@ let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
 let currentDraftChatId = null;
 let isSending = false;
+
+// ===== КАСТОМНЫЕ ИМЕНА И ЗАКРЕПЛЕНИЯ =====
+let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 
 // ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
 let mediaRecorder = null;
@@ -288,7 +292,7 @@ function loadDraft(chatId) {
   currentDraftChatId = chatId;
 }
 
-// ===== ОТКРЫТИЕ ЧАТА =====
+// ===== ОТКРЫТИЕ ЧАТА С БОТОМ =====
 function openBotChat(bot) {
   console.log('Открываем чат с ботом:', bot);
   
@@ -305,7 +309,7 @@ function openBotChat(bot) {
   const usernameEl = document.getElementById('chatContactUsername');
   const avatarEl = document.getElementById('chatAvatar');
   
-  if (nameEl) nameEl.textContent = bot.name;
+  if (nameEl) nameEl.textContent = customNames[bot.id] || bot.name;
   if (usernameEl) usernameEl.textContent = `@${bot.username}`;
   
   if (avatarEl) {
@@ -324,6 +328,60 @@ function openBotChat(bot) {
   
   loadChatHistory(bot.id);
   loadDraft(bot.id);
+  
+  if (typeof window.showScreen === 'function') {
+    window.showScreen('chatScreen');
+  }
+}
+
+async function openFriendChat(friend) {
+  console.log('Открываем чат с другом:', friend);
+  
+  if (messagesListener) messagesListener();
+  if (chatListener) chatListener();
+  
+  saveCurrentDraft();
+  
+  currentChat = friend;
+  currentChatId = friend.id;
+  currentChatType = 'friend';
+  
+  const nameEl = document.getElementById('chatContactName');
+  const usernameEl = document.getElementById('chatContactUsername');
+  const avatarEl = document.getElementById('chatAvatar');
+  
+  if (nameEl) nameEl.textContent = customNames[friend.id] || friend.name;
+  if (usernameEl) usernameEl.textContent = `@${friend.username}`;
+  if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
+  
+  const quickPanel = document.getElementById('quickReplyPanel');
+  if (quickPanel) {
+    quickPanel.style.display = 'none';
+  }
+  
+  if (!friend.chatId) {
+    const chatId = await window.createPrivateChat(window.auth.currentUser.uid, friend.id);
+    friend.chatId = chatId;
+    currentChatId = chatId;
+  } else {
+    currentChatId = friend.chatId;
+  }
+  
+  listenToMessages(currentChatId, (messages) => {
+    renderRealMessages(messages);
+  });
+  
+  listenToChat(currentChatId, (chatData) => {
+    if (chatData.typing) {
+      const isTyping = chatData.typing[friend.id];
+      const typingEl = document.getElementById('typingIndicator');
+      if (typingEl) {
+        typingEl.style.display = isTyping ? 'flex' : 'none';
+      }
+    }
+  });
+  
+  loadDraft(currentChatId);
   
   if (typeof window.showScreen === 'function') {
     window.showScreen('chatScreen');
@@ -358,10 +416,134 @@ function toggleQuickPanel() {
   panel.style.display = quickPanelVisible ? 'flex' : 'none';
 }
 
-// ===== ЗАПИСЬ ГОЛОСА (ИСПРАВЛЕННАЯ) =====
+// ===== ФУНКЦИИ ДЛЯ СОХРАНЕНИЯ ИМЁН И ЗАКРЕПЛЕНИЯ =====
+function saveCustomName(chatId, name) {
+  if (name && name.trim()) {
+    customNames[chatId] = name.trim();
+  } else {
+    delete customNames[chatId];
+  }
+  localStorage.setItem('nyashgram_custom_names', JSON.stringify(customNames));
+  
+  if (typeof window.renderContacts === 'function') {
+    window.renderContacts();
+  }
+}
+
+function togglePinChat() {
+  if (!currentChatId) return;
+  
+  if (pinnedChats.includes(currentChatId)) {
+    pinnedChats = pinnedChats.filter(id => id !== currentChatId);
+    showNotification('📌 чат откреплён');
+  } else {
+    pinnedChats.push(currentChatId);
+    showNotification('📌 чат закреплён');
+  }
+  
+  localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
+  
+  if (typeof window.renderContacts === 'function') {
+    window.renderContacts();
+  }
+}
+
+function showRenameModal() {
+  const modal = document.getElementById('renameModal');
+  const input = document.getElementById('renameInput');
+  if (modal && input && currentChatId) {
+    const nameEl = document.getElementById('chatContactName');
+    input.value = customNames[currentChatId] || (nameEl ? nameEl.textContent : '');
+    modal.style.display = 'flex';
+    setTimeout(() => input.focus(), 100);
+  }
+}
+
+function hideRenameModal() {
+  const modal = document.getElementById('renameModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renameCurrentChat() {
+  const input = document.getElementById('renameInput');
+  if (!input || !currentChatId) return;
+  
+  const newName = input.value.trim();
+  if (newName) {
+    saveCustomName(currentChatId, newName);
+    const nameEl = document.getElementById('chatContactName');
+    if (nameEl) nameEl.textContent = newName;
+    showNotification('✏️ имя изменено');
+  }
+  hideRenameModal();
+}
+
+function deleteChatHistory() {
+  if (!currentChatId) return;
+  
+  if (currentChatType === 'bot') {
+    if (confirm('удалить историю чата с ботом?')) {
+      delete chatMessages[currentChatId];
+      localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
+      const chatArea = document.getElementById('chatArea');
+      if (chatArea) chatArea.innerHTML = '';
+      
+      if (currentChatId && currentChatId.startsWith('nyash')) {
+        const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
+        const el = document.createElement('div');
+        el.className = 'message bot';
+        el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+        if (chatArea) {
+          chatArea.appendChild(el);
+          saveMessage(currentChatId, 'bot', greeting);
+        }
+      }
+      showNotification('🗑️ история удалена');
+    }
+  } else {
+    alert('История сообщений с друзьями хранится в облаке');
+  }
+}
+
+function muteChat() {
+  showNotification('🔇 звук выключен');
+}
+
+// ===== СЛУШАТЕЛИ FIREBASE =====
+function listenToMessages(chatId, callback) {
+  if (messagesListener) messagesListener();
+  
+  messagesListener = window.db.collection('messages')
+    .where('chatId', '==', chatId)
+    .orderBy('timestamp', 'asc')
+    .onSnapshot((snapshot) => {
+      const messages = [];
+      snapshot.forEach(doc => {
+        messages.push({ id: doc.id, ...doc.data() });
+      });
+      callback(messages);
+    }, (error) => {
+      console.error('Ошибка слушателя:', error);
+    });
+  
+  return messagesListener;
+}
+
+function listenToChat(chatId, callback) {
+  if (chatListener) chatListener();
+  
+  chatListener = window.db.collection('chats').doc(chatId)
+    .onSnapshot((doc) => {
+      if (doc.exists) callback(doc.data());
+    });
+  
+  return chatListener;
+}
+
+// ===== ФУНКЦИИ ДЛЯ ГОЛОСА =====
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
@@ -403,16 +585,14 @@ function createWaveformVisualizer(stream) {
 
 function showVoiceRecordingUI() {
   const inputArea = document.querySelector('.message-input-area');
-  const voiceBtn = document.getElementById('voiceRecordBtn');
   const messageInput = document.getElementById('messageInput');
   const sendBtn = document.getElementById('sendMessageBtn');
+  const voiceBtn = document.getElementById('voiceRecordBtn');
   
-  // Скрываем элементы
   messageInput.style.display = 'none';
   sendBtn.style.display = 'none';
   voiceBtn.style.display = 'none';
   
-  // Создаём UI для записи
   const voiceUI = document.createElement('div');
   voiceUI.className = 'voice-recording-ui';
   voiceUI.id = 'voiceRecordingUI';
@@ -427,12 +607,10 @@ function showVoiceRecordingUI() {
   
   inputArea.appendChild(voiceUI);
   
-  // Устанавливаем размер canvas
   const canvas = document.getElementById('voiceWaveform');
   canvas.width = inputArea.clientWidth - 180;
   canvas.height = 50;
   
-  // Запускаем таймер
   recordingTimer = setInterval(() => {
     if (isRecording) {
       const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
@@ -453,7 +631,6 @@ function hideVoiceRecordingUI() {
     recordingTimer = null;
   }
   
-  // Показываем элементы обратно
   document.getElementById('messageInput').style.display = 'block';
   document.getElementById('sendMessageBtn').style.display = 'flex';
   document.getElementById('voiceRecordBtn').style.display = 'flex';
@@ -465,7 +642,6 @@ function showVoicePreviewUI(audioUrl, duration) {
   const sendBtn = document.getElementById('sendMessageBtn');
   const voiceBtn = document.getElementById('voiceRecordBtn');
   
-  // Скрываем элементы
   messageInput.style.display = 'none';
   sendBtn.style.display = 'none';
   voiceBtn.style.display = 'none';
@@ -518,9 +694,7 @@ function showVoicePreviewUI(audioUrl, duration) {
       audioPlayer.addEventListener('ended', () => {
         playBtn.textContent = '▶️';
         progressEl.style.width = '0%';
-        if (durationEl) {
-          durationEl.textContent = formatTime(duration);
-        }
+        durationEl.textContent = formatTime(duration);
       });
     }
   });
@@ -536,7 +710,6 @@ function showVoicePreviewUI(audioUrl, duration) {
       recordedAudioUrl = null;
       document.getElementById('voicePreviewUI').remove();
       
-      // Показываем элементы обратно
       document.getElementById('messageInput').style.display = 'block';
       document.getElementById('sendMessageBtn').style.display = 'flex';
       document.getElementById('voiceRecordBtn').style.display = 'flex';
@@ -548,7 +721,6 @@ function showVoicePreviewUI(audioUrl, duration) {
     recordedAudioUrl = null;
     document.getElementById('voicePreviewUI').remove();
     
-    // Показываем элементы обратно
     document.getElementById('messageInput').style.display = 'block';
     document.getElementById('sendMessageBtn').style.display = 'flex';
     document.getElementById('voiceRecordBtn').style.display = 'flex';
@@ -591,7 +763,6 @@ async function startVoiceRecording() {
       if (recordedDuration > 1) {
         showVoicePreviewUI(recordedAudioUrl, recordedDuration);
       } else {
-        // Слишком короткая запись - показываем обычный интерфейс
         document.getElementById('messageInput').style.display = 'block';
         document.getElementById('sendMessageBtn').style.display = 'flex';
         document.getElementById('voiceRecordBtn').style.display = 'flex';
@@ -627,14 +798,13 @@ function cancelVoiceRecording() {
     hideVoiceRecordingUI();
     document.getElementById('voiceRecordBtn').classList.remove('recording');
     
-    // Показываем элементы обратно
     document.getElementById('messageInput').style.display = 'block';
     document.getElementById('sendMessageBtn').style.display = 'flex';
     document.getElementById('voiceRecordBtn').style.display = 'flex';
   }
 }
 
-// ===== ВОСПРОИЗВЕДЕНИЕ ГОЛОСОВОГО СООБЩЕНИЯ =====
+// ===== ВОСПРОИЗВЕДЕНИЕ ГОЛОСОВОГО =====
 function playVoiceMessage(audioUrl, buttonElement, progressElement, durationElement) {
   console.log('🎵 Воспроизведение:', audioUrl);
   
@@ -643,13 +813,9 @@ function playVoiceMessage(audioUrl, buttonElement, progressElement, durationElem
     audioPlayer = null;
   }
   
-  // Создаём новый аудио элемент
   audioPlayer = new Audio(audioUrl);
-  
-  // Устанавливаем громкость
   audioPlayer.volume = 1.0;
   
-  // Добавляем обработчики событий
   audioPlayer.addEventListener('loadedmetadata', () => {
     console.log('✅ Аудио загружено, длительность:', audioPlayer.duration);
   });
@@ -658,33 +824,29 @@ function playVoiceMessage(audioUrl, buttonElement, progressElement, durationElem
     if (progressElement) {
       const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
       progressElement.style.width = `${progress}%`;
-      console.log('⏯️ Прогресс:', progress.toFixed(1) + '%');
     }
     
     if (durationElement) {
       const current = Math.floor(audioPlayer.currentTime);
       const total = Math.floor(audioPlayer.duration);
-      durationElement.textContent = `${Math.floor(current / 60)}:${(current % 60).toString().padStart(2, '0')} / ${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, '0')}`;
+      durationElement.textContent = `${formatTime(current)} / ${formatTime(total)}`;
     }
   });
   
   audioPlayer.addEventListener('play', () => {
-    console.log('▶️ Воспроизведение началось');
     if (buttonElement) buttonElement.textContent = '⏸️';
   });
   
   audioPlayer.addEventListener('pause', () => {
-    console.log('⏸️ Воспроизведение приостановлено');
     if (buttonElement) buttonElement.textContent = '▶️';
   });
   
   audioPlayer.addEventListener('ended', () => {
-    console.log('⏹️ Воспроизведение завершено');
     if (buttonElement) buttonElement.textContent = '▶️';
     if (progressElement) progressElement.style.width = '0%';
     if (durationElement) {
       const total = Math.floor(audioPlayer.duration);
-      durationElement.textContent = `0:00 / ${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, '0')}`;
+      durationElement.textContent = formatTime(total);
     }
     audioPlayer = null;
   });
@@ -695,15 +857,99 @@ function playVoiceMessage(audioUrl, buttonElement, progressElement, durationElem
     if (buttonElement) buttonElement.textContent = '▶️';
   });
   
-  // Пробуем воспроизвести
-  const playPromise = audioPlayer.play();
+  audioPlayer.play().catch(error => {
+    console.error('❌ Ошибка воспроизведения:', error);
+    alert('❌ Не удалось воспроизвести');
+  });
+}
+
+// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ =====
+function renderRealMessages(messages) {
+  const area = document.getElementById('chatArea');
+  if (!area) return;
   
-  if (playPromise !== undefined) {
-    playPromise.catch(error => {
-      console.error('❌ Ошибка воспроизведения:', error);
-      alert('❌ Не удалось воспроизвести. Возможно, файл повреждён.');
+  area.innerHTML = '';
+  
+  messages.forEach(msg => {
+    const isMe = msg.from === window.auth?.currentUser?.uid;
+    
+    if (msg.type === 'voice') {
+      const el = document.createElement('div');
+      el.className = `message voice ${isMe ? 'user' : 'bot'}`;
+      
+      const time = msg.timestamp?.toDate 
+        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      const duration = msg.duration || 0;
+      const durationStr = formatTime(duration);
+      
+      el.innerHTML = `
+        <div class="voice-message">
+          <button class="voice-play-btn" data-url="${msg.audioUrl}">▶️</button>
+          <div class="voice-timeline">
+            <div class="voice-progress" style="width: 0%"></div>
+          </div>
+          <span class="voice-duration">${durationStr}</span>
+        </div>
+        <span class="message-time">${time}</span>
+      `;
+      
+      area.appendChild(el);
+    } else {
+      const el = document.createElement('div');
+      el.className = `message ${isMe ? 'user' : 'bot'}`;
+      
+      const time = msg.timestamp?.toDate 
+        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      el.innerHTML = `${msg.text}<span class="message-time">${time}</span>`;
+      area.appendChild(el);
+    }
+  });
+  
+  setTimeout(() => {
+    document.querySelectorAll('.voice-play-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const url = btn.dataset.url;
+        const messageEl = btn.closest('.message');
+        const progressEl = messageEl.querySelector('.voice-progress');
+        const durationEl = messageEl.querySelector('.voice-duration');
+        
+        playVoiceMessage(url, btn, progressEl, durationEl);
+      });
     });
+  }, 100);
+  
+  area.scrollTop = area.scrollHeight;
+}
+
+// ===== ЗАГРУЗКА ИСТОРИИ =====
+function loadChatHistory(chatId) {
+  const area = document.getElementById('chatArea');
+  if (!area) return;
+  
+  area.innerHTML = '';
+  
+  if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
+    chatMessages[chatId].forEach(msg => {
+      const el = document.createElement('div');
+      el.className = `message ${msg.type}`;
+      el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
+      area.appendChild(el);
+    });
+  } else if (chatId && chatId.startsWith('nyash')) {
+    const greeting = greetings[chatId] || "привет! давай общаться! 💕";
+    const el = document.createElement('div');
+    el.className = 'message bot';
+    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+    area.appendChild(el);
+    saveMessage(chatId, 'bot', greeting);
   }
+  
+  area.scrollTop = area.scrollHeight;
 }
 
 // ===== ОТПРАВКА СООБЩЕНИЯ =====
@@ -749,32 +995,6 @@ async function sendMessage() {
   }, 500);
 }
 
-// ===== ЗАГРУЗКА ИСТОРИИ =====
-function loadChatHistory(chatId) {
-  const area = document.getElementById('chatArea');
-  if (!area) return;
-  
-  area.innerHTML = '';
-  
-  if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
-    chatMessages[chatId].forEach(msg => {
-      const el = document.createElement('div');
-      el.className = `message ${msg.type}`;
-      el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
-      area.appendChild(el);
-    });
-  } else if (chatId && chatId.startsWith('nyash')) {
-    const greeting = greetings[chatId] || "привет! давай общаться! 💕";
-    const el = document.createElement('div');
-    el.className = 'message bot';
-    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
-    area.appendChild(el);
-    saveMessage(chatId, 'bot', greeting);
-  }
-  
-  area.scrollTop = area.scrollHeight;
-}
-
 // ===== ДЕЙСТВИЯ =====
 function toggleChatActions() {
   const panel = document.getElementById('chatActionsPanel');
@@ -813,6 +1033,51 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleQuickPanelBtn.addEventListener('click', toggleQuickPanel);
   }
   
+  // КНОПКИ ДЕЙСТВИЙ
+  const pinChatActionBtn = document.getElementById('pinChatActionBtn');
+  if (pinChatActionBtn) {
+    pinChatActionBtn.addEventListener('click', () => {
+      togglePinChat();
+      document.getElementById('chatActionsPanel').style.display = 'none';
+    });
+  }
+  
+  const renameChatBtn = document.getElementById('renameChatBtn');
+  if (renameChatBtn) {
+    renameChatBtn.addEventListener('click', () => {
+      showRenameModal();
+      document.getElementById('chatActionsPanel').style.display = 'none';
+    });
+  }
+  
+  const muteChatBtn = document.getElementById('muteChatBtn');
+  if (muteChatBtn) {
+    muteChatBtn.addEventListener('click', () => {
+      muteChat();
+      document.getElementById('chatActionsPanel').style.display = 'none';
+    });
+  }
+  
+  const deleteChatBtn = document.getElementById('deleteChatBtn');
+  if (deleteChatBtn) {
+    deleteChatBtn.addEventListener('click', () => {
+      deleteChatHistory();
+      document.getElementById('chatActionsPanel').style.display = 'none';
+    });
+  }
+  
+  // МОДАЛКА
+  const renameCancelBtn = document.getElementById('renameCancelBtn');
+  if (renameCancelBtn) {
+    renameCancelBtn.addEventListener('click', hideRenameModal);
+  }
+  
+  const renameConfirmBtn = document.getElementById('renameConfirmBtn');
+  if (renameConfirmBtn) {
+    renameConfirmBtn.addEventListener('click', renameCurrentChat);
+  }
+  
+  // ГОЛОС
   const voiceBtn = document.getElementById('voiceRecordBtn');
   if (voiceBtn) {
     voiceBtn.addEventListener('click', (e) => {
@@ -825,7 +1090,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Глобальные обработчики
   document.addEventListener('click', (e) => {
     if (e.target.id === 'stopRecordingBtn') {
       stopVoiceRecording();
@@ -863,4 +1127,5 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   window.openBotChat = openBotChat;
+  window.openFriendChat = openFriendChat;
 });

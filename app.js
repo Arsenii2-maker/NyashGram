@@ -367,47 +367,51 @@ async function sendFriendRequest(toUserId) {
   }
 }
 
-// ПРИНЯТИЕ ЗАПРОСА
+// ===== ПРИНЯТИЕ ЗАПРОСА (ИСПРАВЛЕНО) =====
 async function acceptFriendRequest(fromUserId) {
   if (!auth.currentUser) return { success: false, error: 'не авторизован' };
   
   try {
     console.log('✅ Принимаем заявку от:', fromUserId);
     
-    // Добавляем друга в свой список
+    // 1. Добавляем друга в свой список
     await db.collection('users').doc(auth.currentUser.uid).update({
       friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
     });
     
-    // Добавляем себя в список друга
+    // 2. Добавляем себя в список друга
     await db.collection('users').doc(fromUserId).update({
       friends: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid)
     });
     
-    // Получаем текущие заявки
+    // 3. Получаем свои текущие заявки
     const userRef = db.collection('users').doc(auth.currentUser.uid);
     const userDoc = await userRef.get();
-    const requests = userDoc.data().friendRequests || [];
+    const userData = userDoc.data();
+    const requests = userData.friendRequests || [];
     
-    // Удаляем принятую заявку
+    // 4. Удаляем принятую заявку (фильтруем)
     const updatedRequests = requests.filter(req => req.from !== fromUserId);
     
-    // Обновляем
+    // 5. Обновляем документ
     await userRef.update({
       friendRequests: updatedRequests
     });
     
-    // Создаём чат
+    // 6. Создаём чат
     const chatId = await createPrivateChat(auth.currentUser.uid, fromUserId);
     
-    // Обновляем список друзей
+    // 7. Обновляем список друзей
     if (typeof window.loadFriends === 'function') {
-      window.loadFriends();
+      setTimeout(() => window.loadFriends(), 500);
     }
+    
+    showNotification('✅ друг добавлен!');
     
     return { success: true, chatId };
   } catch (error) {
     console.error('❌ Ошибка принятия запроса:', error);
+    showNotification('❌ ошибка: ' + error.message);
     return { success: false, error: error.message };
   }
 }

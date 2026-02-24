@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NyashGram — говори по-няшному 💗</title>
   
   <!-- Шрифты -->
@@ -19,16 +19,14 @@
   <meta name="apple-mobile-web-app-title" content="NyashGram">
   <meta name="theme-color" content="#ff9acb">
   
-  <!-- Иконки для всех устройств -->
+  <!-- Иконка -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23ff9acb'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white' font-family='Arial'%3E🐾%3C/text%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23ff9acb'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white' font-family='Arial'%3E🐾%3C/text%3E%3C/svg%3E">
   
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- Заполнитель для статус-бара (под цвет темы) -->
-<div class="status-bar-fill"></div>
+
   <!-- ЭКРАН ЗАГРУЗКИ -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="loading-container">
@@ -110,7 +108,6 @@
 
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="friendsScreen" class="screen">
-    <div class="status-bar-placeholder"></div>
     <div class="top-bar">
       <span class="top-title">NyashGram</span>
       <div class="header-buttons">
@@ -130,7 +127,6 @@
 
   <!-- ЭКРАН ПОИСКА ДРУЗЕЙ -->
   <section id="searchFriendsScreen" class="screen">
-    <div class="status-bar-placeholder"></div>
     <div class="top-bar">
       <button id="backFromSearchBtn" class="icon-btn">←</button>
       <span class="top-title">поиск</span>
@@ -144,7 +140,6 @@
 
   <!-- ЭКРАН ЧАТА -->
   <section id="chatScreen" class="screen">
-    <div class="status-bar-placeholder"></div>
     <div class="chat-header">
       <button id="backBtn" class="icon-btn">←</button>
       <div id="chatAvatar" class="avatar"></div>
@@ -174,7 +169,6 @@
 
   <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
-    <div class="status-bar-placeholder"></div>
     <div class="top-bar">
       <button id="backFromSettingsBtn" class="icon-btn">←</button>
       <span class="top-title">настройки</span>

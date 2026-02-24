@@ -19,7 +19,7 @@ let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}
 window.customNames = customNames;
 window.pinnedChats = pinnedChats;
 
-// ===== ЗАГРУЗКА ДРУЗЕЙ ИЗ FIREBASE =====
+// ===== ЗАГРУЗКА ДРУЗЕЙ ИЗ FIREBASE (ИСПРАВЛЕНО) =====
 async function loadFriends() {
   console.log('👥 Загружаем друзей...');
   
@@ -34,6 +34,7 @@ async function loadFriends() {
     
     if (!userData) return;
     
+    console.log('📨 Данные пользователя:', userData);
     console.log('📨 Заявки в базе:', userData.friendRequests);
     
     // Загружаем друзей
@@ -57,6 +58,7 @@ async function loadFriends() {
       
       const requestsData = await Promise.all(
         userData.friendRequests.map(async (req) => {
+          console.log('📨 Обрабатываем заявку:', req);
           const userDoc = await window.db.collection('users').doc(req.from).get();
           return {
             ...req,
@@ -65,6 +67,7 @@ async function loadFriends() {
         })
       );
       friendRequests = requestsData;
+      console.log('📨 Заявки после обработки:', friendRequests);
     } else {
       friendRequests = [];
     }
@@ -77,6 +80,78 @@ async function loadFriends() {
     
   } catch (error) {
     console.error('❌ Ошибка загрузки друзей:', error);
+  }
+}
+
+// ===== ОБНОВЛЕНИЕ БЕЙДЖА =====
+function updateRequestsBadge() {
+  const badge = document.getElementById('requestsBadge');
+  if (badge) {
+    if (friendRequests.length > 0) {
+      badge.textContent = friendRequests.length;
+      badge.style.display = 'inline';
+      console.log('📨 Бейдж обновлён:', friendRequests.length);
+    } else {
+      badge.style.display = 'none';
+      console.log('📨 Бейдж скрыт');
+    }
+  } else {
+    console.error('❌ Элемент requestsBadge не найден');
+  }
+}
+
+// ===== ОТРИСОВКА ЗАЯВОК =====
+function renderRequests(list) {
+  console.log('📨 Рендерим заявки:', friendRequests);
+  
+  if (friendRequests.length > 0) {
+    friendRequests.forEach(request => {
+      console.log('📨 Рендерим заявку:', request);
+      
+      const el = document.createElement('div');
+      el.className = 'contact';
+      
+      el.innerHTML = `
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="info">
+          <div class="name">${request.fromUser?.name || 'пользователь'}</div>
+          <div class="username">@${request.fromUser?.username || 'unknown'}</div>
+        </div>
+        <div class="request-actions">
+          <button class="accept-request" data-id="${request.from}">✅</button>
+          <button class="reject-request" data-id="${request.from}">❌</button>
+        </div>
+      `;
+      
+      el.querySelector('.accept-request')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (typeof window.acceptFriendRequest === 'function') {
+          const result = await window.acceptFriendRequest(request.from);
+          if (result?.success) {
+            loadFriends();
+          }
+        }
+      });
+      
+      el.querySelector('.reject-request')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (typeof window.removeFriendRequest === 'function') {
+          await window.removeFriendRequest(request.from);
+          loadFriends();
+        }
+      });
+      
+      list.appendChild(el);
+    });
+  } else {
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'empty-state';
+    emptyEl.innerHTML = `
+      <div class="empty-icon">📨</div>
+      <h3>нет заявок</h3>
+      <p>когда кто-то захочет добавить тебя, они появятся здесь</p>
+    `;
+    list.appendChild(emptyEl);
   }
 }
 // ===== ЧЕРНОВИКИ =====

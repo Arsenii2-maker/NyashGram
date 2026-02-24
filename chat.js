@@ -1,9 +1,4 @@
 // chat.js — ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С ПОДДЕРЖКОЙ МОБИЛЬНЫХ УСТРОЙСТВ
-
-// ===== ИМПОРТ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ (исправлено!) =====
-let customNames = window.customNames || JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
-let pinnedChats = window.pinnedChats || JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
-
 let currentChat = null;
 let currentChatId = null;
 let currentChatType = null;

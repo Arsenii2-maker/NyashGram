@@ -1,4 +1,4 @@
-// contacts.js — ПОЛНЫЙ С ДРУЗЬЯМИ v3.5
+// contacts.js — ПОЛНЫЙ С ДРУЗЬЯМИ И ПЛАВНЫМ ПОЯВЛЕНИЕМ
 
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp' },
@@ -23,8 +23,8 @@ window.pinnedChats = pinnedChats;
 async function loadFriends() {
   console.log('👥 Загружаем друзей...');
   
-  if (!window.auth || !window.auth.currentUser) {
-    console.log('❌ Нет авторизации');
+  if (!window.auth || !window.auth.currentUser || window.auth.currentUser.isAnonymous) {
+    console.log('❌ Нет авторизации или гость');
     return;
   }
   
@@ -34,40 +34,38 @@ async function loadFriends() {
     
     if (!userData) return;
     
-   // В функции loadFriends, после загрузки друзей:
-if (userData.friends && userData.friends.length > 0) {
-  console.log(`👥 Найдено ${userData.friends.length} друзей`);
-  
-  const friendsData = await Promise.all(
-    userData.friends.map(async (friendId) => {
-      const friendDoc = await window.db.collection('users').doc(friendId).get();
-      return { id: friendDoc.id, ...friendDoc.data() };
-    })
-  );
-  friendsList = friendsData;
-  
-  // Обновляем отображение
-  renderContacts();
-}
-
+    // Загружаем друзей
+    if (userData.friends && userData.friends.length > 0) {
+      console.log(`👥 Найдено ${userData.friends.length} друзей`);
+      
+      const friendsData = await Promise.all(
+        userData.friends.map(async (friendId) => {
+          const friendDoc = await window.db.collection('users').doc(friendId).get();
+          return { id: friendDoc.id, ...friendDoc.data() };
+        })
+      );
+      friendsList = friendsData;
+    } else {
+      friendsList = [];
+    }
     
-   // В функции loadFriends, часть с заявками:
-if (userData.friendRequests && userData.friendRequests.length > 0) {
-  console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
-  
-  const requestsData = await Promise.all(
-    userData.friendRequests.map(async (req) => {
-      const userDoc = await window.db.collection('users').doc(req.from).get();
-      return {
-        ...req,
-        fromUser: { id: userDoc.id, ...userDoc.data() }
-        // timestamp уже обычное число, не serverTimestamp
-      };
-    })
-  );
-  friendRequests = requestsData;
-}
-
+    // Загружаем заявки
+    if (userData.friendRequests && userData.friendRequests.length > 0) {
+      console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
+      
+      const requestsData = await Promise.all(
+        userData.friendRequests.map(async (req) => {
+          const userDoc = await window.db.collection('users').doc(req.from).get();
+          return {
+            ...req,
+            fromUser: { id: userDoc.id, ...userDoc.data() }
+          };
+        })
+      );
+      friendRequests = requestsData;
+    } else {
+      friendRequests = [];
+    }
     
     // Обновляем бейдж
     updateRequestsBadge();
@@ -124,12 +122,22 @@ function updateRequestsBadge() {
 }
 
 // ===== ПЛАВНОЕ ПОЯВЛЕНИЕ КОНТАКТОВ =====
+function animateContacts(container) {
+  const contacts = container.querySelectorAll('.contact');
+  contacts.forEach((contact, index) => {
+    contact.style.animation = `contactAppear 0.3s ease ${index * 0.05}s forwards`;
+    contact.style.opacity = '0';
+    contact.style.transform = 'translateY(10px)';
+  });
+}
+
+// ===== ОТРИСОВКА =====
 function renderContacts() {
   const list = document.getElementById('friendsList');
   if (!list) return;
   
   // Показываем загрузку
-  list.innerHTML = '<div class="loading-contacts">✨ Загружаем контакты...</div>';
+  list.innerHTML = '<div class="loading-contacts">✨ Загрузка контактов...</div>';
   
   // Небольшая задержка для плавности
   setTimeout(() => {
@@ -145,16 +153,10 @@ function renderContacts() {
       renderRequests(list);
     }
     
-    // Добавляем анимацию появления
-    const contacts = list.querySelectorAll('.contact');
-    contacts.forEach((contact, index) => {
-      contact.style.animation = `contactAppear 0.3s ease ${index * 0.05}s forwards`;
-      contact.style.opacity = '0';
-      contact.style.transform = 'translateY(10px)';
-    });
+    // Анимируем появление контактов
+    animateContacts(list);
   }, 200);
 }
-
 
 function renderChats(list) {
   // Секция ботов
@@ -213,7 +215,6 @@ function renderChats(list) {
     
     list.appendChild(el);
   });
-  
   
   // Секция друзей (если есть)
   if (friendsList.length > 0) {
@@ -375,5 +376,5 @@ window.renderContacts = renderContacts;
 window.updateDraft = updateDraft;
 window.getDraft = getDraft;
 window.togglePin = togglePin;
-
-    
+window.friendsList = friendsList;
+window.friendRequests = friendRequests;

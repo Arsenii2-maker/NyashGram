@@ -34,6 +34,8 @@ async function loadFriends() {
     
     if (!userData) return;
     
+    console.log('📨 Заявки в базе:', userData.friendRequests);
+    
     // Загружаем друзей
     if (userData.friends && userData.friends.length > 0) {
       console.log(`👥 Найдено ${userData.friends.length} друзей`);
@@ -77,7 +79,6 @@ async function loadFriends() {
     console.error('❌ Ошибка загрузки друзей:', error);
   }
 }
-
 // ===== ЧЕРНОВИКИ =====
 function updateDraft(contactId, text) {
   if (text && text.trim()) {

@@ -1,4 +1,4 @@
-// chat.js — ПОЛНЫЙ С РЕАЛЬНЫМИ ДРУЗЬЯМИ И ИСПРАВЛЕННОЙ СТРУКТУРОЙ
+// chat.js — ПОЛНЫЙ С ГОЛОСОВЫМИ СООБЩЕНИЯМИ
 
 let currentChat = null;
 let currentChatId = null;
@@ -6,11 +6,19 @@ let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
 let currentDraftChatId = null;
-let isSending = false; // Флаг для предотвращения двойной отправки
+let isSending = false;
 
 // Слушатели Firebase
 let messagesListener = null;
 let chatListener = null;
+
+// ===== ГОЛОСОВЫЕ ПЕРЕМЕННЫЕ =====
+let mediaRecorder = null;
+let audioChunks = [];
+let recordingStartTime = 0;
+let recordingTimer = null;
+let audioPlayer = null;
+const storage = firebase.storage();
 
 // ===== МИЛЫЕ БЫСТРЫЕ ВОПРОСЫ =====
 const quickQuestions = {
@@ -185,7 +193,6 @@ function saveCustomName(chatId, name) {
   else delete window.customNames[chatId];
   localStorage.setItem('nyashgram_custom_names', JSON.stringify(window.customNames));
   
-  // Обновляем в списке контактов
   if (typeof window.renderContacts === 'function') {
     setTimeout(window.renderContacts, 100);
   }
@@ -235,11 +242,9 @@ function loadDraft(chatId) {
 function openBotChat(bot) {
   console.log('Открываем чат с ботом:', bot);
   
-  // Очищаем слушатели
   if (messagesListener) messagesListener();
   if (chatListener) chatListener();
   
-  // Сохраняем черновик предыдущего чата
   saveCurrentDraft();
   
   currentChat = bot;
@@ -261,7 +266,6 @@ function openBotChat(bot) {
     else if (bot.id === 'nyashcook') avatarEl.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
   }
   
-  // Показываем панель быстрых ответов для ботов
   const quickPanel = document.getElementById('quickReplyPanel');
   if (quickPanel) {
     quickPanel.style.display = 'flex';
@@ -280,11 +284,9 @@ function openBotChat(bot) {
 async function openFriendChat(friend) {
   console.log('Открываем чат с другом:', friend);
   
-  // Очищаем слушатели
   if (messagesListener) messagesListener();
   if (chatListener) chatListener();
   
-  // Сохраняем черновик предыдущего чата
   saveCurrentDraft();
   
   currentChat = friend;
@@ -299,13 +301,11 @@ async function openFriendChat(friend) {
   if (usernameEl) usernameEl.textContent = `@${friend.username}`;
   if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
   
-  // Скрываем панель быстрых ответов для друзей
   const quickPanel = document.getElementById('quickReplyPanel');
   if (quickPanel) {
     quickPanel.style.display = 'none';
   }
   
-  // Создаём или получаем чат
   if (!friend.chatId) {
     const chatId = await window.createPrivateChat(window.auth.currentUser.uid, friend.id);
     friend.chatId = chatId;
@@ -314,12 +314,10 @@ async function openFriendChat(friend) {
     currentChatId = friend.chatId;
   }
   
-  // Подписываемся на сообщения
   listenToMessages(currentChatId, (messages) => {
     renderRealMessages(messages);
   });
   
-  // Подписываемся на статус чата
   listenToChat(currentChatId, (chatData) => {
     if (chatData.typing) {
       const isTyping = chatData.typing[friend.id];
@@ -337,7 +335,7 @@ async function openFriendChat(friend) {
   }
 }
 
-// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ =====
+// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ С ГОЛОСОВЫМИ =====
 function renderRealMessages(messages) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -346,15 +344,53 @@ function renderRealMessages(messages) {
   
   messages.forEach(msg => {
     const isMe = msg.from === window.auth?.currentUser?.uid;
-    const el = document.createElement('div');
-    el.className = `message ${isMe ? 'user' : 'bot'}`;
     
-    const time = msg.timestamp?.toDate 
-      ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    el.innerHTML = `${msg.text}<span class="message-time">${time}</span>`;
-    area.appendChild(el);
+    if (msg.type === 'voice') {
+      // Голосовое сообщение
+      const el = document.createElement('div');
+      el.className = `message voice ${isMe ? 'user' : 'bot'}`;
+      
+      const time = msg.timestamp?.toDate 
+        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      el.innerHTML = `
+        <div class="voice-message">
+          <button class="voice-play-btn" data-url="${msg.audioUrl || ''}">▶️</button>
+          <div class="voice-timeline">
+            <div class="voice-progress" style="width: 0%"></div>
+          </div>
+          <span class="voice-duration">${msg.duration || 0}с</span>
+        </div>
+        <span class="message-time">${time}</span>
+      `;
+      
+      setTimeout(() => {
+        const playBtn = el.querySelector('.voice-play-btn');
+        const progressEl = el.querySelector('.voice-progress');
+        const durationEl = el.querySelector('.voice-duration');
+        
+        if (playBtn && msg.audioUrl) {
+          playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playVoiceMessage(msg.audioUrl, playBtn, durationEl, progressEl);
+          });
+        }
+      }, 0);
+      
+      area.appendChild(el);
+    } else {
+      // Текстовое сообщение
+      const el = document.createElement('div');
+      el.className = `message ${isMe ? 'user' : 'bot'}`;
+      
+      const time = msg.timestamp?.toDate 
+        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      el.innerHTML = `${msg.text || ''}<span class="message-time">${time}</span>`;
+      area.appendChild(el);
+    }
   });
   
   area.scrollTop = area.scrollHeight;
@@ -375,14 +411,12 @@ function loadChatHistory(chatId) {
       area.appendChild(el);
     });
   } else if (chatId && chatId.startsWith('nyash')) {
-    // Приветствие для ботов
     const greeting = greetings[chatId] || "привет! давай общаться! 💕";
     const el = document.createElement('div');
     el.className = 'message bot';
     el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
     area.appendChild(el);
     
-    // Сохраняем приветствие
     saveMessage(chatId, 'bot', greeting);
   }
   
@@ -405,7 +439,6 @@ function showQuickReplies(botId) {
       const input = document.getElementById('messageInput');
       if (input) {
         input.value = q;
-        // Не отправляем автоматически, только подставляем
       }
     };
     panel.appendChild(btn);
@@ -424,13 +457,11 @@ async function sendMessage() {
   const input = document.getElementById('messageInput');
   if (!input) return;
   
-  // Защита от двойной отправки
   if (isSending) return;
   
   const text = input.value.trim();
   if (!text || !currentChat) return;
   
-  // Блокируем кнопку отправки
   isSending = true;
   const sendBtn = document.getElementById('sendMessageBtn');
   if (sendBtn) {
@@ -438,39 +469,30 @@ async function sendMessage() {
     sendBtn.style.opacity = '0.5';
   }
   
-  // ОЧЕНЬ ВАЖНО: сразу очищаем поле ввода
   input.value = '';
   
-  // Очищаем черновик
   let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
   delete drafts[currentChatId];
   localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
   
   if (currentChatType === 'friend') {
-    // Отправляем другу через Firebase
     const success = await sendMessageToFriend(currentChatId, text);
     
     if (!success) {
-      // Если ошибка, показываем уведомление
       showNotification('❌ Ошибка отправки');
-      // Возвращаем текст обратно в поле
       input.value = text;
     }
     
-    // Отправляем статус "печатает" (false)
     await setTyping(currentChatId, false);
   } else {
-    // Отправляем боту (локально)
     addMessage(text, 'user', true);
     
-    // Ответ бота
     setTimeout(() => {
       const response = getBotResponse(currentChatId, text);
       addMessage(response, 'bot', true);
     }, 1000);
   }
   
-  // Разблокируем кнопку отправки через небольшую задержку
   setTimeout(() => {
     isSending = false;
     if (sendBtn) {
@@ -480,7 +502,7 @@ async function sendMessage() {
   }, 500);
 }
 
-// ===== ДОБАВЛЕНИЕ СООБЩЕНИЯ (ЛОКАЛЬНО) =====
+// ===== ДОБАВЛЕНИЕ СООБЩЕНИЯ =====
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -552,6 +574,182 @@ function getBotResponse(botId, text) {
   return "💕";
 }
 
+// ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
+
+async function uploadAudio(audioBlob, chatId) {
+  const fileName = `voice_${Date.now()}.webm`;
+  const storageRef = storage.ref(`chats/${chatId}/${fileName}`);
+  
+  showNotification('⏳ загрузка...');
+  
+  try {
+    await storageRef.put(audioBlob);
+    const url = await storageRef.getDownloadURL();
+    return url;
+  } catch (error) {
+    console.error('Ошибка загрузки аудио:', error);
+    showNotification('❌ ошибка загрузки');
+    return null;
+  }
+}
+
+async function startVoiceRecording() {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('❌ Ваш браузер не поддерживает запись голоса');
+      return;
+    }
+    
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    recordingStartTime = Date.now();
+    
+    mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+    
+    mediaRecorder.onstop = async () => {
+      if (recordingTimer) {
+        clearInterval(recordingTimer);
+        recordingTimer = null;
+      }
+      
+      stream.getTracks().forEach(track => track.stop());
+      
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      
+      if (audioBlob.size > 1000) {
+        await sendVoiceMessage(audioBlob);
+      } else {
+        showNotification('❌ запись слишком короткая');
+      }
+      
+      audioChunks = [];
+      const btn = document.getElementById('voiceRecordBtn');
+      if (btn) btn.classList.remove('recording');
+    };
+    
+    mediaRecorder.start();
+    const btn = document.getElementById('voiceRecordBtn');
+    if (btn) btn.classList.add('recording');
+    
+    recordingTimer = setInterval(() => {
+      const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+      if (duration >= 60) {
+        stopVoiceRecording();
+      } else if (duration % 5 === 0) {
+        showNotification(`⏺ запись ${duration}с`);
+      }
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Ошибка доступа к микрофону:', error);
+    
+    if (error.name === 'NotAllowedError') {
+      alert('❌ Нет доступа к микрофону');
+    } else if (error.name === 'NotFoundError') {
+      alert('❌ Микрофон не найден');
+    } else {
+      alert('❌ Ошибка: ' + error.message);
+    }
+  }
+}
+
+function stopVoiceRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    
+    if (recordingTimer) {
+      clearInterval(recordingTimer);
+      recordingTimer = null;
+    }
+  }
+}
+
+async function sendVoiceMessage(audioBlob) {
+  if (!currentChatId) return;
+  
+  const audioUrl = await uploadAudio(audioBlob, currentChatId);
+  if (!audioUrl) return;
+  
+  const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+  
+  if (currentChatType === 'friend') {
+    try {
+      await window.db.collection('messages').add({
+        chatId: currentChatId,
+        from: window.auth.currentUser.uid,
+        type: 'voice',
+        audioUrl: audioUrl,
+        duration: duration,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        readBy: [window.auth.currentUser.uid]
+      });
+      
+      await window.db.collection('chats').doc(currentChatId).update({
+        lastMessage: {
+          text: '🎤 Голосовое сообщение',
+          from: window.auth.currentUser.uid,
+          type: 'voice',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }
+      });
+      
+      showNotification('✅ голосовое отправлено');
+    } catch (error) {
+      console.error('Ошибка отправки:', error);
+      showNotification('❌ ошибка отправки');
+    }
+  } else {
+    addMessage('🎤 Голосовое сообщение (бот не может его прослушать)', 'bot', true);
+  }
+}
+
+function playVoiceMessage(audioUrl, buttonElement, durationElement, progressElement) {
+  if (audioPlayer) {
+    audioPlayer.pause();
+    audioPlayer = null;
+  }
+  
+  audioPlayer = new Audio(audioUrl);
+  
+  audioPlayer.addEventListener('timeupdate', () => {
+    if (progressElement) {
+      const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      progressElement.style.width = `${progress}%`;
+    }
+    
+    if (durationElement) {
+      const current = Math.floor(audioPlayer.currentTime);
+      durationElement.textContent = `${current}с`;
+    }
+  });
+  
+  audioPlayer.addEventListener('ended', () => {
+    buttonElement.textContent = '▶️';
+    if (progressElement) {
+      progressElement.style.width = '0%';
+    }
+    if (durationElement) {
+      durationElement.textContent = `${Math.floor(audioPlayer.duration)}с`;
+    }
+    audioPlayer = null;
+  });
+  
+  audioPlayer.play();
+  buttonElement.textContent = '⏸️';
+}
+
+function showNotification(msg) {
+  const notif = document.createElement('div');
+  notif.className = 'notification';
+  notif.textContent = msg;
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 2000);
+}
+
 // ===== ДЕЙСТВИЯ =====
 function toggleChatActions() {
   const panel = document.getElementById('chatActionsPanel');
@@ -576,7 +774,6 @@ function hideRenameModal() {
   if (modal) modal.style.display = 'none';
 }
 
-// ПЕРЕИМЕНОВАНИЕ ЧАТА (РАБОТАЕТ ВЕЗДЕ)
 function renameCurrentChat() {
   const input = document.getElementById('renameInput');
   if (!input || !currentChatId) return;
@@ -592,7 +789,6 @@ function renameCurrentChat() {
   hideRenameModal();
 }
 
-// ЗАКРЕПЛЕНИЕ ЧАТА
 function togglePinChat() {
   if (!currentChatId) return;
   
@@ -608,13 +804,11 @@ function togglePinChat() {
   
   localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
   
-  // Обновляем отображение в списке контактов
   if (typeof window.renderContacts === 'function') {
     window.renderContacts();
   }
 }
 
-// УДАЛЕНИЕ ИСТОРИИ
 function deleteChatHistory() {
   if (!currentChatId) return;
   
@@ -625,7 +819,6 @@ function deleteChatHistory() {
       const chatArea = document.getElementById('chatArea');
       if (chatArea) chatArea.innerHTML = '';
       
-      // Добавляем новое приветствие
       if (currentChatId && currentChatId.startsWith('nyash')) {
         const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
         const el = document.createElement('div');
@@ -639,156 +832,20 @@ function deleteChatHistory() {
       showNotification('🗑️ история удалена');
     }
   } else {
-    alert('История сообщений с друзьями хранится в облаке и не может быть удалена из этого чата');
+    alert('История сообщений с друзьями хранится в облаке');
   }
 }
 
-function showNotification(msg) {
-  const notif = document.createElement('div');
-  notif.className = 'notification';
-  notif.textContent = msg;
-  document.body.appendChild(notif);
-  setTimeout(() => notif.remove(), 2000);
-}
-
-// ===== ИСПРАВЛЕННЫЙ ОБРАБОТЧИК СВАЙПОВ (ТОЛЬКО В ЧАТЕ) =====
-let touchStartX = 0;
-let touchStartY = 0;
-let isSwiping = false;
-let swipeStartTime = 0;
-
-function handleTouchStart(e) {
-  const activeScreen = document.querySelector('.screen.active');
-  
-  // Свайп работает только на экране чата
-  if (!activeScreen || activeScreen.id !== 'chatScreen') {
-    return;
-  }
-  
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-  swipeStartTime = Date.now();
-  isSwiping = false;
-}
-
-function handleTouchMove(e) {
-  const activeScreen = document.querySelector('.screen.active');
-  
-  // Только на экране чата
-  if (!activeScreen || activeScreen.id !== 'chatScreen') {
-    return;
-  }
-  
-  if (!isSwiping) {
-    // Только от левого края (первые 40px)
-    if (touchStartX < 40) {
-      const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      const diffX = currentX - touchStartX;
-      const diffY = Math.abs(currentY - touchStartY);
-      
-      if (diffX > 10 && diffY < 30) {
-        isSwiping = true;
-        activeScreen.classList.add('swiping');
-        e.preventDefault();
-      }
-    }
-  }
-  
-  if (isSwiping) {
-    e.preventDefault();
-    const currentX = e.touches[0].clientX;
-    const diffX = currentX - touchStartX;
-    
-    if (diffX > 0) {
-      const translateX = Math.min(diffX * 0.5, 100);
-      activeScreen.style.transform = `translateX(${translateX}px)`;
-      activeScreen.style.opacity = 1 - (translateX / 200);
-    }
-  }
-}
-
-function handleTouchEnd(e) {
-  const activeScreen = document.querySelector('.screen.active');
-  
-  // Только на экране чата
-  if (!activeScreen || activeScreen.id !== 'chatScreen') {
-    return;
-  }
-  
-  if (isSwiping) {
-    e.preventDefault();
-    
-    const touchEndX = e.changedTouches[0].clientX;
-    const diffX = touchEndX - touchStartX;
-    const swipeDuration = Date.now() - swipeStartTime;
-    
-    activeScreen.classList.remove('swiping');
-    
-    if (diffX > 80 && swipeDuration < 300) {
-      // Успешный свайп - возвращаем на главный экран
-      activeScreen.classList.add('swipe-right');
-      
-      setTimeout(() => {
-        activeScreen.classList.remove('swipe-right');
-        activeScreen.style.transform = '';
-        activeScreen.style.opacity = '';
-        
-        if (typeof window.showScreen === 'function') {
-          window.showScreen('friendsScreen');
-        }
-      }, 200);
-    } else {
-      // Возвращаем обратно
-      activeScreen.style.transform = '';
-      activeScreen.style.opacity = '';
-      activeScreen.classList.add('swipe-in');
-      
-      setTimeout(() => {
-        activeScreen.classList.remove('swipe-in');
-      }, 300);
-    }
-  }
-  
-  isSwiping = false;
-}
-
-// ===== ОБРАБОТКА ФОКУСА НА ПОЛЕ ВВОДА =====
-function setupInputFocusHandling() {
-  const messageInput = document.getElementById('messageInput');
-  if (!messageInput) return;
-  
-  messageInput.addEventListener('focus', () => {
-    document.body.classList.add('input-focused');
-  });
-  
-  messageInput.addEventListener('blur', () => {
-    document.body.classList.remove('input-focused');
-  });
-}
-
-// ===== ИНИЦИАЛИЗАЦИЯ =====
+// ===== ОБРАБОТЧИКИ СОБЫТИЙ =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔧 chat.js загружен');
-  
-  // Настройка обработки свайпов
-  document.addEventListener('touchstart', handleTouchStart, { passive: true });
-  document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd, { passive: true });
-  
-  // Настройка обработки фокуса на поле ввода
-  setupInputFocusHandling();
   
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      // Сохраняем черновик перед уходом
       saveCurrentDraft();
-      
-      // Очищаем слушатели
       if (messagesListener) messagesListener();
       if (chatListener) chatListener();
-      
       if (typeof window.showScreen === 'function') {
         window.showScreen('friendsScreen');
       }
@@ -868,7 +925,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     messageInput.addEventListener('input', (e) => {
       if (currentChatId) {
-        // Сохраняем черновик
         let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
         if (e.target.value.trim()) {
           drafts[currentChatId] = e.target.value;
@@ -877,322 +933,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
         
-        // Отправляем статус "печатает" другу (только для чатов с друзьями)
         if (currentChatType === 'friend' && currentChatId) {
           setTyping(currentChatId, e.target.value.trim().length > 0);
         }
       }
     });
   }
-  // ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
-
-let mediaRecorder = null;
-let audioChunks = [];
-let recordingStartTime = 0;
-let recordingTimer = null;
-let audioPlayer = null;
-
-// Инициализация Firebase Storage
-const storage = firebase.storage();
-
-// Загрузка аудио в Firebase Storage
-async function uploadAudio(audioBlob, chatId) {
-  const fileName = `voice_${Date.now()}.webm`;
-  const storageRef = storage.ref(`chats/${chatId}/${fileName}`);
   
-  // Показываем уведомление о загрузке
-  showNotification('⏳ загрузка голосового...');
-  
-  try {
-    await storageRef.put(audioBlob);
-    const url = await storageRef.getDownloadURL();
-    return url;
-  } catch (error) {
-    console.error('Ошибка загрузки аудио:', error);
-    showNotification('❌ ошибка загрузки');
-    return null;
-  }
-}
-
-// Начать запись голоса
-async function startVoiceRecording() {
-  try {
-    // Проверяем поддержку
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('❌ Ваш браузер не поддерживает запись голоса');
-      return;
-    }
+  // ===== ОБРАБОТЧИКИ ГОЛОСА =====
+  const voiceBtn = document.getElementById('voiceRecordBtn');
+  if (voiceBtn) {
+    voiceBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      startVoiceRecording();
+    });
     
-    // Запрашиваем доступ к микрофону
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    voiceBtn.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      stopVoiceRecording();
+    });
     
-    // Создаём MediaRecorder
-    mediaRecorder = new MediaRecorder(stream);
-    audioChunks = [];
-    recordingStartTime = Date.now();
-    
-    // Собираем данные
-    mediaRecorder.ondataavailable = event => {
-      audioChunks.push(event.data);
-    };
-    
-    // Когда запись закончена
-    mediaRecorder.onstop = async () => {
-      // Останавливаем таймер
-      if (recordingTimer) {
-        clearInterval(recordingTimer);
-        recordingTimer = null;
-      }
-      
-      // Останавливаем все треки
-      stream.getTracks().forEach(track => track.stop());
-      
-      // Создаём blob
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-      
-      // Отправляем, если запись не слишком короткая
-      if (audioBlob.size > 1000) { // минимум 1KB
-        await sendVoiceMessage(audioBlob);
-      } else {
-        showNotification('❌ запись слишком короткая');
-      }
-      
-      // Очищаем
-      audioChunks = [];
-      document.getElementById('voiceRecordBtn').classList.remove('recording');
-    };
-    
-    // Запускаем запись
-    mediaRecorder.start();
-    document.getElementById('voiceRecordBtn').classList.add('recording');
-    
-    // Показываем длительность записи
-    recordingTimer = setInterval(() => {
-      const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-      if (duration <= 60) {
-        // Можно показывать длительность в уведомлении
-        if (duration % 5 === 0) {
-          showNotification(`⏺ запись ${duration}с`);
-        }
-      } else {
-        // Автоматически останавливаем через 60 секунд
+    voiceBtn.addEventListener('mouseleave', (e) => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
         stopVoiceRecording();
       }
-    }, 1000);
+    });
     
-  } catch (error) {
-    console.error('Ошибка доступа к микрофону:', error);
+    // Для мобильных
+    voiceBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      startVoiceRecording();
+    });
     
-    if (error.name === 'NotAllowedError') {
-      alert('❌ Нет доступа к микрофону. Разрешите доступ в настройках браузера.');
-    } else if (error.name === 'NotFoundError') {
-      alert('❌ Микрофон не найден');
-    } else {
-      alert('❌ Ошибка: ' + error.message);
-    }
-  }
-}
-
-// Остановить запись голоса
-function stopVoiceRecording() {
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
-    
-    // Останавливаем таймер
-    if (recordingTimer) {
-      clearInterval(recordingTimer);
-      recordingTimer = null;
-    }
-  }
-}
-
-// Отправить голосовое сообщение
-async function sendVoiceMessage(audioBlob) {
-  if (!currentChatId) return;
-  
-  // Загружаем в Storage
-  const audioUrl = await uploadAudio(audioBlob, currentChatId);
-  if (!audioUrl) return;
-  
-  const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-  
-  if (currentChatType === 'friend') {
-    // Отправляем другу через Firebase
-    try {
-      await window.db.collection('messages').add({
-        chatId: currentChatId,
-        from: window.auth.currentUser.uid,
-        type: 'voice',
-        audioUrl: audioUrl,
-        duration: duration,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        readBy: [window.auth.currentUser.uid]
-      });
-      
-      await window.db.collection('chats').doc(currentChatId).update({
-        lastMessage: {
-          text: '🎤 Голосовое сообщение',
-          from: window.auth.currentUser.uid,
-          type: 'voice',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }
-      });
-      
-      showNotification('✅ голосовое отправлено');
-    } catch (error) {
-      console.error('Ошибка отправки:', error);
-      showNotification('❌ ошибка отправки');
-    }
-  } else {
-    // Для ботов просто показываем сообщение
-    addMessage('🎤 Голосовое сообщение (бот не может его прослушать)', 'bot', true);
-  }
-}
-
-// Воспроизвести голосовое сообщение
-function playVoiceMessage(audioUrl, buttonElement, durationElement, progressElement) {
-  if (audioPlayer) {
-    audioPlayer.pause();
-    audioPlayer = null;
-  }
-  
-  audioPlayer = new Audio(audioUrl);
-  
-  audioPlayer.addEventListener('timeupdate', () => {
-    if (progressElement) {
-      const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-      progressElement.style.width = `${progress}%`;
-    }
-    
-    if (durationElement) {
-      const current = Math.floor(audioPlayer.currentTime);
-      durationElement.textContent = `${current}с`;
-    }
-  });
-  
-  audioPlayer.addEventListener('ended', () => {
-    buttonElement.textContent = '▶️';
-    if (progressElement) {
-      progressElement.style.width = '0%';
-    }
-    if (durationElement) {
-      durationElement.textContent = '0с';
-    }
-    audioPlayer = null;
-  });
-  
-  audioPlayer.play();
-  buttonElement.textContent = '⏸️';
-}
-
-// Обновлённая функция отрисовки сообщений (добавить в renderRealMessages)
-function renderRealMessages(messages) {
-  const area = document.getElementById('chatArea');
-  if (!area) return;
-  
-  area.innerHTML = '';
-  
-  messages.forEach(msg => {
-    const isMe = msg.from === window.auth?.currentUser?.uid;
-    
-    if (msg.type === 'voice') {
-      // Специальное отображение для голосовых
-      const el = document.createElement('div');
-      el.className = `message voice ${isMe ? 'user' : 'bot'}`;
-      
-      const time = msg.timestamp?.toDate 
-        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      el.innerHTML = `
-        <div class="voice-message">
-          <button class="voice-play-btn" data-url="${msg.audioUrl}">▶️</button>
-          <div class="voice-timeline">
-            <div class="voice-progress" style="width: 0%"></div>
-          </div>
-          <span class="voice-duration">0с</span>
-        </div>
-        <span class="message-time">${time}</span>
-      `;
-      
-      // Добавляем обработчик для кнопки воспроизведения
-      setTimeout(() => {
-        const playBtn = el.querySelector('.voice-play-btn');
-        const progressEl = el.querySelector('.voice-progress');
-        const durationEl = el.querySelector('.voice-duration');
-        
-        playBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const url = playBtn.dataset.url;
-          
-          if (audioPlayer && audioPlayer.src === url && !audioPlayer.paused) {
-            audioPlayer.pause();
-            playBtn.textContent = '▶️';
-          } else {
-            playVoiceMessage(url, playBtn, durationEl, progressEl);
-          }
-        });
-      }, 0);
-      
-      area.appendChild(el);
-    } else {
-      // Обычное текстовое сообщение
-      const el = document.createElement('div');
-      el.className = `message ${isMe ? 'user' : 'bot'}`;
-      
-      const time = msg.timestamp?.toDate 
-        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      el.innerHTML = `${msg.text}<span class="message-time">${time}</span>`;
-      area.appendChild(el);
-    }
-  });
-  
-  area.scrollTop = area.scrollHeight;
-}
-
-// ===== ДОБАВИТЬ ОБРАБОТЧИКИ В ИНИЦИАЛИЗАЦИЮ =====
-
-// Добавьте в конец функции инициализации в chat.js:
-
-const voiceBtn = document.getElementById('voiceRecordBtn');
-if (voiceBtn) {
-  // Для мобильных: touch события
-  voiceBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startVoiceRecording();
-  });
-  
-  voiceBtn.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    stopVoiceRecording();
-  });
-  
-  voiceBtn.addEventListener('touchcancel', (e) => {
-    e.preventDefault();
-    stopVoiceRecording();
-  });
-  
-  // Для ПК: mouse события
-  voiceBtn.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    startVoiceRecording();
-  });
-  
-  voiceBtn.addEventListener('mouseup', (e) => {
-    e.preventDefault();
-    stopVoiceRecording();
-  });
-  
-  voiceBtn.addEventListener('mouseleave', (e) => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
+    voiceBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
       stopVoiceRecording();
-    }
-  });
-}
+    });
+    
+    voiceBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      stopVoiceRecording();
+    });
+  }
   
-  // Экспорт функций
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;
   window.sendMessageToFriend = sendMessageToFriend;

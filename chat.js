@@ -634,6 +634,78 @@ function cancelVoiceRecording() {
   }
 }
 
+// ===== ВОСПРОИЗВЕДЕНИЕ ГОЛОСОВОГО СООБЩЕНИЯ =====
+function playVoiceMessage(audioUrl, buttonElement, progressElement, durationElement) {
+  console.log('🎵 Воспроизведение:', audioUrl);
+  
+  if (audioPlayer) {
+    audioPlayer.pause();
+    audioPlayer = null;
+  }
+  
+  // Создаём новый аудио элемент
+  audioPlayer = new Audio(audioUrl);
+  
+  // Устанавливаем громкость
+  audioPlayer.volume = 1.0;
+  
+  // Добавляем обработчики событий
+  audioPlayer.addEventListener('loadedmetadata', () => {
+    console.log('✅ Аудио загружено, длительность:', audioPlayer.duration);
+  });
+  
+  audioPlayer.addEventListener('timeupdate', () => {
+    if (progressElement) {
+      const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      progressElement.style.width = `${progress}%`;
+      console.log('⏯️ Прогресс:', progress.toFixed(1) + '%');
+    }
+    
+    if (durationElement) {
+      const current = Math.floor(audioPlayer.currentTime);
+      const total = Math.floor(audioPlayer.duration);
+      durationElement.textContent = `${Math.floor(current / 60)}:${(current % 60).toString().padStart(2, '0')} / ${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, '0')}`;
+    }
+  });
+  
+  audioPlayer.addEventListener('play', () => {
+    console.log('▶️ Воспроизведение началось');
+    if (buttonElement) buttonElement.textContent = '⏸️';
+  });
+  
+  audioPlayer.addEventListener('pause', () => {
+    console.log('⏸️ Воспроизведение приостановлено');
+    if (buttonElement) buttonElement.textContent = '▶️';
+  });
+  
+  audioPlayer.addEventListener('ended', () => {
+    console.log('⏹️ Воспроизведение завершено');
+    if (buttonElement) buttonElement.textContent = '▶️';
+    if (progressElement) progressElement.style.width = '0%';
+    if (durationElement) {
+      const total = Math.floor(audioPlayer.duration);
+      durationElement.textContent = `0:00 / ${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, '0')}`;
+    }
+    audioPlayer = null;
+  });
+  
+  audioPlayer.addEventListener('error', (e) => {
+    console.error('❌ Ошибка воспроизведения:', e);
+    alert('❌ Не удалось воспроизвести голосовое сообщение');
+    if (buttonElement) buttonElement.textContent = '▶️';
+  });
+  
+  // Пробуем воспроизвести
+  const playPromise = audioPlayer.play();
+  
+  if (playPromise !== undefined) {
+    playPromise.catch(error => {
+      console.error('❌ Ошибка воспроизведения:', error);
+      alert('❌ Не удалось воспроизвести. Возможно, файл повреждён.');
+    });
+  }
+}
+
 // ===== ОТПРАВКА СООБЩЕНИЯ =====
 async function sendMessage() {
   const input = document.getElementById('messageInput');

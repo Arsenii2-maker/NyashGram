@@ -1285,3 +1285,57 @@ button:active {
     top: 60px;
   }
 }
+/* ===== СТАТУС БАР (ПУСТОЙ, ТОЛЬКО ДЛЯ ОТСТУПА) ===== */
+.status-bar-fill {
+  height: env(safe-area-inset-top, 35px);
+  width: 100%;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+/* Топ бар теперь ниже статус-бара */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 90;
+}
+
+/* Вкладки ниже топ-бара */
+.tabs-container {
+  display: flex;
+  padding: 8px 12px;
+  gap: 6px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 80;
+}
+
+/* Чат-хедер ниже статус-бара */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 90;
+}

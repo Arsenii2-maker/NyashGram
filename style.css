@@ -8,40 +8,6 @@
   -ms-user-select: none;
   user-select: none;
 }
-/* Добавьте в начало файла */
-
-.status-bar-placeholder {
-  height: env(safe-area-inset-top, 0px);
-  width: 100%;
-  background: transparent;
-}
-
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-light);
-  position: relative;
-  z-index: 10;
-}
-
-/* Убедитесь, что в chat-header тоже добавлен этот стиль */
-.chat-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-light);
-  position: relative;
-  z-index: 10;
-}
 
 input, textarea, [contenteditable="true"] {
   -webkit-user-select: text;
@@ -53,10 +19,11 @@ input, textarea, [contenteditable="true"] {
 html, body {
   height: 100%;
   margin: 0;
-  padding: 0;
   font-family: 'Comfortaa', cursive;
   min-height: 100vh;
   transition: background 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -97,6 +64,7 @@ body {
   --input-placeholder: #ffb6c1;
 }
 
+/* Milk Rose - Light */
 .theme-milk-rose.light-mode {
   --bg-start: #ffb6c1;
   --bg-end: #ff9eb5;
@@ -129,6 +97,7 @@ body {
   --input-placeholder: #ffcccc;
 }
 
+/* Night Blue - Light */
 .theme-night-blue.light-mode {
   --bg-start: #d4e0f0;
   --bg-end: #c0d0e8;
@@ -161,6 +130,7 @@ body {
   --input-placeholder: #b0c4de;
 }
 
+/* Lo-Fi Beige - Light */
 .theme-lo-fi-beige.light-mode {
   --bg-start: #f9f5ee;
   --bg-end: #f0e6d9;
@@ -193,6 +163,7 @@ body {
   --input-placeholder: #deb887;
 }
 
+/* Soft Lilac - Light */
 .theme-soft-lilac.light-mode {
   --bg-start: #f5f0ff;
   --bg-end: #e6d9ff;
@@ -225,6 +196,7 @@ body {
   --input-placeholder: #d8bfd8;
 }
 
+/* Forest Mint - Light */
 .theme-forest-mint.light-mode {
   --bg-start: #e0f2e0;
   --bg-end: #c8e6c9;
@@ -275,10 +247,19 @@ body {
   color: var(--text);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  transform: scale(0.98);
 }
 
 .screen.active {
   display: flex;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.screen.swiping {
+  transition: none;
 }
 
 /* Центрирование */
@@ -297,70 +278,127 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 32px;
   border: 1px solid var(--border-light);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 8px 20px rgba(255, 192, 203, 0.3);
   padding: 32px 24px;
   width: 90%;
   max-width: 380px;
-  margin: 0 auto;
   text-align: center;
+  margin: 0 auto;
 }
 
-h1, h2 {
+h1 {
+  font-size: 2.2rem;
   color: var(--text);
   margin-bottom: 8px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
 }
 
-h1 { font-size: 2.2rem; }
-h2 { font-size: 1.8rem; }
+h2 {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 16px;
+}
 
 .subtitle {
   color: var(--text-soft);
   margin-bottom: 24px;
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.9;
 }
 
-input, button {
-  width: 100%;
+/* ===== ПОЛЯ ВВОДА ===== */
+input, select, textarea {
   padding: 14px 16px;
-  border-radius: 40px;
-  border: 2px solid var(--border-light);
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--text);
-  font-family: inherit;
   font-size: 16px;
+  border: 2px solid var(--border-light);
+  border-radius: 40px;
+  background: var(--input-bg);
+  backdrop-filter: blur(5px);
+  font-family: inherit;
+  color: var(--input-text);
+  transition: all 0.2s;
+  width: 100%;
   margin: 8px 0;
-  transition: all 0.2s ease;
 }
 
-input:focus {
+input:focus, select:focus, textarea:focus {
   border-color: var(--accent);
+  background: var(--input-bg);
   outline: none;
-  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(255, 165, 185, 0.2);
 }
 
+input::placeholder {
+  color: var(--input-placeholder);
+  opacity: 0.7;
+}
+
+/* ===== КНОПКИ ===== */
 button {
+  padding: 14px 20px;
+  font-size: 16px;
+  border-radius: 40px;
+  border: 2px solid transparent;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  width: 100%;
+  margin: 8px 0;
   font-weight: 500;
-}
-
-button:hover {
-  transform: scale(1.02);
-  background: rgba(255, 255, 255, 0.25);
 }
 
 button.active {
   background: var(--accent);
   border-color: var(--accent-soft);
-  color: var(--text);
+  color: white;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
+}
+
+button:hover {
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.login-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  padding: 16px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .text-btn {
   background: transparent;
   border: none;
   color: var(--text-soft);
+  margin-top: 8px;
+  font-size: 14px;
+  width: auto;
+  display: inline-block;
 }
 
-/* Топ бар */
+.text-btn:hover {
+  background: transparent;
+  transform: none;
+  color: var(--accent);
+}
+
+/* ===== ТОП БАР ===== */
 .top-bar {
   display: flex;
   align-items: center;
@@ -372,7 +410,7 @@ button.active {
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   width: 100%;
 }
 
@@ -402,6 +440,7 @@ button.active {
   padding: 0;
   margin: 0;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .icon-btn:hover {
@@ -410,7 +449,7 @@ button.active {
   border-color: var(--accent);
 }
 
-/* Вкладки */
+/* ===== ВКЛАДКИ ===== */
 .tabs-container {
   display: flex;
   padding: 8px 12px;
@@ -420,8 +459,9 @@ button.active {
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   position: sticky;
-  top: 60px;
-  z-index: 9;
+  top: 64px;
+  z-index: 90;
+  width: 100%;
 }
 
 .tab-btn {
@@ -443,12 +483,13 @@ button.active {
   border-color: var(--accent);
 }
 
-/* Контакты */
+/* ===== КОНТАКТЫ ===== */
 .contacts-list {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
   -webkit-overflow-scrolling: touch;
+  width: 100%;
 }
 
 .contact {
@@ -458,11 +499,14 @@ button.active {
   padding: 12px;
   background: var(--card-bg);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-radius: 24px;
   margin-bottom: 8px;
   border: 1px solid var(--border-light);
   cursor: pointer;
   transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .contact:hover {
@@ -480,7 +524,9 @@ button.active {
   height: 48px;
   border-radius: 50%;
   border: 2px solid white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   background-size: cover;
+  background-position: center;
   flex-shrink: 0;
 }
 
@@ -495,25 +541,29 @@ button.active {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .username {
   font-size: 11px;
   color: var(--text-soft);
+  margin-top: 2px;
 }
 
 .draft {
   font-size: 11px;
   color: var(--accent);
-  margin-top: 2px;
+  margin-top: 4px;
   font-style: italic;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .draft::before {
   content: "📝 ";
+  opacity: 0.8;
 }
 
 .pin-icon {
@@ -532,7 +582,29 @@ button.active {
   opacity: 0.8;
 }
 
-/* Чат */
+.message-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-light);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.message-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* ===== ЧАТ ===== */
 .chat-header {
   display: flex;
   align-items: center;
@@ -540,10 +612,12 @@ button.active {
   padding: 12px 16px;
   background: var(--card-bg);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
+  width: 100%;
 }
 
 .chat-info {
@@ -554,6 +628,7 @@ button.active {
   font-weight: 600;
   color: var(--text);
   display: block;
+  margin-bottom: 2px;
 }
 
 .chat-username {
@@ -568,8 +643,10 @@ button.active {
   padding: 12px 16px;
   background: var(--card-bg);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   justify-content: center;
+  width: 100%;
 }
 
 .action-btn {
@@ -601,8 +678,9 @@ button.active {
   padding: 12px 16px;
   background: var(--card-bg);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
-  justify-content: center;
+  width: 100%;
 }
 
 .quick-chip {
@@ -632,17 +710,20 @@ button.active {
   flex-direction: column;
   gap: 8px;
   background: var(--card-bg);
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .message {
   max-width: 80%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 18px;
   position: relative;
-  padding-bottom: 18px;
+  padding-bottom: 20px;
   animation: messageSlide 0.25s ease;
   word-wrap: break-word;
   line-height: 1.4;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .message.user {
@@ -660,9 +741,9 @@ button.active {
 }
 
 .message-time {
-  font-size: 8px;
+  font-size: 9px;
   color: var(--text-soft);
-  opacity: 0.6;
+  opacity: 0.7;
   position: absolute;
   bottom: 3px;
   right: 8px;
@@ -674,15 +755,28 @@ button.active {
   padding: 12px 16px;
   background: var(--card-bg);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--border-light);
   position: sticky;
   bottom: 0;
-  z-index: 10;
+  z-index: 100;
+  width: 100%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
 .message-input-area input {
   flex: 1;
   margin: 0;
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 15px;
+  padding: 14px 18px;
+}
+
+.message-input-area input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .send-btn {
@@ -696,17 +790,165 @@ button.active {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
   padding: 0;
   margin: 0;
-  cursor: pointer;
+  flex-shrink: 0;
 }
 
-/* Настройки */
+.send-btn:hover {
+  transform: scale(1.05);
+}
+
+.send-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ===== ИНДИКАТОР ПЕЧАТИ ===== */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: var(--text-soft);
+  border-radius: 50%;
+  display: inline-block;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-8px); }
+}
+
+/* ===== ЭКРАН ЗАГРУЗКИ ===== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.loading-overlay[style*="display: flex"] {
+  opacity: 1;
+}
+
+.loading-container {
+  text-align: center;
+  max-width: 320px;
+  padding: 30px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 48px;
+  border: 2px solid var(--border-light);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.nyash-loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 20px auto;
+}
+
+.loader-circle {
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid var(--accent);
+  border-right: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.loader-paw {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  animation: bounce 1.5s ease infinite;
+}
+
+.tips-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 20px;
+  margin: 20px 0 10px;
+  min-height: 100px;
+  border: 1px solid var(--border-light);
+}
+
+.tip-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 15px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip-counter {
+  font-size: 12px;
+  color: var(--text-soft);
+  text-align: center;
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
+}
+
+.loading-message {
+  font-size: 18px;
+  color: var(--accent);
+  margin: 20px 0;
+}
+
+.loading-contacts {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-soft);
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ===== НАСТРОЙКИ ===== */
 .settings-wrapper {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
   -webkit-overflow-scrolling: touch;
+  width: 100%;
 }
 
 .settings-container {
@@ -715,10 +957,6 @@ button.active {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.settings-section {
-  margin-bottom: 0;
 }
 
 .theme-header {
@@ -793,108 +1031,62 @@ button.active {
   justify-content: center;
   padding: 0;
   margin: 0;
+  transition: all 0.2s ease;
 }
 
-/* Экран загрузки */
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.3s ease;
+.generate-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 
-.loading-container {
-  text-align: center;
-  max-width: 320px;
-  padding: 30px;
-  background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  border-radius: 48px;
-  border: 2px solid var(--border-light);
+.generate-btn:active {
+  transform: scale(0.95);
 }
 
-.nyash-loader {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  margin: 20px auto;
-}
-
-.loader-circle {
-  width: 80px;
-  height: 80px;
-  border: 4px solid rgba(255, 255, 255, 0.2);
-  border-top: 4px solid var(--accent);
-  border-right: 4px solid var(--accent);
-  border-radius: 50%;
-  animation: spin 1.5s infinite;
-}
-
-.loader-paw {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 30px;
-  animation: bounce 1.5s infinite;
-}
-
-.tips-container {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 20px;
-  margin: 20px 0 10px;
-  min-height: 100px;
-}
-
-.tip-text {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: 15px;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tip-counter {
-  font-size: 12px;
+.profile-email {
+  font-size: 13px;
   color: var(--text-soft);
-  border-top: 1px solid var(--border-light);
-  padding-top: 12px;
+  margin-bottom: 8px;
+  word-break: break-all;
 }
 
-/* Модалка */
+/* ===== МОДАЛКА ===== */
 .modal {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
   background: var(--card-bg);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 32px;
   padding: 24px;
   width: 85%;
   max-width: 320px;
   border: 2px solid var(--border-light);
+  animation: scaleIn 0.3s ease;
 }
 
 .modal-content h3 {
   margin-bottom: 16px;
   color: var(--text);
   text-align: center;
+}
+
+.modal-content input {
+  margin-bottom: 16px;
 }
 
 .modal-buttons {
@@ -910,9 +1102,10 @@ button.active {
 .modal-buttons button:last-child {
   background: var(--accent);
   color: white;
+  border-color: var(--accent-soft);
 }
 
-/* Пустое состояние */
+/* ===== ПУСТОЕ СОСТОЯНИЕ ===== */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -922,12 +1115,13 @@ button.active {
 .empty-icon {
   font-size: 64px;
   margin-bottom: 20px;
-  animation: float 3s infinite;
+  animation: float 3s ease-in-out infinite;
 }
 
 .empty-state h3 {
   margin-bottom: 10px;
   color: var(--text);
+  font-size: 1.2rem;
 }
 
 .empty-state p {
@@ -946,7 +1140,7 @@ button.active {
   cursor: pointer;
 }
 
-/* Уведомления */
+/* ===== УВЕДОМЛЕНИЯ ===== */
 .notification {
   position: fixed;
   top: 20px;
@@ -960,210 +1154,11 @@ button.active {
   color: var(--text);
   z-index: 10000;
   font-size: 14px;
-  animation: slideDown 0.3s ease, fadeOut 0.3s ease 2s forwards;
-}
-
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px);
-  }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes bounce {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -60%) scale(1.1); }
-}
-
-@keyframes messageSlide {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-/* Скроллбар */
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-}
-
-/* Медиа-запросы */
-@media (max-width: 480px) {
-  h1 { font-size: 2rem; }
-  .top-title { font-size: 1.2rem; }
-  .glass-container { padding: 24px 16px; }
-  .contact { padding: 10px; }
-  .avatar { width: 44px; height: 44px; }
-  .message { max-width: 85%; font-size: 14px; }
-  .quick-chip { font-size: 11px; padding: 6px 12px; }
-}
-/* ===== ИСПРАВЛЕНИЯ ДЛЯ ЧАТА ===== */
-
-/* Запрет горизонтального скролла */
-html, body {
-  overflow-x: hidden;
-  max-width: 100%;
-}
-
-.screen {
-  overflow-x: hidden;
-  max-width: 100vw;
-}
-
-#chatArea, .messages-area {
-  overflow-x: hidden;
-  word-wrap: break-word;
-  word-break: break-word;
-  max-width: 100%;
-}
-
-.message {
-  max-width: 80%;
-  word-wrap: break-word;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-/* ===== ВЕРХНЯЯ ПАНЕЛЬ (СТАТУС БАР) ===== */
-.status-bar-fill {
-  height: env(safe-area-inset-top, 0px);
-  width: 100%;
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-  position: relative;
-  z-index: 20;
-}
-
-.top-bar {
-  position: relative;
-  z-index: 10;
-  margin-top: 0;
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* ===== ПЛАВНОЕ ПОДНЯТИЕ ПРИ ФОКУСЕ ===== */
-body.input-focused .message-input-area {
-  transform: translateY(0);
-  transition: transform 0.3s ease;
-}
-
-.message-input-area {
-  transition: transform 0.3s ease, bottom 0.3s ease;
-  position: sticky;
-  bottom: 0;
-  z-index: 15;
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Для мобильных устройств */
-@media (max-width: 768px) {
-  body.input-focused .message-input-area {
-    transform: translateY(0);
-  }
-  
-  /* Убираем лишнее пространство снизу */
-  body.input-focused {
-    padding-bottom: 0;
-  }
-}
-
-/* ===== АНИМАЦИЯ ПРИ СВАЙПЕ ===== */
-.screen {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.swiping-right {
-  transform: translateX(30%);
-  opacity: 0.7;
-}
-
-/* ===== ФИКСИРОВАННАЯ ШИРИНА ДЛЯ ДЛИННЫХ СЛОВ ===== */
-.message {
-  max-width: 80%;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  hyphens: auto;
-}
-
-/* Длинные ссылки и слова */
-.message a, .message .long-word {
-  word-break: break-all;
-}
-
-/* ===== УЛУЧШЕНИЯ ДЛЯ КНОПОК ===== */
-#sendMessageBtn:disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* ===== СТИЛИ ДЛЯ ЗАКРЕПЛЁННЫХ ЧАТОВ ===== */
-.contact.pinned {
-  border-left: 4px solid var(--accent);
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.pin-icon {
-  font-size: 14px;
-  color: var(--accent);
-  margin-left: 4px;
-}
-
-/* ===== СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ ===== */
-.notification {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  padding: 12px 24px;
-  border-radius: 40px;
-  border: 2px solid var(--accent);
-  color: var(--text);
-  z-index: 10000;
-  font-size: 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  animation: slideDown 0.3s ease, fadeOut 0.3s ease 2s forwards;
   white-space: nowrap;
   max-width: 90%;
   overflow: hidden;
   text-overflow: ellipsis;
+  animation: slideDown 0.3s ease, fadeOut 0.3s ease 2s forwards;
 }
 
 @keyframes slideDown {
@@ -1184,300 +1179,48 @@ body.input-focused .message-input-area {
   }
 }
 
-/* ===== СТАТУС БАР ПОД ТЕМУ ===== */
-.status-bar-fill {
-  height: env(safe-area-inset-top, 0px);
-  width: 100%;
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
+/* ===== АНИМАЦИИ ===== */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Для устройств с вырезом (notch) */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .status-bar-fill {
-    height: env(safe-area-inset-top);
+@keyframes bounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -60%) scale(1.1); }
+}
+
+@keyframes messageSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-}
-
-/* ===== УЛУЧШЕННАЯ ПРОКРУТКА ===== */
-.chat-area, #chatArea, .messages-area {
-  scroll-behavior: smooth;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ===== ФИКСЫ ДЛЯ РАЗНЫХ БРАУЗЕРОВ ===== */
-input, textarea {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: 40px;
-}
-
-/* ===== СТИЛИ ДЛЯ ПЕЧАТАЮЩЕГО ИНДИКАТОРА ===== */
-.typing-indicator {
-  display: flex;
-  gap: 4px;
-  padding: 12px 16px;
-  justify-content: center;
-  align-items: center;
-}
-
-.typing-indicator span {
-  width: 8px;
-  height: 8px;
-  background: var(--text-soft);
-  border-radius: 50%;
-  display: inline-block;
-  animation: typingBounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(1) { animation-delay: 0s; }
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-8px); }
-}
-
-/* ===== СТИЛИ ДЛЯ СТАТУСА ОНЛАЙН ===== */
-.online-dot {
-  color: #4caf50;
-  font-size: 14px;
-  margin-left: 4px;
-  display: inline-block;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-/* ===== ИСПРАВЛЕНИЕ КНОПКИ 💬 ===== */
-.message-btn {
-  width: 32px !important;
-  height: 32px !important;
-  font-size: 14px !important;
-  min-width: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid var(--border-light);
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0 0 0 4px;
-  flex-shrink: 0;
-}
-
-/* ===== ВЕРХНЯЯ ПАНЕЛЬ (СТАТУС БАР) ===== */
-body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-}
-
-.status-bar-fill {
-  height: env(safe-area-inset-top, 20px);
-  width: 100%;
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.top-bar {
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-light);
-  position: sticky;
-  top: env(safe-area-inset-top, 20px);
-  z-index: 90;
-}
-
-/* ===== ПЛАВНОЕ ПОДНЯТИЕ ПРИ ФОКУСЕ ===== */
-.message-input-area {
-  position: sticky;
-  bottom: 0;
-  z-index: 50;
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid var(--border-light);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 12px 16px;
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-body.input-focused .message-input-area {
-  transform: translateY(0);
-}
-
-/* Убираем белую полосу над клавиатурой */
-body.input-focused {
-  background: linear-gradient(145deg, var(--bg-start), var(--bg-end));
-}
-
-/* Для мобильных устройств */
-@media (max-width: 768px) {
-  .message-input-area {
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
-  }
-}
-
-/* ===== АНИМАЦИЯ СВАЙПА ===== */
-.screen {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-  will-change: transform;
-}
-
-.screen.swiping {
-  transition: none;
-}
-
-.screen.swipe-left {
-  transform: translateX(-30%);
-  opacity: 0.7;
-}
-
-.screen.swipe-right {
-  transform: translateX(30%);
-  opacity: 0.7;
-}
-
-/* ===== УЛУЧШЕНИЯ ДЛЯ ЧАТА ===== */
-.chat-area, #chatArea {
-  scroll-behavior: smooth;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding: 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.message {
-  max-width: 75%;
-  padding: 10px 14px;
-  border-radius: 18px;
-  position: relative;
-  animation: messageSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  word-wrap: break-word;
-  line-height: 1.4;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.message.user {
-  align-self: flex-end;
-  background: var(--bubble-user);
-  border-bottom-right-radius: 4px;
-  color: var(--text);
-}
-
-.message.bot {
-  align-self: flex-start;
-  background: var(--bubble-bot);
-  border-bottom-left-radius: 4px;
-  color: var(--text);
-}
-
-.message-time {
-  font-size: 9px;
-  color: var(--text-soft);
-  opacity: 0.7;
-  display: block;
-  text-align: right;
-  margin-top: 4px;
-  letter-spacing: -0.2px;
-}
-
-/* ===== УЛУЧШЕННАЯ АНИМАЦИЯ СВАЙПА ===== */
-@keyframes swipeOut {
-  0% {
-    transform: translateX(0);
+  to {
     opacity: 1;
-  }
-  100% {
-    transform: translateX(30%);
-    opacity: 0.7;
+    transform: translateY(0);
   }
 }
 
-@keyframes swipeIn {
-  0% {
-    transform: translateX(30%);
-    opacity: 0.7;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
-  100% {
-    transform: translateX(0);
+  to {
     opacity: 1;
+    transform: scale(1);
   }
 }
 
-.swipe-out {
-  animation: swipeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
-
-.swipe-in {
-  animation: swipeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-/* ===== ИСПРАВЛЕНИЕ ДЛЯ СВАЙПОВ ===== */
-.screen {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-  will-change: transform, opacity;
-  position: relative;
-  z-index: 1;
-}
-
-.screen.swiping {
-  transition: none; /* Убираем анимацию во время свайпа */
-}
-
-.screen.swipe-right {
-  animation: swipeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.screen.swipe-in {
-  animation: swipeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes swipeOut {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(30%);
-    opacity: 0.7;
-  }
-}
-
-@keyframes swipeIn {
-  0% {
-    transform: translateX(30%);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Запрещаем выделение при свайпе */
-.screen * {
-  user-select: none;
-  -webkit-user-select: none;
-}
-// Добавьте в style.css
 
 @keyframes contactAppear {
   to {
@@ -1486,15 +1229,59 @@ body.input-focused {
   }
 }
 
-.loading-contacts {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-soft);
-  font-size: 14px;
-  animation: pulse 1.5s infinite;
+@keyframes swipeOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(30%);
+    opacity: 0.7;
+  }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+@keyframes swipeIn {
+  0% {
+    transform: translateX(30%);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ===== СКРОЛЛБАР ===== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== МЕДИА-ЗАПРОСЫ ===== */
+@media (max-width: 480px) {
+  h1 { font-size: 2rem; }
+  .top-title { font-size: 1.2rem; }
+  .glass-container { padding: 24px 16px; }
+  .contact { padding: 10px; }
+  .avatar { width: 44px; height: 44px; }
+  .message { max-width: 85%; font-size: 14px; }
+  .quick-chip { font-size: 11px; padding: 6px 12px; }
+  .theme-btn, .font-btn { font-size: 11px; padding: 8px; }
+  
+  .tabs-container {
+    top: 60px;
+  }
 }

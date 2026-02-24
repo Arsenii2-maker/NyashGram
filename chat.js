@@ -8,9 +8,6 @@ let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') ||
 let currentDraftChatId = null;
 let isSending = false;
 
-// ===== КАСТОМНЫЕ ИМЕНА И ЗАКРЕПЛЕНИЯ =====
-let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
-let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 
 // ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
 let mediaRecorder = null;

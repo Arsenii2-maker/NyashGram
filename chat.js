@@ -884,6 +884,313 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  // ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
+
+let mediaRecorder = null;
+let audioChunks = [];
+let recordingStartTime = 0;
+let recordingTimer = null;
+let audioPlayer = null;
+
+// Инициализация Firebase Storage
+const storage = firebase.storage();
+
+// Загрузка аудио в Firebase Storage
+async function uploadAudio(audioBlob, chatId) {
+  const fileName = `voice_${Date.now()}.webm`;
+  const storageRef = storage.ref(`chats/${chatId}/${fileName}`);
+  
+  // Показываем уведомление о загрузке
+  showNotification('⏳ загрузка голосового...');
+  
+  try {
+    await storageRef.put(audioBlob);
+    const url = await storageRef.getDownloadURL();
+    return url;
+  } catch (error) {
+    console.error('Ошибка загрузки аудио:', error);
+    showNotification('❌ ошибка загрузки');
+    return null;
+  }
+}
+
+// Начать запись голоса
+async function startVoiceRecording() {
+  try {
+    // Проверяем поддержку
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('❌ Ваш браузер не поддерживает запись голоса');
+      return;
+    }
+    
+    // Запрашиваем доступ к микрофону
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    // Создаём MediaRecorder
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    recordingStartTime = Date.now();
+    
+    // Собираем данные
+    mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+    
+    // Когда запись закончена
+    mediaRecorder.onstop = async () => {
+      // Останавливаем таймер
+      if (recordingTimer) {
+        clearInterval(recordingTimer);
+        recordingTimer = null;
+      }
+      
+      // Останавливаем все треки
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Создаём blob
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      
+      // Отправляем, если запись не слишком короткая
+      if (audioBlob.size > 1000) { // минимум 1KB
+        await sendVoiceMessage(audioBlob);
+      } else {
+        showNotification('❌ запись слишком короткая');
+      }
+      
+      // Очищаем
+      audioChunks = [];
+      document.getElementById('voiceRecordBtn').classList.remove('recording');
+    };
+    
+    // Запускаем запись
+    mediaRecorder.start();
+    document.getElementById('voiceRecordBtn').classList.add('recording');
+    
+    // Показываем длительность записи
+    recordingTimer = setInterval(() => {
+      const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+      if (duration <= 60) {
+        // Можно показывать длительность в уведомлении
+        if (duration % 5 === 0) {
+          showNotification(`⏺ запись ${duration}с`);
+        }
+      } else {
+        // Автоматически останавливаем через 60 секунд
+        stopVoiceRecording();
+      }
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Ошибка доступа к микрофону:', error);
+    
+    if (error.name === 'NotAllowedError') {
+      alert('❌ Нет доступа к микрофону. Разрешите доступ в настройках браузера.');
+    } else if (error.name === 'NotFoundError') {
+      alert('❌ Микрофон не найден');
+    } else {
+      alert('❌ Ошибка: ' + error.message);
+    }
+  }
+}
+
+// Остановить запись голоса
+function stopVoiceRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    
+    // Останавливаем таймер
+    if (recordingTimer) {
+      clearInterval(recordingTimer);
+      recordingTimer = null;
+    }
+  }
+}
+
+// Отправить голосовое сообщение
+async function sendVoiceMessage(audioBlob) {
+  if (!currentChatId) return;
+  
+  // Загружаем в Storage
+  const audioUrl = await uploadAudio(audioBlob, currentChatId);
+  if (!audioUrl) return;
+  
+  const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+  
+  if (currentChatType === 'friend') {
+    // Отправляем другу через Firebase
+    try {
+      await window.db.collection('messages').add({
+        chatId: currentChatId,
+        from: window.auth.currentUser.uid,
+        type: 'voice',
+        audioUrl: audioUrl,
+        duration: duration,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        readBy: [window.auth.currentUser.uid]
+      });
+      
+      await window.db.collection('chats').doc(currentChatId).update({
+        lastMessage: {
+          text: '🎤 Голосовое сообщение',
+          from: window.auth.currentUser.uid,
+          type: 'voice',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }
+      });
+      
+      showNotification('✅ голосовое отправлено');
+    } catch (error) {
+      console.error('Ошибка отправки:', error);
+      showNotification('❌ ошибка отправки');
+    }
+  } else {
+    // Для ботов просто показываем сообщение
+    addMessage('🎤 Голосовое сообщение (бот не может его прослушать)', 'bot', true);
+  }
+}
+
+// Воспроизвести голосовое сообщение
+function playVoiceMessage(audioUrl, buttonElement, durationElement, progressElement) {
+  if (audioPlayer) {
+    audioPlayer.pause();
+    audioPlayer = null;
+  }
+  
+  audioPlayer = new Audio(audioUrl);
+  
+  audioPlayer.addEventListener('timeupdate', () => {
+    if (progressElement) {
+      const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      progressElement.style.width = `${progress}%`;
+    }
+    
+    if (durationElement) {
+      const current = Math.floor(audioPlayer.currentTime);
+      durationElement.textContent = `${current}с`;
+    }
+  });
+  
+  audioPlayer.addEventListener('ended', () => {
+    buttonElement.textContent = '▶️';
+    if (progressElement) {
+      progressElement.style.width = '0%';
+    }
+    if (durationElement) {
+      durationElement.textContent = '0с';
+    }
+    audioPlayer = null;
+  });
+  
+  audioPlayer.play();
+  buttonElement.textContent = '⏸️';
+}
+
+// Обновлённая функция отрисовки сообщений (добавить в renderRealMessages)
+function renderRealMessages(messages) {
+  const area = document.getElementById('chatArea');
+  if (!area) return;
+  
+  area.innerHTML = '';
+  
+  messages.forEach(msg => {
+    const isMe = msg.from === window.auth?.currentUser?.uid;
+    
+    if (msg.type === 'voice') {
+      // Специальное отображение для голосовых
+      const el = document.createElement('div');
+      el.className = `message voice ${isMe ? 'user' : 'bot'}`;
+      
+      const time = msg.timestamp?.toDate 
+        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      el.innerHTML = `
+        <div class="voice-message">
+          <button class="voice-play-btn" data-url="${msg.audioUrl}">▶️</button>
+          <div class="voice-timeline">
+            <div class="voice-progress" style="width: 0%"></div>
+          </div>
+          <span class="voice-duration">0с</span>
+        </div>
+        <span class="message-time">${time}</span>
+      `;
+      
+      // Добавляем обработчик для кнопки воспроизведения
+      setTimeout(() => {
+        const playBtn = el.querySelector('.voice-play-btn');
+        const progressEl = el.querySelector('.voice-progress');
+        const durationEl = el.querySelector('.voice-duration');
+        
+        playBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const url = playBtn.dataset.url;
+          
+          if (audioPlayer && audioPlayer.src === url && !audioPlayer.paused) {
+            audioPlayer.pause();
+            playBtn.textContent = '▶️';
+          } else {
+            playVoiceMessage(url, playBtn, durationEl, progressEl);
+          }
+        });
+      }, 0);
+      
+      area.appendChild(el);
+    } else {
+      // Обычное текстовое сообщение
+      const el = document.createElement('div');
+      el.className = `message ${isMe ? 'user' : 'bot'}`;
+      
+      const time = msg.timestamp?.toDate 
+        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      el.innerHTML = `${msg.text}<span class="message-time">${time}</span>`;
+      area.appendChild(el);
+    }
+  });
+  
+  area.scrollTop = area.scrollHeight;
+}
+
+// ===== ДОБАВИТЬ ОБРАБОТЧИКИ В ИНИЦИАЛИЗАЦИЮ =====
+
+// Добавьте в конец функции инициализации в chat.js:
+
+const voiceBtn = document.getElementById('voiceRecordBtn');
+if (voiceBtn) {
+  // Для мобильных: touch события
+  voiceBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startVoiceRecording();
+  });
+  
+  voiceBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    stopVoiceRecording();
+  });
+  
+  voiceBtn.addEventListener('touchcancel', (e) => {
+    e.preventDefault();
+    stopVoiceRecording();
+  });
+  
+  // Для ПК: mouse события
+  voiceBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    startVoiceRecording();
+  });
+  
+  voiceBtn.addEventListener('mouseup', (e) => {
+    e.preventDefault();
+    stopVoiceRecording();
+  });
+  
+  voiceBtn.addEventListener('mouseleave', (e) => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      stopVoiceRecording();
+    }
+  });
+}
   
   // Экспорт функций
   window.openBotChat = openBotChat;

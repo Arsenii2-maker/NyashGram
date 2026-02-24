@@ -151,7 +151,6 @@ async function sendVoiceMessageToFriend(chatId, audioBlob, duration) {
   if (!window.auth?.currentUser || !audioBlob) return false;
   
   try {
-    // Загружаем в Firebase Storage
     const fileName = `voice_${Date.now()}.webm`;
     const storageRef = firebase.storage().ref(`chats/${chatId}/${fileName}`);
     await storageRef.put(audioBlob);
@@ -360,6 +359,12 @@ function toggleQuickPanel() {
 }
 
 // ===== ЗАПИСЬ ГОЛОСА (ИСПРАВЛЕННАЯ) =====
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 function createWaveformVisualizer(stream) {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioContext.createAnalyser();
@@ -378,8 +383,7 @@ function createWaveformVisualizer(stream) {
     animationFrame = requestAnimationFrame(draw);
     analyser.getByteFrequencyData(dataArray);
     
-    canvasCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
     
     const barWidth = (canvas.width / bufferLength) * 2.5;
     let x = 0;
@@ -400,10 +404,12 @@ function createWaveformVisualizer(stream) {
 function showVoiceRecordingUI() {
   const inputArea = document.querySelector('.message-input-area');
   const voiceBtn = document.getElementById('voiceRecordBtn');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendMessageBtn');
   
-  // Скрываем поле ввода и кнопку отправки
-  document.getElementById('messageInput').style.display = 'none';
-  document.getElementById('sendMessageBtn').style.display = 'none';
+  // Скрываем элементы
+  messageInput.style.display = 'none';
+  sendBtn.style.display = 'none';
   voiceBtn.style.display = 'none';
   
   // Создаём UI для записи
@@ -423,15 +429,31 @@ function showVoiceRecordingUI() {
   
   // Устанавливаем размер canvas
   const canvas = document.getElementById('voiceWaveform');
-  canvas.width = inputArea.clientWidth - 120;
+  canvas.width = inputArea.clientWidth - 180;
   canvas.height = 50;
+  
+  // Запускаем таймер
+  recordingTimer = setInterval(() => {
+    if (isRecording) {
+      const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+      const timerEl = document.getElementById('voiceTimer');
+      if (timerEl) {
+        timerEl.textContent = formatTime(duration);
+      }
+    }
+  }, 100);
 }
 
 function hideVoiceRecordingUI() {
   const voiceUI = document.getElementById('voiceRecordingUI');
   if (voiceUI) voiceUI.remove();
   
-  // Показываем поле ввода и кнопки обратно
+  if (recordingTimer) {
+    clearInterval(recordingTimer);
+    recordingTimer = null;
+  }
+  
+  // Показываем элементы обратно
   document.getElementById('messageInput').style.display = 'block';
   document.getElementById('sendMessageBtn').style.display = 'flex';
   document.getElementById('voiceRecordBtn').style.display = 'flex';
@@ -439,6 +461,14 @@ function hideVoiceRecordingUI() {
 
 function showVoicePreviewUI(audioUrl, duration) {
   const inputArea = document.querySelector('.message-input-area');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendMessageBtn');
+  const voiceBtn = document.getElementById('voiceRecordBtn');
+  
+  // Скрываем элементы
+  messageInput.style.display = 'none';
+  sendBtn.style.display = 'none';
+  voiceBtn.style.display = 'none';
   
   const previewUI = document.createElement('div');
   previewUI.className = 'voice-preview-ui';
@@ -447,9 +477,9 @@ function showVoicePreviewUI(audioUrl, duration) {
     <div class="voice-preview">
       <button id="playPreviewBtn" class="voice-play-btn">▶️</button>
       <div class="voice-timeline-preview">
-        <div class="voice-progress-preview" style="width: 0%"></div>
+        <div class="voice-progress-preview" id="voiceProgressPreview" style="width: 0%"></div>
       </div>
-      <span class="voice-duration-preview">${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}</span>
+      <span class="voice-duration-preview" id="previewDuration">${formatTime(duration)}</span>
       <button id="sendVoiceBtn" class="voice-send-btn">📤</button>
       <button id="deleteVoiceBtn" class="voice-delete-btn">🗑️</button>
     </div>
@@ -457,23 +487,45 @@ function showVoicePreviewUI(audioUrl, duration) {
   
   inputArea.appendChild(previewUI);
   
-  document.getElementById('playPreviewBtn').addEventListener('click', () => {
+  let playBtn = document.getElementById('playPreviewBtn');
+  let sendVoiceBtn = document.getElementById('sendVoiceBtn');
+  let deleteVoiceBtn = document.getElementById('deleteVoiceBtn');
+  let progressEl = document.getElementById('voiceProgressPreview');
+  let durationEl = document.getElementById('previewDuration');
+  
+  playBtn.addEventListener('click', () => {
     if (audioPlayer && audioPlayer.src === audioUrl && !audioPlayer.paused) {
       audioPlayer.pause();
-      document.getElementById('playPreviewBtn').textContent = '▶️';
+      playBtn.textContent = '▶️';
     } else {
       if (audioPlayer) audioPlayer.pause();
       audioPlayer = new Audio(audioUrl);
       audioPlayer.play();
-      document.getElementById('playPreviewBtn').textContent = '⏸️';
+      playBtn.textContent = '⏸️';
+      
+      audioPlayer.addEventListener('timeupdate', () => {
+        if (progressEl) {
+          const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+          progressEl.style.width = `${progress}%`;
+        }
+        if (durationEl) {
+          const current = Math.floor(audioPlayer.currentTime);
+          const total = Math.floor(audioPlayer.duration);
+          durationEl.textContent = `${formatTime(current)} / ${formatTime(total)}`;
+        }
+      });
       
       audioPlayer.addEventListener('ended', () => {
-        document.getElementById('playPreviewBtn').textContent = '▶️';
+        playBtn.textContent = '▶️';
+        progressEl.style.width = '0%';
+        if (durationEl) {
+          durationEl.textContent = formatTime(duration);
+        }
       });
     }
   });
   
-  document.getElementById('sendVoiceBtn').addEventListener('click', async () => {
+  sendVoiceBtn.addEventListener('click', async () => {
     if (recordedAudioBlob && currentChatId) {
       if (currentChatType === 'friend') {
         await sendVoiceMessageToFriend(currentChatId, recordedAudioBlob, recordedDuration);
@@ -483,13 +535,23 @@ function showVoicePreviewUI(audioUrl, duration) {
       recordedAudioBlob = null;
       recordedAudioUrl = null;
       document.getElementById('voicePreviewUI').remove();
+      
+      // Показываем элементы обратно
+      document.getElementById('messageInput').style.display = 'block';
+      document.getElementById('sendMessageBtn').style.display = 'flex';
+      document.getElementById('voiceRecordBtn').style.display = 'flex';
     }
   });
   
-  document.getElementById('deleteVoiceBtn').addEventListener('click', () => {
+  deleteVoiceBtn.addEventListener('click', () => {
     recordedAudioBlob = null;
     recordedAudioUrl = null;
     document.getElementById('voicePreviewUI').remove();
+    
+    // Показываем элементы обратно
+    document.getElementById('messageInput').style.display = 'block';
+    document.getElementById('sendMessageBtn').style.display = 'flex';
+    document.getElementById('voiceRecordBtn').style.display = 'flex';
   });
 }
 
@@ -528,6 +590,12 @@ async function startVoiceRecording() {
       
       if (recordedDuration > 1) {
         showVoicePreviewUI(recordedAudioUrl, recordedDuration);
+      } else {
+        // Слишком короткая запись - показываем обычный интерфейс
+        document.getElementById('messageInput').style.display = 'block';
+        document.getElementById('sendMessageBtn').style.display = 'flex';
+        document.getElementById('voiceRecordBtn').style.display = 'flex';
+        alert('⏱️ Запись слишком короткая');
       }
       
       document.getElementById('voiceRecordBtn').classList.remove('recording');
@@ -558,6 +626,11 @@ function cancelVoiceRecording() {
     recordedAudioUrl = null;
     hideVoiceRecordingUI();
     document.getElementById('voiceRecordBtn').classList.remove('recording');
+    
+    // Показываем элементы обратно
+    document.getElementById('messageInput').style.display = 'block';
+    document.getElementById('sendMessageBtn').style.display = 'flex';
+    document.getElementById('voiceRecordBtn').style.display = 'flex';
   }
 }
 
@@ -639,7 +712,6 @@ function toggleChatActions() {
 }
 
 function showNotification(msg) {
-  // Для Dynamic Island используем alert как fallback
   alert(msg);
 }
 
@@ -681,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Глобальные обработчики для кнопок записи
+  // Глобальные обработчики
   document.addEventListener('click', (e) => {
     if (e.target.id === 'stopRecordingBtn') {
       stopVoiceRecording();

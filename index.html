@@ -12,6 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
   
   <!-- Манифест и иконки -->
   <link rel="manifest" href="manifest.json">
@@ -164,12 +165,12 @@
     <div id="quickReplyPanel" class="quick-reply-panel"></div>
     <div id="chatArea" class="chat-area"></div>
     
-  <!-- Поле ввода сообщения с голосовой кнопкой -->
-<div class="message-input-area">
-  <button id="voiceRecordBtn" class="voice-btn" title="записать голосовое">🎤</button>
-  <input type="text" id="messageInput" placeholder="сообщение..." />
-  <button id="sendMessageBtn" class="send-btn">➤</button>
-</div>
+    <div class="message-input-area">
+      <button id="voiceRecordBtn" class="voice-btn" title="записать голосовое">🎤</button>
+      <input type="text" id="messageInput" placeholder="сообщение..." />
+      <button id="sendMessageBtn" class="send-btn">➤</button>
+    </div>
+  </section>
 
   <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
@@ -185,13 +186,14 @@
         <!-- ПРОФИЛЬ -->
         <div class="glass-container">
           <h3>👤 профиль</h3>
-          <div id="profileEmail"></div>
+          <div id="profileEmail" class="profile-email"></div>
+          <div id="profileType" class="profile-type"></div>
           <input type="text" id="settingsName" placeholder="имя" />
           <div class="username-row">
             <input type="text" id="settingsUsername" placeholder="юзернейм" />
             <button id="settingsGenerateBtn" class="generate-btn">🎲</button>
           </div>
-          <button id="saveSettingsBtn">сохранить</button>
+          <button id="saveSettingsBtn" class="save-btn">сохранить</button>
         </div>
         
         <!-- ТЕМЫ -->
@@ -226,7 +228,7 @@
     </div>
   </section>
 
-  <!-- МОДАЛКА -->
+  <!-- МОДАЛКА ПЕРЕИМЕНОВАНИЯ -->
   <div id="renameModal" class="modal" style="display: none;">
     <div class="modal-content">
       <h3>переименовать</h3>

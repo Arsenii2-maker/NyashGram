@@ -804,63 +804,91 @@ function cancelVoiceRecording() {
   }
 }
 
-// ===== ВОСПРОИЗВЕДЕНИЕ ГОЛОСОВОГО =====
 function playVoiceMessage(audioUrl, buttonElement, progressElement, durationElement) {
   console.log('🎵 Воспроизведение:', audioUrl);
   
-  if (audioPlayer) {
-    audioPlayer.pause();
-    audioPlayer = null;
+  // Останавливаем текущее воспроизведение
+  if (window.currentAudioPlayer) {
+    window.currentAudioPlayer.pause();
+    window.currentAudioPlayer = null;
   }
   
-  audioPlayer = new Audio(audioUrl);
-  audioPlayer.volume = 1.0;
+  // Очищаем предыдущий URL если был
+  if (window.currentAudioUrl) {
+    URL.revokeObjectURL(window.currentAudioUrl);
+  }
   
-  audioPlayer.addEventListener('loadedmetadata', () => {
-    console.log('✅ Аудио загружено, длительность:', audioPlayer.duration);
+  // Пробуем разные форматы
+  const audio = new Audio();
+  
+  // Проверяем поддержку формата
+  const canPlayWebM = audio.canPlayType('audio/webm');
+  const canPlayMp3 = audio.canPlayType('audio/mpeg');
+  
+  console.log('Поддержка форматов:', { canPlayWebM, canPlayMp3 });
+  
+  audio.src = audioUrl;
+  audio.volume = 1.0;
+  
+  audio.addEventListener('loadedmetadata', () => {
+    console.log('✅ Аудио загружено, длительность:', audio.duration);
   });
   
-  audioPlayer.addEventListener('timeupdate', () => {
+  audio.addEventListener('timeupdate', () => {
     if (progressElement) {
-      const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      const progress = (audio.currentTime / audio.duration) * 100;
       progressElement.style.width = `${progress}%`;
     }
     
     if (durationElement) {
-      const current = Math.floor(audioPlayer.currentTime);
-      const total = Math.floor(audioPlayer.duration);
+      const current = Math.floor(audio.currentTime);
+      const total = Math.floor(audio.duration);
       durationElement.textContent = `${formatTime(current)} / ${formatTime(total)}`;
     }
   });
   
-  audioPlayer.addEventListener('play', () => {
+  audio.addEventListener('play', () => {
     if (buttonElement) buttonElement.textContent = '⏸️';
   });
   
-  audioPlayer.addEventListener('pause', () => {
+  audio.addEventListener('pause', () => {
     if (buttonElement) buttonElement.textContent = '▶️';
   });
   
-  audioPlayer.addEventListener('ended', () => {
+  audio.addEventListener('ended', () => {
     if (buttonElement) buttonElement.textContent = '▶️';
     if (progressElement) progressElement.style.width = '0%';
     if (durationElement) {
-      const total = Math.floor(audioPlayer.duration);
+      const total = Math.floor(audio.duration);
       durationElement.textContent = formatTime(total);
     }
-    audioPlayer = null;
+    window.currentAudioPlayer = null;
   });
   
-  audioPlayer.addEventListener('error', (e) => {
+  audio.addEventListener('error', (e) => {
     console.error('❌ Ошибка воспроизведения:', e);
-    alert('❌ Не удалось воспроизвести голосовое сообщение');
-    if (buttonElement) buttonElement.textContent = '▶️';
+    console.error('Код ошибки:', audio.error ? audio.error.code : 'unknown');
+    console.error('Сообщение:', audio.error ? audio.error.message : 'unknown');
+    
+    // Пробуем альтернативный формат
+    if (audioUrl.includes('.webm')) {
+      const mp3Url = audioUrl.replace('.webm', '.mp3');
+      console.log('Пробуем MP3 версию:', mp3Url);
+      alert('❌ Не удалось воспроизвести. Пробуем другой формат...');
+      playVoiceMessage(mp3Url, buttonElement, progressElement, durationElement);
+    } else {
+      alert('❌ Не удалось воспроизвести голосовое сообщение');
+      if (buttonElement) buttonElement.textContent = '▶️';
+    }
   });
   
-  audioPlayer.play().catch(error => {
+  audio.play().catch(error => {
     console.error('❌ Ошибка воспроизведения:', error);
     alert('❌ Не удалось воспроизвести');
   });
+  
+  window.currentAudioPlayer = audio;
+  window.currentAudioUrl = audioUrl;
 }
 
 // ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ =====

@@ -1,4 +1,4 @@
-// chat.js — ПОЛНЫЙ С ГОЛОСОВЫМИ СООБЩЕНИЯМИ
+// chat.js — ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С ГОЛОСОВЫМИ
 
 let currentChat = null;
 let currentChatId = null;
@@ -8,17 +8,24 @@ let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') ||
 let currentDraftChatId = null;
 let isSending = false;
 
-// Слушатели Firebase
-let messagesListener = null;
-let chatListener = null;
-
-// ===== ГОЛОСОВЫЕ ПЕРЕМЕННЫЕ =====
+// ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
 let mediaRecorder = null;
 let audioChunks = [];
 let recordingStartTime = 0;
 let recordingTimer = null;
+let audioContext = null;
+let analyser = null;
+let source = null;
+let animationFrame = null;
+let recordedAudioUrl = null;
+let recordedAudioBlob = null;
+let recordedDuration = 0;
+let isRecording = false;
 let audioPlayer = null;
-const storage = firebase.storage();
+
+// Слушатели Firebase
+let messagesListener = null;
+let chatListener = null;
 
 // ===== МИЛЫЕ БЫСТРЫЕ ВОПРОСЫ =====
 const quickQuestions = {
@@ -110,9 +117,7 @@ const greetings = {
   nyashcook: "🍳 привет! я NyashCook! хочешь рецепт чего-нибудь вкусненького?"
 };
 
-// ===== 🔥 НОВЫЕ ФУНКЦИИ ДЛЯ РЕАЛЬНЫХ СООБЩЕНИЙ =====
-
-// ОТПРАВКА СООБЩЕНИЯ ДРУГУ
+// ===== ФУНКЦИИ ДЛЯ ДРУЗЕЙ =====
 async function sendMessageToFriend(chatId, text) {
   if (!window.auth?.currentUser || !text.trim()) return false;
   
@@ -141,68 +146,44 @@ async function sendMessageToFriend(chatId, text) {
   }
 }
 
-// СТАТУС "ПЕЧАТАЕТ..."
-async function setTyping(chatId, isTyping) {
-  if (!window.auth?.currentUser || !chatId) return;
+// ===== ОТПРАВКА ГОЛОСОВОГО СООБЩЕНИЯ =====
+async function sendVoiceMessageToFriend(chatId, audioBlob, duration) {
+  if (!window.auth?.currentUser || !audioBlob) return false;
   
   try {
+    // Загружаем в Firebase Storage
+    const fileName = `voice_${Date.now()}.webm`;
+    const storageRef = firebase.storage().ref(`chats/${chatId}/${fileName}`);
+    await storageRef.put(audioBlob);
+    const audioUrl = await storageRef.getDownloadURL();
+    
+    await window.db.collection('messages').add({
+      chatId: chatId,
+      from: window.auth.currentUser.uid,
+      type: 'voice',
+      audioUrl: audioUrl,
+      duration: duration,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      readBy: [window.auth.currentUser.uid]
+    });
+    
     await window.db.collection('chats').doc(chatId).update({
-      [`typing.${window.auth.currentUser.uid}`]: isTyping
+      lastMessage: {
+        text: '🎤 Голосовое сообщение',
+        from: window.auth.currentUser.uid,
+        type: 'voice',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }
     });
+    
+    return true;
   } catch (error) {
-    console.error('Ошибка статуса печати:', error);
+    console.error('Ошибка отправки голоса:', error);
+    return false;
   }
 }
 
-// СЛУШАТЕЛЬ СООБЩЕНИЙ
-function listenToMessages(chatId, callback) {
-  if (messagesListener) messagesListener();
-  
-  messagesListener = window.db.collection('messages')
-    .where('chatId', '==', chatId)
-    .orderBy('timestamp', 'asc')
-    .onSnapshot((snapshot) => {
-      const messages = [];
-      snapshot.forEach(doc => {
-        messages.push({ id: doc.id, ...doc.data() });
-      });
-      callback(messages);
-    }, (error) => {
-      console.error('Ошибка слушателя:', error);
-    });
-  
-  return messagesListener;
-}
-
-// СЛУШАТЕЛЬ СТАТУСА ЧАТА
-function listenToChat(chatId, callback) {
-  if (chatListener) chatListener();
-  
-  chatListener = window.db.collection('chats').doc(chatId)
-    .onSnapshot((doc) => {
-      if (doc.exists) callback(doc.data());
-    });
-  
-  return chatListener;
-}
-
-// ===== СОХРАНЕНИЕ ИМЁН =====
-function saveCustomName(chatId, name) {
-  if (!window.customNames) window.customNames = {};
-  if (name) window.customNames[chatId] = name;
-  else delete window.customNames[chatId];
-  localStorage.setItem('nyashgram_custom_names', JSON.stringify(window.customNames));
-  
-  if (typeof window.renderContacts === 'function') {
-    setTimeout(window.renderContacts, 100);
-  }
-}
-
-function getCustomName(chatId, defaultName) {
-  return window.customNames?.[chatId] || defaultName;
-}
-
-// ===== СОХРАНЕНИЕ СООБЩЕНИЙ (ДЛЯ БОТОВ) =====
+// ===== ФУНКЦИИ ДЛЯ БОТОВ =====
 function saveMessage(chatId, type, text) {
   if (!chatMessages[chatId]) chatMessages[chatId] = [];
   chatMessages[chatId].push({
@@ -214,295 +195,6 @@ function saveMessage(chatId, type, text) {
   localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
 }
 
-// ===== ЧЕРНОВИКИ =====
-function saveCurrentDraft() {
-  if (currentChatId) {
-    const input = document.getElementById('messageInput');
-    if (input) {
-      const text = input.value.trim();
-      if (text) {
-        let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-        drafts[currentChatId] = text;
-        localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-      }
-    }
-  }
-}
-
-function loadDraft(chatId) {
-  const input = document.getElementById('messageInput');
-  if (!input) return;
-  
-  const drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-  input.value = drafts[chatId] || '';
-  currentDraftChatId = chatId;
-}
-
-// ===== ОТКРЫТИЕ ЧАТА С БОТОМ =====
-function openBotChat(bot) {
-  console.log('Открываем чат с ботом:', bot);
-  
-  if (messagesListener) messagesListener();
-  if (chatListener) chatListener();
-  
-  saveCurrentDraft();
-  
-  currentChat = bot;
-  currentChatId = bot.id;
-  currentChatType = 'bot';
-  
-  const nameEl = document.getElementById('chatContactName');
-  const usernameEl = document.getElementById('chatContactUsername');
-  const avatarEl = document.getElementById('chatAvatar');
-  
-  if (nameEl) nameEl.textContent = getCustomName(bot.id, bot.name);
-  if (usernameEl) usernameEl.textContent = `@${bot.username}`;
-  
-  if (avatarEl) {
-    if (bot.id === 'nyashhelp') avatarEl.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
-    else if (bot.id === 'nyashtalk') avatarEl.style.background = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
-    else if (bot.id === 'nyashgame') avatarEl.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
-    else if (bot.id === 'nyashhoroscope') avatarEl.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
-    else if (bot.id === 'nyashcook') avatarEl.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
-  }
-  
-  const quickPanel = document.getElementById('quickReplyPanel');
-  if (quickPanel) {
-    quickPanel.style.display = 'flex';
-    showQuickReplies(bot.id);
-  }
-  
-  loadChatHistory(bot.id);
-  loadDraft(bot.id);
-  
-  if (typeof window.showScreen === 'function') {
-    window.showScreen('chatScreen');
-  }
-}
-
-// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ =====
-async function openFriendChat(friend) {
-  console.log('Открываем чат с другом:', friend);
-  
-  if (messagesListener) messagesListener();
-  if (chatListener) chatListener();
-  
-  saveCurrentDraft();
-  
-  currentChat = friend;
-  currentChatId = friend.id;
-  currentChatType = 'friend';
-  
-  const nameEl = document.getElementById('chatContactName');
-  const usernameEl = document.getElementById('chatContactUsername');
-  const avatarEl = document.getElementById('chatAvatar');
-  
-  if (nameEl) nameEl.textContent = getCustomName(friend.id, friend.name);
-  if (usernameEl) usernameEl.textContent = `@${friend.username}`;
-  if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
-  
-  const quickPanel = document.getElementById('quickReplyPanel');
-  if (quickPanel) {
-    quickPanel.style.display = 'none';
-  }
-  
-  if (!friend.chatId) {
-    const chatId = await window.createPrivateChat(window.auth.currentUser.uid, friend.id);
-    friend.chatId = chatId;
-    currentChatId = chatId;
-  } else {
-    currentChatId = friend.chatId;
-  }
-  
-  listenToMessages(currentChatId, (messages) => {
-    renderRealMessages(messages);
-  });
-  
-  listenToChat(currentChatId, (chatData) => {
-    if (chatData.typing) {
-      const isTyping = chatData.typing[friend.id];
-      const typingEl = document.getElementById('typingIndicator');
-      if (typingEl) {
-        typingEl.style.display = isTyping ? 'flex' : 'none';
-      }
-    }
-  });
-  
-  loadDraft(currentChatId);
-  
-  if (typeof window.showScreen === 'function') {
-    window.showScreen('chatScreen');
-  }
-}
-
-// ===== ОТРИСОВКА РЕАЛЬНЫХ СООБЩЕНИЙ С ГОЛОСОВЫМИ =====
-function renderRealMessages(messages) {
-  const area = document.getElementById('chatArea');
-  if (!area) return;
-  
-  area.innerHTML = '';
-  
-  messages.forEach(msg => {
-    const isMe = msg.from === window.auth?.currentUser?.uid;
-    
-    if (msg.type === 'voice') {
-      // Голосовое сообщение
-      const el = document.createElement('div');
-      el.className = `message voice ${isMe ? 'user' : 'bot'}`;
-      
-      const time = msg.timestamp?.toDate 
-        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      el.innerHTML = `
-        <div class="voice-message">
-          <button class="voice-play-btn" data-url="${msg.audioUrl || ''}">▶️</button>
-          <div class="voice-timeline">
-            <div class="voice-progress" style="width: 0%"></div>
-          </div>
-          <span class="voice-duration">${msg.duration || 0}с</span>
-        </div>
-        <span class="message-time">${time}</span>
-      `;
-      
-      setTimeout(() => {
-        const playBtn = el.querySelector('.voice-play-btn');
-        const progressEl = el.querySelector('.voice-progress');
-        const durationEl = el.querySelector('.voice-duration');
-        
-        if (playBtn && msg.audioUrl) {
-          playBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            playVoiceMessage(msg.audioUrl, playBtn, durationEl, progressEl);
-          });
-        }
-      }, 0);
-      
-      area.appendChild(el);
-    } else {
-      // Текстовое сообщение
-      const el = document.createElement('div');
-      el.className = `message ${isMe ? 'user' : 'bot'}`;
-      
-      const time = msg.timestamp?.toDate 
-        ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      el.innerHTML = `${msg.text || ''}<span class="message-time">${time}</span>`;
-      area.appendChild(el);
-    }
-  });
-  
-  area.scrollTop = area.scrollHeight;
-}
-
-// ===== ЗАГРУЗКА ИСТОРИИ ЧАТА =====
-function loadChatHistory(chatId) {
-  const area = document.getElementById('chatArea');
-  if (!area) return;
-  
-  area.innerHTML = '';
-  
-  if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
-    chatMessages[chatId].forEach(msg => {
-      const el = document.createElement('div');
-      el.className = `message ${msg.type}`;
-      el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
-      area.appendChild(el);
-    });
-  } else if (chatId && chatId.startsWith('nyash')) {
-    const greeting = greetings[chatId] || "привет! давай общаться! 💕";
-    const el = document.createElement('div');
-    el.className = 'message bot';
-    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
-    area.appendChild(el);
-    
-    saveMessage(chatId, 'bot', greeting);
-  }
-  
-  area.scrollTop = area.scrollHeight;
-}
-
-// ===== БЫСТРЫЕ ОТВЕТЫ =====
-function showQuickReplies(botId) {
-  const panel = document.getElementById('quickReplyPanel');
-  if (!panel) return;
-  
-  const questions = quickQuestions[botId] || quickQuestions.nyashtalk;
-  
-  panel.innerHTML = '';
-  questions.forEach(q => {
-    const btn = document.createElement('button');
-    btn.className = 'quick-chip';
-    btn.textContent = q;
-    btn.onclick = () => {
-      const input = document.getElementById('messageInput');
-      if (input) {
-        input.value = q;
-      }
-    };
-    panel.appendChild(btn);
-  });
-}
-
-function toggleQuickPanel() {
-  const panel = document.getElementById('quickReplyPanel');
-  if (!panel) return;
-  quickPanelVisible = !quickPanelVisible;
-  panel.style.display = quickPanelVisible ? 'flex' : 'none';
-}
-
-// ===== ОТПРАВКА СООБЩЕНИЯ =====
-async function sendMessage() {
-  const input = document.getElementById('messageInput');
-  if (!input) return;
-  
-  if (isSending) return;
-  
-  const text = input.value.trim();
-  if (!text || !currentChat) return;
-  
-  isSending = true;
-  const sendBtn = document.getElementById('sendMessageBtn');
-  if (sendBtn) {
-    sendBtn.disabled = true;
-    sendBtn.style.opacity = '0.5';
-  }
-  
-  input.value = '';
-  
-  let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-  delete drafts[currentChatId];
-  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-  
-  if (currentChatType === 'friend') {
-    const success = await sendMessageToFriend(currentChatId, text);
-    
-    if (!success) {
-      showNotification('❌ Ошибка отправки');
-      input.value = text;
-    }
-    
-    await setTyping(currentChatId, false);
-  } else {
-    addMessage(text, 'user', true);
-    
-    setTimeout(() => {
-      const response = getBotResponse(currentChatId, text);
-      addMessage(response, 'bot', true);
-    }, 1000);
-  }
-  
-  setTimeout(() => {
-    isSending = false;
-    if (sendBtn) {
-      sendBtn.disabled = false;
-      sendBtn.style.opacity = '1';
-    }
-  }, 500);
-}
-
-// ===== ДОБАВЛЕНИЕ СООБЩЕНИЯ =====
 function addMessage(text, type, save = false) {
   const area = document.getElementById('chatArea');
   if (!area) return;
@@ -521,7 +213,6 @@ function addMessage(text, type, save = false) {
   }
 }
 
-// ===== ПОЛУЧЕНИЕ ОТВЕТА ОТ БОТА =====
 function getBotResponse(botId, text) {
   const bot = botResponses[botId];
   if (!bot) return "💕";
@@ -574,180 +265,369 @@ function getBotResponse(botId, text) {
   return "💕";
 }
 
-// ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
-
-async function uploadAudio(audioBlob, chatId) {
-  const fileName = `voice_${Date.now()}.webm`;
-  const storageRef = storage.ref(`chats/${chatId}/${fileName}`);
-  
-  showNotification('⏳ загрузка...');
-  
-  try {
-    await storageRef.put(audioBlob);
-    const url = await storageRef.getDownloadURL();
-    return url;
-  } catch (error) {
-    console.error('Ошибка загрузки аудио:', error);
-    showNotification('❌ ошибка загрузки');
-    return null;
+// ===== ЧЕРНОВИКИ =====
+function saveCurrentDraft() {
+  if (currentChatId) {
+    const input = document.getElementById('messageInput');
+    if (input) {
+      const text = input.value.trim();
+      if (text) {
+        let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+        drafts[currentChatId] = text;
+        localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
+      }
+    }
   }
+}
+
+function loadDraft(chatId) {
+  const input = document.getElementById('messageInput');
+  if (!input) return;
+  
+  const drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+  input.value = drafts[chatId] || '';
+  currentDraftChatId = chatId;
+}
+
+// ===== ОТКРЫТИЕ ЧАТА =====
+function openBotChat(bot) {
+  console.log('Открываем чат с ботом:', bot);
+  
+  if (messagesListener) messagesListener();
+  if (chatListener) chatListener();
+  
+  saveCurrentDraft();
+  
+  currentChat = bot;
+  currentChatId = bot.id;
+  currentChatType = 'bot';
+  
+  const nameEl = document.getElementById('chatContactName');
+  const usernameEl = document.getElementById('chatContactUsername');
+  const avatarEl = document.getElementById('chatAvatar');
+  
+  if (nameEl) nameEl.textContent = bot.name;
+  if (usernameEl) usernameEl.textContent = `@${bot.username}`;
+  
+  if (avatarEl) {
+    if (bot.id === 'nyashhelp') avatarEl.style.background = 'linear-gradient(135deg, #c38ef0, #e0b0ff)';
+    else if (bot.id === 'nyashtalk') avatarEl.style.background = 'linear-gradient(135deg, #85d1c5, #b0e0d5)';
+    else if (bot.id === 'nyashgame') avatarEl.style.background = 'linear-gradient(135deg, #ffb347, #ff8c42)';
+    else if (bot.id === 'nyashhoroscope') avatarEl.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
+    else if (bot.id === 'nyashcook') avatarEl.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4)';
+  }
+  
+  const quickPanel = document.getElementById('quickReplyPanel');
+  if (quickPanel) {
+    quickPanel.style.display = 'flex';
+    showQuickReplies(bot.id);
+  }
+  
+  loadChatHistory(bot.id);
+  loadDraft(bot.id);
+  
+  if (typeof window.showScreen === 'function') {
+    window.showScreen('chatScreen');
+  }
+}
+
+function showQuickReplies(botId) {
+  const panel = document.getElementById('quickReplyPanel');
+  if (!panel) return;
+  
+  const questions = quickQuestions[botId] || quickQuestions.nyashtalk;
+  
+  panel.innerHTML = '';
+  questions.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-chip';
+    btn.textContent = q;
+    btn.onclick = () => {
+      const input = document.getElementById('messageInput');
+      if (input) {
+        input.value = q;
+      }
+    };
+    panel.appendChild(btn);
+  });
+}
+
+function toggleQuickPanel() {
+  const panel = document.getElementById('quickReplyPanel');
+  if (!panel) return;
+  quickPanelVisible = !quickPanelVisible;
+  panel.style.display = quickPanelVisible ? 'flex' : 'none';
+}
+
+// ===== ЗАПИСЬ ГОЛОСА (ИСПРАВЛЕННАЯ) =====
+function createWaveformVisualizer(stream) {
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 256;
+  source = audioContext.createMediaStreamSource(stream);
+  source.connect(analyser);
+  
+  const canvas = document.getElementById('voiceWaveform');
+  const canvasCtx = canvas.getContext('2d');
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  
+  function draw() {
+    if (!isRecording) return;
+    
+    animationFrame = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
+    
+    canvasCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const barWidth = (canvas.width / bufferLength) * 2.5;
+    let x = 0;
+    
+    for (let i = 0; i < bufferLength; i++) {
+      const barHeight = dataArray[i] / 2;
+      
+      canvasCtx.fillStyle = `rgb(${barHeight + 100}, 100, 150)`;
+      canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+      
+      x += barWidth + 1;
+    }
+  }
+  
+  draw();
+}
+
+function showVoiceRecordingUI() {
+  const inputArea = document.querySelector('.message-input-area');
+  const voiceBtn = document.getElementById('voiceRecordBtn');
+  
+  // Скрываем поле ввода и кнопку отправки
+  document.getElementById('messageInput').style.display = 'none';
+  document.getElementById('sendMessageBtn').style.display = 'none';
+  voiceBtn.style.display = 'none';
+  
+  // Создаём UI для записи
+  const voiceUI = document.createElement('div');
+  voiceUI.className = 'voice-recording-ui';
+  voiceUI.id = 'voiceRecordingUI';
+  voiceUI.innerHTML = `
+    <canvas id="voiceWaveform" class="voice-waveform"></canvas>
+    <div class="voice-recording-controls">
+      <span class="voice-timer" id="voiceTimer">0:00</span>
+      <button id="stopRecordingBtn" class="voice-stop-btn">⏹️</button>
+      <button id="cancelRecordingBtn" class="voice-cancel-btn">❌</button>
+    </div>
+  `;
+  
+  inputArea.appendChild(voiceUI);
+  
+  // Устанавливаем размер canvas
+  const canvas = document.getElementById('voiceWaveform');
+  canvas.width = inputArea.clientWidth - 120;
+  canvas.height = 50;
+}
+
+function hideVoiceRecordingUI() {
+  const voiceUI = document.getElementById('voiceRecordingUI');
+  if (voiceUI) voiceUI.remove();
+  
+  // Показываем поле ввода и кнопки обратно
+  document.getElementById('messageInput').style.display = 'block';
+  document.getElementById('sendMessageBtn').style.display = 'flex';
+  document.getElementById('voiceRecordBtn').style.display = 'flex';
+}
+
+function showVoicePreviewUI(audioUrl, duration) {
+  const inputArea = document.querySelector('.message-input-area');
+  
+  const previewUI = document.createElement('div');
+  previewUI.className = 'voice-preview-ui';
+  previewUI.id = 'voicePreviewUI';
+  previewUI.innerHTML = `
+    <div class="voice-preview">
+      <button id="playPreviewBtn" class="voice-play-btn">▶️</button>
+      <div class="voice-timeline-preview">
+        <div class="voice-progress-preview" style="width: 0%"></div>
+      </div>
+      <span class="voice-duration-preview">${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}</span>
+      <button id="sendVoiceBtn" class="voice-send-btn">📤</button>
+      <button id="deleteVoiceBtn" class="voice-delete-btn">🗑️</button>
+    </div>
+  `;
+  
+  inputArea.appendChild(previewUI);
+  
+  document.getElementById('playPreviewBtn').addEventListener('click', () => {
+    if (audioPlayer && audioPlayer.src === audioUrl && !audioPlayer.paused) {
+      audioPlayer.pause();
+      document.getElementById('playPreviewBtn').textContent = '▶️';
+    } else {
+      if (audioPlayer) audioPlayer.pause();
+      audioPlayer = new Audio(audioUrl);
+      audioPlayer.play();
+      document.getElementById('playPreviewBtn').textContent = '⏸️';
+      
+      audioPlayer.addEventListener('ended', () => {
+        document.getElementById('playPreviewBtn').textContent = '▶️';
+      });
+    }
+  });
+  
+  document.getElementById('sendVoiceBtn').addEventListener('click', async () => {
+    if (recordedAudioBlob && currentChatId) {
+      if (currentChatType === 'friend') {
+        await sendVoiceMessageToFriend(currentChatId, recordedAudioBlob, recordedDuration);
+      } else {
+        addMessage('🎤 Голосовое сообщение (бот не может его прослушать)', 'bot', true);
+      }
+      recordedAudioBlob = null;
+      recordedAudioUrl = null;
+      document.getElementById('voicePreviewUI').remove();
+    }
+  });
+  
+  document.getElementById('deleteVoiceBtn').addEventListener('click', () => {
+    recordedAudioBlob = null;
+    recordedAudioUrl = null;
+    document.getElementById('voicePreviewUI').remove();
+  });
 }
 
 async function startVoiceRecording() {
   try {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('❌ Ваш браузер не поддерживает запись голоса');
-      return;
-    }
-    
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     
     mediaRecorder = new MediaRecorder(stream);
     audioChunks = [];
     recordingStartTime = Date.now();
+    isRecording = true;
     
     mediaRecorder.ondataavailable = event => {
       audioChunks.push(event.data);
     };
     
     mediaRecorder.onstop = async () => {
-      if (recordingTimer) {
-        clearInterval(recordingTimer);
-        recordingTimer = null;
+      isRecording = false;
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+      
+      if (audioContext) {
+        await audioContext.close();
+        audioContext = null;
       }
       
       stream.getTracks().forEach(track => track.stop());
       
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      recordedAudioUrl = URL.createObjectURL(recordedAudioBlob);
+      recordedDuration = Math.floor((Date.now() - recordingStartTime) / 1000);
       
-      if (audioBlob.size > 1000) {
-        await sendVoiceMessage(audioBlob);
-      } else {
-        showNotification('❌ запись слишком короткая');
+      hideVoiceRecordingUI();
+      
+      if (recordedDuration > 1) {
+        showVoicePreviewUI(recordedAudioUrl, recordedDuration);
       }
       
-      audioChunks = [];
-      const btn = document.getElementById('voiceRecordBtn');
-      if (btn) btn.classList.remove('recording');
+      document.getElementById('voiceRecordBtn').classList.remove('recording');
     };
     
     mediaRecorder.start();
-    const btn = document.getElementById('voiceRecordBtn');
-    if (btn) btn.classList.add('recording');
+    document.getElementById('voiceRecordBtn').classList.add('recording');
     
-    recordingTimer = setInterval(() => {
-      const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-      if (duration >= 60) {
-        stopVoiceRecording();
-      } else if (duration % 5 === 0) {
-        showNotification(`⏺ запись ${duration}с`);
-      }
-    }, 1000);
+    showVoiceRecordingUI();
+    createWaveformVisualizer(stream);
     
   } catch (error) {
     console.error('Ошибка доступа к микрофону:', error);
-    
-    if (error.name === 'NotAllowedError') {
-      alert('❌ Нет доступа к микрофону');
-    } else if (error.name === 'NotFoundError') {
-      alert('❌ Микрофон не найден');
-    } else {
-      alert('❌ Ошибка: ' + error.message);
-    }
+    alert('❌ Нет доступа к микрофону');
   }
 }
 
 function stopVoiceRecording() {
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     mediaRecorder.stop();
-    
-    if (recordingTimer) {
-      clearInterval(recordingTimer);
-      recordingTimer = null;
-    }
   }
 }
 
-async function sendVoiceMessage(audioBlob) {
-  if (!currentChatId) return;
+function cancelVoiceRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    recordedAudioBlob = null;
+    recordedAudioUrl = null;
+    hideVoiceRecordingUI();
+    document.getElementById('voiceRecordBtn').classList.remove('recording');
+  }
+}
+
+// ===== ОТПРАВКА СООБЩЕНИЯ =====
+async function sendMessage() {
+  const input = document.getElementById('messageInput');
+  if (!input) return;
   
-  const audioUrl = await uploadAudio(audioBlob, currentChatId);
-  if (!audioUrl) return;
+  if (isSending) return;
   
-  const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+  const text = input.value.trim();
+  if (!text || !currentChat) return;
+  
+  isSending = true;
+  const sendBtn = document.getElementById('sendMessageBtn');
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.5';
+  }
+  
+  input.value = '';
+  
+  let drafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
+  delete drafts[currentChatId];
+  localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
   
   if (currentChatType === 'friend') {
-    try {
-      await window.db.collection('messages').add({
-        chatId: currentChatId,
-        from: window.auth.currentUser.uid,
-        type: 'voice',
-        audioUrl: audioUrl,
-        duration: duration,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        readBy: [window.auth.currentUser.uid]
-      });
-      
-      await window.db.collection('chats').doc(currentChatId).update({
-        lastMessage: {
-          text: '🎤 Голосовое сообщение',
-          from: window.auth.currentUser.uid,
-          type: 'voice',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }
-      });
-      
-      showNotification('✅ голосовое отправлено');
-    } catch (error) {
-      console.error('Ошибка отправки:', error);
-      showNotification('❌ ошибка отправки');
-    }
+    await sendMessageToFriend(currentChatId, text);
   } else {
-    addMessage('🎤 Голосовое сообщение (бот не может его прослушать)', 'bot', true);
-  }
-}
-
-function playVoiceMessage(audioUrl, buttonElement, durationElement, progressElement) {
-  if (audioPlayer) {
-    audioPlayer.pause();
-    audioPlayer = null;
-  }
-  
-  audioPlayer = new Audio(audioUrl);
-  
-  audioPlayer.addEventListener('timeupdate', () => {
-    if (progressElement) {
-      const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-      progressElement.style.width = `${progress}%`;
-    }
+    addMessage(text, 'user', true);
     
-    if (durationElement) {
-      const current = Math.floor(audioPlayer.currentTime);
-      durationElement.textContent = `${current}с`;
-    }
-  });
+    setTimeout(() => {
+      const response = getBotResponse(currentChatId, text);
+      addMessage(response, 'bot', true);
+    }, 1000);
+  }
   
-  audioPlayer.addEventListener('ended', () => {
-    buttonElement.textContent = '▶️';
-    if (progressElement) {
-      progressElement.style.width = '0%';
+  setTimeout(() => {
+    isSending = false;
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.style.opacity = '1';
     }
-    if (durationElement) {
-      durationElement.textContent = `${Math.floor(audioPlayer.duration)}с`;
-    }
-    audioPlayer = null;
-  });
-  
-  audioPlayer.play();
-  buttonElement.textContent = '⏸️';
+  }, 500);
 }
 
-function showNotification(msg) {
-  const notif = document.createElement('div');
-  notif.className = 'notification';
-  notif.textContent = msg;
-  document.body.appendChild(notif);
-  setTimeout(() => notif.remove(), 2000);
+// ===== ЗАГРУЗКА ИСТОРИИ =====
+function loadChatHistory(chatId) {
+  const area = document.getElementById('chatArea');
+  if (!area) return;
+  
+  area.innerHTML = '';
+  
+  if (chatMessages[chatId] && chatMessages[chatId].length > 0) {
+    chatMessages[chatId].forEach(msg => {
+      const el = document.createElement('div');
+      el.className = `message ${msg.type}`;
+      el.innerHTML = `${msg.text}<span class="message-time">${msg.timeString}</span>`;
+      area.appendChild(el);
+    });
+  } else if (chatId && chatId.startsWith('nyash')) {
+    const greeting = greetings[chatId] || "привет! давай общаться! 💕";
+    const el = document.createElement('div');
+    el.className = 'message bot';
+    el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
+    area.appendChild(el);
+    saveMessage(chatId, 'bot', greeting);
+  }
+  
+  area.scrollTop = area.scrollHeight;
 }
 
 // ===== ДЕЙСТВИЯ =====
@@ -758,85 +638,12 @@ function toggleChatActions() {
   }
 }
 
-function showRenameModal() {
-  const modal = document.getElementById('renameModal');
-  const input = document.getElementById('renameInput');
-  if (modal && input && currentChatId) {
-    const nameEl = document.getElementById('chatContactName');
-    input.value = getCustomName(currentChatId, nameEl ? nameEl.textContent : '');
-    modal.style.display = 'flex';
-    setTimeout(() => input.focus(), 100);
-  }
+function showNotification(msg) {
+  // Для Dynamic Island используем alert как fallback
+  alert(msg);
 }
 
-function hideRenameModal() {
-  const modal = document.getElementById('renameModal');
-  if (modal) modal.style.display = 'none';
-}
-
-function renameCurrentChat() {
-  const input = document.getElementById('renameInput');
-  if (!input || !currentChatId) return;
-  
-  const newName = input.value.trim();
-  if (newName) {
-    saveCustomName(currentChatId, newName);
-    const nameEl = document.getElementById('chatContactName');
-    if (nameEl) nameEl.textContent = newName;
-    
-    showNotification('✏️ имя изменено');
-  }
-  hideRenameModal();
-}
-
-function togglePinChat() {
-  if (!currentChatId) return;
-  
-  let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
-  
-  if (pinnedChats.includes(currentChatId)) {
-    pinnedChats = pinnedChats.filter(id => id !== currentChatId);
-    showNotification('📌 чат откреплён');
-  } else {
-    pinnedChats.push(currentChatId);
-    showNotification('📌 чат закреплён');
-  }
-  
-  localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
-  
-  if (typeof window.renderContacts === 'function') {
-    window.renderContacts();
-  }
-}
-
-function deleteChatHistory() {
-  if (!currentChatId) return;
-  
-  if (currentChatType === 'bot') {
-    if (confirm('удалить историю чата с ботом?')) {
-      delete chatMessages[currentChatId];
-      localStorage.setItem('nyashgram_chat_messages', JSON.stringify(chatMessages));
-      const chatArea = document.getElementById('chatArea');
-      if (chatArea) chatArea.innerHTML = '';
-      
-      if (currentChatId && currentChatId.startsWith('nyash')) {
-        const greeting = greetings[currentChatId] || "привет! давай общаться! 💕";
-        const el = document.createElement('div');
-        el.className = 'message bot';
-        el.innerHTML = `${greeting}<span class="message-time">${new Date().toLocaleTimeString()}</span>`;
-        if (chatArea) {
-          chatArea.appendChild(el);
-          saveMessage(currentChatId, 'bot', greeting);
-        }
-      }
-      showNotification('🗑️ история удалена');
-    }
-  } else {
-    alert('История сообщений с друзьями хранится в облаке');
-  }
-}
-
-// ===== ОБРАБОТЧИКИ СОБЫТИЙ =====
+// ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔧 chat.js загружен');
   
@@ -862,51 +669,26 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleQuickPanelBtn.addEventListener('click', toggleQuickPanel);
   }
   
-  const pinChatActionBtn = document.getElementById('pinChatActionBtn');
-  if (pinChatActionBtn) {
-    pinChatActionBtn.addEventListener('click', () => {
-      togglePinChat();
-      const panel = document.getElementById('chatActionsPanel');
-      if (panel) panel.style.display = 'none';
+  const voiceBtn = document.getElementById('voiceRecordBtn');
+  if (voiceBtn) {
+    voiceBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (isRecording) {
+        stopVoiceRecording();
+      } else {
+        startVoiceRecording();
+      }
     });
   }
   
-  const renameChatBtn = document.getElementById('renameChatBtn');
-  if (renameChatBtn) {
-    renameChatBtn.addEventListener('click', () => {
-      showRenameModal();
-      const panel = document.getElementById('chatActionsPanel');
-      if (panel) panel.style.display = 'none';
-    });
-  }
-  
-  const muteChatBtn = document.getElementById('muteChatBtn');
-  if (muteChatBtn) {
-    muteChatBtn.addEventListener('click', () => {
-      showNotification('🔇 звук выключен');
-      const panel = document.getElementById('chatActionsPanel');
-      if (panel) panel.style.display = 'none';
-    });
-  }
-  
-  const deleteChatBtn = document.getElementById('deleteChatBtn');
-  if (deleteChatBtn) {
-    deleteChatBtn.addEventListener('click', () => {
-      deleteChatHistory();
-      const panel = document.getElementById('chatActionsPanel');
-      if (panel) panel.style.display = 'none';
-    });
-  }
-  
-  const renameCancelBtn = document.getElementById('renameCancelBtn');
-  if (renameCancelBtn) {
-    renameCancelBtn.addEventListener('click', hideRenameModal);
-  }
-  
-  const renameConfirmBtn = document.getElementById('renameConfirmBtn');
-  if (renameConfirmBtn) {
-    renameConfirmBtn.addEventListener('click', renameCurrentChat);
-  }
+  // Глобальные обработчики для кнопок записи
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'stopRecordingBtn') {
+      stopVoiceRecording();
+    } else if (e.target.id === 'cancelRecordingBtn') {
+      cancelVoiceRecording();
+    }
+  });
   
   const sendMessageBtn = document.getElementById('sendMessageBtn');
   const messageInput = document.getElementById('messageInput');
@@ -932,54 +714,9 @@ document.addEventListener('DOMContentLoaded', function() {
           delete drafts[currentChatId];
         }
         localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
-        
-        if (currentChatType === 'friend' && currentChatId) {
-          setTyping(currentChatId, e.target.value.trim().length > 0);
-        }
       }
-    });
-  }
-  
-  // ===== ОБРАБОТЧИКИ ГОЛОСА =====
-  const voiceBtn = document.getElementById('voiceRecordBtn');
-  if (voiceBtn) {
-    voiceBtn.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      startVoiceRecording();
-    });
-    
-    voiceBtn.addEventListener('mouseup', (e) => {
-      e.preventDefault();
-      stopVoiceRecording();
-    });
-    
-    voiceBtn.addEventListener('mouseleave', (e) => {
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        stopVoiceRecording();
-      }
-    });
-    
-    // Для мобильных
-    voiceBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      startVoiceRecording();
-    });
-    
-    voiceBtn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      stopVoiceRecording();
-    });
-    
-    voiceBtn.addEventListener('touchcancel', (e) => {
-      e.preventDefault();
-      stopVoiceRecording();
     });
   }
   
   window.openBotChat = openBotChat;
-  window.openFriendChat = openFriendChat;
-  window.sendMessageToFriend = sendMessageToFriend;
-  window.setTyping = setTyping;
-  
-  console.log('✅ chat.js готов');
 });

@@ -1,5 +1,4 @@
-// chat.js — ПОЛНЫЙ С РЕАЛЬНЫМИ ДРУЗЬЯМИ v3.5
-// ИСПРАВЛЕНО: двойная отправка, черновики, свайпы, закрепление
+// chat.js — ПОЛНЫЙ С РЕАЛЬНЫМИ ДРУЗЬЯМИ И ИСПРАВЛЕННОЙ СТРУКТУРОЙ
 
 let currentChat = null;
 let currentChatId = null;
@@ -105,7 +104,7 @@ const greetings = {
 
 // ===== 🔥 НОВЫЕ ФУНКЦИИ ДЛЯ РЕАЛЬНЫХ СООБЩЕНИЙ =====
 
-// ОТПРАВКА СООБЩЕНИЯ ДРУГУ (ИСПРАВЛЕНО: убрана двойная отправка)
+// ОТПРАВКА СООБЩЕНИЯ ДРУГУ
 async function sendMessageToFriend(chatId, text) {
   if (!window.auth?.currentUser || !text.trim()) return false;
   
@@ -277,7 +276,7 @@ function openBotChat(bot) {
   }
 }
 
-// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ (ИСПРАВЛЕНО) =====
+// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ =====
 async function openFriendChat(friend) {
   console.log('Открываем чат с другом:', friend);
   
@@ -406,8 +405,7 @@ function showQuickReplies(botId) {
       const input = document.getElementById('messageInput');
       if (input) {
         input.value = q;
-        // Автоматически отправляем сообщение (можно убрать, если не нужно)
-        // sendMessage();
+        // Не отправляем автоматически, только подставляем
       }
     };
     panel.appendChild(btn);
@@ -420,7 +418,8 @@ function toggleQuickPanel() {
   quickPanelVisible = !quickPanelVisible;
   panel.style.display = quickPanelVisible ? 'flex' : 'none';
 }
-// ===== ОТПРАВКА СООБЩЕНИЯ (ИСПРАВЛЕНО: убрана двойная отправка и задержка ввода) =====
+
+// ===== ОТПРАВКА СООБЩЕНИЯ =====
 async function sendMessage() {
   const input = document.getElementById('messageInput');
   if (!input) return;
@@ -439,7 +438,7 @@ async function sendMessage() {
     sendBtn.style.opacity = '0.5';
   }
   
-  // ОЧЕНЬ ВАЖНО: сразу очищаем поле ввода, чтобы нельзя было заспамить
+  // ОЧЕНЬ ВАЖНО: сразу очищаем поле ввода
   input.value = '';
   
   // Очищаем черновик
@@ -448,10 +447,9 @@ async function sendMessage() {
   localStorage.setItem('nyashgram_chat_drafts', JSON.stringify(drafts));
   
   if (currentChatType === 'friend') {
-    // Отправляем другу через Firebase (реальное сообщение)
+    // Отправляем другу через Firebase
     const success = await sendMessageToFriend(currentChatId, text);
     
-    // Визуально сообщение добавится через слушатель, ничего не делаем
     if (!success) {
       // Если ошибка, показываем уведомление
       showNotification('❌ Ошибка отправки');
@@ -578,9 +576,7 @@ function hideRenameModal() {
   if (modal) modal.style.display = 'none';
 }
 
-// ===== ДЕЙСТВИЯ (ПОЛНОСТЬЮ ИСПРАВЛЕНЫ) =====
-
-// ПЕРЕИМЕНОВАНИЕ ЧАТА (ТЕПЕРЬ РАБОТАЕТ ВЕЗДЕ)
+// ПЕРЕИМЕНОВАНИЕ ЧАТА (РАБОТАЕТ ВЕЗДЕ)
 function renameCurrentChat() {
   const input = document.getElementById('renameInput');
   if (!input || !currentChatId) return;
@@ -591,17 +587,12 @@ function renameCurrentChat() {
     const nameEl = document.getElementById('chatContactName');
     if (nameEl) nameEl.textContent = newName;
     
-    // Принудительно обновляем список контактов
-    if (typeof window.renderContacts === 'function') {
-      window.renderContacts();
-    }
-    
     showNotification('✏️ имя изменено');
   }
   hideRenameModal();
 }
 
-// ЗАКРЕПЛЕНИЕ ЧАТА (ТЕПЕРЬ РАБОТАЕТ)
+// ЗАКРЕПЛЕНИЕ ЧАТА
 function togglePinChat() {
   if (!currentChatId) return;
   
@@ -617,12 +608,13 @@ function togglePinChat() {
   
   localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
   
-  // Принудительно обновляем список контактов
+  // Обновляем отображение в списке контактов
   if (typeof window.renderContacts === 'function') {
     window.renderContacts();
   }
 }
-// ===== УДАЛЕНИЕ ИСТОРИИ (ИСПРАВЛЕНО) =====
+
+// УДАЛЕНИЕ ИСТОРИИ
 function deleteChatHistory() {
   if (!currentChatId) return;
   
@@ -647,10 +639,6 @@ function deleteChatHistory() {
       showNotification('🗑️ история удалена');
     }
   } else {
-    // Для друзей удаление истории из локального хранилища не имеет смысла,
-    // так как сообщения хранятся в Firebase. Можно либо:
-    // 1. Ничего не делать (просто показать уведомление)
-    // 2. Удалить все сообщения из Firebase (сложно, нужно право)
     alert('История сообщений с друзьями хранится в облаке и не может быть удалена из этого чата');
   }
 }
@@ -663,51 +651,56 @@ function showNotification(msg) {
   setTimeout(() => notif.remove(), 2000);
 }
 
-// ===== ИСПРАВЛЕННАЯ ОБРАБОТКА СВАЙПОВ (ТОЛЬКО ОТ ЛЕВОГО КРАЯ) =====
+// ===== ИСПРАВЛЕННЫЙ ОБРАБОТЧИК СВАЙПОВ (ТОЛЬКО В ЧАТЕ) =====
 let touchStartX = 0;
 let touchStartY = 0;
 let isSwiping = false;
 let swipeStartTime = 0;
 
 function handleTouchStart(e) {
-  // Запоминаем начальные координаты
+  const activeScreen = document.querySelector('.screen.active');
+  
+  // Свайп работает только на экране чата
+  if (!activeScreen || activeScreen.id !== 'chatScreen') {
+    return;
+  }
+  
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
   swipeStartTime = Date.now();
-  isSwiping = false; // Сбрасываем флаг
+  isSwiping = false;
 }
 
 function handleTouchMove(e) {
-  // Если уже не свайп или нет активного экрана - выходим
+  const activeScreen = document.querySelector('.screen.active');
+  
+  // Только на экране чата
+  if (!activeScreen || activeScreen.id !== 'chatScreen') {
+    return;
+  }
+  
   if (!isSwiping) {
-    // Проверяем, начинается ли свайп от левого края
-    if (touchStartX < 40) { // Только от левого края экрана
+    // Только от левого края (первые 40px)
+    if (touchStartX < 40) {
       const currentX = e.touches[0].clientX;
       const currentY = e.touches[0].clientY;
       const diffX = currentX - touchStartX;
       const diffY = Math.abs(currentY - touchStartY);
       
-      // Проверяем, что движение больше по горизонтали, чем по вертикали
-      if (diffX > 10 && diffY < 20) {
+      if (diffX > 10 && diffY < 30) {
         isSwiping = true;
-        
-        // Добавляем класс для отключения transition во время свайпа
-        const activeScreen = document.querySelector('.screen.active');
-        if (activeScreen) {
-          activeScreen.classList.add('swiping');
-        }
+        activeScreen.classList.add('swiping');
+        e.preventDefault();
       }
     }
   }
   
-  // Если это свайп - применяем трансформацию
   if (isSwiping) {
-    e.preventDefault(); // Предотвращаем стандартное поведение
+    e.preventDefault();
     const currentX = e.touches[0].clientX;
     const diffX = currentX - touchStartX;
-    const activeScreen = document.querySelector('.screen.active');
     
-    if (activeScreen && diffX > 0) { // Только движение вправо
+    if (diffX > 0) {
       const translateX = Math.min(diffX * 0.5, 100);
       activeScreen.style.transform = `translateX(${translateX}px)`;
       activeScreen.style.opacity = 1 - (translateX / 200);
@@ -717,21 +710,21 @@ function handleTouchMove(e) {
 
 function handleTouchEnd(e) {
   const activeScreen = document.querySelector('.screen.active');
-  if (!activeScreen) {
-    isSwiping = false;
+  
+  // Только на экране чата
+  if (!activeScreen || activeScreen.id !== 'chatScreen') {
     return;
   }
   
   if (isSwiping) {
     e.preventDefault();
     
+    const touchEndX = e.changedTouches[0].clientX;
     const diffX = touchEndX - touchStartX;
     const swipeDuration = Date.now() - swipeStartTime;
     
-    // Убираем класс swiping
     activeScreen.classList.remove('swiping');
     
-    // Проверяем, был ли достаточно длинный свайп
     if (diffX > 80 && swipeDuration < 300) {
       // Успешный свайп - возвращаем на главный экран
       activeScreen.classList.add('swipe-right');
@@ -741,15 +734,12 @@ function handleTouchEnd(e) {
         activeScreen.style.transform = '';
         activeScreen.style.opacity = '';
         
-        // Проверяем, что мы не на главном экране
-        if (activeScreen.id !== 'friendsScreen') {
-          if (typeof window.showScreen === 'function') {
-            window.showScreen('friendsScreen');
-          }
+        if (typeof window.showScreen === 'function') {
+          window.showScreen('friendsScreen');
         }
       }, 200);
     } else {
-      // Недостаточный свайп - возвращаем обратно
+      // Возвращаем обратно
       activeScreen.style.transform = '';
       activeScreen.style.opacity = '';
       activeScreen.classList.add('swipe-in');
@@ -760,7 +750,6 @@ function handleTouchEnd(e) {
     }
   }
   
-  // Сбрасываем флаги в любом случае
   isSwiping = false;
 }
 
@@ -770,12 +759,10 @@ function setupInputFocusHandling() {
   if (!messageInput) return;
   
   messageInput.addEventListener('focus', () => {
-    // Когда поле ввода получает фокус, добавляем класс для анимации
     document.body.classList.add('input-focused');
   });
   
   messageInput.addEventListener('blur', () => {
-    // Когда поле ввода теряет фокус, убираем класс
     document.body.classList.remove('input-focused');
   });
 }
@@ -785,8 +772,9 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('🔧 chat.js загружен');
   
   // Настройка обработки свайпов
-  document.addEventListener('touchstart', handleTouchStart, false);
-  document.addEventListener('touchend', handleTouchEnd, false);
+  document.addEventListener('touchstart', handleTouchStart, { passive: true });
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd, { passive: true });
   
   // Настройка обработки фокуса на поле ввода
   setupInputFocusHandling();
@@ -896,99 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  // ===== УЛУЧШЕННАЯ ОБРАБОТКА СВАЙПОВ С АНИМАЦИЕЙ =====
-let touchStartX = 0;
-let touchEndX = 0;
-let isSwiping = false;
-let swipeStartTime = 0;
-
-function handleTouchStart(e) {
-  touchStartX = e.touches[0].clientX;
-  swipeStartTime = Date.now();
-  isSwiping = true;
   
-  // Добавляем класс для отключения transition во время свайпа
-  const activeScreen = document.querySelector('.screen.active');
-  if (activeScreen) {
-    activeScreen.classList.add('swiping');
-  }
-}
-
-function handleTouchMove(e) {
-  if (!isSwiping) return;
-  
-  const currentX = e.touches[0].clientX;
-  const diff = currentX - touchStartX;
-  
-  // Если свайп от левого края и достаточно длинный
-  if (touchStartX < 50 && diff > 20) {
-    const activeScreen = document.querySelector('.screen.active');
-    if (activeScreen) {
-      // Применяем трансформацию в реальном времени
-      const translateX = Math.min(diff * 0.5, 100);
-      activeScreen.style.transform = `translateX(${translateX}px)`;
-      activeScreen.style.opacity = 1 - (translateX / 200);
-    }
-  }
-}
-
-function handleTouchEnd(e) {
-  if (!isSwiping) return;
-  
-  touchEndX = e.changedTouches[0].clientX;
-  const swipeDistance = touchEndX - touchStartX;
-  const swipeDuration = Date.now() - swipeStartTime;
-  const activeScreen = document.querySelector('.screen.active');
-  
-  if (!activeScreen) {
-    isSwiping = false;
-    return;
-  }
-  
-  // Убираем класс swiping
-  activeScreen.classList.remove('swiping');
-  
-  // Проверяем, был ли свайп от левого края
-  if (touchStartX < 50 && swipeDistance > 80 && swipeDuration < 300) {
-    // Достаточно быстрый и длинный свайп - выполняем действие
-    activeScreen.style.transform = '';
-    activeScreen.style.opacity = '';
-    
-    // Добавляем класс анимации
-    activeScreen.classList.add('swipe-right');
-    
-    setTimeout(() => {
-      activeScreen.classList.remove('swipe-right');
-      
-      // Проверяем, что мы не на главном экране
-      if (activeScreen.id !== 'friendsScreen') {
-        if (typeof window.showScreen === 'function') {
-          window.showScreen('friendsScreen');
-        }
-      }
-    }, 200);
-  } else {
-    // Возвращаем на место с анимацией
-    activeScreen.style.transform = '';
-    activeScreen.style.opacity = '';
-    activeScreen.classList.add('swipe-in');
-    
-    setTimeout(() => {
-      activeScreen.classList.remove('swipe-in');
-    }, 300);
-  }
-  
-  isSwiping = false;
-}
-
-// Добавьте в инициализацию
-document.addEventListener('touchstart', handleTouchStart, { passive: true });
-document.addEventListener('touchmove', handleTouchMove, { passive: true });
-document.addEventListener('touchend', handleTouchEnd, { passive: true });
-// Добавьте в инициализацию
-document.addEventListener('touchstart', handleTouchStart, { passive: true });
-document.addEventListener('touchmove', handleTouchMove, { passive: false }); // passive: false чтобы можно было вызвать preventDefault
-document.addEventListener('touchend', handleTouchEnd, { passive: true });
   // Экспорт функций
   window.openBotChat = openBotChat;
   window.openFriendChat = openFriendChat;

@@ -1430,3 +1430,50 @@ body.input-focused {
 .swipe-in {
   animation: swipeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+/* ===== ИСПРАВЛЕНИЕ ДЛЯ СВАЙПОВ ===== */
+.screen {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  will-change: transform, opacity;
+  position: relative;
+  z-index: 1;
+}
+
+.screen.swiping {
+  transition: none; /* Убираем анимацию во время свайпа */
+}
+
+.screen.swipe-right {
+  animation: swipeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.screen.swipe-in {
+  animation: swipeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes swipeOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(30%);
+    opacity: 0.7;
+  }
+}
+
+@keyframes swipeIn {
+  0% {
+    transform: translateX(30%);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Запрещаем выделение при свайпе */
+.screen * {
+  user-select: none;
+  -webkit-user-select: none;
+}

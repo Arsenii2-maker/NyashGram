@@ -404,7 +404,12 @@ function showQuickReplies(botId) {
     if (!panel) return;
     
     const questions = quickQuestions[botId] || quickQuestions.nyashtalk;
-    
+    // После того как настроили чат, добавляем кнопки звонков
+setTimeout(() => {
+    if (typeof window.addCallButtonsToChat === 'function') {
+        window.addCallButtonsToChat();
+    }
+}, 500);
     panel.innerHTML = '';
     questions.forEach(q => {
         const btn = document.createElement('button');

@@ -1,12 +1,12 @@
-// contacts.js — РАБОЧАЯ ВЕРСИЯ (как было)
+// contacts.js — РАБОЧАЯ ВЕРСИЯ
 
 // ===== БОТЫ =====
 const botUsers = [
-  { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp' },
-  { id: 'nyashtalk', name: 'NyashTalk', username: 'nyashtalk' },
-  { id: 'nyashgame', name: 'NyashGame', username: 'nyashgame' },
-  { id: 'nyashhoroscope', name: 'NyashHoroscope', username: 'nyashhoroscope' },
-  { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook' }
+  { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp', emoji: '🩷' },
+  { id: 'nyashtalk', name: 'NyashTalk', username: 'nyashtalk', emoji: '🌸' },
+  { id: 'nyashgame', name: 'NyashGame', username: 'nyashgame', emoji: '🎮' },
+  { id: 'nyashhoroscope', name: 'NyashHoroscope', username: 'nyashhoroscope', emoji: '🔮' },
+  { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook', emoji: '🍳' }
 ];
 
 // ===== СОСТОЯНИЕ =====
@@ -16,9 +16,10 @@ let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '
 let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
 
-// Делаем глобальными
 window.customNames = customNames;
 window.pinnedChats = pinnedChats;
+window.friendsList = friendsList;
+window.friendRequests = friendRequests;
 
 // ===== ГРАДИЕНТЫ ДЛЯ БОТОВ =====
 function getBotGradient(botId) {
@@ -59,7 +60,9 @@ function togglePin(chatId) {
     pinnedChats.push(chatId);
   }
   localStorage.setItem('nyashgram_pinned_chats', JSON.stringify(pinnedChats));
+  window.pinnedChats = pinnedChats;
   renderContacts();
+  window.showToast?.(pinnedChats.includes(chatId) ? '📌 Чат закреплён' : '📌 Чат откреплён', 'info');
 }
 
 // ===== КАСТОМНЫЕ ИМЕНА =====
@@ -84,10 +87,7 @@ async function loadFriends() {
     
     console.log('📨 Данные пользователя:', userData);
     
-    // Загружаем друзей
     if (userData.friends && userData.friends.length > 0) {
-      console.log(`👥 Найдено ${userData.friends.length} друзей`);
-      
       const friendsData = await Promise.all(
         userData.friends.map(async (friendId) => {
           const friendDoc = await window.db.collection('users').doc(friendId).get();
@@ -99,29 +99,30 @@ async function loadFriends() {
       friendsList = [];
     }
     
-    // Загружаем заявки
     if (userData.friendRequests && userData.friendRequests.length > 0) {
       console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
       
       const requestsData = await Promise.all(
         userData.friendRequests.map(async (req) => {
-          const userDoc = await window.db.collection('users').doc(req.from).get();
+          const fromId = typeof req === 'object' ? req.from : req;
+          const userDoc = await window.db.collection('users').doc(fromId).get();
           return {
-            ...req,
-            fromUser: { id: userDoc.id, ...userDoc.data() }
+            from: fromId,
+            fromUser: { id: userDoc.id, ...userDoc.data() },
+            timestamp: typeof req === 'object' ? req.timestamp : Date.now()
           };
         })
       );
       friendRequests = requestsData;
-      console.log('📨 Заявки после обработки:', friendRequests);
+      console.log('📨 Заявки:', friendRequests);
     } else {
       friendRequests = [];
     }
     
-    // Обновляем бейдж
-    updateRequestsBadge();
+    window.friendsList = friendsList;
+    window.friendRequests = friendRequests;
     
-    // Рендерим
+    updateRequestsBadge();
     renderContacts();
     
   } catch (error) {
@@ -135,7 +136,7 @@ function updateRequestsBadge() {
   if (badge) {
     if (friendRequests.length > 0) {
       badge.textContent = friendRequests.length;
-      badge.style.display = 'inline';
+      badge.style.display = 'inline-flex';
     } else {
       badge.style.display = 'none';
     }
@@ -161,13 +162,11 @@ function renderContacts() {
 }
 
 function renderChats(list) {
-  // Секция ботов
   const botsHeader = document.createElement('div');
   botsHeader.className = 'section-header';
   botsHeader.textContent = '🤖 няш-боты';
   list.appendChild(botsHeader);
   
-  // Сортируем ботов: закреплённые сверху
   const sortedBots = [...botUsers].sort((a, b) => {
     const aPinned = isPinned(a.id) ? 1 : 0;
     const bPinned = isPinned(b.id) ? 1 : 0;
@@ -182,7 +181,9 @@ function renderChats(list) {
     el.setAttribute('data-id', bot.id);
     
     el.innerHTML = `
-      <div class="avatar" style="background: ${getBotGradient(bot.id)}; background-size: cover;"></div>
+      <div class="avatar" style="background: ${getBotGradient(bot.id)};">
+        <span class="avatar-emoji">${bot.emoji || '🤖'}</span>
+      </div>
       <div class="info">
         <div class="name">${displayName} ${isPinned(bot.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
         <div class="username">@${bot.username}</div>
@@ -190,16 +191,10 @@ function renderChats(list) {
       </div>
     `;
     
-    el.onclick = () => {
-      if (typeof window.openBotChat === 'function') {
-        window.openBotChat(bot);
-      }
-    };
-    
+    el.onclick = () => window.openBotChat?.(bot);
     list.appendChild(el);
   });
   
-  // Секция друзей (если есть)
   if (friendsList.length > 0) {
     const friendsHeader = document.createElement('div');
     friendsHeader.className = 'section-header';
@@ -216,7 +211,9 @@ function renderChats(list) {
       const onlineStatus = friend.online ? '<span class="online-dot">●</span>' : '';
       
       el.innerHTML = `
-        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);">
+          <span class="avatar-emoji">👤</span>
+        </div>
         <div class="info">
           <div class="name">${displayName} ${onlineStatus} ${isPinned(friend.id) ? '<span class="pin-icon">📌</span>' : ''}</div>
           <div class="username">@${friend.username}</div>
@@ -224,12 +221,7 @@ function renderChats(list) {
         </div>
       `;
       
-      el.onclick = () => {
-        if (typeof window.openFriendChat === 'function') {
-          window.openFriendChat(friend);
-        }
-      };
-      
+      el.onclick = () => window.openFriendChat?.(friend);
       list.appendChild(el);
     });
   }
@@ -245,7 +237,9 @@ function renderFriends(list) {
       const onlineStatus = friend.online ? '<span class="online-dot">●</span>' : '';
       
       el.innerHTML = `
-        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);">
+          <span class="avatar-emoji">👤</span>
+        </div>
         <div class="info">
           <div class="name">${friend.name} ${onlineStatus}</div>
           <div class="username">@${friend.username}</div>
@@ -255,17 +249,10 @@ function renderFriends(list) {
       
       el.querySelector('.message-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (typeof window.openFriendChat === 'function') {
-          window.openFriendChat(friend);
-        }
+        window.openFriendChat?.(friend);
       });
       
-      el.onclick = () => {
-        if (typeof window.openFriendChat === 'function') {
-          window.openFriendChat(friend);
-        }
-      };
-      
+      el.onclick = () => window.openFriendChat?.(friend);
       list.appendChild(el);
     });
   } else {
@@ -281,9 +268,7 @@ function renderFriends(list) {
     
     setTimeout(() => {
       document.getElementById('findFriendsBtn')?.addEventListener('click', () => {
-        if (typeof window.showScreen === 'function') {
-          window.showScreen('searchFriendsScreen');
-        }
+        window.showScreen?.('searchFriendsScreen');
       });
     }, 100);
   }
@@ -293,13 +278,16 @@ function renderRequests(list) {
   if (friendRequests.length > 0) {
     friendRequests.forEach(request => {
       const el = document.createElement('div');
-      el.className = 'contact';
+      el.className = 'contact request-item';
       
       el.innerHTML = `
-        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+        <div class="avatar" style="background: linear-gradient(135deg, #ffb6c1, #ff9eb5);">
+          <span class="avatar-emoji">📨</span>
+        </div>
         <div class="info">
           <div class="name">${request.fromUser?.name || 'пользователь'}</div>
           <div class="username">@${request.fromUser?.username || 'unknown'}</div>
+          <div class="request-time">${new Date(request.timestamp).toLocaleDateString()}</div>
         </div>
         <div class="request-actions">
           <button class="accept-request" data-id="${request.from}">✅</button>
@@ -311,20 +299,18 @@ function renderRequests(list) {
       
       el.querySelector('.accept-request')?.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (typeof window.acceptFriendRequest === 'function') {
-          const result = await window.acceptFriendRequest(request.from);
-          if (result?.success) {
-            loadFriends();
-          }
+        const result = await window.acceptFriendRequest?.(request.from);
+        if (result?.success) {
+          loadFriends();
+          window.showToast?.('✅ Заявка принята!', 'success');
         }
       });
       
       el.querySelector('.reject-request')?.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (typeof window.removeFriendRequest === 'function') {
-          await window.removeFriendRequest(request.from);
-          loadFriends();
-        }
+        await window.removeFriendRequest?.(request.from);
+        loadFriends();
+        window.showToast?.('❌ Заявка отклонена', 'info');
       });
     });
   } else {
@@ -339,16 +325,14 @@ function renderRequests(list) {
   }
 }
 
-// ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ В FIREBASE =====
+// ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ =====
 function listenToFriendChanges() {
   if (!window.auth?.currentUser || window.auth.currentUser.isAnonymous) return;
   
   window.db.collection('users').doc(window.auth.currentUser.uid)
-    .onSnapshot((doc) => {
-      if (doc.exists) {
-        console.log('👥 Данные пользователя изменились');
-        loadFriends();
-      }
+    .onSnapshot(() => {
+      console.log('👥 Данные изменились');
+      loadFriends();
     });
 }
 
@@ -356,7 +340,6 @@ function listenToFriendChanges() {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('👥 contacts.js загружен');
   
-  // Добавляем обработчики на табы
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -365,7 +348,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Загружаем друзей если уже авторизованы
   if (window.auth?.currentUser && !window.auth.currentUser.isAnonymous) {
     setTimeout(() => {
       loadFriends();
@@ -373,9 +355,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
   }
   
-  if (document.getElementById('friendsScreen')?.classList.contains('active')) {
-    renderContacts();
-  }
+  document.addEventListener('userAuthenticated', () => {
+    loadFriends();
+    listenToFriendChanges();
+  });
 });
 
 // ===== ЭКСПОРТ =====

@@ -21,6 +21,14 @@ const storage = firebase.storage();
 window.auth = auth;
 window.db = db;
 window.storage = storage;
+// ===== СОХРАНЯЕМ СЕССИЮ =====
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log('✅ Сессия будет сохраняться');
+    })
+    .catch((error) => {
+        console.error('❌ Ошибка сохранения сессии:', error);
+    });
 
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 let currentUser = null;

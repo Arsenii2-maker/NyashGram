@@ -64,7 +64,6 @@ body {
   --input-placeholder: #ffb6c1;
 }
 
-/* Milk Rose */
 .theme-milk-rose.mode-light {
   --bg-start: #ffb6c1;
   --bg-end: #ff9eb5;
@@ -97,7 +96,6 @@ body {
   --input-placeholder: #ffcccc;
 }
 
-/* Night Blue */
 .theme-night-blue.mode-light {
   --bg-start: #d4e0f0;
   --bg-end: #c0d0e8;
@@ -130,7 +128,6 @@ body {
   --input-placeholder: #b0c4de;
 }
 
-/* Lo-Fi Beige */
 .theme-lo-fi-beige.mode-light {
   --bg-start: #f9f5ee;
   --bg-end: #f0e6d9;
@@ -163,7 +160,6 @@ body {
   --input-placeholder: #deb887;
 }
 
-/* Soft Lilac */
 .theme-soft-lilac.mode-light {
   --bg-start: #f5f0ff;
   --bg-end: #e6d9ff;
@@ -196,7 +192,6 @@ body {
   --input-placeholder: #d8bfd8;
 }
 
-/* Forest Mint */
 .theme-forest-mint.mode-light {
   --bg-start: #e0f2e0;
   --bg-end: #c8e6c9;

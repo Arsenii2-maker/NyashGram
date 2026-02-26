@@ -307,6 +307,11 @@ function openBotChat(bot) {
     if (messagesListener) messagesListener();
     if (chatListener) chatListener();
     
+    // В openBotChat добавить:
+if (typeof window.updateCallButtonsVisibility === 'function') {
+    window.updateCallButtonsVisibility();
+}
+    
     saveCurrentDraft();
     
     currentChat = bot;
@@ -354,6 +359,11 @@ async function openFriendChat(friend) {
     
     if (messagesListener) messagesListener();
     if (chatListener) chatListener();
+    
+    // В openFriendChat добавить:
+if (typeof window.updateCallButtonsVisibility === 'function') {
+    window.updateCallButtonsVisibility();
+}
     
     saveCurrentDraft();
     

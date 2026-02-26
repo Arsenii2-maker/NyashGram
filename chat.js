@@ -5,7 +5,7 @@ let currentChatType = null;
 let quickPanelVisible = true;
 let chatMessages = JSON.parse(localStorage.getItem('nyashgram_chat_messages') || '{}');
 let currentDraftChatId = null;
-let isSending = false;
+let isSending = false; 
 
 // ===== ГОЛОСОВЫЕ СООБЩЕНИЯ =====
 let mediaRecorder = null;

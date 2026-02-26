@@ -1622,3 +1622,104 @@ button:active {
     font-size: 16px;
   }
 }
+/* ===== МИЛЫЕ ОБЛАЧКА ===== */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10000;
+    gap: 10px;
+}
+
+.toast {
+    background: white;
+    color: #333;
+    padding: 12px 24px;
+    border-radius: 40px;
+    box-shadow: 0 4px 20px rgba(255, 155, 200, 0.3);
+    font-size: 15px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 200, 220, 0.5);
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: toastFloat 0.3s ease forwards;
+    max-width: 80%;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(135deg, #fff9fc, #ffffff);
+}
+
+.toast::before {
+    content: "☁️";
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    font-size: 24px;
+    opacity: 0.5;
+    transform: rotate(-10deg);
+}
+
+.toast::after {
+    content: "☁️";
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 24px;
+    opacity: 0.5;
+    transform: rotate(10deg);
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #f0fff0, #ffffff);
+    border-color: #a5d6a5;
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #fff0f0, #ffffff);
+    border-color: #ffb6b6;
+}
+
+.toast.info {
+    background: linear-gradient(135deg, #f0f5ff, #ffffff);
+    border-color: #b8d1ff;
+}
+
+@keyframes toastFloat {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toastFadeOut {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+}
+
+.toast.fade-out {
+    animation: toastFadeOut 0.3s ease forwards;
+}
+
+/* Тёмная тема для облачков */
+.mode-dark .toast {
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+    color: #fff;
+    border-color: #ff9acb;
+    box-shadow: 0 4px 20px rgba(255, 155, 200, 0.2);
+}

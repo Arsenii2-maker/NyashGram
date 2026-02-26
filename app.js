@@ -81,16 +81,21 @@ function showToast(message, type = 'info', duration = 3000) {
     }, duration);
 }
 
-// ===== ПРИМЕНЕНИЕ ТЕМЫ =====
+// ===== ПРИМЕНЕНИЕ ТЕМЫ (РАБОЧАЯ ВЕРСИЯ) =====
 function applyTheme() {
     const theme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
     const mode = localStorage.getItem('nyashgram_mode') || 'light';
     const font = localStorage.getItem('nyashgram_font') || 'font-cozy';
     
-    // Полностью очищаем классы
-    document.body.className = '';
+    // Убираем старые классы
+    document.body.classList.remove(
+        'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue',
+        'theme-lo-fi-beige', 'theme-soft-lilac', 'theme-forest-mint',
+        'mode-light', 'mode-dark',
+        'font-system', 'font-rounded', 'font-cozy', 'font-elegant', 'font-bold-soft', 'font-mono-cozy'
+    );
     
-    // Добавляем новые классы
+    // Добавляем новые
     document.body.classList.add(`theme-${theme}`, `mode-${mode}`, font);
     
     console.log('🎨 Тема применена:', theme, mode, font);

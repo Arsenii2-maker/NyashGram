@@ -62,6 +62,27 @@ const cuteNouns = [
 const EXTRA_RARE = ['honeycomb', 'butterfly', 'dragonfly', 'strawberry'];
 const SECRET_WORDS = ['parallelogram'];
 
+// ===== МИЛЫЕ ОБЛАЧКА (ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ) =====
+function showToast(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 300);
+    }, duration);
+}
+
 // ===== ГЕНЕРАЦИЯ МИЛОГО ЮЗЕРНЕЙМА =====
 function generateCuteUsername() {
     // Редкая пасхалка - 0.5% шанс на parallelogram
@@ -172,14 +193,14 @@ async function updateUsername(newUsername) {
             
             if (new Date() < weekLater) {
                 const daysLeft = Math.ceil((weekLater - new Date()) / (24 * 60 * 60 * 1000));
-                alert(`⏳ Менять username можно раз в неделю. Осталось ${daysLeft} дн.`);
+                showToast(`⏳ Можно менять раз в неделю. Осталось ${daysLeft} ${getDaysWord(daysLeft)}`, 'info');
                 return false;
             }
         }
         
         const available = await isUsernameAvailable(newUsername);
         if (!available) {
-            alert('❌ этот username уже занят');
+            showToast('❌ Этот username уже занят', 'error');
             return false;
         }
         
@@ -198,13 +219,37 @@ async function updateUsername(newUsername) {
         });
         
         localStorage.setItem('nyashgram_username', newUsername);
-        alert('✅ Username обновлён!');
+        showToast('✨ Username обновлён!', 'success');
         return true;
         
     } catch (error) {
         console.error('❌ Ошибка обновления username:', error);
+        showToast('❌ Ошибка при обновлении', 'error');
         return false;
     }
+}
+
+function getDaysWord(days) {
+    if (days % 10 === 1 && days % 100 !== 11) return 'день';
+    if ([2, 3, 4].includes(days % 10) && ![12, 13, 14].includes(days % 100)) return 'дня';
+    return 'дней';
+}
+
+// ===== ПРИМЕНЕНИЕ ТЕМЫ =====
+function applyTheme() {
+    const theme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
+    const mode = localStorage.getItem('nyashgram_mode') || 'light';
+    
+    document.body.classList.remove(
+        'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue',
+        'theme-lo-fi-beige', 'theme-soft-lilac', 'theme-forest-mint',
+        'mode-light', 'mode-dark'
+    );
+    
+    document.body.classList.add(`theme-${theme}`, `mode-${mode}`);
+    
+    const modeBtn = document.getElementById('themeModeToggle');
+    if (modeBtn) modeBtn.textContent = mode === 'light' ? '☀️' : '🌙';
 }
 
 // ===== ПОИСК ПОЛЬЗОВАТЕЛЯ =====
@@ -234,7 +279,7 @@ async function sendFriendRequest(toUsername) {
         const toUser = await findUserByUsername(toUsername);
         
         if (!toUser) {
-            alert('❌ Пользователь не найден');
+            showToast('❌ Пользователь не найден', 'error');
             return;
         }
         
@@ -242,7 +287,7 @@ async function sendFriendRequest(toUsername) {
         const currentUserId = auth.currentUser.uid;
         
         if (toUserId === currentUserId) {
-            alert('❌ Нельзя добавить самого себя');
+            showToast('❌ Нельзя добавить самого себя', 'error');
             return;
         }
         
@@ -258,11 +303,11 @@ async function sendFriendRequest(toUsername) {
             outgoingRequests: firebase.firestore.FieldValue.arrayUnion(toUserId)
         });
         
-        alert('✅ Заявка отправлена!');
+        showToast('✅ Заявка отправлена!', 'success');
         
     } catch (error) {
         console.error('❌ Ошибка:', error);
-        alert('❌ Ошибка при отправке заявки');
+        showToast('❌ Ошибка при отправке заявки', 'error');
     }
 }
 
@@ -405,6 +450,9 @@ async function checkUserProfile() {
         document.getElementById('settingsName').value = userData.name || '';
         document.getElementById('settingsUsername').value = userData.username || '';
         document.getElementById('profileEmail').textContent = auth.currentUser.email || '';
+        document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
+        
+        applyTheme();
         
         return true;
         
@@ -459,7 +507,7 @@ async function loginAnonymously() {
         showScreen('friendsScreen');
         
     } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        showToast('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
@@ -484,35 +532,6 @@ async function logout() {
     }
 }
 
-// ===== ТЕМЫ =====
-function setTheme(themeId) {
-    currentTheme = themeId;
-    localStorage.setItem('nyashgram_theme', themeId);
-    applyTheme();
-}
-
-function toggleThemeMode() {
-    themeMode = themeMode === 'light' ? 'dark' : 'light';
-    localStorage.setItem('nyashgram_mode', themeMode);
-    
-    const modeBtn = document.getElementById('themeModeToggle');
-    if (modeBtn) modeBtn.textContent = themeMode === 'light' ? '☀️' : '🌙';
-    
-    applyTheme();
-}
-
-function applyTheme() {
-    document.body.className = `theme-${currentTheme} mode-${themeMode}`;
-}
-
-// ===== ШРИФТЫ =====
-function setFont(fontClass) {
-    currentFont = fontClass;
-    localStorage.setItem('nyashgram_font', fontClass);
-    document.body.className = document.body.className.split(' ').filter(c => !c.startsWith('font-')).join(' ');
-    document.body.classList.add(fontClass);
-}
-
 // ===== СООБЩЕНИЯ ОБ ОШИБКАХ =====
 function getErrorMessage(error) {
     switch (error.code) {
@@ -529,17 +548,14 @@ function getErrorMessage(error) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 NyashGram v3.5 загружается...');
     
-    // Применяем тему и шрифт
     applyTheme();
     document.body.classList.add(currentFont);
     
     // ===== ОБРАБОТЧИКИ ЭКРАНОВ =====
     
-    // Экран входа
     document.getElementById('emailMethodBtn').addEventListener('click', () => showScreen('emailLoginScreen'));
     document.getElementById('anonymousMethodBtn').addEventListener('click', loginAnonymously);
     
-    // Регистрация
     document.getElementById('showRegisterLink').addEventListener('click', (e) => {
         e.preventDefault();
         showScreen('emailRegisterScreen');
@@ -566,7 +582,6 @@ document.addEventListener('DOMContentLoaded', function() {
         registerWithEmail(name, email, password);
     });
     
-    // Вход по email
     document.getElementById('showLoginLink').addEventListener('click', (e) => {
         e.preventDefault();
         showScreen('emailLoginScreen');
@@ -586,20 +601,19 @@ document.addEventListener('DOMContentLoaded', function() {
         loginWithEmail(email, password);
     });
     
-    // Подтверждение email
     document.getElementById('checkVerificationBtn').addEventListener('click', async () => {
         await auth.currentUser.reload();
         if (auth.currentUser.emailVerified) {
             await checkUserProfile();
             showScreen('friendsScreen');
         } else {
-            alert('📧 Email ещё не подтверждён');
+            showToast('📧 Email ещё не подтверждён', 'info');
         }
     });
     
     document.getElementById('resendEmailBtn').addEventListener('click', async () => {
         await auth.currentUser.sendEmailVerification();
-        alert('📧 Письмо отправлено снова');
+        showToast('📧 Письмо отправлено снова', 'success');
     });
     
     document.getElementById('backToLoginFromVerifyBtn').addEventListener('click', () => showScreen('loginMethodScreen'));
@@ -661,6 +675,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const success = await saveUserProfile(name, username);
             if (success) {
+                showToast('✨ Профиль создан!', 'success');
                 showScreen('friendsScreen');
             }
         });
@@ -672,6 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const username = 'user_' + Math.floor(Math.random() * 10000);
             
             await saveUserProfile(name, username);
+            showToast('👤 Профиль создан автоматически', 'info');
             showScreen('friendsScreen');
         });
     }
@@ -690,32 +706,53 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('backFromSettingsBtn').addEventListener('click', () => showScreen('friendsScreen'));
     document.getElementById('logoutBtn').addEventListener('click', logout);
     
-    // Генератор в настройках
     document.getElementById('settingsGenerateBtn').addEventListener('click', () => {
         document.getElementById('settingsUsername').value = generateCuteUsername();
     });
     
-    // Сохранение настроек
     document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
         const newName = document.getElementById('settingsName').value.trim();
         const newUsername = document.getElementById('settingsUsername').value.trim();
         
         if (!newName || !newUsername) {
-            alert('❌ Заполни все поля');
+            showToast('❌ Заполни все поля', 'error');
             return;
         }
         
         const oldUsername = localStorage.getItem('nyashgram_username');
+        const oldName = localStorage.getItem('nyashgram_name');
         
-        if (newUsername !== oldUsername) {
-            await updateUsername(newUsername);
+        try {
+            if (newUsername !== oldUsername) {
+                if (!isValidUsername(newUsername)) {
+                    showToast('❌ Только a-z, 0-9 и _ (3-50 символов)', 'error');
+                    return;
+                }
+                
+                const result = await updateUsername(newUsername);
+                if (!result) return;
+            }
+            
+            if (newName !== oldName) {
+                localStorage.setItem('nyashgram_name', newName);
+                
+                if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                    await db.collection('users').doc(auth.currentUser.uid).update({
+                        name: newName
+                    });
+                }
+            }
+            
+            showToast('✨ Настройки сохранены!', 'success');
+            
+            setTimeout(() => {
+                showScreen('friendsScreen');
+            }, 500);
+            
+        } catch (error) {
+            console.error('❌ Ошибка:', error);
+            showToast('❌ Ошибка при сохранении', 'error');
         }
-        
-        if (newName !== localStorage.getItem('nyashgram_name')) {
-            localStorage.setItem('nyashgram_name', newName);
-        }
-        
-        alert('✅ Настройки сохранены');
     });
     
     // ===== ПОИСК ДРУЗЕЙ =====
@@ -764,14 +801,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ===== ТЕМЫ =====
     document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+        btn.addEventListener('click', () => {
+            const theme = btn.dataset.theme;
+            localStorage.setItem('nyashgram_theme', theme);
+            applyTheme();
+            showToast(`🎨 Тема изменена на ${btn.textContent}`, 'success', 2000);
+        });
     });
     
-    document.getElementById('themeModeToggle').addEventListener('click', toggleThemeMode);
+    document.getElementById('themeModeToggle').addEventListener('click', () => {
+        const mode = localStorage.getItem('nyashgram_mode') === 'light' ? 'dark' : 'light';
+        localStorage.setItem('nyashgram_mode', mode);
+        applyTheme();
+        showToast(`${mode === 'light' ? '☀️' : '🌙'} ${mode === 'light' ? 'Светлая' : 'Тёмная'} тема`, 'info', 2000);
+    });
     
     // ===== ШРИФТЫ =====
     document.querySelectorAll('.font-btn').forEach(btn => {
-        btn.addEventListener('click', () => setFont(btn.dataset.font));
+        btn.addEventListener('click', () => {
+            const font = btn.dataset.font;
+            localStorage.setItem('nyashgram_font', font);
+            document.body.classList.remove('font-system', 'font-rounded', 'font-cozy', 'font-elegant', 'font-bold-soft', 'font-mono-cozy');
+            document.body.classList.add(font);
+            showToast(`📝 Шрифт: ${btn.textContent}`, 'info', 2000);
+        });
     });
     
     // ===== СЛУШАТЕЛЬ АВТОРИЗАЦИИ =====
@@ -793,6 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== ЭКСПОРТ =====
 window.showScreen = showScreen;
+window.showToast = showToast;
 window.createPrivateChat = createPrivateChat;
 window.acceptFriendRequest = acceptFriendRequest;
 window.removeFriendRequest = removeFriendRequest;

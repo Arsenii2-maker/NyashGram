@@ -14,6 +14,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
   
+  <!-- PeerJS для звонков -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  
   <!-- Манифест и иконки -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -27,6 +30,9 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- КОНТЕЙНЕР ДЛЯ ОБЛАЧКОВ (ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ) -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <!-- ЭКРАН ЗАГРУЗКИ -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
@@ -106,32 +112,32 @@
       </div>
     </div>
   </section>
-  
+
   <!-- ЭКРАН СОЗДАНИЯ ПРОФИЛЯ (НОВЫЙ) -->
-<section id="createProfileScreen" class="screen">
-  <div class="center-wrapper">
-    <div class="glass-container">
-      <h2>NyashGram 💗</h2>
-      <p class="subtitle">создаём профиль</p>
-      
-      <div class="avatar-preview" id="profileAvatar">
-        <span class="avatar-emoji-big">🐾</span>
+  <section id="createProfileScreen" class="screen">
+    <div class="center-wrapper">
+      <div class="glass-container">
+        <h2>NyashGram 💗</h2>
+        <p class="subtitle">создаём профиль</p>
+        
+        <div class="avatar-preview" id="profileAvatar">
+          <span class="avatar-emoji-big">🐾</span>
+        </div>
+        
+        <input type="text" id="profileName" placeholder="твоё имя" maxlength="30" />
+        <div class="username-field">
+          <span class="username-at">@</span>
+          <input type="text" id="profileUsername" placeholder="username" maxlength="50" />
+          <button id="generateUsernameBtn" class="generate-btn" title="сгенерировать">🎲</button>
+        </div>
+        <div class="username-hint">только a-z, 0-9, _, от 3 до 50 символов</div>
+        <div id="usernameError" class="error-message"></div>
+        
+        <button id="createProfileBtn" class="active" disabled>✨ создать профиль</button>
+        <button id="skipProfileBtn" class="text-btn">пропустить (будет user_123)</button>
       </div>
-      
-      <input type="text" id="profileName" placeholder="твоё имя" maxlength="30" />
-      <div class="username-field">
-        <span class="username-at">@</span>
-        <input type="text" id="profileUsername" placeholder="username" maxlength="50" />
-        <button id="generateUsernameBtn" class="generate-btn" title="сгенерировать">🎲</button>
-      </div>
-      <div class="username-hint">только a-z, 0-9, _, от 3 до 50 символов</div>
-      <div id="usernameError" class="error-message"></div>
-      
-      <button id="createProfileBtn" class="active" disabled>✨ создать профиль</button>
-      <button id="skipProfileBtn" class="text-btn">пропустить (будет user_123)</button>
     </div>
-  </div>
-</section>
+  </section>
 
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="friendsScreen" class="screen">
@@ -147,7 +153,10 @@
     <div class="tabs-container">
       <button class="tab-btn active" data-tab="chats">💬 чаты</button>
       <button class="tab-btn" data-tab="friends">👥 друзья</button>
-      <button class="tab-btn" data-tab="requests">📨 заявки</button>
+      <button class="tab-btn" data-tab="requests">
+        📨 заявки
+        <span id="requestsBadge" class="badge" style="display: none;">0</span>
+      </button>
     </div>
     
     <div id="friendsList" class="contacts-list"></div>
@@ -178,6 +187,7 @@
         <span id="chatContactUsername"></span>
       </div>
       <button id="toggleQuickPanelBtn" class="icon-btn">💬</button>
+      <button id="callFriendBtn" class="icon-btn" title="позвонить">📞</button>
       <button id="chatMenuBtn" class="icon-btn">⋮</button>
     </div>
     
@@ -195,6 +205,32 @@
       <button id="voiceRecordBtn" class="voice-btn" title="записать голосовое">🎤</button>
       <input type="text" id="messageInput" placeholder="сообщение..." />
       <button id="sendMessageBtn" class="send-btn">➤</button>
+    </div>
+  </section>
+
+  <!-- ЭКРАН ЗВОНКА (НОВЫЙ) -->
+  <section id="callScreen" class="screen call-screen" style="display: none;">
+    <div class="call-container">
+      <div class="call-header">
+        <button id="callBackBtn" class="call-icon-btn">←</button>
+        <div class="call-status">
+          <div class="call-avatar" id="callAvatar">👤</div>
+          <div class="call-name" id="callName">...</div>
+          <div class="call-state" id="callState">📞 Звоним...</div>
+        </div>
+        <div></div>
+      </div>
+      
+      <div class="call-timer" id="callTimer">00:00</div>
+      
+      <div class="call-controls">
+        <button id="callMuteBtn" class="call-control-btn">🎤</button>
+        <button id="callSpeakerBtn" class="call-control-btn">🔊</button>
+        <button id="callEndBtn" class="call-control-btn end-call">📞</button>
+        <button id="callAnswerBtn" class="call-control-btn answer-call" style="display: none;">✅ Ответить</button>
+      </div>
+      
+      <audio id="remoteAudio" autoplay></audio>
     </div>
   </section>
 
@@ -266,8 +302,10 @@
     </div>
   </div>
 
+  <!-- СКРИПТЫ (ПРАВИЛЬНЫЙ ПОРЯДОК) -->
   <script src="app.js"></script>
   <script src="contacts.js"></script>
   <script src="chat.js"></script>
+  <script src="calls.js"></script>
 </body>
 </html>

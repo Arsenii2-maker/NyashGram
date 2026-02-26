@@ -1,5 +1,6 @@
-// app.js — ПОЛНЫЙ С ПЛАВНЫМИ ПЕРЕХОДАМИ И ИСПРАВЛЕННОЙ НАВИГАЦИЕЙ
+// app.js — ПОЛНАЯ ВЕРСИЯ СО ВСЕМИ ИСПРАВЛЕНИЯМИ
 
+// ===== FIREBASE КОНФИГ =====
 const firebaseConfig = {
   apiKey: "AIzaSyCqTm_oMEVRjOwodVrhmWHLNl1DA4x9sUQ",
   authDomain: "nyashgram-e9f69.firebaseapp.com",
@@ -10,726 +11,791 @@ const firebaseConfig = {
   measurementId: "G-KXXQTJVEGV"
 };
 
-// Инициализация Firebase
+// ===== ИНИЦИАЛИЗАЦИЯ FIREBASE =====
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
 
-// Настройка сохранения сессии
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+// Делаем глобальными
+window.auth = auth;
+window.db = db;
+window.storage = storage;
 
-// ===== СОСТОЯНИЕ ПРИЛОЖЕНИЯ =====
-let currentTheme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
-let currentMode = localStorage.getItem('nyashgram_mode') || 'light';
-let currentFont = localStorage.getItem('nyashgram_font') || 'font-cozy';
+// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 let currentUser = null;
-let isLoading = true;
-let loadingStartTime = Date.now();
+let currentScreen = 'loginMethodScreen';
+let themeMode = localStorage.getItem('nyashgram_mode') || 'light';
+let currentTheme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
+let currentFont = localStorage.getItem('nyashgram_font') || 'font-cozy';
 
-// ===== ПОДСКАЗКИ ДЛЯ ЗАГРУЗКИ =====
-const loadingTips = [
-  "🐱 NyashHelp поможет с любой темой!",
-  "🎮 NyashGame знает много игр!",
-  "🔮 NyashHoroscope расскажет о звёздах",
-  "🍳 NyashCook поделится рецептами",
-  "🌸 NyashTalk обожает болтать",
-  "👥 Ищи друзей по юзернейму!",
-  "🎨 6 милых тем в настройках",
-  "✍️ 6 красивых шрифтов",
-  "📌 Чаты можно закреплять",
-  "✏️ Чаты можно переименовывать"
+// ===== МИЛЫЕ АНГЛИЙСКИЕ СЛОВА ДЛЯ ГЕНЕРАЦИИ =====
+const cuteAdjectives = [
+    'cute', 'sweet', 'soft', 'fluffy', 'gentle', 'little', 'tiny', 'lovely',
+    'adorable', 'charming', 'graceful', 'peaceful', 'sunny', 'rainy', 'cloudy',
+    'happy', 'joyful', 'merry', 'bright', 'shiny', 'glowing', 'sparkly',
+    'dreamy', 'magic', 'mystic', 'cosmic', 'stellar', 'lunar', 'solar',
+    'berry', 'honey', 'sugar', 'candy', 'cookie', 'muffin', 'cupcake',
+    'pink', 'purple', 'rainbow', 'pastel', 'velvet', 'silky', 'smooth',
+    'bouncy', 'jumpy', 'wiggly', 'cuddly', 'snuggly', 'huggable', 'kissable',
+    'cloud', 'star', 'moon', 'sun', 'flower', 'rose', 'lily', 'daisy',
+    'ocean', 'wave', 'river', 'forest', 'meadow', 'garden', 'rain', 'snow'
 ];
 
-let tipInterval = null;
+const cuteNouns = [
+    'cat', 'kitty', 'kitten', 'dog', 'puppy', 'bunny', 'rabbit',
+    'fox', 'panda', 'bear', 'koala', 'otter', 'deer', 'fawn',
+    'bird', 'robin', 'finch', 'duck', 'owl', 'hedgehog',
+    'sun', 'moon', 'star', 'cloud', 'rain', 'rainbow', 'flower',
+    'rose', 'lily', 'daisy', 'cherry', 'blossom', 'leaf', 'petal',
+    'ocean', 'wave', 'river', 'forest', 'meadow', 'garden',
+    'berry', 'strawberry', 'raspberry', 'blueberry', 'cherry',
+    'peach', 'mango', 'coconut', 'honey', 'sugar', 'candy',
+    'cookie', 'biscuit', 'muffin', 'cupcake', 'donut', 'cake',
+    'fairy', 'elf', 'pixie', 'sprite', 'dream', 'magic', 'spell',
+    'wish', 'hope', 'joy', 'bliss', 'peace', 'love', 'heart',
+    'ribbon', 'bow', 'button', 'bubble', 'glitter', 'sparkle',
+    'dewdrop', 'snowflake', 'raindrop', 'feather', 'pillow',
+    'blanket', 'socks', 'mittens', 'scarf'
+];
 
-// ===== ЭКРАН ЗАГРУЗКИ =====
-function showLoadingScreen(message = 'Загружаем...', minDuration = 1000) {
-  const overlay = document.getElementById('loadingOverlay');
-  if (!overlay) return;
-  
-  const msgEl = document.getElementById('loadingMessage');
-  if (msgEl) msgEl.textContent = message;
-  
-  overlay.style.display = 'flex';
-  overlay.style.opacity = '0';
-  
-  setTimeout(() => {
-    overlay.style.opacity = '1';
-  }, 50);
-  
-  showRandomTip();
-  if (tipInterval) clearInterval(tipInterval);
-  tipInterval = setInterval(showRandomTip, 3000);
-  
-  loadingStartTime = Date.now();
-  isLoading = true;
-  
-  return new Promise((resolve) => {
-    window.loadingResolve = resolve;
-  });
-}
+const EXTRA_RARE = ['honeycomb', 'butterfly', 'dragonfly', 'strawberry'];
+const SECRET_WORDS = ['parallelogram'];
 
-function hideLoadingScreen() {
-  const overlay = document.getElementById('loadingOverlay');
-  if (!overlay) return;
-  
-  const elapsedTime = Date.now() - loadingStartTime;
-  const minDuration = 1000;
-  const delay = Math.max(0, minDuration - elapsedTime);
-  
-  setTimeout(() => {
-    overlay.style.opacity = '0';
-    
-    if (tipInterval) {
-      clearInterval(tipInterval);
-      tipInterval = null;
+// ===== ГЕНЕРАЦИЯ МИЛОГО ЮЗЕРНЕЙМА =====
+function generateCuteUsername() {
+    // Редкая пасхалка - 0.5% шанс на parallelogram
+    if (Math.random() < 0.005) {
+        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
+        return `parallelogram${num}`;
     }
     
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      isLoading = false;
-      if (window.loadingResolve) {
-        window.loadingResolve();
-        window.loadingResolve = null;
-      }
-    }, 300);
-  }, delay);
-}
-
-function showRandomTip() {
-  const tipEl = document.getElementById('tipText');
-  if (!tipEl) return;
-  const randomIndex = Math.floor(Math.random() * loadingTips.length);
-  tipEl.textContent = loadingTips[randomIndex];
-}
-
-// ===== ПЛАВНОЕ ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
-function showScreen(id) {
-  console.log('📱 Переключаем на экран:', id);
-  
-  const currentScreen = document.querySelector('.screen.active');
-  const nextScreen = document.getElementById(id);
-  
-  if (!nextScreen) return;
-  
-  if (currentScreen) {
-    // Плавно скрываем текущий экран
-    currentScreen.style.opacity = '0';
-    currentScreen.style.transform = 'scale(0.98)';
-    
-    setTimeout(() => {
-      currentScreen.classList.remove('active');
-      
-      // Показываем новый экран с анимацией
-      nextScreen.classList.add('active');
-      nextScreen.style.opacity = '0';
-      nextScreen.style.transform = 'scale(0.98)';
-      
-      setTimeout(() => {
-        nextScreen.style.opacity = '1';
-        nextScreen.style.transform = 'scale(1)';
-      }, 50);
-    }, 200);
-  } else {
-    // Если нет текущего экрана, просто показываем новый
-    nextScreen.classList.add('active');
-    nextScreen.style.opacity = '0';
-    nextScreen.style.transform = 'scale(0.98)';
-    
-    setTimeout(() => {
-      nextScreen.style.opacity = '1';
-      nextScreen.style.transform = 'scale(1)';
-    }, 50);
-  }
-  
-  if (id === 'friendsScreen' && typeof window.renderContacts === 'function') {
-    // Показываем загрузку контактов
-    const list = document.getElementById('friendsList');
-    if (list) {
-      list.innerHTML = '<div class="loading-contacts">✨ Загрузка контактов...</div>';
+    // Очень редкие - 1% шанс
+    if (Math.random() < 0.01) {
+        const rare = EXTRA_RARE[Math.floor(Math.random() * EXTRA_RARE.length)];
+        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
+        return `${rare}${num}`;
     }
     
-    // Загружаем контакты с небольшой задержкой для плавности
-    setTimeout(() => {
-      if (typeof window.renderContacts === 'function') {
-        window.renderContacts();
-      }
-    }, 300);
-  }
+    const adj = cuteAdjectives[Math.floor(Math.random() * cuteAdjectives.length)];
+    const noun = cuteNouns[Math.floor(Math.random() * cuteNouns.length)];
+    
+    const separators = ['_', '.', '', '-'];
+    const separator = separators[Math.floor(Math.random() * separators.length)];
+    
+    let num = '';
+    if (Math.random() < 0.4) {
+        num = Math.floor(Math.random() * 100).toString();
+    }
+    
+    let username = `${adj}${separator}${noun}${num}`;
+    username = username.toLowerCase();
+    
+    if (username.length > 50) {
+        username = username.substring(0, 50);
+    }
+    
+    return username;
 }
 
-// ===== СИСТЕМА ТЕМ =====
-function setTheme(theme, mode) {
-  document.body.classList.remove(
-    'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue',
-    'theme-lo-fi-beige', 'theme-soft-lilac', 'theme-forest-mint',
-    'light-mode', 'dark-mode'
-  );
-  document.body.classList.add(`theme-${theme}`, mode + '-mode');
-  
-  currentTheme = theme; currentMode = mode;
-  localStorage.setItem('nyashgram_theme', theme);
-  localStorage.setItem('nyashgram_mode', mode);
-  
-  const modeBtn = document.getElementById('themeModeToggle');
-  if (modeBtn) modeBtn.textContent = mode === 'light' ? '☀️' : '🌙';
-  
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.theme === theme) btn.classList.add('active');
-  });
+// ===== ПРОВЕРКА ВАЛИДНОСТИ ЮЗЕРНЕЙМА =====
+function isValidUsername(username) {
+    if (!username || username.length < 3 || username.length > 50) return false;
+    return /^[a-zA-Z0-9_]+$/.test(username);
 }
 
-function toggleMode() {
-  setTheme(currentTheme, currentMode === 'light' ? 'dark' : 'light');
+// ===== ПРОВЕРКА УНИКАЛЬНОСТИ ЮЗЕРНЕЙМА =====
+async function isUsernameAvailable(username) {
+    if (!isValidUsername(username)) return false;
+    
+    try {
+        const doc = await db.collection('usernames').doc(username).get();
+        return !doc.exists;
+    } catch (error) {
+        console.error('❌ Ошибка проверки username:', error);
+        return false;
+    }
 }
 
-// ===== СИСТЕМА ШРИФТОВ =====
-function applyFont(fontClass) {
-  document.body.classList.remove(
-    'font-system', 'font-rounded', 'font-cozy',
-    'font-elegant', 'font-bold-soft', 'font-mono-cozy'
-  );
-  document.body.classList.add(fontClass);
-  currentFont = fontClass;
-  localStorage.setItem('nyashgram_font', fontClass);
-  
-  document.querySelectorAll('.font-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.font === fontClass) btn.classList.add('active');
-  });
+// ===== СОХРАНЕНИЕ ПРОФИЛЯ =====
+async function saveUserProfile(name, username) {
+    if (!auth.currentUser) return false;
+    
+    try {
+        const userId = auth.currentUser.uid;
+        
+        const available = await isUsernameAvailable(username);
+        if (!available) {
+            document.getElementById('usernameError').textContent = '❌ этот username уже занят';
+            return false;
+        }
+        
+        await db.collection('usernames').doc(username).set({
+            uid: userId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        await db.collection('users').doc(userId).set({
+            name: name || 'Пользователь',
+            username: username,
+            email: auth.currentUser.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastUsernameChange: firebase.firestore.FieldValue.serverTimestamp(),
+            friends: [],
+            friendRequests: [],
+            online: true
+        });
+        
+        localStorage.setItem('nyashgram_name', name);
+        localStorage.setItem('nyashgram_username', username);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка сохранения профиля:', error);
+        return false;
+    }
+}
+
+// ===== ОБНОВЛЕНИЕ ЮЗЕРНЕЙМА =====
+async function updateUsername(newUsername) {
+    if (!auth.currentUser) return false;
+    
+    try {
+        const userId = auth.currentUser.uid;
+        const userDoc = await db.collection('users').doc(userId).get();
+        const userData = userDoc.data();
+        
+        if (userData.lastUsernameChange) {
+            const lastChange = userData.lastUsernameChange.toDate();
+            const weekLater = new Date(lastChange.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            if (new Date() < weekLater) {
+                const daysLeft = Math.ceil((weekLater - new Date()) / (24 * 60 * 60 * 1000));
+                alert(`⏳ Менять username можно раз в неделю. Осталось ${daysLeft} дн.`);
+                return false;
+            }
+        }
+        
+        const available = await isUsernameAvailable(newUsername);
+        if (!available) {
+            alert('❌ этот username уже занят');
+            return false;
+        }
+        
+        if (userData.username) {
+            await db.collection('usernames').doc(userData.username).delete();
+        }
+        
+        await db.collection('usernames').doc(newUsername).set({
+            uid: userId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        await db.collection('users').doc(userId).update({
+            username: newUsername,
+            lastUsernameChange: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        localStorage.setItem('nyashgram_username', newUsername);
+        alert('✅ Username обновлён!');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка обновления username:', error);
+        return false;
+    }
+}
+
+// ===== ПОИСК ПОЛЬЗОВАТЕЛЯ =====
+async function findUserByUsername(username) {
+    try {
+        const usernameDoc = await db.collection('usernames').doc(username).get();
+        
+        if (!usernameDoc.exists) return null;
+        
+        const { uid } = usernameDoc.data();
+        const userDoc = await db.collection('users').doc(uid).get();
+        
+        return {
+            id: uid,
+            ...userDoc.data()
+        };
+        
+    } catch (error) {
+        console.error('❌ Ошибка поиска:', error);
+        return null;
+    }
+}
+
+// ===== ОТПРАВКА ЗАЯВКИ В ДРУЗЬЯ =====
+async function sendFriendRequest(toUsername) {
+    try {
+        const toUser = await findUserByUsername(toUsername);
+        
+        if (!toUser) {
+            alert('❌ Пользователь не найден');
+            return;
+        }
+        
+        const toUserId = toUser.id;
+        const currentUserId = auth.currentUser.uid;
+        
+        if (toUserId === currentUserId) {
+            alert('❌ Нельзя добавить самого себя');
+            return;
+        }
+        
+        await db.collection('users').doc(toUserId).update({
+            friendRequests: firebase.firestore.FieldValue.arrayUnion({
+                from: currentUserId,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending'
+            })
+        });
+        
+        await db.collection('users').doc(currentUserId).update({
+            outgoingRequests: firebase.firestore.FieldValue.arrayUnion(toUserId)
+        });
+        
+        alert('✅ Заявка отправлена!');
+        
+    } catch (error) {
+        console.error('❌ Ошибка:', error);
+        alert('❌ Ошибка при отправке заявки');
+    }
+}
+
+// ===== ПРИНЯТИЕ ЗАЯВКИ =====
+async function acceptFriendRequest(fromUserId) {
+    if (!auth.currentUser) return { success: false };
+    
+    try {
+        const currentUserId = auth.currentUser.uid;
+        const batch = db.batch();
+        
+        const currentUserRef = db.collection('users').doc(currentUserId);
+        const fromUserRef = db.collection('users').doc(fromUserId);
+        
+        batch.update(currentUserRef, {
+            friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
+        });
+        
+        batch.update(fromUserRef, {
+            friends: firebase.firestore.FieldValue.arrayUnion(currentUserId)
+        });
+        
+        const currentUserDoc = await currentUserRef.get();
+        const currentUserData = currentUserDoc.data();
+        
+        if (currentUserData.friendRequests) {
+            const updatedRequests = currentUserData.friendRequests.filter(req => {
+                if (typeof req === 'object') {
+                    return req.from !== fromUserId;
+                }
+                return req !== fromUserId;
+            });
+            
+            batch.update(currentUserRef, { friendRequests: updatedRequests });
+        }
+        
+        const fromUserDoc = await fromUserRef.get();
+        const fromUserData = fromUserDoc.data();
+        
+        if (fromUserData.outgoingRequests) {
+            const updatedOutgoing = fromUserData.outgoingRequests.filter(id => id !== currentUserId);
+            batch.update(fromUserRef, { outgoingRequests: updatedOutgoing });
+        }
+        
+        const chatRef = db.collection('chats').doc();
+        batch.set(chatRef, {
+            participants: [currentUserId, fromUserId],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastMessage: null
+        });
+        
+        await batch.commit();
+        
+        return { success: true };
+        
+    } catch (error) {
+        console.error('❌ Ошибка при принятии заявки:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// ===== ОТКЛОНЕНИЕ ЗАЯВКИ =====
+async function removeFriendRequest(fromUserId) {
+    if (!auth.currentUser) return;
+    
+    try {
+        const currentUserId = auth.currentUser.uid;
+        const currentUserRef = db.collection('users').doc(currentUserId);
+        
+        const userDoc = await currentUserRef.get();
+        const userData = userDoc.data();
+        
+        if (userData.friendRequests) {
+            const updatedRequests = userData.friendRequests.filter(req => {
+                if (typeof req === 'object') {
+                    return req.from !== fromUserId;
+                }
+                return req !== fromUserId;
+            });
+            
+            await currentUserRef.update({
+                friendRequests: updatedRequests
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка при отклонении:', error);
+    }
+}
+
+// ===== СОЗДАНИЕ ЧАТА =====
+async function createPrivateChat(uid1, uid2) {
+    try {
+        const chatRef = db.collection('chats').doc();
+        await chatRef.set({
+            participants: [uid1, uid2],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastMessage: null
+        });
+        return chatRef.id;
+    } catch (error) {
+        console.error('❌ Ошибка создания чата:', error);
+        return null;
+    }
+}
+
+// ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.classList.add('active');
+        currentScreen = screenId;
+        
+        if (screenId === 'friendsScreen' && typeof window.renderContacts === 'function') {
+            window.renderContacts();
+        }
+    }
+}
+
+// ===== ПРОВЕРКА ПРОФИЛЯ ПОСЛЕ ВХОДА =====
+async function checkUserProfile() {
+    if (!auth.currentUser) return false;
+    
+    try {
+        const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+        
+        if (!userDoc.exists) {
+            showScreen('createProfileScreen');
+            return false;
+        }
+        
+        const userData = userDoc.data();
+        localStorage.setItem('nyashgram_name', userData.name || '');
+        localStorage.setItem('nyashgram_username', userData.username || '');
+        
+        document.getElementById('settingsName').value = userData.name || '';
+        document.getElementById('settingsUsername').value = userData.username || '';
+        document.getElementById('profileEmail').textContent = auth.currentUser.email || '';
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка проверки профиля:', error);
+        return false;
+    }
+}
+
+// ===== ВХОД ЧЕРЕЗ EMAIL =====
+async function loginWithEmail(email, password) {
+    try {
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        
+        if (result.user.emailVerified) {
+            await checkUserProfile();
+            showScreen('friendsScreen');
+        } else {
+            showScreen('verifyEmailScreen');
+        }
+        
+    } catch (error) {
+        document.getElementById('loginError').textContent = getErrorMessage(error);
+    }
 }
 
 // ===== РЕГИСТРАЦИЯ =====
 async function registerWithEmail(name, email, password) {
-  try {
-    showLoadingScreen('создаём аккаунт...', 1500);
-    
-    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    
-    await user.sendEmailVerification();
-    await user.updateProfile({ displayName: name });
-    
-    // Создаём профиль в Firestore
-    await db.collection('users').doc(user.uid).set({
-      name: name,
-      email: email,
-      username: name.toLowerCase().replace(/\s/g, '') + Math.floor(Math.random() * 1000),
-      avatar: null,
-      theme: currentTheme,
-      mode: currentMode,
-      font: currentFont,
-      friends: [],
-      friendRequests: [],
-      online: true,
-      lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
-    hideLoadingScreen();
-    alert('✅ письмо отправлено! проверь почту');
-    showScreen('loginMethodScreen');
-    return true;
-  } catch (error) {
-    hideLoadingScreen();
-    let message = 'ошибка регистрации';
-    if (error.code === 'auth/email-already-in-use') message = 'email уже используется';
-    if (error.code === 'auth/weak-password') message = 'пароль слишком слабый';
-    alert('❌ ' + message);
-    return false;
-  }
-}
-
-// ===== ВХОД =====
-async function loginWithEmail(email, password) {
-  try {
-    showLoadingScreen('вход...', 1500);
-    
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    
-    if (!user.emailVerified) {
-      hideLoadingScreen();
-      alert('❌ подтверди email сначала');
-      return false;
+    try {
+        const result = await auth.createUserWithEmailAndPassword(email, password);
+        
+        await result.user.sendEmailVerification();
+        
+        localStorage.setItem('nyashgram_name', name);
+        
+        showScreen('verifyEmailScreen');
+        
+    } catch (error) {
+        document.getElementById('regError').textContent = getErrorMessage(error);
     }
-    
-    // Обновляем статус онлайн
-    await db.collection('users').doc(user.uid).update({
-      online: true,
-      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
-    currentUser = user;
-    hideLoadingScreen();
-    showScreen('friendsScreen');
-    if (typeof window.loadFriends === 'function') {
-      setTimeout(() => window.loadFriends(), 500);
-    }
-    return true;
-  } catch (error) {
-    hideLoadingScreen();
-    let message = 'ошибка входа';
-    if (error.code === 'auth/user-not-found') message = 'пользователь не найден';
-    if (error.code === 'auth/wrong-password') message = 'неверный пароль';
-    alert('❌ ' + message);
-    return false;
-  }
 }
 
 // ===== АНОНИМНЫЙ ВХОД =====
 async function loginAnonymously() {
-  try {
-    showLoadingScreen('создаём гостя...', 1500);
-    const userCredential = await auth.signInAnonymously();
-    currentUser = userCredential.user;
-    hideLoadingScreen();
-    showScreen('friendsScreen');
-    if (typeof window.renderContacts === 'function') {
-      setTimeout(() => window.renderContacts(), 500);
+    try {
+        await auth.signInAnonymously();
+        
+        const username = 'guest_' + Math.floor(Math.random() * 10000);
+        localStorage.setItem('nyashgram_name', 'Гость');
+        localStorage.setItem('nyashgram_username', username);
+        
+        showScreen('friendsScreen');
+        
+    } catch (error) {
+        alert('❌ Ошибка: ' + error.message);
     }
-    return true;
-  } catch (error) {
-    hideLoadingScreen();
-    alert('❌ ' + error.message);
-    return false;
-  }
 }
 
 // ===== ВЫХОД =====
 async function logout() {
-  showLoadingScreen('выход...', 1000);
-  
-  if (auth.currentUser && !auth.currentUser.isAnonymous) {
-    await db.collection('users').doc(auth.currentUser.uid).update({
-      online: false,
-      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }
-  
-  await auth.signOut();
-  currentUser = null;
-  
-  setTimeout(() => {
-    hideLoadingScreen();
-    showScreen('loginMethodScreen');
-  }, 1000);
-}
-
-// ===== 🔥 НОВЫЕ ФУНКЦИИ ДЛЯ ДРУЗЕЙ =====
-
-// ПОИСК ПОЛЬЗОВАТЕЛЕЙ
-async function searchUsers(query) {
-  if (!query || query.length < 2 || !auth.currentUser) return [];
-  
-  try {
-    console.log('🔍 Ищем пользователей с username:', query);
-    
-    const usersRef = db.collection('users');
-    const snapshot = await usersRef
-      .where('username', '>=', query.toLowerCase())
-      .where('username', '<=', query.toLowerCase() + '\uf8ff')
-      .limit(20)
-      .get();
-    
-    const results = snapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(user => user.id !== auth.currentUser.uid);
-    
-    console.log('✅ Найдено:', results.length, 'результатов');
-    return results;
-  } catch (error) {
-    console.error('❌ Ошибка поиска:', error);
-    return [];
-  }
-}
-
-// ОТПРАВКА ЗАПРОСА В ДРУЗЬЯ
-async function sendFriendRequest(toUserId) {
-  if (!auth.currentUser) return { success: false, error: 'не авторизован' };
-  
-  try {
-    const request = {
-      from: auth.currentUser.uid,
-      timestamp: Date.now(),
-      status: 'pending'
-    };
-    
-    await db.collection('users').doc(toUserId).update({
-      friendRequests: firebase.firestore.FieldValue.arrayUnion(request)
-    });
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Ошибка отправки запроса:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-// ===== ПРИНЯТИЕ ЗАПРОСА (ИСПРАВЛЕНО) =====
-async function acceptFriendRequest(fromUserId) {
-  if (!auth.currentUser) return { success: false, error: 'не авторизован' };
-  
-  try {
-    console.log('✅ Принимаем заявку от:', fromUserId);
-    
-    // 1. Добавляем друга в свой список
-    await db.collection('users').doc(auth.currentUser.uid).update({
-      friends: firebase.firestore.FieldValue.arrayUnion(fromUserId)
-    });
-    
-    // 2. Добавляем себя в список друга
-    await db.collection('users').doc(fromUserId).update({
-      friends: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid)
-    });
-    
-    // 3. Получаем свои текущие заявки
-    const userRef = db.collection('users').doc(auth.currentUser.uid);
-    const userDoc = await userRef.get();
-    const userData = userDoc.data();
-    const requests = userData.friendRequests || [];
-    
-    // 4. Удаляем принятую заявку (фильтруем)
-    const updatedRequests = requests.filter(req => req.from !== fromUserId);
-    
-    // 5. Обновляем документ
-    await userRef.update({
-      friendRequests: updatedRequests
-    });
-    
-    // 6. Создаём чат
-    const chatId = await createPrivateChat(auth.currentUser.uid, fromUserId);
-    
-    // 7. Обновляем список друзей
-    if (typeof window.loadFriends === 'function') {
-      setTimeout(() => window.loadFriends(), 500);
-    }
-    
-    showNotification('✅ друг добавлен!');
-    
-    return { success: true, chatId };
-  } catch (error) {
-    console.error('❌ Ошибка принятия запроса:', error);
-    showNotification('❌ ошибка: ' + error.message);
-    return { success: false, error: error.message };
-  }
-}
-
-// УДАЛЕНИЕ ЗАПРОСА
-async function removeFriendRequest(fromUserId) {
-  if (!auth.currentUser) return;
-  
-  try {
-    const userRef = db.collection('users').doc(auth.currentUser.uid);
-    const userDoc = await userRef.get();
-    const requests = userDoc.data().friendRequests || [];
-    
-    const updatedRequests = requests.filter(req => req.from !== fromUserId);
-    
-    await userRef.update({
-      friendRequests: updatedRequests
-    });
-    
-    if (typeof window.loadFriends === 'function') {
-      window.loadFriends();
-    }
-  } catch (error) {
-    console.error('Ошибка удаления запроса:', error);
-  }
-}
-
-// СОЗДАНИЕ ЧАТА
-async function createPrivateChat(userId1, userId2) {
-  // Проверяем, есть ли уже чат
-  const chatsRef = db.collection('chats');
-  const snapshot = await chatsRef
-    .where('type', '==', 'private')
-    .where('participants', 'array-contains', userId1)
-    .get();
-  
-  const existingChat = snapshot.docs.find(doc => 
-    doc.data().participants.includes(userId2)
-  );
-  
-  if (existingChat) return existingChat.id;
-  
-  // Создаём новый чат
-  const newChat = await chatsRef.add({
-    type: 'private',
-    participants: [userId1, userId2],
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    lastMessage: null,
-    typing: {}
-  });
-  
-  return newChat.id;
-}
-
-// ===== ПРОВЕРКА АВТОРИЗАЦИИ =====
-async function checkAuthAndRedirect() {
-  showLoadingScreen('Загружаем профиль...', 1500);
-  
-  const user = auth.currentUser;
-  
-  if (user && !user.isAnonymous) {
     try {
-      // Загружаем данные пользователя
-      const userDoc = await db.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        if (userData.theme) setTheme(userData.theme, userData.mode || 'light');
-        if (userData.font) applyFont(userData.font);
-      }
-      
-      hideLoadingScreen();
-      showScreen('friendsScreen');
-      
-      // Загружаем друзей после показа экрана
-      setTimeout(() => {
-        if (typeof window.loadFriends === 'function') {
-          window.loadFriends();
+        if (auth.currentUser && !auth.currentUser.isAnonymous) {
+            await db.collection('users').doc(auth.currentUser.uid).update({
+                online: false
+            });
         }
-      }, 500);
+        
+        await auth.signOut();
+        
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        showScreen('loginMethodScreen');
+        
     } catch (error) {
-      console.error('Ошибка загрузки:', error);
-      hideLoadingScreen();
-      showScreen('loginMethodScreen');
+        console.error('❌ Ошибка выхода:', error);
     }
-  } else if (user && user.isAnonymous) {
-    hideLoadingScreen();
-    showScreen('friendsScreen');
-  } else {
-    hideLoadingScreen();
-    showScreen('loginMethodScreen');
-  }
+}
+
+// ===== ТЕМЫ =====
+function setTheme(themeId) {
+    currentTheme = themeId;
+    localStorage.setItem('nyashgram_theme', themeId);
+    applyTheme();
+}
+
+function toggleThemeMode() {
+    themeMode = themeMode === 'light' ? 'dark' : 'light';
+    localStorage.setItem('nyashgram_mode', themeMode);
+    
+    const modeBtn = document.getElementById('themeModeToggle');
+    if (modeBtn) modeBtn.textContent = themeMode === 'light' ? '☀️' : '🌙';
+    
+    applyTheme();
+}
+
+function applyTheme() {
+    document.body.className = `theme-${currentTheme} mode-${themeMode}`;
+}
+
+// ===== ШРИФТЫ =====
+function setFont(fontClass) {
+    currentFont = fontClass;
+    localStorage.setItem('nyashgram_font', fontClass);
+    document.body.className = document.body.className.split(' ').filter(c => !c.startsWith('font-')).join(' ');
+    document.body.classList.add(fontClass);
+}
+
+// ===== СООБЩЕНИЯ ОБ ОШИБКАХ =====
+function getErrorMessage(error) {
+    switch (error.code) {
+        case 'auth/email-already-in-use': return '📧 Email уже используется';
+        case 'auth/invalid-email': return '❌ Неверный email';
+        case 'auth/weak-password': return '🔐 Слабый пароль (минимум 6 символов)';
+        case 'auth/user-not-found': return '👤 Пользователь не найден';
+        case 'auth/wrong-password': return '🔑 Неверный пароль';
+        default: return error.message;
+    }
 }
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 NyashGram v3.5 загружается...');
-  
-  setTheme(currentTheme, currentMode);
-  applyFont(currentFont);
-  
-  // Кнопки входа
-  document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
-    showLoadingScreen('Переходим к регистрации...', 500);
-    setTimeout(() => {
-      hideLoadingScreen();
-      showScreen('emailRegisterScreen');
-    }, 500);
-  });
-  
-  document.getElementById('anonymousMethodBtn')?.addEventListener('click', loginAnonymously);
-  
-  // Навигация назад (ИСПРАВЛЕНО)
-  document.getElementById('backToLoginFromRegBtn')?.addEventListener('click', () => {
-    showScreen('loginMethodScreen');
-  });
-  
-  document.getElementById('backFromEmailLoginBtn')?.addEventListener('click', () => {
-    showScreen('loginMethodScreen');
-  });
-  
-  document.getElementById('backToLoginFromVerifyBtn')?.addEventListener('click', () => {
-    showScreen('loginMethodScreen');
-  });
-  
-  document.getElementById('backFromSearchBtn')?.addEventListener('click', () => {
-    showScreen('friendsScreen');
-  });
-  
-  document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => {
-    showScreen('friendsScreen');
-  });
-  
-  document.getElementById('backBtn')?.addEventListener('click', () => {
-    showScreen('friendsScreen');
-  });
-  
-  // Ссылки
-  document.getElementById('showLoginLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showScreen('emailLoginScreen');
-  });
-  
-  document.getElementById('showRegisterLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showScreen('emailRegisterScreen');
-  });
-  
-  // Регистрация
-  document.getElementById('registerBtn')?.addEventListener('click', async () => {
-    const name = document.getElementById('regName')?.value;
-    const email = document.getElementById('regEmail')?.value;
-    const pass = document.getElementById('regPassword')?.value;
-    const confirm = document.getElementById('regConfirmPassword')?.value;
+    console.log('🚀 NyashGram v3.5 загружается...');
     
-    if (!name || !email || !pass) return alert('заполни поля');
-    if (pass !== confirm) return alert('пароли не совпадают');
-    if (pass.length < 6) return alert('пароль минимум 6 символов');
-    await registerWithEmail(name, email, pass);
-  });
-  
-  // Вход
-  document.getElementById('loginBtn')?.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail')?.value;
-    const pass = document.getElementById('loginPassword')?.value;
-    if (!email || !pass) return alert('введи email и пароль');
-    await loginWithEmail(email, pass);
-  });
-  
-  // Подтверждение
-  document.getElementById('checkVerificationBtn')?.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if (user) {
-      await user.reload();
-      if (user.emailVerified) {
-        showLoadingScreen('вход выполнен...', 1500);
-        setTimeout(() => {
-          hideLoadingScreen();
-          showScreen('friendsScreen');
-          if (typeof window.loadFriends === 'function') {
-            window.loadFriends();
-          }
-        }, 1500);
-      } else {
-        alert('❌ email ещё не подтверждён');
-      }
-    }
-  });
-  
-  document.getElementById('resendEmailBtn')?.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if (user) {
-      await user.sendEmailVerification();
-      alert('✅ письмо отправлено повторно');
-    }
-  });
-  
-  // Кнопка поиска друзей
-  document.getElementById('searchFriendsBtn')?.addEventListener('click', () => {
-    showScreen('searchFriendsScreen');
-  });
-  
-  // Кнопка настроек
-  document.getElementById('settingsBtn')?.addEventListener('click', () => {
-    document.getElementById('settingsName').value = localStorage.getItem('nyashgram_name') || '';
-    document.getElementById('settingsUsername').value = localStorage.getItem('nyashgram_username') || '';
-    document.getElementById('profileEmail').textContent = auth.currentUser?.email || 'гость';
-    showScreen('settingsScreen');
-  });
-  
-  document.getElementById('logoutBtn')?.addEventListener('click', logout);
-  
-  // Сохранение настроек
-  document.getElementById('saveSettingsBtn')?.addEventListener('click', () => {
-    const name = document.getElementById('settingsName')?.value;
-    const username = document.getElementById('settingsUsername')?.value;
-    if (name) localStorage.setItem('nyashgram_name', name);
-    if (username) localStorage.setItem('nyashgram_username', username);
-    showScreen('friendsScreen');
-    if (typeof window.renderContacts === 'function') {
-      setTimeout(() => window.renderContacts(), 100);
-    }
-  });
-  
-  document.getElementById('settingsGenerateBtn')?.addEventListener('click', () => {
-    document.getElementById('settingsUsername').value = 'user_' + Math.floor(Math.random() * 1000);
-  });
-  
-  // Кнопки тем и шрифтов
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    btn.addEventListener('click', () => setTheme(btn.dataset.theme, currentMode));
-  });
-  
-  document.querySelectorAll('.font-btn').forEach(btn => {
-    btn.addEventListener('click', () => applyFont(btn.dataset.font));
-  });
-  
-  document.getElementById('themeModeToggle')?.addEventListener('click', toggleMode);
-  
-  // Вкладки
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (typeof window.renderContacts === 'function') {
-        window.renderContacts();
-      }
+    // Применяем тему и шрифт
+    applyTheme();
+    document.body.classList.add(currentFont);
+    
+    // ===== ОБРАБОТЧИКИ ЭКРАНОВ =====
+    
+    // Экран входа
+    document.getElementById('emailMethodBtn').addEventListener('click', () => showScreen('emailLoginScreen'));
+    document.getElementById('anonymousMethodBtn').addEventListener('click', loginAnonymously);
+    
+    // Регистрация
+    document.getElementById('showRegisterLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        showScreen('emailRegisterScreen');
     });
-  });
-  
-  // 🔥 ПОИСК ПОЛЬЗОВАТЕЛЕЙ
-  const searchInput = document.getElementById('searchUsersInput');
-  const resultsList = document.getElementById('searchResultsList');
-  
-  if (searchInput && resultsList) {
-    let timeout;
-    searchInput.addEventListener('input', async (e) => {
-      const query = e.target.value.trim();
-      
-      if (timeout) clearTimeout(timeout);
-      
-      if (query.length < 2) {
-        resultsList.innerHTML = '';
-        return;
-      }
-      
-      timeout = setTimeout(async () => {
-        const users = await searchUsers(query);
+    
+    document.getElementById('backToLoginFromRegBtn').addEventListener('click', () => showScreen('emailLoginScreen'));
+    
+    document.getElementById('registerBtn').addEventListener('click', () => {
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
         
-        if (users.length === 0) {
-          resultsList.innerHTML = '<div class="empty-state">❌ ничего не найдено</div>';
-          return;
+        if (!name || !email || !password) {
+            document.getElementById('regError').textContent = '❌ Заполни все поля';
+            return;
         }
         
-        resultsList.innerHTML = '';
-        users.forEach(user => {
-          const el = document.createElement('div');
-          el.className = 'search-result-item';
-          el.innerHTML = `
-            <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
-            <div class="info">
-              <div class="name">${user.name || 'пользователь'}</div>
-              <div class="username">@${user.username}</div>
-            </div>
-            <button class="add-friend-btn" data-id="${user.id}">➕</button>
-          `;
-          
-          el.querySelector('.add-friend-btn')?.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const result = await sendFriendRequest(user.id);
-            if (result.success) {
-              alert('✅ запрос отправлен');
-              searchInput.value = '';
-              resultsList.innerHTML = '';
-            } else {
-              alert('❌ ошибка: ' + result.error);
-            }
-          });
-          
-          resultsList.appendChild(el);
-        });
-      }, 500);
+        if (password !== confirm) {
+            document.getElementById('regError').textContent = '❌ Пароли не совпадают';
+            return;
+        }
+        
+        registerWithEmail(name, email, password);
     });
-  }
-  
-  // Проверка авторизации
-  auth.onAuthStateChanged((user) => {
-    currentUser = user;
-    checkAuthAndRedirect();
-  });
-  
-  // Экспорт функций
-  window.showScreen = showScreen;
-  window.searchUsers = searchUsers;
-  window.sendFriendRequest = sendFriendRequest;
-  window.acceptFriendRequest = acceptFriendRequest;
-  window.removeFriendRequest = removeFriendRequest;
-  window.createPrivateChat = createPrivateChat;
-  window.db = db;
-  window.auth = auth;
-  window.loadFriends = null; // Будет определено в contacts.js
+    
+    // Вход по email
+    document.getElementById('showLoginLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        showScreen('emailLoginScreen');
+    });
+    
+    document.getElementById('backFromEmailLoginBtn').addEventListener('click', () => showScreen('loginMethodScreen'));
+    
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            document.getElementById('loginError').textContent = '❌ Заполни все поля';
+            return;
+        }
+        
+        loginWithEmail(email, password);
+    });
+    
+    // Подтверждение email
+    document.getElementById('checkVerificationBtn').addEventListener('click', async () => {
+        await auth.currentUser.reload();
+        if (auth.currentUser.emailVerified) {
+            await checkUserProfile();
+            showScreen('friendsScreen');
+        } else {
+            alert('📧 Email ещё не подтверждён');
+        }
+    });
+    
+    document.getElementById('resendEmailBtn').addEventListener('click', async () => {
+        await auth.currentUser.sendEmailVerification();
+        alert('📧 Письмо отправлено снова');
+    });
+    
+    document.getElementById('backToLoginFromVerifyBtn').addEventListener('click', () => showScreen('loginMethodScreen'));
+    
+    // ===== ЭКРАН СОЗДАНИЯ ПРОФИЛЯ =====
+    const profileName = document.getElementById('profileName');
+    const profileUsername = document.getElementById('profileUsername');
+    const generateBtn = document.getElementById('generateUsernameBtn');
+    const createBtn = document.getElementById('createProfileBtn');
+    const skipBtn = document.getElementById('skipProfileBtn');
+    const usernameError = document.getElementById('usernameError');
+    
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => {
+            profileUsername.value = generateCuteUsername();
+            usernameError.textContent = '';
+            validateProfileForm();
+        });
+    }
+    
+    if (profileUsername) {
+        profileUsername.addEventListener('input', validateProfileForm);
+    }
+    
+    if (profileName) {
+        profileName.addEventListener('input', validateProfileForm);
+    }
+    
+    async function validateProfileForm() {
+        const name = profileName.value.trim();
+        const username = profileUsername.value.trim();
+        
+        if (!name || !username) {
+            createBtn.disabled = true;
+            return;
+        }
+        
+        if (!isValidUsername(username)) {
+            usernameError.textContent = '❌ Только a-z, 0-9 и _ (3-50 символов)';
+            createBtn.disabled = true;
+            return;
+        }
+        
+        const available = await isUsernameAvailable(username);
+        if (!available) {
+            usernameError.textContent = '❌ Этот username уже занят';
+            createBtn.disabled = true;
+            return;
+        }
+        
+        usernameError.textContent = '';
+        createBtn.disabled = false;
+    }
+    
+    if (createBtn) {
+        createBtn.addEventListener('click', async () => {
+            const name = profileName.value.trim();
+            const username = profileUsername.value.trim();
+            
+            const success = await saveUserProfile(name, username);
+            if (success) {
+                showScreen('friendsScreen');
+            }
+        });
+    }
+    
+    if (skipBtn) {
+        skipBtn.addEventListener('click', async () => {
+            const name = 'Пользователь';
+            const username = 'user_' + Math.floor(Math.random() * 10000);
+            
+            await saveUserProfile(name, username);
+            showScreen('friendsScreen');
+        });
+    }
+    
+    // ===== НАСТРОЙКИ =====
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        if (auth.currentUser) {
+            document.getElementById('settingsName').value = localStorage.getItem('nyashgram_name') || '';
+            document.getElementById('settingsUsername').value = localStorage.getItem('nyashgram_username') || '';
+            document.getElementById('profileEmail').textContent = auth.currentUser.email || 'гость';
+            document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
+        }
+        showScreen('settingsScreen');
+    });
+    
+    document.getElementById('backFromSettingsBtn').addEventListener('click', () => showScreen('friendsScreen'));
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    
+    // Генератор в настройках
+    document.getElementById('settingsGenerateBtn').addEventListener('click', () => {
+        document.getElementById('settingsUsername').value = generateCuteUsername();
+    });
+    
+    // Сохранение настроек
+    document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+        const newName = document.getElementById('settingsName').value.trim();
+        const newUsername = document.getElementById('settingsUsername').value.trim();
+        
+        if (!newName || !newUsername) {
+            alert('❌ Заполни все поля');
+            return;
+        }
+        
+        const oldUsername = localStorage.getItem('nyashgram_username');
+        
+        if (newUsername !== oldUsername) {
+            await updateUsername(newUsername);
+        }
+        
+        if (newName !== localStorage.getItem('nyashgram_name')) {
+            localStorage.setItem('nyashgram_name', newName);
+        }
+        
+        alert('✅ Настройки сохранены');
+    });
+    
+    // ===== ПОИСК ДРУЗЕЙ =====
+    document.getElementById('searchFriendsBtn').addEventListener('click', () => {
+        showScreen('searchFriendsScreen');
+        document.getElementById('searchUsersInput').value = '';
+        document.getElementById('searchResultsList').innerHTML = '';
+    });
+    
+    document.getElementById('backFromSearchBtn').addEventListener('click', () => showScreen('friendsScreen'));
+    
+    let searchTimeout;
+    document.getElementById('searchUsersInput').addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        if (query.length < 3) {
+            document.getElementById('searchResultsList').innerHTML = '';
+            return;
+        }
+        
+        searchTimeout = setTimeout(async () => {
+            const user = await findUserByUsername(query);
+            const resultsList = document.getElementById('searchResultsList');
+            
+            if (user && user.id !== auth.currentUser.uid) {
+                resultsList.innerHTML = `
+                    <div class="contact">
+                        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+                        <div class="info">
+                            <div class="name">${user.name || 'Пользователь'}</div>
+                            <div class="username">@${user.username}</div>
+                        </div>
+                        <button class="add-friend-btn" data-username="${user.username}">➕</button>
+                    </div>
+                `;
+                
+                resultsList.querySelector('.add-friend-btn').addEventListener('click', () => {
+                    sendFriendRequest(user.username);
+                });
+            } else {
+                resultsList.innerHTML = '<div class="empty-state">❌ пользователь не найден</div>';
+            }
+        }, 500);
+    });
+    
+    // ===== ТЕМЫ =====
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+    });
+    
+    document.getElementById('themeModeToggle').addEventListener('click', toggleThemeMode);
+    
+    // ===== ШРИФТЫ =====
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.addEventListener('click', () => setFont(btn.dataset.font));
+    });
+    
+    // ===== СЛУШАТЕЛЬ АВТОРИЗАЦИИ =====
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log('👤 Пользователь авторизован:', user.uid);
+            
+            if (!user.isAnonymous) {
+                await checkUserProfile();
+            }
+            
+            document.dispatchEvent(new CustomEvent('userAuthenticated'));
+        } else {
+            console.log('👤 Пользователь не авторизован');
+            showScreen('loginMethodScreen');
+        }
+    });
 });
+
+// ===== ЭКСПОРТ =====
+window.showScreen = showScreen;
+window.createPrivateChat = createPrivateChat;
+window.acceptFriendRequest = acceptFriendRequest;
+window.removeFriendRequest = removeFriendRequest;
+window.generateCuteUsername = generateCuteUsername;
+window.isValidUsername = isValidUsername;
+window.findUserByUsername = findUserByUsername;

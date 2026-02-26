@@ -316,7 +316,11 @@ function openBotChat(bot) {
     const nameEl = document.getElementById('chatContactName');
     const usernameEl = document.getElementById('chatContactUsername');
     const avatarEl = document.getElementById('chatAvatar');
-    
+    // Для ботов скрываем кнопки звонков
+const audioCallBtn = document.getElementById('audioCallActionBtn');
+const videoCallBtn = document.getElementById('videoCallActionBtn');
+if (audioCallBtn) audioCallBtn.style.display = 'none';
+if (videoCallBtn) videoCallBtn.style.display = 'none';
     if (nameEl) nameEl.textContent = customNames[bot.id] || bot.name;
     if (usernameEl) usernameEl.textContent = `@${bot.username}`;
     
@@ -1193,6 +1197,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
+        // В обработчике backBtn
+document.getElementById('audioCallActionBtn')?.remove();
+document.getElementById('videoCallActionBtn')?.remove();
         backBtn.addEventListener('click', () => {
             saveCurrentDraft();
             if (messagesListener) messagesListener();

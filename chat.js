@@ -317,7 +317,19 @@ if (typeof window.updateCallButtonsVisibility === 'function') {
     currentChat = bot;
     currentChatId = bot.id;
     currentChatType = 'bot';
+    // В открытии чата с ботом
+function openBotChat(bot) {
+    console.log('🤖 Открываем чат с ботом:', bot);
     
+    // Показываем панель только для ботов
+    const quickPanel = document.getElementById('quickReplyPanel');
+    if (quickPanel) {
+        quickPanel.style.display = 'flex';
+        showQuickReplies(bot.id);
+    }
+    
+    // ... остальной код
+}
     const nameEl = document.getElementById('chatContactName');
     const usernameEl = document.getElementById('chatContactUsername');
     const avatarEl = document.getElementById('chatAvatar');
@@ -364,7 +376,21 @@ async function openFriendChat(friend) {
 if (typeof window.updateCallButtonsVisibility === 'function') {
     window.updateCallButtonsVisibility();
 }
+    // В открытии чата с другом
+function openFriendChat(friend) {
+    console.log('👥 Открываем чат с другом:', friend);
     
+    // Очищаем панель быстрых сообщений для друзей
+    const quickPanel = document.getElementById('quickReplyPanel');
+    if (quickPanel) {
+        quickPanel.style.display = 'none';
+        quickPanel.innerHTML = ''; // Очищаем
+    }
+    
+    // ... остальной код
+}
+
+
     saveCurrentDraft();
     
     currentChat = friend;

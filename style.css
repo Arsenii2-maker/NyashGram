@@ -1723,3 +1723,49 @@ button:active {
     border-color: #ff9acb;
     box-shadow: 0 4px 20px rgba(255, 155, 200, 0.2);
 }
+/* ===== ОБЛАЧКА ДЛЯ IPHONE (НИЖЕ) ===== */
+.toast-container {
+    position: fixed;
+    top: 60px; /* Опускаем ниже для Dynamic Island */
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10000;
+    gap: 10px;
+    padding: 0 16px;
+}
+
+/* Для старых iPhone без Dynamic Island */
+@supports (padding-top: constant(safe-area-inset-top)) {
+    .toast-container {
+        top: calc(60px + constant(safe-area-inset-top));
+    }
+}
+
+@supports (padding-top: env(safe-area-inset-top)) {
+    .toast-container {
+        top: calc(60px + env(safe-area-inset-top));
+    }
+}
+
+.toast {
+    background: white;
+    color: #333;
+    padding: 14px 24px;
+    border-radius: 40px;
+    box-shadow: 0 8px 25px rgba(255, 155, 200, 0.3);
+    font-size: 15px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 200, 220, 0.5);
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: toastFloat 0.3s ease forwards;
+    max-width: 90%;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(135deg, #fff9fc, #ffffff);
+}

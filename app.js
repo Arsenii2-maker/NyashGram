@@ -1,4 +1,4 @@
-// app.js — ПОЛНАЯ ВЕРСИЯ СО ВСЕМИ ИСПРАВЛЕНИЯМИ
+// app.js — ПОЛНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
 
 // ===== FIREBASE КОНФИГ =====
 const firebaseConfig = {
@@ -25,9 +25,6 @@ window.storage = storage;
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 let currentUser = null;
 let currentScreen = 'loginMethodScreen';
-let themeMode = localStorage.getItem('nyashgram_mode') || 'light';
-let currentTheme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
-let currentFont = localStorage.getItem('nyashgram_font') || 'font-cozy';
 
 // ===== МИЛЫЕ АНГЛИЙСКИЕ СЛОВА ДЛЯ ГЕНЕРАЦИИ =====
 const cuteAdjectives = [
@@ -37,9 +34,7 @@ const cuteAdjectives = [
     'dreamy', 'magic', 'mystic', 'cosmic', 'stellar', 'lunar', 'solar',
     'berry', 'honey', 'sugar', 'candy', 'cookie', 'muffin', 'cupcake',
     'pink', 'purple', 'rainbow', 'pastel', 'velvet', 'silky', 'smooth',
-    'bouncy', 'jumpy', 'wiggly', 'cuddly', 'snuggly', 'huggable', 'kissable',
-    'cloud', 'star', 'moon', 'sun', 'flower', 'rose', 'lily', 'daisy',
-    'ocean', 'wave', 'river', 'forest', 'meadow', 'garden', 'rain', 'snow'
+    'bouncy', 'jumpy', 'wiggly', 'cuddly', 'snuggly', 'huggable', 'kissable'
 ];
 
 const cuteNouns = [
@@ -53,19 +48,22 @@ const cuteNouns = [
     'peach', 'mango', 'coconut', 'honey', 'sugar', 'candy',
     'cookie', 'biscuit', 'muffin', 'cupcake', 'donut', 'cake',
     'fairy', 'elf', 'pixie', 'sprite', 'dream', 'magic', 'spell',
-    'wish', 'hope', 'joy', 'bliss', 'peace', 'love', 'heart',
-    'ribbon', 'bow', 'button', 'bubble', 'glitter', 'sparkle',
-    'dewdrop', 'snowflake', 'raindrop', 'feather', 'pillow',
-    'blanket', 'socks', 'mittens', 'scarf'
+    'wish', 'hope', 'joy', 'bliss', 'peace', 'love', 'heart'
 ];
 
 const EXTRA_RARE = ['honeycomb', 'butterfly', 'dragonfly', 'strawberry'];
 const SECRET_WORDS = ['parallelogram'];
 
-// ===== МИЛЫЕ ОБЛАЧКА (ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ) =====
+// ===== МИЛЫЕ ОБЛАЧКА =====
 function showToast(message, type = 'info', duration = 3000) {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
+    let container = document.getElementById('toastContainer');
+    
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
@@ -83,9 +81,28 @@ function showToast(message, type = 'info', duration = 3000) {
     }, duration);
 }
 
+// ===== ПРИМЕНЕНИЕ ТЕМЫ =====
+function applyTheme() {
+    const theme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
+    const mode = localStorage.getItem('nyashgram_mode') || 'light';
+    const font = localStorage.getItem('nyashgram_font') || 'font-cozy';
+    
+    // Полностью очищаем классы
+    document.body.className = '';
+    
+    // Добавляем новые классы
+    document.body.classList.add(`theme-${theme}`, `mode-${mode}`, font);
+    
+    console.log('🎨 Тема применена:', theme, mode, font);
+    
+    // Обновляем кнопку режима
+    const modeBtn = document.getElementById('themeModeToggle');
+    if (modeBtn) modeBtn.textContent = mode === 'light' ? '☀️' : '🌙';
+}
+
 // ===== ГЕНЕРАЦИЯ МИЛОГО ЮЗЕРНЕЙМА =====
 function generateCuteUsername() {
-    // Редкая пасхалка - 0.5% шанс на parallelogram
+    // Редкая пасхалка - 0.5% шанс
     if (Math.random() < 0.005) {
         const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
         return `parallelogram${num}`;
@@ -101,16 +118,14 @@ function generateCuteUsername() {
     const adj = cuteAdjectives[Math.floor(Math.random() * cuteAdjectives.length)];
     const noun = cuteNouns[Math.floor(Math.random() * cuteNouns.length)];
     
-    const separators = ['_', '.', '', '-'];
-    const separator = separators[Math.floor(Math.random() * separators.length)];
-    
+    // Только подчёркивание, никаких дефисов!
     let num = '';
     if (Math.random() < 0.4) {
         num = Math.floor(Math.random() * 100).toString();
     }
     
-    let username = `${adj}${separator}${noun}${num}`;
-    username = username.toLowerCase();
+    let username = `${adj}_${noun}${num}`;
+    username = username.toLowerCase().replace(/-/g, '_');
     
     if (username.length > 50) {
         username = username.substring(0, 50);
@@ -122,6 +137,7 @@ function generateCuteUsername() {
 // ===== ПРОВЕРКА ВАЛИДНОСТИ ЮЗЕРНЕЙМА =====
 function isValidUsername(username) {
     if (!username || username.length < 3 || username.length > 50) return false;
+    // Только a-z, 0-9, _ (никаких дефисов!)
     return /^[a-zA-Z0-9_]+$/.test(username);
 }
 
@@ -235,23 +251,6 @@ function getDaysWord(days) {
     return 'дней';
 }
 
-// ===== ПРИМЕНЕНИЕ ТЕМЫ =====
-function applyTheme() {
-    const theme = localStorage.getItem('nyashgram_theme') || 'pastel-pink';
-    const mode = localStorage.getItem('nyashgram_mode') || 'light';
-    
-    document.body.classList.remove(
-        'theme-pastel-pink', 'theme-milk-rose', 'theme-night-blue',
-        'theme-lo-fi-beige', 'theme-soft-lilac', 'theme-forest-mint',
-        'mode-light', 'mode-dark'
-    );
-    
-    document.body.classList.add(`theme-${theme}`, `mode-${mode}`);
-    
-    const modeBtn = document.getElementById('themeModeToggle');
-    if (modeBtn) modeBtn.textContent = mode === 'light' ? '☀️' : '🌙';
-}
-
 // ===== ПОИСК ПОЛЬЗОВАТЕЛЯ =====
 async function findUserByUsername(username) {
     try {
@@ -273,7 +272,7 @@ async function findUserByUsername(username) {
     }
 }
 
-// ===== ОТПРАВКА ЗАЯВКИ В ДРУЗЬЯ =====
+// ===== ОТПРАВКА ЗАЯВКИ =====
 async function sendFriendRequest(toUsername) {
     try {
         const toUser = await findUserByUsername(toUsername);
@@ -431,7 +430,7 @@ function showScreen(screenId) {
     }
 }
 
-// ===== ПРОВЕРКА ПРОФИЛЯ ПОСЛЕ ВХОДА =====
+// ===== ПРОВЕРКА ПРОФИЛЯ =====
 async function checkUserProfile() {
     if (!auth.currentUser) return false;
     
@@ -462,7 +461,7 @@ async function checkUserProfile() {
     }
 }
 
-// ===== ВХОД ЧЕРЕЗ EMAIL =====
+// ===== ВХОД =====
 async function loginWithEmail(email, password) {
     try {
         const result = await auth.signInWithEmailAndPassword(email, password);
@@ -483,13 +482,9 @@ async function loginWithEmail(email, password) {
 async function registerWithEmail(name, email, password) {
     try {
         const result = await auth.createUserWithEmailAndPassword(email, password);
-        
         await result.user.sendEmailVerification();
-        
         localStorage.setItem('nyashgram_name', name);
-        
         showScreen('verifyEmailScreen');
-        
     } catch (error) {
         document.getElementById('regError').textContent = getErrorMessage(error);
     }
@@ -499,13 +494,10 @@ async function registerWithEmail(name, email, password) {
 async function loginAnonymously() {
     try {
         await auth.signInAnonymously();
-        
         const username = 'guest_' + Math.floor(Math.random() * 10000);
         localStorage.setItem('nyashgram_name', 'Гость');
         localStorage.setItem('nyashgram_username', username);
-        
         showScreen('friendsScreen');
-        
     } catch (error) {
         showToast('❌ Ошибка: ' + error.message, 'error');
     }
@@ -519,14 +511,10 @@ async function logout() {
                 online: false
             });
         }
-        
         await auth.signOut();
-        
         localStorage.clear();
         sessionStorage.clear();
-        
         showScreen('loginMethodScreen');
-        
     } catch (error) {
         console.error('❌ Ошибка выхода:', error);
     }
@@ -548,22 +536,21 @@ function getErrorMessage(error) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 NyashGram v3.5 загружается...');
     
+    // Применяем сохранённые настройки
     applyTheme();
-    document.body.classList.add(currentFont);
     
     // ===== ОБРАБОТЧИКИ ЭКРАНОВ =====
+    document.getElementById('emailMethodBtn')?.addEventListener('click', () => showScreen('emailLoginScreen'));
+    document.getElementById('anonymousMethodBtn')?.addEventListener('click', loginAnonymously);
     
-    document.getElementById('emailMethodBtn').addEventListener('click', () => showScreen('emailLoginScreen'));
-    document.getElementById('anonymousMethodBtn').addEventListener('click', loginAnonymously);
-    
-    document.getElementById('showRegisterLink').addEventListener('click', (e) => {
+    document.getElementById('showRegisterLink')?.addEventListener('click', (e) => {
         e.preventDefault();
         showScreen('emailRegisterScreen');
     });
     
-    document.getElementById('backToLoginFromRegBtn').addEventListener('click', () => showScreen('emailLoginScreen'));
+    document.getElementById('backToLoginFromRegBtn')?.addEventListener('click', () => showScreen('emailLoginScreen'));
     
-    document.getElementById('registerBtn').addEventListener('click', () => {
+    document.getElementById('registerBtn')?.addEventListener('click', () => {
         const name = document.getElementById('regName').value.trim();
         const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value;
@@ -582,14 +569,14 @@ document.addEventListener('DOMContentLoaded', function() {
         registerWithEmail(name, email, password);
     });
     
-    document.getElementById('showLoginLink').addEventListener('click', (e) => {
+    document.getElementById('showLoginLink')?.addEventListener('click', (e) => {
         e.preventDefault();
         showScreen('emailLoginScreen');
     });
     
-    document.getElementById('backFromEmailLoginBtn').addEventListener('click', () => showScreen('loginMethodScreen'));
+    document.getElementById('backFromEmailLoginBtn')?.addEventListener('click', () => showScreen('loginMethodScreen'));
     
-    document.getElementById('loginBtn').addEventListener('click', () => {
+    document.getElementById('loginBtn')?.addEventListener('click', () => {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
         
@@ -601,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginWithEmail(email, password);
     });
     
-    document.getElementById('checkVerificationBtn').addEventListener('click', async () => {
+    document.getElementById('checkVerificationBtn')?.addEventListener('click', async () => {
         await auth.currentUser.reload();
         if (auth.currentUser.emailVerified) {
             await checkUserProfile();
@@ -611,12 +598,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    document.getElementById('resendEmailBtn').addEventListener('click', async () => {
+    document.getElementById('resendEmailBtn')?.addEventListener('click', async () => {
         await auth.currentUser.sendEmailVerification();
         showToast('📧 Письмо отправлено снова', 'success');
     });
     
-    document.getElementById('backToLoginFromVerifyBtn').addEventListener('click', () => showScreen('loginMethodScreen'));
+    document.getElementById('backToLoginFromVerifyBtn')?.addEventListener('click', () => showScreen('loginMethodScreen'));
     
     // ===== ЭКРАН СОЗДАНИЯ ПРОФИЛЯ =====
     const profileName = document.getElementById('profileName');
@@ -693,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ===== НАСТРОЙКИ =====
-    document.getElementById('settingsBtn').addEventListener('click', () => {
+    document.getElementById('settingsBtn')?.addEventListener('click', () => {
         if (auth.currentUser) {
             document.getElementById('settingsName').value = localStorage.getItem('nyashgram_name') || '';
             document.getElementById('settingsUsername').value = localStorage.getItem('nyashgram_username') || '';
@@ -703,14 +690,14 @@ document.addEventListener('DOMContentLoaded', function() {
         showScreen('settingsScreen');
     });
     
-    document.getElementById('backFromSettingsBtn').addEventListener('click', () => showScreen('friendsScreen'));
-    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => showScreen('friendsScreen'));
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
     
-    document.getElementById('settingsGenerateBtn').addEventListener('click', () => {
+    document.getElementById('settingsGenerateBtn')?.addEventListener('click', () => {
         document.getElementById('settingsUsername').value = generateCuteUsername();
     });
     
-    document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', async () => {
         const newName = document.getElementById('settingsName').value.trim();
         const newUsername = document.getElementById('settingsUsername').value.trim();
         
@@ -744,10 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             showToast('✨ Настройки сохранены!', 'success');
-            
-            setTimeout(() => {
-                showScreen('friendsScreen');
-            }, 500);
+            setTimeout(() => showScreen('friendsScreen'), 500);
             
         } catch (error) {
             console.error('❌ Ошибка:', error);
@@ -756,16 +740,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // ===== ПОИСК ДРУЗЕЙ =====
-    document.getElementById('searchFriendsBtn').addEventListener('click', () => {
+    document.getElementById('searchFriendsBtn')?.addEventListener('click', () => {
         showScreen('searchFriendsScreen');
         document.getElementById('searchUsersInput').value = '';
         document.getElementById('searchResultsList').innerHTML = '';
     });
     
-    document.getElementById('backFromSearchBtn').addEventListener('click', () => showScreen('friendsScreen'));
+    document.getElementById('backFromSearchBtn')?.addEventListener('click', () => showScreen('friendsScreen'));
     
     let searchTimeout;
-    document.getElementById('searchUsersInput').addEventListener('input', (e) => {
+    document.getElementById('searchUsersInput')?.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
         const query = e.target.value.trim();
         
@@ -790,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
                 
-                resultsList.querySelector('.add-friend-btn').addEventListener('click', () => {
+                resultsList.querySelector('.add-friend-btn')?.addEventListener('click', () => {
                     sendFriendRequest(user.username);
                 });
             } else {
@@ -809,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    document.getElementById('themeModeToggle').addEventListener('click', () => {
+    document.getElementById('themeModeToggle')?.addEventListener('click', () => {
         const mode = localStorage.getItem('nyashgram_mode') === 'light' ? 'dark' : 'light';
         localStorage.setItem('nyashgram_mode', mode);
         applyTheme();

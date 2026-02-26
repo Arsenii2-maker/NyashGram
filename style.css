@@ -32,7 +32,7 @@ body {
 }
 
 /* ===== ТЕМЫ ===== */
-.theme-pastel-pink.light-mode {
+.theme-pastel-pink.mode-light {
   --bg-start: #ffd1dc;
   --bg-end: #ffe4e1;
   --text: #5c3a4a;
@@ -48,7 +48,7 @@ body {
   --input-placeholder: #8b6f8b;
 }
 
-.theme-pastel-pink.dark-mode {
+.theme-pastel-pink.mode-dark {
   --bg-start: #8b1a4d;
   --bg-end: #4a1a2a;
   --text: #ffe4f0;
@@ -64,8 +64,8 @@ body {
   --input-placeholder: #ffb6c1;
 }
 
-/* Milk Rose - Light */
-.theme-milk-rose.light-mode {
+/* Milk Rose */
+.theme-milk-rose.mode-light {
   --bg-start: #ffb6c1;
   --bg-end: #ff9eb5;
   --text: #4a2c1f;
@@ -81,7 +81,7 @@ body {
   --input-placeholder: #8b6f6f;
 }
 
-.theme-milk-rose.dark-mode {
+.theme-milk-rose.mode-dark {
   --bg-start: #8b3a3a;
   --bg-end: #4a1f1f;
   --text: #fff0f0;
@@ -97,8 +97,8 @@ body {
   --input-placeholder: #ffcccc;
 }
 
-/* Night Blue - Light */
-.theme-night-blue.light-mode {
+/* Night Blue */
+.theme-night-blue.mode-light {
   --bg-start: #d4e0f0;
   --bg-end: #c0d0e8;
   --text: #1a2a4a;
@@ -114,7 +114,7 @@ body {
   --input-placeholder: #4a5a7a;
 }
 
-.theme-night-blue.dark-mode {
+.theme-night-blue.mode-dark {
   --bg-start: #0a2351;
   --bg-end: #03002b;
   --text: #f0f8ff;
@@ -130,8 +130,8 @@ body {
   --input-placeholder: #b0c4de;
 }
 
-/* Lo-Fi Beige - Light */
-.theme-lo-fi-beige.light-mode {
+/* Lo-Fi Beige */
+.theme-lo-fi-beige.mode-light {
   --bg-start: #f9f5ee;
   --bg-end: #f0e6d9;
   --text: #4a3c2e;
@@ -147,7 +147,7 @@ body {
   --input-placeholder: #8b7a6f;
 }
 
-.theme-lo-fi-beige.dark-mode {
+.theme-lo-fi-beige.mode-dark {
   --bg-start: #5d3a1a;
   --bg-end: #2d1e0a;
   --text: #fdf5e6;
@@ -163,8 +163,8 @@ body {
   --input-placeholder: #deb887;
 }
 
-/* Soft Lilac - Light */
-.theme-soft-lilac.light-mode {
+/* Soft Lilac */
+.theme-soft-lilac.mode-light {
   --bg-start: #f5f0ff;
   --bg-end: #e6d9ff;
   --text: #3c1f5c;
@@ -180,7 +180,7 @@ body {
   --input-placeholder: #6f4f8f;
 }
 
-.theme-soft-lilac.dark-mode {
+.theme-soft-lilac.mode-dark {
   --bg-start: #4b0082;
   --bg-end: #240041;
   --text: #f0e6ff;
@@ -196,8 +196,8 @@ body {
   --input-placeholder: #d8bfd8;
 }
 
-/* Forest Mint - Light */
-.theme-forest-mint.light-mode {
+/* Forest Mint */
+.theme-forest-mint.mode-light {
   --bg-start: #e0f2e0;
   --bg-end: #c8e6c9;
   --text: #1d3b1d;
@@ -213,7 +213,7 @@ body {
   --input-placeholder: #2d5a2d;
 }
 
-.theme-forest-mint.dark-mode {
+.theme-forest-mint.mode-dark {
   --bg-start: #1b4d1b;
   --bg-end: #0a330a;
   --text: #e8f5e8;

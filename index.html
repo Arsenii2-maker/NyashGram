@@ -106,6 +106,32 @@
       </div>
     </div>
   </section>
+  
+  <!-- ЭКРАН СОЗДАНИЯ ПРОФИЛЯ (НОВЫЙ) -->
+<section id="createProfileScreen" class="screen">
+  <div class="center-wrapper">
+    <div class="glass-container">
+      <h2>NyashGram 💗</h2>
+      <p class="subtitle">создаём профиль</p>
+      
+      <div class="avatar-preview" id="profileAvatar">
+        <span class="avatar-emoji-big">🐾</span>
+      </div>
+      
+      <input type="text" id="profileName" placeholder="твоё имя" maxlength="30" />
+      <div class="username-field">
+        <span class="username-at">@</span>
+        <input type="text" id="profileUsername" placeholder="username" maxlength="50" />
+        <button id="generateUsernameBtn" class="generate-btn" title="сгенерировать">🎲</button>
+      </div>
+      <div class="username-hint">только a-z, 0-9, _, от 3 до 50 символов</div>
+      <div id="usernameError" class="error-message"></div>
+      
+      <button id="createProfileBtn" class="active" disabled>✨ создать профиль</button>
+      <button id="skipProfileBtn" class="text-btn">пропустить (будет user_123)</button>
+    </div>
+  </div>
+</section>
 
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="friendsScreen" class="screen">

@@ -1,6 +1,5 @@
-// contacts.js — РАБОЧАЯ ВЕРСИЯ
+// contacts.js — ПОЛНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
 
-// ===== БОТЫ =====
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp', emoji: '🩷' },
   { id: 'nyashtalk', name: 'NyashTalk', username: 'nyashtalk', emoji: '🌸' },
@@ -9,7 +8,6 @@ const botUsers = [
   { id: 'nyashcook', name: 'NyashCook', username: 'nyashcook', emoji: '🍳' }
 ];
 
-// ===== СОСТОЯНИЕ =====
 let friendsList = [];
 let friendRequests = [];
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
@@ -21,7 +19,6 @@ window.pinnedChats = pinnedChats;
 window.friendsList = friendsList;
 window.friendRequests = friendRequests;
 
-// ===== ГРАДИЕНТЫ ДЛЯ БОТОВ =====
 function getBotGradient(botId) {
   const gradients = {
     nyashhelp: 'linear-gradient(135deg, #c38ef0, #e0b0ff)',
@@ -33,7 +30,6 @@ function getBotGradient(botId) {
   return gradients[botId] || 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
 }
 
-// ===== ЧЕРНОВИКИ =====
 function updateDraft(contactId, text) {
   if (text && text.trim()) {
     chatDrafts[contactId] = text;
@@ -48,7 +44,6 @@ function getDraft(contactId) {
   return chatDrafts[contactId] || '';
 }
 
-// ===== ЗАКРЕПЛЕНИЕ =====
 function isPinned(chatId) {
   return pinnedChats.includes(chatId);
 }
@@ -65,12 +60,10 @@ function togglePin(chatId) {
   window.showToast?.(pinnedChats.includes(chatId) ? '📌 Чат закреплён' : '📌 Чат откреплён', 'info');
 }
 
-// ===== КАСТОМНЫЕ ИМЕНА =====
 function getDisplayName(contactId, defaultName) {
   return customNames[contactId] || defaultName;
 }
 
-// ===== ЗАГРУЗКА ДРУЗЕЙ ИЗ FIREBASE =====
 async function loadFriends() {
   console.log('👥 Загружаем друзей...');
   
@@ -82,7 +75,6 @@ async function loadFriends() {
   try {
     const userDoc = await window.db.collection('users').doc(window.auth.currentUser.uid).get();
     const userData = userDoc.data();
-    
     if (!userData) return;
     
     console.log('📨 Данные пользователя:', userData);
@@ -101,7 +93,6 @@ async function loadFriends() {
     
     if (userData.friendRequests && userData.friendRequests.length > 0) {
       console.log(`📨 Найдено ${userData.friendRequests.length} заявок`);
-      
       const requestsData = await Promise.all(
         userData.friendRequests.map(async (req) => {
           const fromId = typeof req === 'object' ? req.from : req;
@@ -130,7 +121,6 @@ async function loadFriends() {
   }
 }
 
-// ===== ОБНОВЛЕНИЕ БЕЙДЖА =====
 function updateRequestsBadge() {
   const badge = document.getElementById('requestsBadge');
   if (badge) {
@@ -143,7 +133,6 @@ function updateRequestsBadge() {
   }
 }
 
-// ===== ОТРИСОВКА =====
 function renderContacts() {
   const list = document.getElementById('friendsList');
   if (!list) return;
@@ -274,19 +263,25 @@ function renderFriends(list) {
   }
 }
 
+// ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАЯВОК =====
 function renderRequests(list) {
-  if (friendRequests.length > 0) {
+  console.log('📨 Рендерим заявки, количество:', friendRequests.length);
+  
+  if (friendRequests && friendRequests.length > 0) {
     friendRequests.forEach(request => {
       const el = document.createElement('div');
       el.className = 'contact request-item';
+      
+      const fromName = request.fromUser?.name || 'Пользователь';
+      const fromUsername = request.fromUser?.username || 'unknown';
       
       el.innerHTML = `
         <div class="avatar" style="background: linear-gradient(135deg, #ffb6c1, #ff9eb5);">
           <span class="avatar-emoji">📨</span>
         </div>
         <div class="info">
-          <div class="name">${request.fromUser?.name || 'пользователь'}</div>
-          <div class="username">@${request.fromUser?.username || 'unknown'}</div>
+          <div class="name">${fromName}</div>
+          <div class="username">@${fromUsername}</div>
           <div class="request-time">${new Date(request.timestamp).toLocaleDateString()}</div>
         </div>
         <div class="request-actions">
@@ -301,31 +296,31 @@ function renderRequests(list) {
         e.stopPropagation();
         const result = await window.acceptFriendRequest?.(request.from);
         if (result?.success) {
-          loadFriends();
+          await loadFriends();
           window.showToast?.('✅ Заявка принята!', 'success');
+        } else {
+          window.showToast?.('❌ Ошибка при принятии', 'error');
         }
       });
       
       el.querySelector('.reject-request')?.addEventListener('click', async (e) => {
         e.stopPropagation();
         await window.removeFriendRequest?.(request.from);
-        loadFriends();
+        await loadFriends();
         window.showToast?.('❌ Заявка отклонена', 'info');
       });
     });
   } else {
-    const emptyEl = document.createElement('div');
-    emptyEl.className = 'empty-state';
-    emptyEl.innerHTML = `
-      <div class="empty-icon">📨</div>
-      <h3>нет заявок</h3>
-      <p>когда кто-то захочет добавить тебя, они появятся здесь</p>
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📨</div>
+        <h3>нет заявок</h3>
+        <p>когда кто-то захочет добавить тебя, они появятся здесь</p>
+      </div>
     `;
-    list.appendChild(emptyEl);
   }
 }
 
-// ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ =====
 function listenToFriendChanges() {
   if (!window.auth?.currentUser || window.auth.currentUser.isAnonymous) return;
   
@@ -336,7 +331,6 @@ function listenToFriendChanges() {
     });
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('👥 contacts.js загружен');
   
@@ -361,7 +355,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// ===== ЭКСПОРТ =====
 window.loadFriends = loadFriends;
 window.renderContacts = renderContacts;
 window.updateDraft = updateDraft;

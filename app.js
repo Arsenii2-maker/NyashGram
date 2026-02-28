@@ -11,6 +11,11 @@ const firebaseConfig = {
   measurementId: "G-KXXQTJVEGV"
 };
 
+// ===== FIREBASE КОНФИГ =====
+const firebaseConfig = {
+    // ... твой конфиг
+};
+
 // ===== ИНИЦИАЛИЗАЦИЯ FIREBASE =====
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -20,6 +25,42 @@ const storage = firebase.storage();
 window.auth = auth;
 window.db = db;
 window.storage = storage;
+
+// ===== ВАЖНО: УСТАНАВЛИВАЕМ PERSISTENCE ДО ВСЕГО =====
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log('✅ Сессия LOCAL установлена');
+        
+        // Проверяем, есть ли уже пользователь
+        if (auth.currentUser) {
+            console.log('👤 Пользователь уже есть:', auth.currentUser.uid);
+            localStorage.setItem('nyashgram_logged_in', 'true');
+            localStorage.setItem('nyashgram_user_id', auth.currentUser.uid);
+        } else {
+            console.log('👤 Нет активного пользователя');
+        }
+    })
+    .catch((error) => {
+        console.error('❌ Ошибка установки persistence:', error);
+    });
+
+// ===== ПРОВЕРЯЕМ ПРИ КАЖДОЙ ЗАГРУЗКЕ =====
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log('🔥 Пользователь в системе:', user.uid);
+        localStorage.setItem('nyashgram_logged_in', 'true');
+        localStorage.setItem('nyashgram_user_id', user.uid);
+        
+        // Если мы на экране входа, перекидываем на главный
+        if (document.getElementById('loginMethodScreen')?.classList.contains('active')) {
+            console.log('➡️ Перенаправляем на главный экран');
+            showScreen('friendsScreen');
+        }
+    } else {
+        console.log('🔥 Пользователь вышел');
+        // НЕ удаляем флаг сразу, даём время на перезагрузку
+    }
+});
 
 // ===== СОХРАНЯЕМ СЕССИЮ НАВСЕГДА =====
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -335,15 +376,25 @@ async function createPrivateChat(uid1, uid2) {
 
 // ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
 function showScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-  const screen = document.getElementById(screenId);
-  if (screen) {
-    screen.classList.add('active');
-    currentScreen = screenId;
-    if (screenId === 'friendsScreen' && typeof window.renderContacts === 'function') {
-      window.renderContacts();
+    // Если пытаемся открыть экран входа, но пользователь уже есть
+    if (screenId === 'loginMethodScreen' && auth.currentUser) {
+        console.log('🚫 Уже есть пользователь, показываем friendsScreen вместо login');
+        screenId = 'friendsScreen';
     }
-  }
+    
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.classList.add('active');
+        currentScreen = screenId;
+        
+        if (screenId === 'friendsScreen' && typeof window.renderContacts === 'function') {
+            window.renderContacts();
+        }
+    }
 }
 
 async function checkUserProfile() {
@@ -546,34 +597,51 @@ document.addEventListener('DOMContentLoaded', function() {
     // (весь остальной код обработчиков остаётся без изменений)
     
     // ===== СЛУШАТЕЛЬ АВТОРИЗАЦИИ =====
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            console.log('👤 Пользователь авторизован:', user.uid);
-            
-            // Показываем загрузку при входе
-            showLoading('Входим в аккаунт...', 10000);
-            
-            if (!user.isAnonymous) {
-                await checkUserProfile();
-            }
-            
-            document.dispatchEvent(new CustomEvent('userAuthenticated'));
-            
-            // Скрываем загрузку после входа
-            setTimeout(hideLoading, 1000);
-            
-        } else {
-            console.log('👤 Пользователь не авторизован');
-            localStorage.removeItem('nyashgram_logged_in');
-            showScreen('loginMethodScreen');
-            hideLoading();
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        console.log('👤 Пользователь авторизован:', user.uid);
+        
+        // Сохраняем флаг
+        localStorage.setItem('nyashgram_logged_in', 'true');
+        localStorage.setItem('nyashgram_user_id', user.uid);
+        
+        // Показываем загрузку
+        if (typeof window.showLoading === 'function') {
+            window.showLoading('Входим в аккаунт...', 5000);
         }
-    });
-    
-    // Если есть сохранённая сессия, сразу показываем главный экран
-    if (auth.currentUser) {
+        
+        if (!user.isAnonymous) {
+            await checkUserProfile();
+        }
+        
+        document.dispatchEvent(new CustomEvent('userAuthenticated'));
+        
+        // Показываем главный экран
         showScreen('friendsScreen');
-        hideLoading();
+        
+        // Скрываем загрузку
+        if (typeof window.hideLoading === 'function') {
+            setTimeout(window.hideLoading, 1000);
+        }
+        
+    } else {
+        console.log('👤 Пользователь не авторизован');
+        
+        // Проверяем, был ли пользователь ранее
+        const wasLoggedIn = localStorage.getItem('nyashgram_logged_in') === 'true';
+        
+        if (wasLoggedIn) {
+            console.log('⚠️ Был ранее авторизован, но сейчас нет. Пробуем восстановить...');
+            // Не показываем экран входа сразу, даём время на восстановление
+            setTimeout(() => {
+                if (!auth.currentUser) {
+                    console.log('❌ Не удалось восстановить, показываем вход');
+                    showScreen('loginMethodScreen');
+                }
+            }, 2000);
+        } else {
+            showScreen('loginMethodScreen');
+        }
     }
 });
   

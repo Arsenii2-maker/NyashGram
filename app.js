@@ -21,10 +21,14 @@ window.auth = auth;
 window.db = db;
 window.storage = storage;
 
-// ===== СОХРАНЯЕМ СЕССИЮ =====
+// ===== СОХРАНЯЕМ СЕССИЮ НАВСЕГДА =====
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(() => console.log('✅ Сессия будет сохраняться'))
-  .catch(error => console.error('❌ Ошибка сохранения сессии:', error));
+    .then(() => {
+        console.log('✅ Сессия будет сохраняться навсегда');
+    })
+    .catch((error) => {
+        console.error('❌ Ошибка сохранения сессии:', error);
+    });
 
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 let currentUser = null;
@@ -342,30 +346,37 @@ function showScreen(screenId) {
   }
 }
 
-// ===== ПРОВЕРКА ПРОФИЛЯ =====
 async function checkUserProfile() {
-  if (!auth.currentUser) return false;
-  try {
-    const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
-    if (!userDoc.exists) {
-      showScreen('createProfileScreen');
-      return false;
+    if (!auth.currentUser) return false;
+    
+    try {
+        const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+        
+        if (!userDoc.exists) {
+            showScreen('createProfileScreen');
+            return false;
+        }
+        
+        const userData = userDoc.data();
+        localStorage.setItem('nyashgram_name', userData.name || '');
+        localStorage.setItem('nyashgram_username', userData.username || '');
+        
+        // ✅ СОХРАНЯЕМ, ЧТО ПОЛЬЗОВАТЕЛЬ УЖЕ ВХОДИЛ
+        localStorage.setItem('nyashgram_logged_in', 'true');
+        localStorage.setItem('nyashgram_user_id', auth.currentUser.uid);
+        
+        document.getElementById('settingsName').value = userData.name || '';
+        document.getElementById('settingsUsername').value = userData.username || '';
+        document.getElementById('profileEmail').textContent = auth.currentUser.email || '';
+        document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
+        
+        applyTheme();
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка проверки профиля:', error);
+        return false;
     }
-    const userData = userDoc.data();
-    localStorage.setItem('nyashgram_name', userData.name || '');
-    localStorage.setItem('nyashgram_username', userData.username || '');
-    
-    document.getElementById('settingsName').value = userData.name || '';
-    document.getElementById('settingsUsername').value = userData.username || '';
-    document.getElementById('profileEmail').textContent = auth.currentUser.email || '';
-    document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
-    
-    applyTheme();
-    return true;
-  } catch (error) {
-    console.error('❌ Ошибка проверки профиля:', error);
-    return false;
-  }
 }
 
 // ===== ВХОД =====
@@ -408,19 +419,23 @@ async function loginAnonymously() {
   }
 }
 
-// ===== ВЫХОД =====
 async function logout() {
-  try {
-    if (auth.currentUser && !auth.currentUser.isAnonymous) {
-      await db.collection('users').doc(auth.currentUser.uid).update({ online: false });
+    try {
+        if (auth.currentUser && !auth.currentUser.isAnonymous) {
+            await db.collection('users').doc(auth.currentUser.uid).update({ online: false });
+        }
+        await auth.signOut();
+        
+        // НЕ УДАЛЯЕМ ВСЁ! Только чистим временное
+        // localStorage.clear(); // ← ЭТО УБЕРИ!
+        
+        // Удаляем только данные сессии, но оставляем флаг входа
+        // localStorage.removeItem('nyashgram_logged_in'); // ← НЕ УДАЛЯЕМ!
+        
+        showScreen('loginMethodScreen');
+    } catch (error) {
+        console.error('❌ Ошибка выхода:', error);
     }
-    await auth.signOut();
-    localStorage.clear();
-    sessionStorage.clear();
-    showScreen('loginMethodScreen');
-  } catch (error) {
-    console.error('❌ Ошибка выхода:', error);
-  }
 }
 
 // ===== СООБЩЕНИЯ ОБ ОШИБКАХ =====
@@ -437,56 +452,130 @@ function getErrorMessage(error) {
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 NyashGram v3.5 загружается...');
-  
-  // Показываем загрузку
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  if (loadingOverlay) loadingOverlay.style.display = 'flex';
-  
-  // Применяем тему
-  applyTheme();
-  
-  // Советы для загрузки
-  const tips = [
-    '💗 Говори по-няшному!',
-    '🎨 У нас 6 милых тем',
-    '🤖 5 ботов готовы помочь',
-    '📝 Меняй шрифты в настройках',
-    '✨ Отправляй голосовые сообщения',
-    '🎮 Поиграй с NyashGame',
-    '🔮 Узнай гороскоп',
-    '🍳 Найди рецепты',
-    '💬 Общайся с друзьями',
-    '📌 Закрепляй важные чаты'
-  ];
-  
-  const tipText = document.getElementById('tipText');
-  const currentTip = document.getElementById('currentTip');
-  const totalTips = document.getElementById('totalTips');
-  
-  if (tipText && currentTip && totalTips) {
-    totalTips.textContent = tips.length;
-    let tipIndex = 0;
-    tipText.textContent = tips[0];
-    currentTip.textContent = '1';
+    console.log('🚀 NyashGram v3.5 загружается...');
     
-    setInterval(() => {
-      tipIndex = (tipIndex + 1) % tips.length;
-      tipText.textContent = tips[tipIndex];
-      currentTip.textContent = tipIndex + 1;
-    }, 3000);
-  }
-  
-  // Скрываем загрузку через 1.5 сек
-  setTimeout(() => {
-    if (loadingOverlay) {
-      loadingOverlay.style.opacity = '0';
-      setTimeout(() => {
-        loadingOverlay.style.display = 'none';
+    // Применяем тему сразу
+    applyTheme();
+    
+    // ===== ФУНКЦИЯ ПОКАЗА ЗАГРУЗКИ =====
+    function showLoading(message = 'Загружаем...', timeout = 5000) {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingMessage = document.getElementById('loadingMessage');
+        if (!loadingOverlay) return;
+        
+        if (loadingMessage) loadingMessage.textContent = message;
+        loadingOverlay.style.display = 'flex';
         loadingOverlay.style.opacity = '1';
-      }, 500);
+        
+        // Автоматически скрываем через timeout, если что-то пошло не так
+        setTimeout(() => {
+            hideLoading();
+        }, timeout);
     }
-  }, 1500);
+    
+    function hideLoading() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (!loadingOverlay) return;
+        
+        loadingOverlay.style.opacity = '0';
+        setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+            loadingOverlay.style.opacity = '1';
+        }, 500);
+    }
+    
+    // Советы для загрузки
+    const tips = [
+        '💗 Говори по-няшному!',
+        '🎨 У нас 6 милых тем',
+        '🤖 5 ботов готовы помочь',
+        '📝 Меняй шрифты в настройках',
+        '✨ Отправляй голосовые сообщения',
+        '🎮 Поиграй с NyashGame',
+        '🔮 Узнай гороскоп',
+        '🍳 Найди рецепты',
+        '💬 Общайся с друзьями',
+        '📌 Закрепляй важные чаты',
+        '👥 Добавляй друзей',
+        '📞 Совершай звонки'
+    ];
+    
+    // Запускаем ротацию советов
+    const tipText = document.getElementById('tipText');
+    const currentTip = document.getElementById('currentTip');
+    const totalTips = document.getElementById('totalTips');
+    
+    if (tipText && currentTip && totalTips) {
+        totalTips.textContent = tips.length;
+        let tipIndex = 0;
+        tipText.textContent = tips[0];
+        currentTip.textContent = '1';
+        
+        setInterval(() => {
+            tipIndex = (tipIndex + 1) % tips.length;
+            tipText.textContent = tips[tipIndex];
+            currentTip.textContent = tipIndex + 1;
+        }, 3000);
+    }
+    
+    // ===== ПРОВЕРЯЕМ, НАДО ЛИ ПОКАЗЫВАТЬ ЗАГРУЗКУ =====
+    
+    // Если пользователь уже входил, не показываем загрузку
+    if (localStorage.getItem('nyashgram_logged_in') === 'true') {
+        console.log('👤 Пользователь уже входил ранее, скрываем загрузку');
+        hideLoading();
+    }
+    
+    // Показываем загрузку только при реальной загрузке данных
+    window.showLoading = showLoading;
+    window.hideLoading = hideLoading;
+    
+    // ===== ЗАГРУЗКА КОНТАКТОВ С ПОКАЗОМ ЗАГРУЗКИ =====
+    const originalRenderContacts = window.renderContacts;
+    if (originalRenderContacts) {
+        window.renderContacts = function() {
+            showLoading('Загружаем контакты...', 10000);
+            setTimeout(() => {
+                originalRenderContacts();
+                hideLoading();
+            }, 300);
+        };
+    }
+    
+    // ===== ВСЕ ТВОИ ОБРАБОТЧИКИ ТУТ =====
+    // (весь остальной код обработчиков остаётся без изменений)
+    
+    // ===== СЛУШАТЕЛЬ АВТОРИЗАЦИИ =====
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log('👤 Пользователь авторизован:', user.uid);
+            
+            // Показываем загрузку при входе
+            showLoading('Входим в аккаунт...', 10000);
+            
+            if (!user.isAnonymous) {
+                await checkUserProfile();
+            }
+            
+            document.dispatchEvent(new CustomEvent('userAuthenticated'));
+            
+            // Скрываем загрузку после входа
+            setTimeout(hideLoading, 1000);
+            
+        } else {
+            console.log('👤 Пользователь не авторизован');
+            localStorage.removeItem('nyashgram_logged_in');
+            showScreen('loginMethodScreen');
+            hideLoading();
+        }
+    });
+    
+    // Если есть сохранённая сессия, сразу показываем главный экран
+    if (auth.currentUser) {
+        showScreen('friendsScreen');
+        hideLoading();
+    }
+});
   
   // ===== ОБРАБОТЧИКИ ЭКРАНОВ =====
   document.getElementById('emailMethodBtn')?.addEventListener('click', () => showScreen('emailLoginScreen'));

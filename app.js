@@ -11,10 +11,6 @@ const firebaseConfig = {
   measurementId: "G-KXXQTJVEGV"
 };
 
-// ===== FIREBASE КОНФИГ =====
-const firebaseConfig = {
-    // ... твой конфиг
-};
 
 // ===== ИНИЦИАЛИЗАЦИЯ FIREBASE =====
 firebase.initializeApp(firebaseConfig);

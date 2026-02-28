@@ -1764,3 +1764,34 @@ button:active {
     position: relative;
     background: linear-gradient(135deg, #fff9fc, #ffffff);
 }
+/* ===== КРАСИВЫЕ ЭМОДЗИ ПО ЦЕНТРУ ===== */
+.avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-emoji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  line-height: 1;
+  display: block;
+  text-align: center;
+  width: auto;
+  height: auto;
+}
+
+/* Для маленьких аватарок */
+.small-avatar .avatar-emoji {
+  font-size: 20px;
+}
+
+/* Для больших аватарок */
+.large-avatar .avatar-emoji {
+  font-size: 36px;
+}

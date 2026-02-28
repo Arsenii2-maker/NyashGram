@@ -1764,34 +1764,34 @@ button:active {
     position: relative;
     background: linear-gradient(135deg, #fff9fc, #ffffff);
 }
-/* ===== КРАСИВЫЕ ЭМОДЗИ ПО ЦЕНТРУ ===== */
+/* ===== ЖЁСТКОЕ ЦЕНТРИРОВАНИЕ ЭМОДЗИ ===== */
 .avatar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    overflow: hidden !important;
 }
 
 .avatar-emoji {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 28px;
-  line-height: 1;
-  display: block;
-  text-align: center;
-  width: auto;
-  height: auto;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    font-size: 28px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    text-align: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Для маленьких аватарок */
-.small-avatar .avatar-emoji {
-  font-size: 20px;
-}
-
-/* Для больших аватарок */
-.large-avatar .avatar-emoji {
-  font-size: 36px;
+/* Для аватарок без эмодзи (с градиентами) */
+.avatar:not(:has(.avatar-emoji)) {
+    background-size: cover !important;
+    background-position: center !important;
 }

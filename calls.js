@@ -95,15 +95,19 @@ function initPeer(userId) {
     }
 }
 
-// ===== ПРОВЕРКА, МОЖНО ЛИ ЗВОНИТЬ (ИСПРАВЛЕНО) =====
+// ===== ПРОВЕРКА, МОЖНО ЛИ ЗВОНИТЬ =====
 function canCall() {
     // Проверяем, что это друг, а не бот
-    if (!window.currentChat) return false;
+    if (!window.currentChat) {
+        console.log('📞 Нет текущего чата');
+        return false;
+    }
     
     // Друзья имеют тип 'friend', боты 'bot'
     const isFriend = window.currentChatType === 'friend';
     
     console.log('📞 Проверка звонка:', {
+        currentChatId: window.currentChatId,
         currentChatType: window.currentChatType,
         isFriend: isFriend,
         canCall: isFriend
@@ -510,34 +514,31 @@ function addCallButtonsToPanel() {
 async function handleCallClick(type) {
     console.log('📞 Нажата кнопка звонка:', type);
     console.log('📞 Текущий чат:', {
+        currentChatId: window.currentChatId,
         currentChatType: window.currentChatType,
-        currentChatId: window.currentChatId
+        currentChat: window.currentChat
     });
     
     // Проверяем, что это друг
+    if (!window.currentChat) {
+        console.log('❌ Нет текущего чата');
+        window.showToast?.('❌ Ошибка: нет чата', 'error');
+        return;
+    }
+    
     if (window.currentChatType !== 'friend') {
         console.log('❌ Это не друг, тип:', window.currentChatType);
-        window.showToast?.('💬 Звонить можно только друзьям', 'info', 2000);
+        window.showToast?.('🤖 Ботам нельзя звонить', 'info', 2000);
         return;
     }
     
     if (!window.currentChatId) {
         console.log('❌ Нет ID чата');
-        window.showToast?.('❌ Ошибка: нет чата', 'error');
+        window.showToast?.('❌ Ошибка: нет ID чата', 'error');
         return;
     }
     
-    try {
-        console.log('📞 Получаем данные друга...');
-        const friendDoc = await window.db.collection('users').doc(window.currentChatId).get();
-        
-        if (!friendDoc.exists) {
-            console.log('❌ Друг не найден в БД');
-            window.showToast?.('❌ Друг не найден', 'error');
-            return;
-        }
-        
-        const friendData = friendDoc.data();
+    const friendData = friendDoc.data();
         console.log('📞 Данные друга:', friendData);
         
         if (!friendData.peerId) {
@@ -554,6 +555,8 @@ async function handleCallClick(type) {
         window.showToast?.('❌ Не удалось совершить звонок', 'error');
     }
 }
+        
+        
 
 // ===== ОБНОВЛЕНИЕ ВИДИМОСТИ КНОПОК =====
 function updateCallButtonsVisibility() {

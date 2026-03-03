@@ -95,15 +95,13 @@ function initPeer(userId) {
     }
 }
 
-// ===== ПРОВЕРКА, МОЖНО ЛИ ЗВОНИТЬ =====
+// ===== ФУНКЦИЯ ДЛЯ ПРОВЕРКИ ТИПА ЧАТА В ЗВОНКАХ =====
 function canCall() {
-    // Проверяем, что это друг, а не бот
     if (!window.currentChat) {
         console.log('📞 Нет текущего чата');
         return false;
     }
     
-    // Друзья имеют тип 'friend', боты 'bot'
     const isFriend = window.currentChatType === 'friend';
     
     console.log('📞 Проверка звонка:', {

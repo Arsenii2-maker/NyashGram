@@ -155,44 +155,56 @@ async function sendMessageToFriend(chatId, text) {
   }
 }
 
-// ===== ОТПРАВКА ГОЛОСОВОГО ДРУЗЬЯМ (ИСПРАВЛЕНО) =====
+// ===== ОТПРАВКА ГОЛОСОВОГО ДРУЗЬЯМ =====
 async function sendVoiceMessageToFriend(chatId, audioBlob, duration) {
-  if (!window.auth?.currentUser || !audioBlob) return false;
-  
-  try {
-    const fileName = `voice_${Date.now()}.${isIOS ? 'm4a' : 'webm'}`;
-    const storageRef = firebase.storage().ref(`chats/${chatId}/${fileName}`);
-    await storageRef.put(audioBlob);
-    const audioUrl = await storageRef.getDownloadURL();
+    console.log('🎤 Отправка голосового другу:', chatId);
     
-    const message = {
-      chatId: chatId,
-      from: window.auth.currentUser.uid,
-      type: 'voice',
-      audioUrl: audioUrl,
-      duration: duration,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      readBy: [window.auth.currentUser.uid]
-    };
+    if (!window.auth?.currentUser || !audioBlob) {
+        console.error('❌ Нет авторизации или аудио');
+        return false;
+    }
     
-    await window.db.collection('messages').add(message);
-    
-    await window.db.collection('chats').doc(chatId).update({
-      lastMessage: {
-        text: '🎤 Голосовое сообщение',
-        from: window.auth.currentUser.uid,
-        type: 'voice',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
-    return true;
-  } catch (error) {
-    console.error('❌ Ошибка отправки голоса:', error);
-    window.showToast?.('❌ Не удалось отправить голосовое', 'error');
-    return false;
-  }
+    try {
+        const fileName = `voice_${Date.now()}.webm`;
+        const storageRef = firebase.storage().ref(`chats/${chatId}/${fileName}`);
+        
+        // Показываем загрузку
+        window.showToast?.('⏳ Отправка голосового...', 'info', 2000);
+        
+        await storageRef.put(audioBlob);
+        const audioUrl = await storageRef.getDownloadURL();
+        
+        const message = {
+            chatId: chatId,
+            from: window.auth.currentUser.uid,
+            type: 'voice',
+            audioUrl: audioUrl,
+            duration: duration,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            readBy: [window.auth.currentUser.uid]
+        };
+        
+        await window.db.collection('messages').add(message);
+        
+        await window.db.collection('chats').doc(chatId).update({
+            lastMessage: {
+                text: '🎤 Голосовое сообщение',
+                from: window.auth.currentUser.uid,
+                type: 'voice',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log('✅ Голосовое отправлено');
+        window.showToast?.('✅ Голосовое отправлено!', 'success', 2000);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка отправки голоса:', error);
+        window.showToast?.('❌ Не удалось отправить голосовое', 'error');
+        return false;
+    }
 }
 
 // ===== ФУНКЦИИ ДЛЯ БОТОВ =====

@@ -530,7 +530,6 @@ async function handleCallClick(type) {
         console.log('❌ Это не друг, тип:', window.currentChatType);
         window.showToast?.('🤖 Ботам нельзя звонить', 'info', 2000);
         return;
-    }
     
     if (!window.currentChatId) {
         console.log('❌ Нет ID чата');

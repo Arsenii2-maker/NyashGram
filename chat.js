@@ -155,25 +155,40 @@ async function sendMessageToFriend(chatId, text) {
   }
 }
 
-// ===== ОТПРАВКА ГОЛОСОВОГО ДРУЗЬЯМ =====
+// ===== ОТПРАВКА ГОЛОСОВОГО ДРУЗЬЯМ (ПОЛНОСТЬЮ ИСПРАВЛЕНО) =====
 async function sendVoiceMessageToFriend(chatId, audioBlob, duration) {
     console.log('🎤 Отправка голосового другу:', chatId);
     
-    if (!window.auth?.currentUser || !audioBlob) {
-        console.error('❌ Нет авторизации или аудио');
+    if (!window.auth?.currentUser) {
+        console.error('❌ Нет авторизации');
+        window.showToast?.('❌ Не авторизован', 'error');
+        return false;
+    }
+    
+    if (!audioBlob) {
+        console.error('❌ Нет аудио');
+        window.showToast?.('❌ Нет аудио для отправки', 'error');
         return false;
     }
     
     try {
+        console.log('📦 Размер аудио:', audioBlob.size, 'bytes');
+        
         const fileName = `voice_${Date.now()}.webm`;
         const storageRef = firebase.storage().ref(`chats/${chatId}/${fileName}`);
         
-        // Показываем загрузку
-        window.showToast?.('⏳ Отправка голосового...', 'info', 2000);
+        window.showToast?.('⏳ Отправка голосового...', 'info');
         
+        // Загружаем в Storage
+        console.log('⬆️ Загружаем в Storage...');
         await storageRef.put(audioBlob);
-        const audioUrl = await storageRef.getDownloadURL();
         
+        // Получаем URL
+        console.log('🔗 Получаем URL...');
+        const audioUrl = await storageRef.getDownloadURL();
+        console.log('✅ URL получен:', audioUrl);
+        
+        // Создаём сообщение
         const message = {
             chatId: chatId,
             from: window.auth.currentUser.uid,
@@ -184,8 +199,13 @@ async function sendVoiceMessageToFriend(chatId, audioBlob, duration) {
             readBy: [window.auth.currentUser.uid]
         };
         
-        await window.db.collection('messages').add(message);
+        // Сохраняем в Firestore
+        console.log('📝 Сохраняем в Firestore...');
+        const docRef = await window.db.collection('messages').add(message);
+        console.log('✅ Сообщение создано, ID:', docRef.id);
         
+        // Обновляем последнее сообщение в чате
+        console.log('🔄 Обновляем чат...');
         await window.db.collection('chats').doc(chatId).update({
             lastMessage: {
                 text: '🎤 Голосовое сообщение',
@@ -196,12 +216,13 @@ async function sendVoiceMessageToFriend(chatId, audioBlob, duration) {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        console.log('✅ Голосовое отправлено');
-        window.showToast?.('✅ Голосовое отправлено!', 'success', 2000);
+        console.log('✅ Голосовое отправлено!');
+        window.showToast?.('✅ Голосовое отправлено!', 'success');
         return true;
         
     } catch (error) {
         console.error('❌ Ошибка отправки голоса:', error);
+        console.error('❌ Детали ошибки:', error.code, error.message);
         window.showToast?.('❌ Не удалось отправить голосовое', 'error');
         return false;
     }
@@ -313,169 +334,216 @@ function loadDraft(chatId) {
   currentDraftChatId = chatId;
 }
 
-// ===== ОТКРЫТИЕ ЧАТА С БОТОМ =====
+// ===== ОТКРЫТИЕ ЧАТА С БОТОМ (ПОЛНОСТЬЮ ИСПРАВЛЕНО) =====
 function openBotChat(bot) {
-  console.log('🤖 Открываем чат с ботом:', bot);
-  
-  if (messagesListener) messagesListener();
-  if (chatListener) chatListener();
-  
-  saveCurrentDraft();
-  
-  currentChat = bot;
-  currentChatId = bot.id;
-  currentChatType = 'bot';
-  
-  const nameEl = document.getElementById('chatContactName');
-  const usernameEl = document.getElementById('chatContactUsername');
-  const avatarEl = document.getElementById('chatAvatar');
-  
-  if (nameEl) nameEl.textContent = customNames[bot.id] || bot.name;
-  if (usernameEl) usernameEl.textContent = `@${bot.username}`;
-  
-  if (avatarEl) {
-    const gradients = {
-      nyashhelp: 'linear-gradient(135deg, #c38ef0, #e0b0ff)',
-      nyashtalk: 'linear-gradient(135deg, #85d1c5, #b0e0d5)',
-      nyashgame: 'linear-gradient(135deg, #ffb347, #ff8c42)',
-      nyashhoroscope: 'linear-gradient(135deg, #9b59b6, #8e44ad)',
-      nyashcook: 'linear-gradient(135deg, #ff9a9e, #fad0c4)'
-    };
-    avatarEl.style.background = gradients[bot.id] || 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
-  }
-  
-  const quickPanel = document.getElementById('quickReplyPanel');
-  if (quickPanel) {
-    quickPanel.style.display = 'flex';
-    showQuickReplies(bot.id);
-  }
-  
-  // Для ботов скрываем кнопки звонков
-  const audioCallBtn = document.getElementById('audioCallActionBtn');
-  const videoCallBtn = document.getElementById('videoCallActionBtn');
-  if (audioCallBtn) audioCallBtn.style.display = 'none';
-  if (videoCallBtn) videoCallBtn.style.display = 'none';
-  
-  loadChatHistory(bot.id);
-  loadDraft(bot.id);
-  
-  if (typeof window.showScreen === 'function') {
-    window.showScreen('chatScreen');
-  }
-}
-
-// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ (ИСПРАВЛЕНО) =====
-async function openFriendChat(friend) {
-  console.log('👥 Открываем чат с другом:', friend);
-  
-  if (messagesListener) messagesListener();
-  if (chatListener) chatListener();
-  
-  saveCurrentDraft();
-  
-  currentChat = friend;
-  currentChatId = friend.id;
-  currentChatType = 'friend';
-  
-  const nameEl = document.getElementById('chatContactName');
-  const usernameEl = document.getElementById('chatContactUsername');
-  const avatarEl = document.getElementById('chatAvatar');
-  
-  if (nameEl) nameEl.textContent = customNames[friend.id] || friend.name;
-  if (usernameEl) usernameEl.textContent = `@${friend.username}`;
-  if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
-  
-  // Для друзей скрываем панель быстрых сообщений
-  const quickPanel = document.getElementById('quickReplyPanel');
-  if (quickPanel) {
-    quickPanel.style.display = 'none';
-    quickPanel.innerHTML = '';
-  }
-  
-  // Для друзей показываем кнопки звонков
-  const audioCallBtn = document.getElementById('audioCallActionBtn');
-  const videoCallBtn = document.getElementById('videoCallActionBtn');
-  if (audioCallBtn) audioCallBtn.style.display = 'flex';
-  if (videoCallBtn) videoCallBtn.style.display = 'flex';
-  
-  // Создаём или получаем chatId
-  if (!friend.chatId) {
-    // Ищем существующий чат
-    const chatsSnapshot = await window.db.collection('chats')
-      .where('participants', 'array-contains', window.auth.currentUser.uid)
-      .get();
+    console.log('🤖 Открываем чат с ботом:', bot);
     
-    let existingChat = null;
-    chatsSnapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.participants.includes(friend.id)) {
-        existingChat = { id: doc.id, ...data };
-      }
+    // 1. ПОЛНОСТЬЮ ОЧИЩАЕМ ИНТЕРФЕЙС
+    const chatArea = document.getElementById('chatArea');
+    if (chatArea) {
+        chatArea.innerHTML = '';
+        console.log('🧹 Очищена область чата');
+    }
+    
+    // 2. Отключаем старые слушатели Firebase
+    if (messagesListener) {
+        messagesListener();
+        messagesListener = null;
+        console.log('🔇 Отключен старый слушатель сообщений');
+    }
+    
+    if (chatListener) {
+        chatListener();
+        chatListener = null;
+        console.log('🔇 Отключен старый слушатель чата');
+    }
+    
+    // 3. Сохраняем черновик предыдущего чата
+    saveCurrentDraft();
+    
+    // 4. Устанавливаем текущий чат
+    currentChat = bot;
+    currentChatId = bot.id;
+    currentChatType = 'bot';
+    console.log('📌 Текущий чат:', { id: currentChatId, type: currentChatType, name: bot.name });
+    
+    // 5. Обновляем интерфейс чата
+    const nameEl = document.getElementById('chatContactName');
+    const usernameEl = document.getElementById('chatContactUsername');
+    const avatarEl = document.getElementById('chatAvatar');
+    
+    if (nameEl) nameEl.textContent = customNames[bot.id] || bot.name;
+    if (usernameEl) usernameEl.textContent = `@${bot.username}`;
+    
+    if (avatarEl) {
+        const gradients = {
+            nyashhelp: 'linear-gradient(135deg, #c38ef0, #e0b0ff)',
+            nyashtalk: 'linear-gradient(135deg, #85d1c5, #b0e0d5)',
+            nyashgame: 'linear-gradient(135deg, #ffb347, #ff8c42)',
+            nyashhoroscope: 'linear-gradient(135deg, #9b59b6, #8e44ad)',
+            nyashcook: 'linear-gradient(135deg, #ff9a9e, #fad0c4)'
+        };
+        avatarEl.style.background = gradients[bot.id] || 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
+    }
+    
+    // 6. Для ботов показываем панель быстрых сообщений
+    const quickPanel = document.getElementById('quickReplyPanel');
+    if (quickPanel) {
+        quickPanel.style.display = 'flex';
+        showQuickReplies(bot.id);
+        console.log('💬 Показана панель быстрых сообщений');
+    }
+    
+    // 7. Для ботов скрываем кнопки звонков
+    const audioCallBtn = document.getElementById('audioCallActionBtn');
+    const videoCallBtn = document.getElementById('videoCallActionBtn');
+    if (audioCallBtn) {
+        audioCallBtn.style.display = 'none';
+        console.log('🔇 Скрыта кнопка аудиозвонка');
+    }
+    if (videoCallBtn) {
+        videoCallBtn.style.display = 'none';
+        console.log('🔇 Скрыта кнопка видеозвонка');
+    }
+    
+    // 8. Загружаем историю чата с ботом
+    loadChatHistory(bot.id);
+    
+    // 9. Загружаем черновик для этого чата
+    loadDraft(bot.id);
+    
+    // 10. Показываем экран чата
+    if (typeof window.showScreen === 'function') {
+        window.showScreen('chatScreen');
+        console.log('🖥️ Показан экран чата');
+    }
+}
+// ===== ОТКРЫТИЕ ЧАТА С ДРУГОМ (ПОЛНОСТЬЮ ИСПРАВЛЕНО) =====
+async function openFriendChat(friend) {
+    console.log('👥 Открываем чат с другом:', friend);
+    
+    // 1. ПОЛНОСТЬЮ ОЧИЩАЕМ ИНТЕРФЕЙС
+    const chatArea = document.getElementById('chatArea');
+    if (chatArea) {
+        chatArea.innerHTML = '';
+        console.log('🧹 Очищена область чата');
+    }
+    
+    // 2. Очищаем панель быстрых сообщений (она только для ботов)
+    const quickPanel = document.getElementById('quickReplyPanel');
+    if (quickPanel) {
+        quickPanel.style.display = 'none';
+        quickPanel.innerHTML = '';
+        console.log('🧹 Скрыта панель быстрых сообщений');
+    }
+    
+    // 3. Отключаем старые слушатели Firebase
+    if (messagesListener) {
+        messagesListener();
+        messagesListener = null;
+        console.log('🔇 Отключен старый слушатель сообщений');
+    }
+    
+    if (chatListener) {
+        chatListener();
+        chatListener = null;
+        console.log('🔇 Отключен старый слушатель чата');
+    }
+    
+    // 4. Сохраняем черновик предыдущего чата
+    saveCurrentDraft();
+    
+    // 5. Устанавливаем текущий чат
+    currentChat = friend;
+    currentChatId = friend.id;
+    currentChatType = 'friend';
+    console.log('📌 Текущий чат:', { id: currentChatId, type: currentChatType, name: friend.name });
+    
+    // 6. Обновляем интерфейс чата
+    const nameEl = document.getElementById('chatContactName');
+    const usernameEl = document.getElementById('chatContactUsername');
+    const avatarEl = document.getElementById('chatAvatar');
+    
+    if (nameEl) nameEl.textContent = customNames[friend.id] || friend.name;
+    if (usernameEl) usernameEl.textContent = `@${friend.username}`;
+    if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
+    
+    // 7. Для друзей показываем кнопки звонков
+    const audioCallBtn = document.getElementById('audioCallActionBtn');
+    const videoCallBtn = document.getElementById('videoCallActionBtn');
+    if (audioCallBtn) {
+        audioCallBtn.style.display = 'flex';
+        console.log('📞 Показана кнопка аудиозвонка');
+    }
+    if (videoCallBtn) {
+        videoCallBtn.style.display = 'flex';
+        console.log('📹 Показана кнопка видеозвонка');
+    }
+    
+    // 8. Получаем или создаём chatId
+    try {
+        if (!friend.chatId) {
+            console.log('🔍 Ищем существующий чат...');
+            const chatsSnapshot = await window.db.collection('chats')
+                .where('participants', 'array-contains', window.auth.currentUser.uid)
+                .get();
+            
+            let existingChat = null;
+            chatsSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.participants.includes(friend.id)) {
+                    existingChat = { id: doc.id, ...data };
+                }
+            });
+            
+            if (existingChat) {
+                friend.chatId = existingChat.id;
+                currentChatId = existingChat.id;
+                console.log('✅ Найден существующий чат:', currentChatId);
+            } else {
+                console.log('🆕 Создаём новый чат...');
+                const chatId = await window.createPrivateChat(window.auth.currentUser.uid, friend.id);
+                friend.chatId = chatId;
+                currentChatId = chatId;
+                console.log('✅ Создан новый чат:', currentChatId);
+            }
+        } else {
+            currentChatId = friend.chatId;
+            console.log('✅ Используем существующий chatId:', currentChatId);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка при получении/создании чата:', error);
+        window.showToast?.('❌ Не удалось открыть чат', 'error');
+        return;
+    }
+    
+    // 9. Загружаем черновик для этого чата
+    loadDraft(currentChatId);
+    
+    // 10. Слушаем сообщения
+    console.log('👂 Устанавливаем слушатель сообщений для чата:', currentChatId);
+    listenToMessages(currentChatId, (messages) => {
+        console.log(`📨 Получено ${messages.length} сообщений`);
+        renderRealMessages(messages);
     });
     
-    if (existingChat) {
-      friend.chatId = existingChat.id;
-      currentChatId = existingChat.id;
-    } else {
-      const chatId = await window.createPrivateChat(window.auth.currentUser.uid, friend.id);
-      friend.chatId = chatId;
-      currentChatId = chatId;
+    // 11. Слушаем изменения чата (печать и т.д.)
+    listenToChat(currentChatId, (chatData) => {
+        if (chatData && chatData.typing) {
+            const isTyping = chatData.typing[friend.id];
+            const typingEl = document.getElementById('typingIndicator');
+            if (typingEl) {
+                typingEl.style.display = isTyping ? 'flex' : 'none';
+            }
+        }
+    });
+    
+    // 12. Показываем экран чата
+    if (typeof window.showScreen === 'function') {
+        window.showScreen('chatScreen');
+        console.log('🖥️ Показан экран чата');
     }
-  } else {
-    currentChatId = friend.chatId;
-  }
-  
-  // Слушаем сообщения
-  listenToMessages(currentChatId, (messages) => {
-    renderRealMessages(messages);
-  });
-  
-  // Слушаем изменения чата (печать и т.д.)
-  listenToChat(currentChatId, (chatData) => {
-    if (chatData && chatData.typing) {
-      const isTyping = chatData.typing[friend.id];
-      const typingEl = document.getElementById('typingIndicator');
-      if (typingEl) {
-        typingEl.style.display = isTyping ? 'flex' : 'none';
-      }
-    }
-  });
-  
-  loadDraft(currentChatId);
-  
-  if (typeof window.showScreen === 'function') {
-    window.showScreen('chatScreen');
-  }
 }
-
-function showQuickReplies(botId) {
-  const panel = document.getElementById('quickReplyPanel');
-  if (!panel) return;
-  
-  const questions = quickQuestions[botId] || quickQuestions.nyashtalk;
-  
-  panel.innerHTML = '';
-  questions.forEach(q => {
-    const btn = document.createElement('button');
-    btn.className = 'quick-chip';
-    btn.textContent = q;
-    btn.onclick = () => {
-      const input = document.getElementById('messageInput');
-      if (input) {
-        input.value = q;
-      }
-    };
-    panel.appendChild(btn);
-  });
-}
-
-function toggleQuickPanel() {
-  const panel = document.getElementById('quickReplyPanel');
-  if (!panel) return;
-  quickPanelVisible = !quickPanelVisible;
-  panel.style.display = quickPanelVisible ? 'flex' : 'none';
-}
-
 // ===== ФУНКЦИИ ДЛЯ СОХРАНЕНИЯ ИМЁН И ЗАКРЕПЛЕНИЯ =====
 function saveCustomName(chatId, name) {
   if (name && name.trim()) {

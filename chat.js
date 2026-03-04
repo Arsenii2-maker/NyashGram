@@ -33,44 +33,89 @@ const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 const isAndroid = /Android/.test(navigator.userAgent);
 const isMobile = isIOS || isAndroid;
 
-// ===== МИЛЫЕ БЫСТРЫЕ ВОПРОСЫ =====
-const quickQuestions = {
-  nyashhelp: [
-    "как сменить тему? 🎨",
-    "как поменять шрифт? ✍️",
-    "кто такие боты? 🤖",
-    "сколько всего тем?",
-    "расскажи о себе 💕"
-  ],
-  nyashtalk: [
-    "как дела? 💕",
-    "что нового? 🌸",
-    "любишь котиков? 🐱",
-    "расскажи секрет 🤫",
-    "обними меня! 🫂"
-  ],
-  nyashgame: [
-    "сыграем? 🎮",
-    "угадай число 🔢",
-    "камень-ножницы ✂️",
-    "кости 🎲",
-    "орёл-решка 🪙"
-  ],
-  nyashhoroscope: [
-    "что сегодня? ✨",
-    "любовь 💕",
-    "деньги 💰",
-    "совет 🌟",
-    "что завтра? 🔮"
-  ],
-  nyashcook: [
-    "что приготовить? 🍳",
-    "кексы 🧁",
-    "печенье 🍪",
-    "тортик 🎂",
-    "завтрак 🥞"
-  ]
-};
+// ===== ФУНКЦИИ ДЛЯ ПАНЕЛИ БЫСТРЫХ ОТВЕТОВ =====
+function showQuickReplies(botId) {
+    console.log('💬 Показываем быстрые ответы для бота:', botId);
+    
+    const panel = document.getElementById('quickReplyPanel');
+    if (!panel) {
+        console.error('❌ Панель quickReplyPanel не найдена');
+        return;
+    }
+    
+    // Быстрые вопросы для каждого бота
+    const quickQuestions = {
+        nyashhelp: [
+            "как сменить тему? 🎨",
+            "как поменять шрифт? ✍️",
+            "кто такие боты? 🤖",
+            "сколько всего тем?",
+            "расскажи о себе 💕"
+        ],
+        nyashtalk: [
+            "как дела? 💕",
+            "что нового? 🌸",
+            "любишь котиков? 🐱",
+            "расскажи секрет 🤫",
+            "обними меня! 🫂"
+        ],
+        nyashgame: [
+            "сыграем? 🎮",
+            "угадай число 🔢",
+            "камень-ножницы ✂️",
+            "кости 🎲",
+            "орёл-решка 🪙"
+        ],
+        nyashhoroscope: [
+            "что сегодня? ✨",
+            "любовь 💕",
+            "деньги 💰",
+            "совет 🌟",
+            "что завтра? 🔮"
+        ],
+        nyashcook: [
+            "что приготовить? 🍳",
+            "кексы 🧁",
+            "печенье 🍪",
+            "тортик 🎂",
+            "завтрак 🥞"
+        ]
+    };
+    
+    const questions = quickQuestions[botId] || quickQuestions.nyashtalk;
+    
+    // Очищаем панель
+    panel.innerHTML = '';
+    
+    // Создаём кнопки для каждого вопроса
+    questions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-chip';
+        btn.textContent = q;
+        btn.onclick = () => {
+            const input = document.getElementById('messageInput');
+            if (input) {
+                input.value = q;
+                input.focus();
+            }
+        };
+        panel.appendChild(btn);
+    });
+    
+    console.log(`✅ Добавлено ${questions.length} быстрых ответов`);
+}
+
+function toggleQuickPanel() {
+    console.log('🔄 Переключение панели быстрых ответов');
+    
+    const panel = document.getElementById('quickReplyPanel');
+    if (!panel) return;
+    
+    quickPanelVisible = !quickPanelVisible;
+    panel.style.display = quickPanelVisible ? 'flex' : 'none';
+    
+    console.log('📌 Панель быстрых ответов:', quickPanelVisible ? 'показана' : 'скрыта');
+}
 
 // ===== МИЛЫЕ ОТВЕТЫ БОТОВ =====
 const botResponses = {
@@ -386,13 +431,15 @@ function openBotChat(bot) {
         avatarEl.style.background = gradients[bot.id] || 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
     }
     
-    // 6. Для ботов показываем панель быстрых сообщений
-    const quickPanel = document.getElementById('quickReplyPanel');
-    if (quickPanel) {
-        quickPanel.style.display = 'flex';
-        showQuickReplies(bot.id);
-        console.log('💬 Показана панель быстрых сообщений');
-    }
+    // В openBotChat после очистки и настройки:
+
+// 6. Для ботов показываем панель быстрых сообщений
+const quickPanel = document.getElementById('quickReplyPanel');
+if (quickPanel) {
+    quickPanel.style.display = 'flex';
+    showQuickReplies(bot.id);  // ← ЭТА ФУНКЦИЯ ТЕПЕРЬ ЕСТЬ!
+    console.log('💬 Показана панель быстрых сообщений');
+}
     
     // 7. Для ботов скрываем кнопки звонков
     const audioCallBtn = document.getElementById('audioCallActionBtn');

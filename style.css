@@ -1037,3 +1037,102 @@ button:active {
     top: 60px;
   }
 }
+/* ===== ВОЗДУХ И ПРОСТОР ===== */
+.contacts-list {
+  gap: 12px !important;
+}
+
+.contact {
+  margin-bottom: 12px !important;
+  padding: 16px !important;
+}
+
+.avatar {
+  width: 56px !important;
+  height: 56px !important;
+}
+
+.avatar-emoji {
+  font-size: 28px !important;
+}
+
+.name {
+  font-size: 1.1rem !important;
+  margin-bottom: 4px !important;
+}
+
+.username {
+  font-size: 13px !important;
+}
+
+.draft {
+  font-size: 13px !important;
+  margin-top: 6px !important;
+}
+
+.section-header {
+  padding: 20px 0 8px 4px !important;
+  font-size: 14px !important;
+}
+
+.message {
+  padding: 12px 16px !important;
+  padding-bottom: 22px !important;
+  font-size: 15px !important;
+}
+
+.message-time {
+  font-size: 10px !important;
+  bottom: 4px !important;
+  right: 12px !important;
+}
+
+.tabs-container {
+  padding: 12px 16px !important;
+  gap: 10px !important;
+}
+
+.tab-btn {
+  padding: 12px 0 !important;
+  font-size: 14px !important;
+}
+
+.icon-btn {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 20px !important;
+}
+
+.top-title {
+  font-size: 1.4rem !important;
+}
+
+.chat-header {
+  padding: 16px !important;
+}
+
+.action-btn {
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 20px !important;
+}
+
+.quick-chip {
+  padding: 10px 18px !important;
+  font-size: 14px !important;
+}
+
+.message-input-area {
+  padding: 16px !important;
+}
+
+.message-input-area input {
+  padding: 16px 20px !important;
+  font-size: 16px !important;
+}
+
+.send-btn, .voice-btn {
+  width: 56px !important;
+  height: 56px !important;
+  font-size: 22px !important;
+}

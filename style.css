@@ -31,7 +31,7 @@ body {
   color: var(--text);
 }
 
-/* ===== ТЕМЫ (ОСТАВЛЯЕМ КАК ЕСТЬ) ===== */
+/* ===== ТЕМЫ ===== */
 .theme-pastel-pink.mode-light {
   --bg-start: #ffd1dc;
   --bg-end: #ffe4e1;
@@ -39,11 +39,11 @@ body {
   --text-soft: #8b6f8b;
   --accent: #ffadd6;
   --accent-soft: #ffc1e0;
-  --card-bg: rgba(255, 255, 255, 0.3);
-  --bubble-user: rgba(255, 255, 255, 0.9);
-  --bubble-bot: rgba(240, 225, 255, 0.8);
-  --border-light: rgba(255, 255, 255, 0.5);
-  --input-bg: rgba(255, 255, 255, 0.7);
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(240, 225, 255, 0.7);
+  --border-light: rgba(255, 255, 255, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.6);
   --input-text: #5c3a4a;
   --input-placeholder: #8b6f8b;
 }
@@ -55,16 +55,187 @@ body {
   --text-soft: #ffb6c1;
   --accent: #ff69b4;
   --accent-soft: #ff82b9;
-  --card-bg: rgba(139, 26, 77, 0.5);
-  --bubble-user: rgba(255, 105, 180, 0.8);
-  --bubble-bot: rgba(199, 21, 133, 0.7);
-  --border-light: rgba(255, 255, 255, 0.2);
-  --input-bg: rgba(30, 30, 30, 0.7);
+  --card-bg: rgba(139, 26, 77, 0.4);
+  --bubble-user: rgba(255, 105, 180, 0.7);
+  --bubble-bot: rgba(199, 21, 133, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --input-bg: rgba(30, 30, 30, 0.6);
   --input-text: #ffffff;
   --input-placeholder: #ffb6c1;
 }
 
-/* Остальные темы аналогично, но с увеличенной прозрачностью */
+/* Milk Rose - Light */
+.theme-milk-rose.mode-light {
+  --bg-start: #ffb6c1;
+  --bg-end: #ff9eb5;
+  --text: #4a2c1f;
+  --text-soft: #8b6f6f;
+  --accent: #ffb199;
+  --accent-soft: #ffc8b3;
+  --card-bg: rgba(255, 200, 200, 0.3);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(255, 200, 200, 0.7);
+  --border-light: rgba(255, 235, 220, 0.5);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-text: #4a2c1f;
+  --input-placeholder: #8b6f6f;
+}
+
+.theme-milk-rose.mode-dark {
+  --bg-start: #8b3a3a;
+  --bg-end: #4a1f1f;
+  --text: #fff0f0;
+  --text-soft: #ffcccc;
+  --accent: #ff7f50;
+  --accent-soft: #ff9966;
+  --card-bg: rgba(139, 58, 58, 0.4);
+  --bubble-user: rgba(255, 127, 80, 0.7);
+  --bubble-bot: rgba(255, 71, 87, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --input-bg: rgba(30, 30, 30, 0.6);
+  --input-text: #ffffff;
+  --input-placeholder: #ffcccc;
+}
+
+/* Night Blue - Light */
+.theme-night-blue.mode-light {
+  --bg-start: #d4e0f0;
+  --bg-end: #c0d0e8;
+  --text: #1a2a4a;
+  --text-soft: #4a5a7a;
+  --accent: #7ab8ff;
+  --accent-soft: #9ac9ff;
+  --card-bg: rgba(255, 255, 255, 0.2);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(210, 230, 255, 0.7);
+  --border-light: rgba(255, 255, 255, 0.3);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-text: #1a2a4a;
+  --input-placeholder: #4a5a7a;
+}
+
+.theme-night-blue.mode-dark {
+  --bg-start: #0a2351;
+  --bg-end: #03002b;
+  --text: #f0f8ff;
+  --text-soft: #b0c4de;
+  --accent: #4169e1;
+  --accent-soft: #1e90ff;
+  --card-bg: rgba(10, 35, 81, 0.4);
+  --bubble-user: rgba(65, 105, 225, 0.7);
+  --bubble-bot: rgba(0, 0, 139, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --input-bg: rgba(30, 30, 30, 0.6);
+  --input-text: #ffffff;
+  --input-placeholder: #b0c4de;
+}
+
+/* Lo-Fi Beige - Light */
+.theme-lo-fi-beige.mode-light {
+  --bg-start: #f9f5ee;
+  --bg-end: #f0e6d9;
+  --text: #4a3c2e;
+  --text-soft: #8b7a6f;
+  --accent: #d9b99b;
+  --accent-soft: #e4c9b0;
+  --card-bg: rgba(255, 250, 240, 0.3);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(235, 220, 210, 0.7);
+  --border-light: rgba(230, 210, 190, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-text: #4a3c2e;
+  --input-placeholder: #8b7a6f;
+}
+
+.theme-lo-fi-beige.mode-dark {
+  --bg-start: #5d3a1a;
+  --bg-end: #2d1e0a;
+  --text: #fdf5e6;
+  --text-soft: #deb887;
+  --accent: #cd853f;
+  --accent-soft: #d2691e;
+  --card-bg: rgba(93, 58, 26, 0.4);
+  --bubble-user: rgba(205, 133, 63, 0.7);
+  --bubble-bot: rgba(139, 69, 19, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --input-bg: rgba(30, 30, 30, 0.6);
+  --input-text: #ffffff;
+  --input-placeholder: #deb887;
+}
+
+/* Soft Lilac - Light */
+.theme-soft-lilac.mode-light {
+  --bg-start: #f5f0ff;
+  --bg-end: #e6d9ff;
+  --text: #3c1f5c;
+  --text-soft: #6f4f8f;
+  --accent: #c4a0ff;
+  --accent-soft: #d4b8ff;
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(220, 200, 255, 0.7);
+  --border-light: rgba(220, 200, 255, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-text: #3c1f5c;
+  --input-placeholder: #6f4f8f;
+}
+
+.theme-soft-lilac.mode-dark {
+  --bg-start: #4b0082;
+  --bg-end: #240041;
+  --text: #f0e6ff;
+  --text-soft: #d8bfd8;
+  --accent: #9370db;
+  --accent-soft: #ba55d3;
+  --card-bg: rgba(75, 0, 130, 0.4);
+  --bubble-user: rgba(147, 112, 219, 0.7);
+  --bubble-bot: rgba(138, 43, 226, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --input-bg: rgba(30, 30, 30, 0.6);
+  --input-text: #ffffff;
+  --input-placeholder: #d8bfd8;
+}
+
+/* Forest Mint - Light */
+.theme-forest-mint.mode-light {
+  --bg-start: #e0f2e0;
+  --bg-end: #c8e6c9;
+  --text: #1d3b1d;
+  --text-soft: #2d5a2d;
+  --accent: #81c784;
+  --accent-soft: #a5d6a7;
+  --card-bg: rgba(200, 230, 200, 0.25);
+  --bubble-user: rgba(255, 255, 255, 0.8);
+  --bubble-bot: rgba(200, 230, 200, 0.7);
+  --border-light: rgba(100, 150, 100, 0.3);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-text: #1d3b1d;
+  --input-placeholder: #2d5a2d;
+}
+
+.theme-forest-mint.mode-dark {
+  --bg-start: #1b4d1b;
+  --bg-end: #0a330a;
+  --text: #e8f5e8;
+  --text-soft: #a5d6a5;
+  --accent: #2e7d32;
+  --accent-soft: #388e3c;
+  --card-bg: rgba(27, 77, 27, 0.4);
+  --bubble-user: rgba(46, 125, 50, 0.7);
+  --bubble-bot: rgba(20, 70, 20, 0.6);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --input-bg: rgba(30, 30, 30, 0.6);
+  --input-text: #ffffff;
+  --input-placeholder: #a5d6a5;
+}
+
+/* ===== ШРИФТЫ ===== */
+.font-system { font-family: system-ui, -apple-system, sans-serif; }
+.font-rounded { font-family: 'Quicksand', 'M PLUS Rounded 1c', sans-serif; }
+.font-cozy { font-family: 'Comfortaa', cursive; }
+.font-elegant { font-family: 'Nunito', sans-serif; }
+.font-bold-soft { font-family: 'Fredoka', sans-serif; }
+.font-mono-cozy { font-family: 'Kosugi Maru', monospace; }
 
 /* ===== ОСНОВНЫЕ СТИЛИ ===== */
 .screen {
@@ -76,10 +247,9 @@ body {
   color: var(--text);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   opacity: 0;
   transform: scale(0.98);
-  padding: 0 20px; /* Добавляем воздух по бокам */
 }
 
 .screen.active {
@@ -88,9 +258,117 @@ body {
   transform: scale(1);
 }
 
+/* Центрирование */
+.center-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.glass-container {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 32px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 8px 20px rgba(255, 192, 203, 0.3);
+  padding: 32px 24px;
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.2rem;
+  color: var(--text);
+  margin-bottom: 8px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+}
+
+h2 {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  color: var(--text-soft);
+  margin-bottom: 24px;
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* ===== ПОЛЯ ВВОДА ===== */
+input, select, textarea {
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid var(--border-light);
+  border-radius: 40px;
+  background: var(--input-bg);
+  backdrop-filter: blur(5px);
+  font-family: inherit;
+  color: var(--input-text);
+  transition: all 0.2s;
+  width: 100%;
+  margin: 8px 0;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  background: var(--input-bg);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 165, 185, 0.2);
+}
+
+input::placeholder {
+  color: var(--input-placeholder);
+  opacity: 0.7;
+}
+
+/* ===== КНОПКИ ===== */
+button {
+  padding: 14px 20px;
+  font-size: 16px;
+  border-radius: 40px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--border-light);
+  color: var(--text);
+  width: 100%;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+button.active {
+  background: var(--accent);
+  border-color: var(--accent-soft);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 120, 160, 0.3);
+}
+
+button:hover {
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
 /* ===== СТАТУС БАР ===== */
 .status-bar-fill {
-  height: env(safe-area-inset-top, 40px); /* Увеличили */
+  height: env(safe-area-inset-top, 35px);
   width: 100%;
   background: transparent;
   flex-shrink: 0;
@@ -101,38 +379,37 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px; /* Увеличили отступы */
+  padding: 12px 16px;
   background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
   width: 100%;
-  flex-shrink: 0;
-  border-radius: 0 0 30px 30px; /* Скругление снизу */
-  margin-bottom: 16px;
 }
 
 .top-title {
-  font-size: 1.6rem; /* Крупнее */
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--text);
-  letter-spacing: -0.5px;
 }
 
 .header-buttons {
   display: flex;
-  gap: 16px; /* Больше воздуха */
+  gap: 8px;
   align-items: center;
 }
 
 .icon-btn {
-  width: 48px; /* Крупнее */
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   border: 2px solid var(--border-light);
   color: var(--text);
-  font-size: 22px; /* Крупнее */
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,103 +417,90 @@ body {
   margin: 0;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
   border-color: var(--accent);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-.icon-btn:active {
-  transform: scale(0.95);
 }
 
 /* ===== ВКЛАДКИ ===== */
 .tabs-container {
   display: flex;
-  padding: 8px 20px; /* Больше воздуха */
-  gap: 12px; /* Больше промежутки */
+  padding: 8px 12px;
+  gap: 6px;
   background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 64px;
+  z-index: 90;
   width: 100%;
-  flex-shrink: 0;
-  border-radius: 0 0 30px 30px;
-  margin-bottom: 20px;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 14px 0; /* Выше кнопки */
-  border-radius: 50px;
+  padding: 8px;
+  border-radius: 40px;
   background: transparent;
   border: 2px solid var(--border-light);
   color: var(--text-soft);
-  font-size: 15px; /* Крупнее */
+  font-size: 12px;
   cursor: pointer;
   margin: 0;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .tab-btn.active {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
-  font-weight: 600;
-  box-shadow: 0 8px 20px rgba(255, 120, 160, 0.3);
 }
 
 /* ===== КОНТАКТЫ ===== */
 .contacts-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px 20px 16px;
+  padding: 12px;
   -webkit-overflow-scrolling: touch;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px; /* Промежутки между контактами */
 }
 
 .contact {
   display: flex;
   align-items: center;
-  gap: 16px; /* Больше воздуха */
-  padding: 16px 20px; /* Крупнее */
+  gap: 12px;
+  padding: 12px;
   background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 28px; /* Скругление */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 24px;
+  margin-bottom: 8px;
   border: 1px solid var(--border-light);
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .contact:hover {
   transform: translateX(4px);
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .contact.pinned {
   border-left: 4px solid var(--accent);
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .avatar {
-  width: 60px; /* Крупнее */
-  height: 60px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  border: 2px solid white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   background-size: cover;
   background-position: center;
   flex-shrink: 0;
@@ -247,7 +511,7 @@ body {
 }
 
 .avatar-emoji {
-  font-size: 32px; /* Крупнее */
+  font-size: 24px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -267,27 +531,25 @@ body {
   color: var(--text);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
-  font-size: 1.2rem; /* Крупнее */
-  margin-bottom: 6px;
 }
 
 .username {
-  font-size: 13px; /* Крупнее */
+  font-size: 11px;
   color: var(--text-soft);
   margin-top: 2px;
 }
 
 .draft {
-  font-size: 13px; /* Крупнее */
+  font-size: 11px;
   color: var(--accent);
-  margin-top: 6px;
+  margin-top: 4px;
   font-style: italic;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 220px;
+  max-width: 200px;
 }
 
 .draft::before {
@@ -296,29 +558,29 @@ body {
 }
 
 .pin-icon {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--accent);
-  margin-left: 6px;
+  margin-left: 4px;
 }
 
 .section-header {
-  padding: 24px 8px 8px 8px; /* Больше сверху */
-  font-size: 15px; /* Крупнее */
+  padding: 16px 0 4px 4px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-soft);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.9;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
 }
 
 .message-btn {
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
-  border: 2px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-light);
   color: var(--text);
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -326,29 +588,27 @@ body {
   padding: 0;
   margin: 0;
   flex-shrink: 0;
-  transition: all 0.2s ease;
 }
 
 .message-btn:hover {
   background: var(--accent);
   color: white;
-  transform: scale(1.1);
 }
 
 /* ===== ЧАТ ===== */
 .chat-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  gap: 12px;
+  padding: 12px 16px;
   background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
   width: 100%;
-  flex-shrink: 0;
-  border-radius: 0 0 30px 30px;
-  margin-bottom: 16px;
 }
 
 .chat-info {
@@ -359,152 +619,140 @@ body {
   font-weight: 600;
   color: var(--text);
   display: block;
-  margin-bottom: 4px;
-  font-size: 1.2rem;
+  margin-bottom: 2px;
 }
 
 .chat-username {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--text-soft);
 }
 
 .chat-actions-panel {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: 8px;
+  padding: 12px 16px;
   background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   justify-content: center;
   width: 100%;
-  border-radius: 30px;
-  margin-bottom: 16px;
 }
 
 .action-btn {
-  width: 52px; /* Крупнее */
-  height: 52px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   border: 2px solid var(--border-light);
   color: var(--text);
-  font-size: 22px; /* Крупнее */
+  font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   margin: 0;
-  transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
   transform: scale(1.1);
   border-color: var(--accent);
 }
 
 .quick-reply-panel {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  padding: 16px 20px;
+  padding: 12px 16px;
   background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   width: 100%;
-  border-radius: 30px;
-  margin-bottom: 16px;
-  justify-content: center;
 }
 
 .quick-chip {
-  padding: 12px 20px; /* Крупнее */
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.25);
+  padding: 6px 14px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.2);
   border: 2px solid var(--border-light);
   color: var(--text);
-  font-size: 14px; /* Крупнее */
+  font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
   width: auto;
   margin: 0;
-  transition: all 0.2s ease;
-  font-weight: 500;
 }
 
 .quick-chip:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
   border-color: var(--accent);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .chat-area {
   flex: 1;
-  padding: 20px;
+  padding: 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   background: var(--card-bg);
   width: 100%;
   -webkit-overflow-scrolling: touch;
-  border-radius: 30px;
-  margin-bottom: 16px;
 }
 
 .message {
-  max-width: 75%; /* Чуть уже */
-  padding: 16px 18px; /* Крупнее */
-  border-radius: 24px;
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 18px;
   position: relative;
-  padding-bottom: 24px;
-  animation: messageSlide 0.3s ease;
+  padding-bottom: 20px;
+  animation: messageSlide 0.25s ease;
   word-wrap: break-word;
-  line-height: 1.5;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  font-size: 15px; /* Крупнее */
+  line-height: 1.4;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .message.user {
   align-self: flex-end;
   background: var(--bubble-user);
-  border-bottom-right-radius: 8px;
+  border-bottom-right-radius: 4px;
   color: var(--text);
 }
 
 .message.bot {
   align-self: flex-start;
   background: var(--bubble-bot);
-  border-bottom-left-radius: 8px;
+  border-bottom-left-radius: 4px;
   color: var(--text);
 }
 
 .message-time {
-  font-size: 11px;
+  font-size: 9px;
   color: var(--text-soft);
-  opacity: 0.8;
+  opacity: 0.7;
   position: absolute;
-  bottom: 6px;
-  right: 12px;
+  bottom: 3px;
+  right: 8px;
 }
 
 .message-input-area {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   padding: 12px 16px;
   background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--border-light);
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
   width: 100%;
-  flex-shrink: 0;
-  border-radius: 50px; /* Сильно скруглённое */
-  margin-top: 8px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
 
@@ -513,26 +761,23 @@ body {
   margin: 0;
   background: var(--input-bg);
   color: var(--input-text);
-  font-size: 16px; /* Крупнее */
-  padding: 18px 22px; /* Крупнее */
-  border-radius: 40px;
-  border: 2px solid var(--border-light);
+  font-size: 15px;
+  padding: 14px 18px;
 }
 
 .message-input-area input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(255, 120, 160, 0.2);
 }
 
 .send-btn {
-  width: 60px; /* Крупнее */
-  height: 60px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--accent);
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -541,12 +786,10 @@ body {
   padding: 0;
   margin: 0;
   flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
 }
 
 .send-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 12px 25px rgba(255, 105, 180, 0.4);
 }
 
 .send-btn:disabled {
@@ -556,13 +799,13 @@ body {
 
 /* ===== ГОЛОСОВЫЕ ===== */
 .voice-btn {
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--accent);
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -570,7 +813,6 @@ body {
   transition: all 0.2s ease;
   flex-shrink: 0;
   margin: 0;
-  box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
 }
 
 .voice-btn.recording {
@@ -578,30 +820,35 @@ body {
   animation: voicePulse 1s infinite;
 }
 
-.voice-btn:hover {
-  transform: scale(1.05);
+.voice-btn:active {
+  transform: scale(0.95);
+}
+
+@keyframes voicePulse {
+  0%, 100% { transform: scale(1); background: #ff4444; }
+  50% { transform: scale(1.1); background: #ff6666; }
 }
 
 .message.voice {
   background: var(--accent);
   color: white;
-  min-width: 180px; /* Шире */
+  min-width: 120px;
 }
 
 .voice-message {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .voice-play-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   border: none;
   color: white;
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -610,9 +857,9 @@ body {
 
 .voice-timeline {
   flex: 1;
-  height: 6px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
+  border-radius: 2px;
   position: relative;
 }
 
@@ -623,40 +870,50 @@ body {
   height: 100%;
   width: 0%;
   background: white;
-  border-radius: 3px;
+  border-radius: 2px;
   transition: width 0.1s linear;
 }
 
 .voice-duration {
-  font-size: 13px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.9);
-  min-width: 45px;
+  min-width: 35px;
   text-align: right;
 }
 
 /* ===== ПУСТЫЕ СОСТОЯНИЯ ===== */
 .empty-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 60px 20px;
   opacity: 0.7;
 }
 
 .empty-icon {
-  font-size: 80px; /* Крупнее */
-  margin-bottom: 24px;
+  font-size: 64px;
+  margin-bottom: 20px;
   animation: float 3s ease-in-out infinite;
 }
 
 .empty-state h3 {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: var(--text);
-  font-size: 1.5rem; /* Крупнее */
+  font-size: 1.2rem;
 }
 
 .empty-state p {
   color: var(--text-soft);
-  margin-bottom: 24px;
-  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.small-btn {
+  width: auto;
+  padding: 8px 16px;
+  font-size: 13px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
 }
 
 /* ===== МОДАЛКА ===== */
@@ -667,8 +924,8 @@ body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -678,56 +935,52 @@ body {
 
 .modal-content {
   background: var(--card-bg);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-radius: 40px;
-  padding: 32px;
-  width: 90%;
-  max-width: 400px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 32px;
+  padding: 24px;
+  width: 85%;
+  max-width: 320px;
   border: 2px solid var(--border-light);
   animation: scaleIn 0.3s ease;
 }
 
 .modal-content h3 {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: var(--text);
   text-align: center;
-  font-size: 1.5rem;
 }
 
 .modal-content input {
-  margin-bottom: 20px;
-  padding: 16px 20px;
-  font-size: 16px;
+  margin-bottom: 16px;
 }
 
 .modal-buttons {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .modal-buttons button {
   flex: 1;
   margin: 0;
-  padding: 16px;
-  font-size: 16px;
+}
+
+.modal-buttons button:last-child {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent-soft);
 }
 
 /* ===== АНИМАЦИИ ===== */
 @keyframes messageSlide {
   from {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-@keyframes voicePulse {
-  0%, 100% { transform: scale(1); background: #ff4444; }
-  50% { transform: scale(1.1); background: #ff6666; }
 }
 
 @keyframes fadeIn {
@@ -753,7 +1006,7 @@ body {
 
 /* ===== СКРОЛЛБАР ===== */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -772,13 +1025,15 @@ body {
 
 /* ===== МЕДИА-ЗАПРОСЫ ===== */
 @media (max-width: 480px) {
-  .screen {
-    padding: 0 12px;
-  }
+  h1 { font-size: 2rem; }
+  .top-title { font-size: 1.2rem; }
+  .glass-container { padding: 24px 16px; }
+  .contact { padding: 10px; }
+  .avatar { width: 44px; height: 44px; }
+  .message { max-width: 85%; font-size: 14px; }
+  .quick-chip { font-size: 11px; padding: 6px 12px; }
   
-  .top-title { font-size: 1.4rem; }
-  .icon-btn { width: 44px; height: 44px; font-size: 20px; }
-  .avatar { width: 52px; height: 52px; }
-  .avatar-emoji { font-size: 28px; }
-  .message { max-width: 85%; }
+  .tabs-container {
+    top: 60px;
+  }
 }

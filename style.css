@@ -1680,3 +1680,41 @@ button:active {
   border-color: #ff9acb;
   box-shadow: 0 4px 20px rgba(255, 155, 200, 0.2);
 }
+/* ===== ИСПРАВЛЕНИЕ КНОПОК В ЧАТЕ ===== */
+.chat-header,
+.chat-actions-panel,
+.quick-reply-panel,
+.message-input-area {
+  position: relative;
+  z-index: 10;
+}
+
+.icon-btn,
+.action-btn,
+.quick-chip,
+.send-btn,
+.voice-btn {
+  position: relative;
+  z-index: 20;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.chat-area {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* Убираем возможные перекрытия */
+.glass-container,
+.modal,
+.toast-container {
+  pointer-events: none;
+}
+
+.glass-container *,
+.modal *,
+.toast-container * {
+  pointer-events: auto;
+}

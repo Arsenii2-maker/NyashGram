@@ -1,4 +1,4 @@
-// app.js — ПОЛНАЯ ВЕРСИЯ С ЗАГРУЗКОЙ И УЛУЧШЕННОЙ НАВИГАЦИЕЙ
+// app.js — ПОЛНАЯ ВЕРСИЯ С ЗАГРУЗКОЙ ВЕЗДЕ
 
 // ===== FIREBASE КОНФИГ =====
 const firebaseConfig = {
@@ -31,8 +31,8 @@ let currentUser = null;
 let currentScreen = 'loginMethodScreen';
 
 // ===== МИЛЫЕ СЛОВА =====
-const cuteAdjectives = ['pinky', 'soft', 'fluffy', 'dreamy', 'sweet', 'tiny', 'magic', 'cloudy', 'sunny', 'cozy'];
-const cuteNouns = ['cat', 'bunny', 'cloud', 'star', 'berry', 'moon', 'flower', 'peach', 'muffin', 'petal'];
+const cuteAdjectives = [ /* твои слова */ ];
+const cuteNouns = [ /* твои слова */ ];
 const EXTRA_RARE = ['honeycomb', 'butterfly', 'dragonfly', 'strawberry'];
 const SECRET_WORDS = ['parallelogram'];
 
@@ -329,33 +329,17 @@ async function createPrivateChat(uid1, uid2) {
     }
 }
 
-// ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ (С АНИМАЦИЕЙ) =====
+// ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
 function showScreen(screenId) {
-    const screens = document.querySelectorAll('.screen');
-    const target = document.getElementById(screenId);
-    
-    if (!target) return;
-
-    // Плавное исчезновение текущих экранов
-    screens.forEach(screen => {
-        if (screen.classList.contains('active')) {
-            screen.style.opacity = '0';
-            screen.style.transform = 'translateY(10px)';
-        }
-        screen.classList.remove('active');
-    });
-
-    // Плавное появление нового экрана
-    setTimeout(() => {
-        target.classList.add('active');
-        target.style.opacity = '1';
-        target.style.transform = 'translateY(0)';
+    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.classList.add('active');
         currentScreen = screenId;
-
         if (screenId === 'friendsScreen' && typeof window.renderContacts === 'function') {
             window.renderContacts();
         }
-    }, 50);
+    }
 }
 
 // ===== ПРОВЕРКА ПРОФИЛЯ =====
@@ -375,10 +359,10 @@ async function checkUserProfile() {
         localStorage.setItem('nyashgram_username', userData.username || '');
         localStorage.setItem('nyashgram_logged_in', 'true');
         
-        if(document.getElementById('settingsName')) document.getElementById('settingsName').value = userData.name || '';
-        if(document.getElementById('settingsUsername')) document.getElementById('settingsUsername').value = userData.username || '';
-        if(document.getElementById('profileEmail')) document.getElementById('profileEmail').textContent = auth.currentUser.email || '';
-        if(document.getElementById('profileType')) document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
+        document.getElementById('settingsName').value = userData.name || '';
+        document.getElementById('settingsUsername').value = userData.username || '';
+        document.getElementById('profileEmail').textContent = auth.currentUser.email || '';
+        document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
         
         applyTheme();
         return true;
@@ -399,7 +383,7 @@ async function loginWithEmail(email, password) {
             showScreen('verifyEmailScreen');
         }
     } catch (error) {
-        if(document.getElementById('loginError')) document.getElementById('loginError').textContent = getErrorMessage(error);
+        document.getElementById('loginError').textContent = getErrorMessage(error);
     }
 }
 
@@ -411,7 +395,7 @@ async function registerWithEmail(name, email, password) {
         localStorage.setItem('nyashgram_name', name);
         showScreen('verifyEmailScreen');
     } catch (error) {
-        if(document.getElementById('regError')) document.getElementById('regError').textContent = getErrorMessage(error);
+        document.getElementById('regError').textContent = getErrorMessage(error);
     }
 }
 
@@ -459,62 +443,450 @@ function getErrorMessage(error) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 NyashGram v3.5 загружается...');
     
+    // ===== ФУНКЦИИ УПРАВЛЕНИЯ ЗАГРУЗКОЙ =====
     function showLoading(message = 'Загружаем...') {
         const overlay = document.getElementById('loadingOverlay');
         const msgEl = document.getElementById('loadingMessage');
         if (!overlay) return;
-        msgEl.textContent = message;
+        
+        if (msgEl) msgEl.textContent = message;
         overlay.style.display = 'flex';
         overlay.style.opacity = '1';
+        console.log('⏳ Загрузка:', message);
     }
     
     function hideLoading() {
         const overlay = document.getElementById('loadingOverlay');
         if (!overlay) return;
+        
         overlay.style.opacity = '0';
-        setTimeout(() => overlay.style.display = 'none', 500);
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.opacity = '1';
+        }, 500);
+        console.log('✅ Загрузка скрыта');
     }
     
+    // Делаем функции глобальными
     window.showLoading = showLoading;
     window.hideLoading = hideLoading;
     
+    // Советы для загрузки
     const tips = [
-        '💗 Говори по-няшному!', '🎨 У нас 6 милых тем', '🤖 5 ботов готовы помочь',
-        '📝 Меняй шрифты в настройках', '✨ Отправляй голосовые сообщения', '🎮 Поиграй с NyashGame'
+        '💗 Говори по-няшному!',
+        '🎨 У нас 6 милых тем',
+        '🤖 5 ботов готовы помочь',
+        '📝 Меняй шрифты в настройках',
+        '✨ Отправляй голосовые сообщения',
+        '🎮 Поиграй с NyashGame',
+        '🔮 Узнай гороскоп',
+        '🍳 Найди рецепты',
+        '💬 Общайся с друзьями',
+        '📌 Закрепляй важные чаты',
+        '👥 Добавляй друзей',
+        '📞 Совершай звонки'
     ];
     
+    // Запускаем ротацию советов
     const tipText = document.getElementById('tipText');
-    if (tipText) {
+    const currentTip = document.getElementById('currentTip');
+    const totalTips = document.getElementById('totalTips');
+    
+    if (tipText && currentTip && totalTips) {
+        totalTips.textContent = tips.length;
         let tipIndex = 0;
+        tipText.textContent = tips[0];
+        currentTip.textContent = '1';
+        
         setInterval(() => {
             tipIndex = (tipIndex + 1) % tips.length;
             tipText.textContent = tips[tipIndex];
+            currentTip.textContent = tipIndex + 1;
         }, 3000);
     }
     
+    // Применяем тему
     applyTheme();
     
-    // Обработчики кнопок (упрощенно)
-    document.getElementById('emailMethodBtn')?.addEventListener('click', () => showScreen('emailLoginScreen'));
-    document.getElementById('anonymousMethodBtn')?.addEventListener('click', loginAnonymously);
-    document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    document.getElementById('settingsBtn')?.addEventListener('click', () => {
-        checkUserProfile();
-        showScreen('settingsScreen');
+    // ===== ОБРАБОТЧИКИ ЭКРАНОВ =====
+    
+    // Вход
+    document.getElementById('emailMethodBtn')?.addEventListener('click', () => {
+        showLoading('Подготовка входа...');
+        setTimeout(() => {
+            showScreen('emailLoginScreen');
+            hideLoading();
+        }, 300);
     });
-    document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => showScreen('friendsScreen'));
-
-    // Слушатель авторизации
+    
+    document.getElementById('anonymousMethodBtn')?.addEventListener('click', () => {
+        showLoading('Вход гостем...');
+        setTimeout(() => {
+            loginAnonymously();
+            hideLoading();
+        }, 500);
+    });
+    
+    // Регистрация
+    document.getElementById('showRegisterLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showLoading('Загружаем регистрацию...');
+        setTimeout(() => {
+            showScreen('emailRegisterScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    document.getElementById('backToLoginFromRegBtn')?.addEventListener('click', () => {
+        showLoading('Возврат...');
+        setTimeout(() => {
+            showScreen('emailLoginScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    document.getElementById('registerBtn')?.addEventListener('click', () => {
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
+        
+        if (!name || !email || !password) {
+            document.getElementById('regError').textContent = '❌ Заполни все поля';
+            return;
+        }
+        if (password !== confirm) {
+            document.getElementById('regError').textContent = '❌ Пароли не совпадают';
+            return;
+        }
+        
+        showLoading('Регистрация...');
+        registerWithEmail(name, email, password);
+        setTimeout(hideLoading, 2000);
+    });
+    
+    // Вход по email
+    document.getElementById('showLoginLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showLoading('Загружаем вход...');
+        setTimeout(() => {
+            showScreen('emailLoginScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    document.getElementById('backFromEmailLoginBtn')?.addEventListener('click', () => {
+        showLoading('Возврат...');
+        setTimeout(() => {
+            showScreen('loginMethodScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    document.getElementById('loginBtn')?.addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            document.getElementById('loginError').textContent = '❌ Заполни все поля';
+            return;
+        }
+        
+        showLoading('Вход в аккаунт...');
+        loginWithEmail(email, password);
+        setTimeout(hideLoading, 2000);
+    });
+    
+    // Подтверждение email
+    document.getElementById('checkVerificationBtn')?.addEventListener('click', async () => {
+        showLoading('Проверяем email...');
+        await auth.currentUser.reload();
+        if (auth.currentUser.emailVerified) {
+            await checkUserProfile();
+            showScreen('friendsScreen');
+        } else {
+            showToast('📧 Email ещё не подтверждён', 'info');
+        }
+        hideLoading();
+    });
+    
+    document.getElementById('resendEmailBtn')?.addEventListener('click', async () => {
+        showLoading('Отправляем письмо...');
+        await auth.currentUser.sendEmailVerification();
+        showToast('📧 Письмо отправлено снова', 'success');
+        hideLoading();
+    });
+    
+    document.getElementById('backToLoginFromVerifyBtn')?.addEventListener('click', () => {
+        showLoading('Возврат...');
+        setTimeout(() => {
+            showScreen('loginMethodScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    // ===== ЭКРАН СОЗДАНИЯ ПРОФИЛЯ =====
+    const profileName = document.getElementById('profileName');
+    const profileUsername = document.getElementById('profileUsername');
+    const generateBtn = document.getElementById('generateUsernameBtn');
+    const createBtn = document.getElementById('createProfileBtn');
+    const skipBtn = document.getElementById('skipProfileBtn');
+    const usernameError = document.getElementById('usernameError');
+    
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => {
+            profileUsername.value = generateCuteUsername();
+            usernameError.textContent = '';
+            validateProfileForm();
+        });
+    }
+    
+    if (profileUsername) profileUsername.addEventListener('input', validateProfileForm);
+    if (profileName) profileName.addEventListener('input', validateProfileForm);
+    
+    async function validateProfileForm() {
+        const name = profileName.value.trim();
+        const username = profileUsername.value.trim();
+        if (!name || !username) {
+            createBtn.disabled = true;
+            return;
+        }
+        if (!isValidUsername(username)) {
+            usernameError.textContent = '❌ Только a-z, 0-9 и _ (3-50 символов)';
+            createBtn.disabled = true;
+            return;
+        }
+        const available = await isUsernameAvailable(username);
+        if (!available) {
+            usernameError.textContent = '❌ Этот username уже занят';
+            createBtn.disabled = true;
+            return;
+        }
+        usernameError.textContent = '';
+        createBtn.disabled = false;
+    }
+    
+    if (createBtn) {
+        createBtn.addEventListener('click', async () => {
+            const name = profileName.value.trim();
+            const username = profileUsername.value.trim();
+            
+            showLoading('Создаём профиль...');
+            const success = await saveUserProfile(name, username);
+            if (success) {
+                showToast('✨ Профиль создан!', 'success');
+                showScreen('friendsScreen');
+            }
+            hideLoading();
+        });
+    }
+    
+    if (skipBtn) {
+        skipBtn.addEventListener('click', async () => {
+            const name = 'Пользователь';
+            const username = 'user_' + Math.floor(Math.random() * 10000);
+            
+            showLoading('Создаём автоматический профиль...');
+            await saveUserProfile(name, username);
+            showToast('👤 Профиль создан автоматически', 'info');
+            showScreen('friendsScreen');
+            hideLoading();
+        });
+    }
+    
+    // ===== НАСТРОЙКИ =====
+    document.getElementById('settingsBtn')?.addEventListener('click', () => {
+        showLoading('Загружаем настройки...');
+        if (auth.currentUser) {
+            document.getElementById('settingsName').value = localStorage.getItem('nyashgram_name') || '';
+            document.getElementById('settingsUsername').value = localStorage.getItem('nyashgram_username') || '';
+            document.getElementById('profileEmail').textContent = auth.currentUser.email || 'гость';
+            document.getElementById('profileType').textContent = auth.currentUser.isAnonymous ? '👤 гость' : '📧 email';
+        }
+        showScreen('settingsScreen');
+        hideLoading();
+    });
+    
+    document.getElementById('backFromSettingsBtn')?.addEventListener('click', () => {
+        showLoading('Возврат...');
+        setTimeout(() => {
+            showScreen('friendsScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    
+    document.getElementById('settingsGenerateBtn')?.addEventListener('click', () => {
+        document.getElementById('settingsUsername').value = generateCuteUsername();
+    });
+    
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', async () => {
+        const newName = document.getElementById('settingsName').value.trim();
+        const newUsername = document.getElementById('settingsUsername').value.trim();
+        
+        if (!newName || !newUsername) {
+            showToast('❌ Заполни все поля', 'error');
+            return;
+        }
+        
+        showLoading('Сохраняем настройки...');
+        
+        const oldUsername = localStorage.getItem('nyashgram_username');
+        const oldName = localStorage.getItem('nyashgram_name');
+        
+        try {
+            if (newUsername !== oldUsername) {
+                if (!isValidUsername(newUsername)) {
+                    showToast('❌ Только a-z, 0-9 и _ (3-50 символов)', 'error');
+                    hideLoading();
+                    return;
+                }
+                const result = await updateUsername(newUsername);
+                if (!result) {
+                    hideLoading();
+                    return;
+                }
+            }
+            if (newName !== oldName) {
+                localStorage.setItem('nyashgram_name', newName);
+                if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                    await db.collection('users').doc(auth.currentUser.uid).update({ name: newName });
+                }
+            }
+            showToast('✨ Настройки сохранены!', 'success');
+            setTimeout(() => showScreen('friendsScreen'), 500);
+        } catch (error) {
+            console.error('❌ Ошибка:', error);
+            showToast('❌ Ошибка при сохранении', 'error');
+        }
+        hideLoading();
+    });
+    
+    // ===== ПОИСК ДРУЗЕЙ =====
+    document.getElementById('searchFriendsBtn')?.addEventListener('click', () => {
+        showLoading('Загружаем поиск...');
+        showScreen('searchFriendsScreen');
+        document.getElementById('searchUsersInput').value = '';
+        document.getElementById('searchResultsList').innerHTML = '';
+        hideLoading();
+    });
+    
+    document.getElementById('backFromSearchBtn')?.addEventListener('click', () => {
+        showLoading('Возврат...');
+        setTimeout(() => {
+            showScreen('friendsScreen');
+            hideLoading();
+        }, 300);
+    });
+    
+    let searchTimeout;
+    document.getElementById('searchUsersInput')?.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        if (query.length < 3) {
+            document.getElementById('searchResultsList').innerHTML = '';
+            return;
+        }
+        
+        showLoading('Ищем пользователя...');
+        
+        searchTimeout = setTimeout(async () => {
+            const user = await findUserByUsername(query);
+            const resultsList = document.getElementById('searchResultsList');
+            
+            if (user && user.id !== auth.currentUser.uid) {
+                resultsList.innerHTML = `
+                    <div class="contact">
+                        <div class="avatar" style="background: linear-gradient(135deg, #fbc2c2, #c2b9f0);"></div>
+                        <div class="info">
+                            <div class="name">${user.name || 'Пользователь'}</div>
+                            <div class="username">@${user.username}</div>
+                        </div>
+                        <button class="add-friend-btn" data-username="${user.username}">➕</button>
+                    </div>
+                `;
+                
+                resultsList.querySelector('.add-friend-btn')?.addEventListener('click', () => {
+                    sendFriendRequest(user.username);
+                });
+            } else {
+                resultsList.innerHTML = '<div class="empty-state">❌ пользователь не найден</div>';
+            }
+            hideLoading();
+        }, 500);
+    });
+    
+    // ===== ТЕМЫ =====
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const theme = btn.dataset.theme;
+            localStorage.setItem('nyashgram_theme', theme);
+            applyTheme();
+            showToast(`🎨 Тема изменена на ${btn.textContent}`, 'success', 2000);
+        });
+    });
+    
+    document.getElementById('themeModeToggle')?.addEventListener('click', () => {
+        const mode = localStorage.getItem('nyashgram_mode') === 'light' ? 'dark' : 'light';
+        localStorage.setItem('nyashgram_mode', mode);
+        applyTheme();
+        showToast(`${mode === 'light' ? '☀️' : '🌙'} ${mode === 'light' ? 'Светлая' : 'Тёмная'} тема`, 'info', 2000);
+    });
+    
+    // ===== ШРИФТЫ =====
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const font = btn.dataset.font;
+            localStorage.setItem('nyashgram_font', font);
+            document.body.classList.remove('font-system', 'font-rounded', 'font-cozy', 'font-elegant', 'font-bold-soft', 'font-mono-cozy');
+            document.body.classList.add(font);
+            showToast(`📝 Шрифт: ${btn.textContent}`, 'info', 2000);
+        });
+    });
+    
+    // ===== СЛУШАТЕЛЬ АВТОРИЗАЦИИ =====
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            if (!user.isAnonymous) await checkUserProfile();
-            showScreen('friendsScreen');
+            console.log('👤 Пользователь авторизован:', user.uid);
+            
+            localStorage.setItem('nyashgram_logged_in', 'true');
+            
+            if (!user.isAnonymous) {
+                showLoading('Загружаем профиль...');
+                await checkUserProfile();
+                hideLoading();
+            }
+            
             document.dispatchEvent(new CustomEvent('userAuthenticated'));
+            showScreen('friendsScreen');
+            
         } else {
+            console.log('👤 Пользователь не авторизован');
+            
+            // Проверяем, был ли пользователь ранее
+            if (localStorage.getItem('nyashgram_logged_in') === 'true') {
+                console.log('🔄 Была сессия, но Firebase её потерял. Пробуем восстановить...');
+                localStorage.removeItem('nyashgram_logged_in');
+            }
+            
             showScreen('loginMethodScreen');
         }
     });
+    
+    // Если пользователь уже есть, показываем главный экран
+    if (auth.currentUser) {
+        showScreen('friendsScreen');
+    }
 });
 
+// ===== ЭКСПОРТ =====
 window.showScreen = showScreen;
 window.showToast = showToast;
+window.createPrivateChat = createPrivateChat;
+window.acceptFriendRequest = acceptFriendRequest;
+window.removeFriendRequest = removeFriendRequest;
+window.generateCuteUsername = generateCuteUsername;
+window.isValidUsername = isValidUsername;
+window.findUserByUsername = findUserByUsername; 

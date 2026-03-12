@@ -73,34 +73,40 @@
     <div id="friendsList" class="contacts-list"></div>
   </section>
 
-  <section id="chatScreen" class="screen">
+ <section id="chatScreen" class="screen">
     <div class="status-bar-fill"></div>
     <div class="chat-header">
-      <button id="backBtn" class="icon-btn">←</button>
-      <div id="chatAvatar" class="avatar"></div>
-      <div class="chat-info">
-        <span id="chatContactName">...</span>
-        <span id="chatContactUsername"></span>
-      </div>
-      <button id="callFriendBtn" class="icon-btn" onclick="handleCallClick('audio')">📞</button>
-      <button id="chatMenuBtn" class="icon-btn">⋮</button>
+        <button id="backBtn" class="icon-btn">←</button>
+        <div id="chatAvatar" class="avatar">🐾</div>
+        <div class="chat-info">
+            <span id="chatContactName">Загрузка...</span>
+            <span id="chatContactUsername">@username</span>
+            <span id="typingIndicator" style="display:none; font-size: 10px; color: var(--main-color);">печатает...</span>
+        </div>
+        <button id="callFriendBtn" class="icon-btn">📞</button>
+        <button id="chatMenuBtn" class="icon-btn">⋮</button>
     </div>
-    
+
     <div id="chatActionsPanel" class="chat-actions-panel" style="display: none;">
-      <button id="pinChatActionBtn" class="action-btn">📌 Закрепить</button>
-      <button id="renameChatBtn" class="action-btn">✏️ Имя</button>
-      <button id="deleteChatBtn" class="action-btn">🗑️ Удалить</button>
+        <button id="pinChatActionBtn" class="action-btn">📌 Закрепить</button>
+        <button id="renameChatBtn" class="action-btn">✏️ Изменить имя</button>
+        <button id="deleteChatBtn" class="action-btn">🗑️ Очистить историю</button>
     </div>
-    
-    <div id="quickReplyPanel" class="quick-reply-panel"></div>
+
     <div id="chatArea" class="chat-area"></div>
     
-    <div class="message-input-area">
-      <button id="voiceRecordBtn" class="voice-btn">🎤</button>
-      <input type="text" id="messageInput" placeholder="сообщение..." />
-      <button id="sendMessageBtn" class="send-btn">➤</button>
+    <div id="quickReplyPanel" class="quick-reply-panel" style="display: none;"></div>
+
+    <div class="message-input-wrapper">
+        <div class="message-input-area">
+            <button id="toggleQuickPanelBtn" class="emoji-btn">🌸</button>
+            <input type="text" id="messageInput" placeholder="Сообщение..." autocomplete="off" />
+            <button id="voiceRecordBtn" class="voice-btn">🎤</button>
+            <button id="sendMessageBtn" class="send-btn" style="display: none;">➤</button>
+        </div>
     </div>
-  </section>
+</section>
+
 
   <section id="callScreen" class="screen call-screen" style="display: none;"></section>
 

@@ -4,37 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NyashGram — говори по-няшному 💗</title>
-  
-  <!-- Шрифты -->
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&family=Fredoka:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
-  
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-  
-  <!-- PeerJS для звонков -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  
-  <!-- Манифест и иконки -->
   <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="NyashGram">
   <meta name="theme-color" content="#ff9acb">
-  
-  <!-- Иконка -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23ff9acb'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white' font-family='Arial'%3E🐾%3C/text%3E%3C/svg%3E">
-  
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-pastel-pink font-cozy">
 
-  <!-- КОНТЕЙНЕР ДЛЯ ОБЛАЧКОВ (ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ) -->
   <div id="toastContainer" class="toast-container"></div>
 
-  <!-- ЭКРАН ЗАГРУЗКИ -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="loading-container">
       <h2>NyashGram 💗</h2>
@@ -44,15 +28,11 @@
       </div>
       <div id="loadingMessage" class="loading-message">Загружаем...</div>
       <div class="tips-container">
-        <div id="tipText" class="tip-text"></div>
-        <div class="tip-counter">
-          <span id="currentTip">1</span>/<span id="totalTips">25</span>
-        </div>
+        <div id="tipText" class="tip-text">💗 Говори по-няшному!</div>
       </div>
     </div>
   </div>
 
-  <!-- ЭКРАН ВЫБОРА ВХОДА -->
   <section id="loginMethodScreen" class="screen active">
     <div class="center-wrapper">
       <div class="glass-container">
@@ -64,177 +44,66 @@
     </div>
   </section>
 
-  <!-- ЭКРАН РЕГИСТРАЦИИ -->
-  <section id="emailRegisterScreen" class="screen">
-    <div class="center-wrapper">
-      <div class="glass-container">
-        <h2>NyashGram 💗</h2>
-        <p class="subtitle">регистрация</p>
-        <input type="text" id="regName" placeholder="имя" />
-        <input type="email" id="regEmail" placeholder="email" />
-        <input type="password" id="regPassword" placeholder="пароль" />
-        <input type="password" id="regConfirmPassword" placeholder="повтори" />
-        <div id="regError" class="error-message"></div>
-        <button id="registerBtn" class="active">✨ зарегистрироваться</button>
-        <button id="backToLoginFromRegBtn" class="text-btn">← назад</button>
-        <p>уже есть? <a href="#" id="showLoginLink">войти</a></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ЭКРАН ВХОДА -->
   <section id="emailLoginScreen" class="screen">
     <div class="center-wrapper">
       <div class="glass-container">
-        <h2>NyashGram 💗</h2>
-        <p class="subtitle">вход</p>
+        <h2>Вход 🌸</h2>
         <input type="email" id="loginEmail" placeholder="email" />
         <input type="password" id="loginPassword" placeholder="пароль" />
         <div id="loginError" class="error-message"></div>
         <button id="loginBtn" class="active">💕 войти</button>
         <button id="backFromEmailLoginBtn" class="text-btn">← назад</button>
-        <p>нет? <a href="#" id="showRegisterLink">регистрация</a></p>
       </div>
     </div>
   </section>
 
-  <!-- ЭКРАН ПОДТВЕРЖДЕНИЯ -->
-  <section id="verifyEmailScreen" class="screen">
-    <div class="center-wrapper">
-      <div class="glass-container">
-        <h2>NyashGram 💗</h2>
-        <p class="subtitle">подтверди email</p>
-        <div style="font-size: 64px; margin: 20px;">📧</div>
-        <p>мы отправили письмо</p>
-        <button id="checkVerificationBtn" class="active">✅ я подтвердил</button>
-        <button id="resendEmailBtn">🔄 отправить снова</button>
-        <button id="backToLoginFromVerifyBtn" class="text-btn">← назад</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ЭКРАН СОЗДАНИЯ ПРОФИЛЯ (НОВЫЙ) -->
-  <section id="createProfileScreen" class="screen">
-    <div class="center-wrapper">
-      <div class="glass-container">
-        <h2>NyashGram 💗</h2>
-        <p class="subtitle">создаём профиль</p>
-        
-        <div class="avatar-preview" id="profileAvatar">
-          <span class="avatar-emoji-big">🐾</span>
-        </div>
-        
-        <input type="text" id="profileName" placeholder="твоё имя" maxlength="30" />
-        <div class="username-field">
-          <span class="username-at">@</span>
-          <input type="text" id="profileUsername" placeholder="username" maxlength="50" />
-          <button id="generateUsernameBtn" class="generate-btn" title="сгенерировать">🎲</button>
-        </div>
-        <div class="username-hint">только a-z, 0-9, _, от 3 до 50 символов</div>
-        <div id="usernameError" class="error-message"></div>
-        
-        <button id="createProfileBtn" class="active" disabled>✨ создать профиль</button>
-        <button id="skipProfileBtn" class="text-btn">пропустить (будет user_123)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="friendsScreen" class="screen">
     <div class="status-bar-fill"></div>
     <div class="top-bar">
       <span class="top-title">NyashGram</span>
       <div class="header-buttons">
-        <button id="searchFriendsBtn" class="icon-btn" title="найти друга">🔍</button>
-        <button id="settingsBtn" class="icon-btn" title="настройки">⚙️</button>
+        <button id="searchFriendsBtn" class="icon-btn">🔍</button>
+        <button id="settingsBtn" class="icon-btn">⚙️</button>
       </div>
     </div>
-    
     <div class="tabs-container">
       <button class="tab-btn active" data-tab="chats">💬 чаты</button>
       <button class="tab-btn" data-tab="friends">👥 друзья</button>
-      <button class="tab-btn" data-tab="requests">
-        📨 заявки
-        <span id="requestsBadge" class="badge" style="display: none;">0</span>
-      </button>
     </div>
-    
     <div id="friendsList" class="contacts-list"></div>
   </section>
 
-  <!-- ЭКРАН ПОИСКА ДРУЗЕЙ -->
-  <section id="searchFriendsScreen" class="screen">
-    <div class="status-bar-fill"></div>
-    <div class="top-bar">
-      <button id="backFromSearchBtn" class="icon-btn">←</button>
-      <span class="top-title">поиск</span>
-      <div style="width:40px;"></div>
-    </div>
-    <div class="search-section">
-      <input type="text" id="searchUsersInput" class="search-input" placeholder="введи юзернейм..." autofocus />
-    </div>
-    <div id="searchResultsList" class="contacts-list"></div>
-  </section>
-
-  <!-- ЭКРАН ЧАТА -->
   <section id="chatScreen" class="screen">
     <div class="status-bar-fill"></div>
     <div class="chat-header">
       <button id="backBtn" class="icon-btn">←</button>
       <div id="chatAvatar" class="avatar"></div>
       <div class="chat-info">
-        <span id="chatContactName">загрузка...</span>
+        <span id="chatContactName">...</span>
         <span id="chatContactUsername"></span>
       </div>
-      <button id="toggleQuickPanelBtn" class="icon-btn">💬</button>
-      <button id="callFriendBtn" class="icon-btn" title="позвонить">📞</button>
+      <button id="callFriendBtn" class="icon-btn" onclick="handleCallClick('audio')">📞</button>
       <button id="chatMenuBtn" class="icon-btn">⋮</button>
     </div>
     
     <div id="chatActionsPanel" class="chat-actions-panel" style="display: none;">
-      <button id="pinChatActionBtn" class="action-btn">📌</button>
-      <button id="renameChatBtn" class="action-btn">✏️</button>
-      <button id="muteChatBtn" class="action-btn">🔇</button>
-      <button id="deleteChatBtn" class="action-btn">🗑️</button>
+      <button id="pinChatActionBtn" class="action-btn">📌 Закрепить</button>
+      <button id="renameChatBtn" class="action-btn">✏️ Имя</button>
+      <button id="deleteChatBtn" class="action-btn">🗑️ Удалить</button>
     </div>
     
     <div id="quickReplyPanel" class="quick-reply-panel"></div>
     <div id="chatArea" class="chat-area"></div>
     
     <div class="message-input-area">
-      <button id="voiceRecordBtn" class="voice-btn" title="записать голосовое">🎤</button>
+      <button id="voiceRecordBtn" class="voice-btn">🎤</button>
       <input type="text" id="messageInput" placeholder="сообщение..." />
       <button id="sendMessageBtn" class="send-btn">➤</button>
     </div>
   </section>
 
-  <!-- ЭКРАН ЗВОНКА (НОВЫЙ) -->
-  <section id="callScreen" class="screen call-screen" style="display: none;">
-    <div class="call-container">
-      <div class="call-header">
-        <button id="callBackBtn" class="call-icon-btn">←</button>
-        <div class="call-status">
-          <div class="call-avatar" id="callAvatar">👤</div>
-          <div class="call-name" id="callName">...</div>
-          <div class="call-state" id="callState">📞 Звоним...</div>
-        </div>
-        <div></div>
-      </div>
-      
-      <div class="call-timer" id="callTimer">00:00</div>
-      
-      <div class="call-controls">
-        <button id="callMuteBtn" class="call-control-btn">🎤</button>
-        <button id="callSpeakerBtn" class="call-control-btn">🔊</button>
-        <button id="callEndBtn" class="call-control-btn end-call">📞</button>
-        <button id="callAnswerBtn" class="call-control-btn answer-call" style="display: none;">✅ Ответить</button>
-      </div>
-      
-      <audio id="remoteAudio" autoplay></audio>
-    </div>
-  </section>
+  <section id="callScreen" class="screen call-screen" style="display: none;"></section>
 
-  <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
     <div class="status-bar-fill"></div>
     <div class="top-bar">
@@ -242,67 +111,28 @@
       <span class="top-title">настройки</span>
       <button id="logoutBtn" class="icon-btn">🚪</button>
     </div>
-    
     <div class="settings-wrapper">
-      <div class="settings-container">
-        <!-- ПРОФИЛЬ -->
-        <div class="glass-container">
-          <h3>👤 профиль</h3>
-          <div id="profileEmail" class="profile-email"></div>
-          <div id="profileType" class="profile-type"></div>
-          <input type="text" id="settingsName" placeholder="имя" />
-          <div class="username-row">
-            <input type="text" id="settingsUsername" placeholder="юзернейм" />
-            <button id="settingsGenerateBtn" class="generate-btn">🎲</button>
-          </div>
-          <button id="saveSettingsBtn" class="save-btn">сохранить</button>
-        </div>
-        
-        <!-- ТЕМЫ -->
-        <div class="glass-container">
-          <div class="theme-header">
-            <h3>🎨 тема</h3>
-            <button id="themeModeToggle" class="mode-btn">☀️</button>
-          </div>
-          <div class="theme-grid">
-            <button class="theme-btn" data-theme="pastel-pink">pink</button>
-            <button class="theme-btn" data-theme="milk-rose">rose</button>
-            <button class="theme-btn" data-theme="night-blue">blue</button>
-            <button class="theme-btn" data-theme="lo-fi-beige">beige</button>
-            <button class="theme-btn" data-theme="soft-lilac">lilac</button>
-            <button class="theme-btn" data-theme="forest-mint">mint</button>
-          </div>
-        </div>
-        
-        <!-- ШРИФТЫ -->
-        <div class="glass-container">
-          <h3>📝 шрифт</h3>
-          <div class="font-grid">
-            <button class="font-btn" data-font="font-system">system</button>
-            <button class="font-btn" data-font="font-rounded">rounded</button>
-            <button class="font-btn" data-font="font-cozy">cozy</button>
-            <button class="font-btn" data-font="font-elegant">elegant</button>
-            <button class="font-btn" data-font="font-bold-soft">bold</button>
-            <button class="font-btn" data-font="font-mono-cozy">mono</button>
-          </div>
+      <div class="glass-container">
+        <h3>🎨 Тема</h3>
+        <div class="theme-grid">
+           <button class="theme-btn" data-theme="pastel-pink">pink</button>
+           <button class="theme-btn" data-theme="night-blue">blue</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- МОДАЛКА ПЕРЕИМЕНОВАНИЯ -->
   <div id="renameModal" class="modal" style="display: none;">
     <div class="modal-content">
-      <h3>переименовать</h3>
+      <h3>Новое имя</h3>
       <input type="text" id="renameInput" />
       <div class="modal-buttons">
-        <button id="renameCancelBtn">отмена</button>
-        <button id="renameConfirmBtn">ок</button>
+        <button id="renameCancelBtn">Отмена</button>
+        <button id="renameConfirmBtn">Ок</button>
       </div>
     </div>
   </div>
 
-  <!-- СКРИПТЫ (ПРАВИЛЬНЫЙ ПОРЯДОК) -->
   <script src="app.js"></script>
   <script src="contacts.js"></script>
   <script src="chat.js"></script>

@@ -141,6 +141,7 @@ function saveCustomName(chatId, name) {
     if (typeof window.renderContacts === 'function') {
         window.renderContacts();
     }
+}
     
     console.log('✅ Имя сохранено:', chatId, name);
 }
@@ -627,6 +628,10 @@ function openBotChat(bot) {
     currentChatId = bot.id;
     currentChatType = 'bot';
     
+    if (typeof window.updateCallButtonsVisibility === 'function') {
+        window.updateCallButtonsVisibility();
+    }
+    
     const nameEl = document.getElementById('chatContactName');
     const usernameEl = document.getElementById('chatContactUsername');
     const avatarEl = document.getElementById('chatAvatar');
@@ -649,10 +654,6 @@ function openBotChat(bot) {
     if (quickPanel) {
         quickPanel.style.display = 'flex';
         showQuickReplies(bot.id);
-    }
-    
-    if (typeof window.updateCallButtonsVisibility === 'function') {
-        window.updateCallButtonsVisibility();
     }
     
     loadChatHistory(bot.id);
@@ -692,6 +693,10 @@ async function openFriendChat(friend) {
     currentChatId = friend.id;
     currentChatType = 'friend';
     
+    if (typeof window.updateCallButtonsVisibility === 'function') {
+        window.updateCallButtonsVisibility();
+    }
+    
     const nameEl = document.getElementById('chatContactName');
     const usernameEl = document.getElementById('chatContactUsername');
     const avatarEl = document.getElementById('chatAvatar');
@@ -700,9 +705,7 @@ async function openFriendChat(friend) {
     if (usernameEl) usernameEl.textContent = `@${friend.username}`;
     if (avatarEl) avatarEl.style.background = 'linear-gradient(135deg, #fbc2c2, #c2b9f0)';
     
-    if (typeof window.updateCallButtonsVisibility === 'function') {
-        window.updateCallButtonsVisibility();
-    }
+    
     
     try {
         if (!friend.chatId) {

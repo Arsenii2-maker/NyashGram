@@ -604,6 +604,10 @@ function openBotChat(bot) {
         showQuickReplies(bot.id);
         console.log('💬 Показана панель быстрых сообщений');
     }
+    // В openBotChat, после установки currentChatType:
+if (typeof window.updateCallButtonsVisibility === 'function') {
+    window.updateCallButtonsVisibility();
+}
     
     const audioCallBtn = document.getElementById('audioCallActionBtn');
     const videoCallBtn = document.getElementById('videoCallActionBtn');
@@ -700,6 +704,11 @@ async function openFriendChat(friend) {
         window.showToast?.('❌ Не удалось открыть чат', 'error');
         return;
     }
+    
+    // В openFriendChat, после установки currentChatType:
+if (typeof window.updateCallButtonsVisibility === 'function') {
+    window.updateCallButtonsVisibility();
+}
     
     loadDraft(currentChatId);
     

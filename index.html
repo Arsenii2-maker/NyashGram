@@ -8,15 +8,6 @@
   <!-- Шрифты -->
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=Quicksand:wght@400;500;600&family=Nunito:wght@400;500;600&family=Fredoka:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-  
-  <!-- PeerJS для звонков -->
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  
   <!-- Манифест и иконки -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
@@ -208,31 +199,30 @@
     </div>
   </section>
 
-  <!-- ЭКРАН ЗВОНКА (НОВЫЙ) -->
-  <section id="callScreen" class="screen call-screen" style="display: none;">
+  <!-- ЭКРАН ЗВОНКА -->
+<section id="callScreen" class="screen call-screen" style="display: none;">
     <div class="call-container">
-      <div class="call-header">
-        <button id="callBackBtn" class="call-icon-btn">←</button>
-        <div class="call-status">
-          <div class="call-avatar" id="callAvatar">👤</div>
-          <div class="call-name" id="callName">...</div>
-          <div class="call-state" id="callState">📞 Звоним...</div>
+        <div class="call-header">
+            <button id="callBackBtn" class="call-icon-btn">←</button>
+            <div class="call-status">
+                <div class="call-avatar" id="callAvatar">👤</div>
+                <div class="call-name" id="callName">...</div>
+                <div class="call-state" id="callState">📞 Звоним...</div>
+            </div>
+            <div></div>
         </div>
-        <div></div>
-      </div>
-      
-      <div class="call-timer" id="callTimer">00:00</div>
-      
-      <div class="call-controls">
-        <button id="callMuteBtn" class="call-control-btn">🎤</button>
-        <button id="callSpeakerBtn" class="call-control-btn">🔊</button>
-        <button id="callEndBtn" class="call-control-btn end-call">📞</button>
-        <button id="callAnswerBtn" class="call-control-btn answer-call" style="display: none;">✅ Ответить</button>
-      </div>
-      
-      <audio id="remoteAudio" autoplay></audio>
+        
+        <div class="call-timer" id="callTimer">00:00</div>
+        
+        <div class="call-controls">
+            <button id="callMuteBtn" class="call-control-btn">🎤</button>
+            <button id="callSpeakerBtn" class="call-control-btn">🔊</button>
+            <button id="callEndBtn" class="call-control-btn end-call">📞</button>
+        </div>
+        
+        <audio id="remoteAudio" autoplay></audio>
     </div>
-  </section>
+</section>
 
   <!-- ЭКРАН НАСТРОЕК -->
   <section id="settingsScreen" class="screen">
@@ -302,10 +292,17 @@
     </div>
   </div>
 
-  <!-- СКРИПТЫ (ПРАВИЛЬНЫЙ ПОРЯДОК) -->
-  <script src="app.js"></script>
-  <script src="contacts.js"></script>
-  <script src="chat.js"></script>
-  <script src="calls.js"></script>
-</body>
-</html>
+  <!-- Сначала Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+<!-- Потом PeerJS для звонков -->
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+<!-- ПОТОМ твои скрипты в правильном порядке -->
+<script src="app.js"></script>
+<script src="contacts.js"></script>
+<script src="chat.js"></script>
+<script src="calls.js"></script>

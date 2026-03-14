@@ -383,15 +383,18 @@ async function handleCallClick() {
     console.log('📞 Нажата кнопка звонка');
     console.log('📞 Текущий чат:', {
         type: window.currentChatType,
-        id: window.currentChatId
+        id: window.currentChatId,
+        exists: !!window.currentChat
     });
     
-    if (!window.currentChat) {
-        window.showToast?.('❌ Нет открытого чата', 'error');
+    if (!window.currentChat || !window.currentChatId) {
+        console.log('❌ Нет открытого чата');
+        window.showToast?.('❌ Сначала открой чат с другом', 'error');
         return;
     }
     
     if (window.currentChatType !== 'friend') {
+        console.log('❌ Это не друг, тип:', window.currentChatType);
         window.showToast?.('🤖 Ботам нельзя звонить', 'info');
         return;
     }

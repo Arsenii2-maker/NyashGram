@@ -1,4 +1,4 @@
-// app.js — ПОЛНАЯ ВЕРСИЯ С ЗАГРУЗКОЙ ВЕЗДЕ
+// app.js — ПОЛНАЯ ВЕРСИЯ С ИСПРАВЛЕННЫМ ГЕНЕРАТОРОМ
 
 // ===== FIREBASE КОНФИГ =====
 const firebaseConfig = {
@@ -10,7 +10,6 @@ const firebaseConfig = {
   appId: "1:54620743155:web:4db4690057b103ef859e86",
   measurementId: "G-KXXQTJVEGV"
 };
-
 // ===== ИНИЦИАЛИЗАЦИЯ FIREBASE =====
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -30,11 +29,177 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 let currentUser = null;
 let currentScreen = 'loginMethodScreen';
 
-// ===== МИЛЫЕ СЛОВА =====
-const cuteAdjectives = [ /* твои слова */ ];
-const cuteNouns = [ /* твои слова */ ];
-const EXTRA_RARE = ['honeycomb', 'butterfly', 'dragonfly', 'strawberry'];
-const SECRET_WORDS = ['parallelogram'];
+// ===== МИЛЫЕ АНГЛИЙСКИЕ СЛОВА ДЛЯ ГЕНЕРАЦИИ (БОЛЬШОЙ СПИСОК) =====
+const cuteAdjectives = [
+    'cute', 'sweet', 'soft', 'fluffy', 'gentle', 'little', 'tiny', 'lovely',
+    'adorable', 'charming', 'graceful', 'peaceful', 'sunny', 'rainy', 'cloudy',
+    'happy', 'joyful', 'merry', 'bright', 'shiny', 'glowing', 'sparkly',
+    'dreamy', 'magic', 'mystic', 'cosmic', 'stellar', 'lunar', 'solar',
+    'berry', 'honey', 'sugar', 'candy', 'cookie', 'muffin', 'cupcake',
+    'pink', 'purple', 'rainbow', 'pastel', 'velvet', 'silky', 'smooth',
+    'bouncy', 'jumpy', 'wiggly', 'cuddly', 'snuggly', 'huggable', 'kissable',
+    'fuzzy', 'warm', 'cozy', 'comfy', 'snug', 'softy', 'squishy',
+    'twinkly', 'glittery', 'shimmery', 'dewy', 'dewdrop', 'dewdrops',
+    'bubbly', 'foamy', 'creamy', 'milky', 'buttery', 'caramel', 'toffee',
+    'peachy', 'plum', 'berry', 'cherry', 'apple', 'pear', 'orange',
+    'minty', 'spicy', 'cinnamon', 'vanilla', 'chocolate', 'caramel'
+];
+
+const cuteNouns = [
+    // Животные
+    'cat', 'kitty', 'kitten', 'dog', 'puppy', 'bunny', 'rabbit',
+    'fox', 'panda', 'bear', 'koala', 'otter', 'deer', 'fawn',
+    'bird', 'robin', 'finch', 'duck', 'owl', 'hedgehog', 'squirrel',
+    'hamster', 'gerbil', 'guinea', 'piggy', 'ferret', 'chinchilla',
+    'parrot', 'parakeet', 'canary', 'budgie', 'cockatiel',
+    'turtle', 'tortoise', 'lizard', 'gecko', 'frog', 'toad',
+    'butterfly', 'ladybug', 'bee', 'dragonfly', 'firefly',
+    
+    // Природа
+    'sun', 'moon', 'star', 'cloud', 'rain', 'rainbow', 'flower',
+    'rose', 'lily', 'daisy', 'cherry', 'blossom', 'leaf', 'petal',
+    'ocean', 'wave', 'river', 'forest', 'meadow', 'garden',
+    'lavender', 'jasmine', 'violet', 'orchid', 'tulip', 'daffodil',
+    'snow', 'frost', 'ice', 'crystal', 'gem', 'pearl', 'diamond',
+    
+    // Еда
+    'berry', 'strawberry', 'raspberry', 'blueberry', 'cherry',
+    'peach', 'mango', 'coconut', 'honey', 'sugar', 'candy',
+    'cookie', 'biscuit', 'muffin', 'cupcake', 'donut', 'cake',
+    'pie', 'tart', 'pudding', 'custard', 'icecream', 'gelato',
+    'chocolate', 'caramel', 'toffee', 'fudge', 'marshmallow',
+    'wafer', 'brownie', 'blondie', 'macaron', 'meringue',
+    
+    // Магия и фантазия
+    'fairy', 'elf', 'pixie', 'sprite', 'dream', 'magic', 'spell',
+    'wish', 'hope', 'joy', 'bliss', 'peace', 'love', 'heart',
+    'unicorn', 'dragon', 'phoenix', 'pegasus', 'griffin',
+    'mermaid', 'siren', 'nymph', 'dryad', 'sylph',
+    
+    // Вещи
+    'ribbon', 'bow', 'button', 'bubble', 'glitter', 'sparkle',
+    'dewdrop', 'snowflake', 'raindrop', 'feather', 'pillow',
+    'blanket', 'socks', 'mittens', 'scarf', 'hat', 'cap',
+    'ball', 'balloon', 'kite', 'toy', 'doll', 'plushie',
+    
+    // Времена года и погода
+    'spring', 'summer', 'autumn', 'winter', 'morning', 'dawn',
+    'dusk', 'twilight', 'night', 'midnight', 'daybreak',
+    
+    // Эмоции и состояния
+    'smile', 'giggle', 'laugh', 'chuckle', 'grin', 'beam',
+    'dream', 'wish', 'hope', 'faith', 'trust', 'care',
+    
+    // Абстрактные
+    'whisper', 'echo', 'harmony', 'melody', 'rhythm', 'song',
+    'story', 'tale', 'legend', 'myth', 'fable', 'fairytale'
+];
+
+// Редкие слова (2% шанс)
+const rareWords = [
+    'honeycomb', 'butterfly', 'dragonfly', 'strawberry',
+    'blueberry', 'raspberry', 'blackberry', 'cranberry',
+    'lavender', 'jasmine', 'gardenia', 'magnolia',
+    'seashell', 'starfish', 'jellyfish', 'seahorse',
+    'raincloud', 'thunder', 'lightning', 'hurricane',
+    'earthquake', 'volcano', 'waterfall', 'cascade',
+    'diamond', 'emerald', 'sapphire', 'ruby', 'amethyst',
+    'crystal', 'opal', 'topaz', 'garnet', 'turquoise'
+];
+
+// Очень редкие слова (1% шанс)
+const veryRareWords = [
+    'butterfly', 'dragonfly', 'honeycomb', 'strawberry',
+    'waterfall', 'rainbow', 'starlight', 'moonlight',
+    'sunshine', 'daydream', 'nightmare', 'wonderland',
+    'neverland', 'camelot', 'avalon', 'el dorado'
+];
+
+// Секретные слова (0.5% шанс)
+const secretWords = [
+    'parallelogram', 'rhombus', 'quadrilateral', 'polygon',
+    'nebula', 'galaxy', 'constellation', 'asteroid',
+    'meteor', 'comet', 'eclipse', 'solstice', 'equinox',
+    'phoenix', 'griffin', 'chimera', 'hydra', 'pegasus'
+];
+
+// ===== ГЕНЕРАЦИЯ МИЛОГО ЮЗЕРНЕЙМА (ИСПРАВЛЕНО) =====
+function generateCuteUsername() {
+    console.log('🎲 Генерация username...');
+    
+    // Определяем редкость
+    const rand = Math.random();
+    
+    // Секретные (0.5% шанс)
+    if (rand < 0.005) {
+        const word = secretWords[Math.floor(Math.random() * secretWords.length)];
+        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
+        console.log('🎉 СЕКРЕТНЫЙ username!');
+        return `${word}${num}`;
+    }
+    
+    // Очень редкие (1% шанс)
+    if (rand < 0.015) {
+        const word = veryRareWords[Math.floor(Math.random() * veryRareWords.length)];
+        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
+        console.log('✨ ОЧЕНЬ РЕДКИЙ username!');
+        return `${word}${num}`;
+    }
+    
+    // Редкие (2% шанс)
+    if (rand < 0.035) {
+        const word = rareWords[Math.floor(Math.random() * rareWords.length)];
+        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
+        console.log('🌟 РЕДКИЙ username!');
+        return `${word}${num}`;
+    }
+    
+    // Обычные (96.5% шанс)
+    const adj = cuteAdjectives[Math.floor(Math.random() * cuteAdjectives.length)];
+    const noun = cuteNouns[Math.floor(Math.random() * cuteNouns.length)];
+    
+    // Разные разделители
+    const separators = ['_', '.', ''];
+    const separator = separators[Math.floor(Math.random() * separators.length)];
+    
+    // Добавляем цифры иногда (30% шанс)
+    let num = '';
+    if (Math.random() < 0.3) {
+        num = Math.floor(Math.random() * 100).toString();
+    }
+    
+    let username = `${adj}${separator}${noun}${num}`;
+    username = username.toLowerCase();
+    
+    // Обрезаем если слишком длинный
+    if (username.length > 50) {
+        username = username.substring(0, 50);
+    }
+    
+    console.log('✅ Сгенерирован username:', username);
+    return username;
+}
+
+// ===== ПРОВЕРКА ВАЛИДНОСТИ ЮЗЕРНЕЙМА =====
+function isValidUsername(username) {
+    if (!username || username.length < 3 || username.length > 50) return false;
+    return /^[a-zA-Z0-9_]+$/.test(username);
+}
+
+// ===== ПРОВЕРКА УНИКАЛЬНОСТИ =====
+async function isUsernameAvailable(username) {
+    if (!isValidUsername(username)) return false;
+    try {
+        const doc = await db.collection('usernames').doc(username).get();
+        return !doc.exists;
+    } catch (error) {
+        console.error('❌ Ошибка проверки username:', error);
+        return false;
+    }
+}
+
+// ===== ОСТАЛЬНЫЕ ФУНКЦИИ APP.JS (БЕЗ ИЗМЕНЕНИЙ) =====
+// ... (весь остальной код app.js остаётся таким же)
 
 // ===== МИЛЫЕ ОБЛАЧКА =====
 function showToast(message, type = 'info', duration = 3000) {
@@ -74,43 +239,6 @@ function applyTheme() {
     if (modeBtn) modeBtn.textContent = mode === 'light' ? '☀️' : '🌙';
 }
 
-// ===== ГЕНЕРАЦИЯ ЮЗЕРНЕЙМА =====
-function generateCuteUsername() {
-    if (Math.random() < 0.005) {
-        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
-        return `parallelogram${num}`;
-    }
-    if (Math.random() < 0.01) {
-        const rare = EXTRA_RARE[Math.floor(Math.random() * EXTRA_RARE.length)];
-        const num = Math.random() < 0.3 ? Math.floor(Math.random() * 100) : '';
-        return `${rare}${num}`;
-    }
-    const adj = cuteAdjectives[Math.floor(Math.random() * cuteAdjectives.length)];
-    const noun = cuteNouns[Math.floor(Math.random() * cuteNouns.length)];
-    let num = '';
-    if (Math.random() < 0.4) num = Math.floor(Math.random() * 100).toString();
-    let username = `${adj}_${noun}${num}`.toLowerCase().replace(/-/g, '_');
-    if (username.length > 50) username = username.substring(0, 50);
-    return username;
-}
-
-// ===== ПРОВЕРКА ЮЗЕРНЕЙМА =====
-function isValidUsername(username) {
-    if (!username || username.length < 3 || username.length > 50) return false;
-    return /^[a-zA-Z0-9_]+$/.test(username);
-}
-
-// ===== ПРОВЕРКА УНИКАЛЬНОСТИ =====
-async function isUsernameAvailable(username) {
-    if (!isValidUsername(username)) return false;
-    try {
-        const doc = await db.collection('usernames').doc(username).get();
-        return !doc.exists;
-    } catch (error) {
-        console.error('❌ Ошибка проверки username:', error);
-        return false;
-    }
-}
 
 // ===== СОХРАНЕНИЕ ПРОФИЛЯ =====
 async function saveUserProfile(name, username) {

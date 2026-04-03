@@ -1,4 +1,4 @@
-// contacts.js — ПОЛНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
+
 
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp', emoji: '🩷' },

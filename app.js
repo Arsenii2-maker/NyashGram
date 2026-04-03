@@ -19,6 +19,29 @@ const storage = firebase.storage();
 window.auth = auth;
 window.db = db;
 window.storage = storage;
+// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ПЕРЕИМЕНОВАНИЯ И ЗАКРЕПЛЕНИЯ =====
+let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
+let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
+
+window.customNames = customNames;
+window.pinnedChats = pinnedChats;
+// ===== СОХРАНЕНИЕ КАСТОМНОГО ИМЕНИ =====
+function saveCustomName(chatId, name) {
+    if (name && name.trim()) {
+        customNames[chatId] = name.trim();
+    } else {
+        delete customNames[chatId];
+    }
+    localStorage.setItem('nyashgram_custom_names', JSON.stringify(customNames));
+    window.customNames = customNames;
+    
+    // Обновляем отображение в контактах
+    if (typeof window.renderContacts === 'function') {
+        window.renderContacts();
+    }
+    console.log('✅ Имя сохранено:', chatId, name);
+}
+window.saveCustomName = saveCustomName;
 
 // ===== СОХРАНЯЕМ СЕССИЮ =====
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)

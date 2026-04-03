@@ -143,7 +143,6 @@ function saveCustomName(chatId, name) {
     }
 }
     
-    console.log('✅ Имя сохранено:', chatId, name);
 
 
 function showRenameModal() {

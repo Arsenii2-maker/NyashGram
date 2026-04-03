@@ -1,5 +1,3 @@
-
-
 const botUsers = [
   { id: 'nyashhelp', name: 'NyashHelp', username: 'nyashhelp', emoji: '🩷' },
   { id: 'nyashtalk', name: 'NyashTalk', username: 'nyashtalk', emoji: '🌸' },
@@ -13,11 +11,6 @@ let friendRequests = [];
 let pinnedChats = JSON.parse(localStorage.getItem('nyashgram_pinned_chats') || '[]');
 let customNames = JSON.parse(localStorage.getItem('nyashgram_custom_names') || '{}');
 let chatDrafts = JSON.parse(localStorage.getItem('nyashgram_chat_drafts') || '{}');
-
-window.customNames = customNames;
-window.pinnedChats = pinnedChats;
-window.friendsList = friendsList;
-window.friendRequests = friendRequests;
 
 function getBotGradient(botId) {
   const gradients = {
